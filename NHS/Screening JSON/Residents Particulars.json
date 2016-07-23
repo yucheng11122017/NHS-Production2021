@@ -1,0 +1,335 @@
+{
+    "groups":[
+              {
+              "id":"group-id",
+              "title":"Resident Particulars",
+              "sections":[
+                          {
+                          "id":"section-0",
+                          "fields":[
+                                    {
+                                    "id":"resident_name",
+                                    "title":"Name *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"nric",
+                                    "title":"NRIC (Eg.S1234567A) *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":60
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"birth_year",
+                                    "title":"Year of Birth (yyyy) *",
+                                    "type":"number",
+                                    "input_type": "number",
+                                    "size":{
+                                    "width":40
+                                    },
+                                    "validations":{
+                                    "required":true,
+                                    "max_length":4
+                                    }
+                                    },
+                                    {
+                                    "id":"gender",
+                                    "title":"Gender *",
+                                    "type":"select",
+                                    "size":{
+                                    "width":27
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    },
+                                    "values":[
+                                              {
+                                              "id":0,
+                                              "title":"M",
+                                              "default":true
+                                              },
+                                              {
+                                              "id":1,
+                                              "title":"F"
+                                              }
+                                              ]
+                                    },
+                                    {
+                                    "id":"contact_no",
+                                    "title":"Contact No *",
+                                    "type":"number",
+                                    "input_type": "number",
+                                    "size":{
+                                    "width":50
+                                    },
+                                    "validations":{
+                                    "required":true,
+                                    "max_length":8
+                                    }
+                                    },
+                                    {
+                                    "id":"contact_no2",
+                                    "title":"Contact No (2)",
+                                    "type":"number",
+                                    "input_type": "number",
+                                    "size":{
+                                    "width":50
+                                    },
+                                    "validations":{
+                                    "required":true,
+                                    "max_length":8
+                                    }
+                                    },
+                                    {
+                                    "id":"ethnicity_id",
+                                    "title":"Ethnicity",
+                                    "type":"select",
+                                    "size":{
+                                    "width":40
+                                    },
+                                    "validations":{
+                                    "required":false
+                                    },
+                                    "values":[
+                                              {
+                                              "id":0,
+                                              "title":"Chinese",
+                                              "default":true
+                                              },
+                                              {
+                                              "id":1,
+                                              "title":"Indian"
+                                              },
+                                              {
+                                              "id":2,
+                                              "title":"Malay"
+                                              },
+                                              {
+                                              "id":3,
+                                              "title":"Others"
+                                              }
+                                              ]
+                                    },
+                                    {
+                                    "id":"spoken_language",
+                                    "title":"Spoken Language *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    },
+                                    },
+                                    {
+                                    "id":"marital_status",
+                                    "title":"Marital Status *",
+                                    "type":"select",
+                                    "size":{
+                                    "width":50
+                                    },
+                                    "validations":{
+                                    "required":true,
+                                    },
+                                    "values":[
+                                              {
+                                              "id":0,
+                                              "title":"Single",
+                                              "default":true
+                                              },
+                                              {
+                                              "id":1,
+                                              "title":"Married"
+                                              },
+                                              {
+                                              "id":2,
+                                              "title":"Divorced"
+                                              },
+                                              {
+                                              "id":3,
+                                              "title":"Separated"
+                                              },
+                                              {
+                                              "id":4,
+                                              "title":"Widowed"
+                                              }
+                                              ]
+                                    },
+                                    {
+                                    "id":"housing_owned_rented",
+                                    "title":"Housing Type *",
+                                    "type":"select",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true,
+                                    },
+                                    "values":[
+                                              {
+                                              "id":0,
+                                              "title":"Owned, 1-room",
+                                              "default":false
+                                              },
+                                              {
+                                              "id":1,
+                                              "title":"Owned, 2-room"
+                                              },
+                                              {
+                                              "id":2,
+                                              "title":"Owned, 3-room"
+                                              },
+                                              {
+                                              "id":3,
+                                              "title":"Owned, 4-room"
+                                              },
+                                              {
+                                              "id":4,
+                                              "title":"Owned, 5-room"
+                                              },
+                                              {
+                                              "id":5,
+                                              "title":"Rental, 1-room"
+                                              },
+                                              {
+                                              "id":6,
+                                              "title":"Rental, 2-room"
+                                              },
+                                              {
+                                              "id":7,
+                                              "title":"Rental, 3-room"
+                                              },
+                                              {
+                                              "id":8,
+                                              "title":"Rental, 4-room"
+                                              }
+                                              ]
+                                    },
+                                    {
+                                    "id":"highest_edu_lvl",
+                                    "title":"Highest education level",
+                                    "type":"select",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":false,
+                                    },
+                                    "values":[
+                                              {
+                                              "id":0,
+                                              "title":"ITE/Pre-U/JC",
+                                              "default":false
+                                              },
+                                              {
+                                              "id":1,
+                                              "title":"No formal qualifications"
+                                              },
+                                              {
+                                              "id":2,
+                                              "title":"Primary"
+                                              },
+                                              {
+                                              "id":3,
+                                              "title":"Secondary"
+                                              },
+                                              {
+                                              "id":4,
+                                              "title":"University"
+                                              },
+                                              ]
+                                    }
+                                  ]
+                          }]
+              },
+              {
+                "id":"group-id",
+                "title":"Address",
+                "sections":[
+                            {
+                            "id":"section-0",
+                            "fields":[
+                                    {
+                                    "id":"address_street",
+                                    "title":"Street *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"address_block",
+                                    "title":"Block *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"address_unit",
+                                    "title":"Unit * - {Add # infront of textfield)",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"address_postcode",
+                                    "title":"Post code (Eg. 123456)",
+                                    "type":"number",
+                                    "input_type": "number",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true,
+                                    "max_length":6
+                                    }
+                                    },
+                                    {
+                                    "id":"address_num_years",
+                                    "title":"# of Years stayed at current block",
+                                    "type":"number",
+                                    "input_type": "number",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true,
+                                    "max_length":6
+                                    }
+                                    },
+                                    {
+                                    "id":"submit_button",
+                                    "title":"Submit",
+                                    "type":"button",
+                                    "size":{
+                                    "width":100,
+                                    "height":1
+                                    }
+                                    }
+                                    ]
+                          }
+                          ]
+              }
+              ]
+}

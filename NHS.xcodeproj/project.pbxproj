@@ -12,12 +12,15 @@
 		C3C2F30AA2C4B174444C3807 /* Pods_NHSUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 209345AB6DD8B9F1E078D209 /* Pods_NHSUITests.framework */; };
 		E120E4081D431E9B002DBC7E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E4071D431E9B002DBC7E /* main.m */; };
 		E120E40B1D431E9B002DBC7E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E40A1D431E9B002DBC7E /* AppDelegate.m */; };
-		E120E40E1D431E9B002DBC7E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E40D1D431E9B002DBC7E /* ViewController.m */; };
 		E120E4111D431E9B002DBC7E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E120E40F1D431E9B002DBC7E /* Main.storyboard */; };
 		E120E4131D431E9B002DBC7E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E120E4121D431E9B002DBC7E /* Assets.xcassets */; };
 		E120E4161D431E9B002DBC7E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E120E4141D431E9B002DBC7E /* LaunchScreen.storyboard */; };
 		E120E4211D431E9B002DBC7E /* NHSTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E4201D431E9B002DBC7E /* NHSTests.m */; };
 		E120E42C1D431E9B002DBC7E /* NHSUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E42B1D431E9B002DBC7E /* NHSUITests.m */; };
+		E1334EE21D432B5800A43539 /* Login.json in Resources */ = {isa = PBXBuildFile; fileRef = E1334EDF1D432B5800A43539 /* Login.json */; };
+		E1334EE31D432B5800A43539 /* Pre-registration.json in Resources */ = {isa = PBXBuildFile; fileRef = E1334EE01D432B5800A43539 /* Pre-registration.json */; };
+		E1334EE41D432B5800A43539 /* Screening JSON in Resources */ = {isa = PBXBuildFile; fileRef = E1334EE11D432B5800A43539 /* Screening JSON */; };
+		E1334EE71D432CAA00A43539 /* PreRegistrationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */; };
 		E1A987441D4327FE005FC83D /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873A1D4327FE005FC83D /* Assets */; };
 		E1A987451D4327FE005FC83D /* Basic-ObjC in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873B1D4327FE005FC83D /* Basic-ObjC */; };
 		E1A987461D4327FE005FC83D /* Basic-Swift in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873C1D4327FE005FC83D /* Basic-Swift */; };
@@ -61,8 +64,6 @@
 		E120E4071D431E9B002DBC7E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E120E4091D431E9B002DBC7E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E120E40A1D431E9B002DBC7E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		E120E40C1D431E9B002DBC7E /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		E120E40D1D431E9B002DBC7E /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		E120E4101D431E9B002DBC7E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E120E4121D431E9B002DBC7E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E120E4151D431E9B002DBC7E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -73,6 +74,11 @@
 		E120E4271D431E9B002DBC7E /* NHSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NHSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E120E42B1D431E9B002DBC7E /* NHSUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NHSUITests.m; sourceTree = "<group>"; };
 		E120E42D1D431E9B002DBC7E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E1334EDF1D432B5800A43539 /* Login.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Login.json; sourceTree = "<group>"; };
+		E1334EE01D432B5800A43539 /* Pre-registration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "Pre-registration.json"; sourceTree = "<group>"; };
+		E1334EE11D432B5800A43539 /* Screening JSON */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Screening JSON"; sourceTree = "<group>"; };
+		E1334EE51D432CAA00A43539 /* PreRegistrationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreRegistrationViewController.h; sourceTree = "<group>"; };
+		E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreRegistrationViewController.m; sourceTree = "<group>"; };
 		E1A9873A1D4327FE005FC83D /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
 		E1A9873B1D4327FE005FC83D /* Basic-ObjC */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Basic-ObjC"; sourceTree = "<group>"; };
 		E1A9873C1D4327FE005FC83D /* Basic-Swift */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Basic-Swift"; sourceTree = "<group>"; };
@@ -171,10 +177,13 @@
 		E120E4051D431E9B002DBC7E /* NHS */ = {
 			isa = PBXGroup;
 			children = (
+				E1334EDF1D432B5800A43539 /* Login.json */,
+				E1334EE01D432B5800A43539 /* Pre-registration.json */,
+				E1334EE11D432B5800A43539 /* Screening JSON */,
 				E120E4091D431E9B002DBC7E /* AppDelegate.h */,
 				E120E40A1D431E9B002DBC7E /* AppDelegate.m */,
-				E120E40C1D431E9B002DBC7E /* ViewController.h */,
-				E120E40D1D431E9B002DBC7E /* ViewController.m */,
+				E1334EE51D432CAA00A43539 /* PreRegistrationViewController.h */,
+				E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */,
 				E120E40F1D431E9B002DBC7E /* Main.storyboard */,
 				E120E4121D431E9B002DBC7E /* Assets.xcassets */,
 				E120E4141D431E9B002DBC7E /* LaunchScreen.storyboard */,
@@ -328,11 +337,14 @@
 				E1A987471D4327FE005FC83D /* CustomField in Resources */,
 				E1A987451D4327FE005FC83D /* Basic-ObjC in Resources */,
 				E1A987481D4327FE005FC83D /* Images in Resources */,
+				E1334EE41D432B5800A43539 /* Screening JSON in Resources */,
 				E1A987491D4327FE005FC83D /* iPhone-Storyboard in Resources */,
 				E1A9874B1D4327FE005FC83D /* ModalForm in Resources */,
 				E120E4131D431E9B002DBC7E /* Assets.xcassets in Resources */,
+				E1334EE21D432B5800A43539 /* Login.json in Resources */,
 				E1A9874A1D4327FE005FC83D /* LoginDemo in Resources */,
 				E1A9874C1D4327FE005FC83D /* Payment in Resources */,
+				E1334EE31D432B5800A43539 /* Pre-registration.json in Resources */,
 				E120E4111D431E9B002DBC7E /* Main.storyboard in Resources */,
 				E1A987461D4327FE005FC83D /* Basic-Swift in Resources */,
 			);
@@ -482,9 +494,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E120E40E1D431E9B002DBC7E /* ViewController.m in Sources */,
 				E120E40B1D431E9B002DBC7E /* AppDelegate.m in Sources */,
 				E120E4081D431E9B002DBC7E /* main.m in Sources */,
+				E1334EE71D432CAA00A43539 /* PreRegistrationViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
