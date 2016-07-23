@@ -1,0 +1,271 @@
+{
+    "groups":[
+              {
+              "id":"group-id",
+              "title":"Patient Data",
+              "sections":[
+                          {
+                          "id":"section-0",
+                          "fields":[
+                                    {
+                                    "id":"patient_name",
+                                    "title":"Patient Name *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"nric",
+                                    "title":"NRIC *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":40
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    
+                                    {
+                                    "id":"dob_year",
+                                    "title":"DoB Year *",
+                                    "type":"number",
+                                    "input_type": "number",
+                                    "size":{
+                                    "width":33
+                                    },
+                                    "validations":{
+                                    "required":true,
+                                    "max_length":4
+                                    }
+                                    },
+                                    {
+                                    "id":"gender",
+                                    "title":"Gender *",
+                                    "type":"select",
+                                    "size":{
+                                    "width":27
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    },
+                                    "values":[
+                                              {
+                                              "id":0,
+                                              "title":"M",
+                                              "default":true
+                                              },
+                                              {
+                                              "id":1,
+                                              "title":"F"
+                                              }
+                                              ]
+                                    },
+                                    ]
+                          }
+                          ]
+              },
+              {
+              "id":"group-id",
+              "title":"Spoken Language",
+              "sections":[
+                          {
+                          "id":"section-0",
+                          "fields":[
+                                    {
+                                    "id":"spoken_language",
+                                    "title":"Spoken Language *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"spoken_language_others",
+                                    "title":"Spoken Language Others",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    }
+                                    }
+                                    ]
+                          }
+                          
+                          ]
+              },
+              {
+              "id":"group-id",
+              "title":"Contact Info",
+              "sections":[
+                          {
+                          "id":"section-0",
+                          "fields":[
+                                    {
+                                    "id":"contact_number",
+                                    "title":"Contact Number *",
+                                    "type":"number",
+                                    "input_type": "number",
+                                    "size":{
+                                    "width":50
+                                    },
+                                    "validations":{
+                                    "required":true,
+                                    "max_length":8
+                                    }
+                                    },
+                                    {
+                                    "id":"address_street",
+                                    "title":"Address Street *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"address_block",
+                                    "title":"Address Block *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":50
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"address_unit",
+                                    "title":"Address Unit *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":50
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"address_postcode",
+                                    "title":"Address Post Code *",
+                                    "type":"number",
+                                    "input_type": "number",
+                                    "size":{
+                                    "width":50
+                                    },
+                                    "validations":{
+                                    "required":true,
+                                    "max_length":6
+                                    }
+                                    }
+                                    ]
+                          }
+                          
+                          ]
+              },
+              {
+              "id":"group-id",
+              "title":"Required Services",
+              "sections":[
+                          {
+                          "id":"section-0",
+                          "fields":[
+                                    {
+                                    "id":"other_required_services",
+                                    "title":"Other Required Services",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    }
+                                    }
+                                    ]
+                          }
+                          
+                          ]
+              },
+              {
+              "id":"group-id",
+              "title":"Others",
+              "sections":[
+                          {
+                          "id":"section-0",
+                          "fields":[
+                                    {
+                                    "id":"preferred_date",
+                                    "title":"Preferred Date *",
+                                    "type":"date",
+                                    "size":{
+                                    "width":50
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"preferred_time",
+                                    "title":"Preferred Time *",
+                                    "type":"select",
+                                    "size":{
+                                    "width":50
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    },
+                                    "values":[
+                                              {
+                                              "id":0,
+                                              "title":"9-11",
+                                              "default":true
+                                              },
+                                              {
+                                              "id":1,
+                                              "title":"11-1"
+                                              },
+                                              {
+                                              "id":2,
+                                              "title":"1-3"
+                                              }
+                                              ]
+                                    },
+                                    {
+                                    "id":"neighbourhood",
+                                    "title":"Neighbourhood *",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    }
+                                    },
+                                    {
+                                    "id":"remarks",
+                                    "title":"Remarks",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    }
+                                    },
+                                    {
+                                    "id":"submit_button",
+                                    "title":"Submit",
+                                    "type":"button",
+                                    "size":{
+                                    "width":100,
+                                    "height":1
+                                    }
+                                    }
+                                    ]
+                          }
+                          ]
+              }
+              ]
+}

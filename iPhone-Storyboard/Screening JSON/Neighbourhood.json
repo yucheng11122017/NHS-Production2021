@@ -1,0 +1,64 @@
+{
+    "groups":[
+              {
+              "id":"group-id",
+              "title":"Screening Location",
+              "sections":[
+                          {
+                          "id":"section-0",
+                          "fields":[
+                                    {
+                                    "id":"neighbourhood_location",
+                                    "title":"Screening Location/Neighbourhood *",
+                                    "type":"select",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":true
+                                    },
+                                    "values":[
+                                              {
+                                              "id":0,
+                                              "title":"Bukit Merah",
+                                              "default":true
+                                              },
+                                              {
+                                              "id":1,
+                                              "title":"Eunos Crescent"
+                                              },
+                                              {
+                                              "id":2,
+                                              "title":"Marine Terrace"
+                                              },
+                                              {
+                                              "id":3,
+                                              "title":"Taman Jurong"
+                                              },
+                                              {
+                                              "id":4,
+                                              "title":"Volunteer Training"
+                                              },
+                                              {
+                                              "id":5,
+                                              "title":"Others"
+                                              }
+                                              ]
+                                    },
+                                    {
+                                    "id":"neighbourhood_location_others",
+                                    "title":"Others",
+                                    "type":"text",
+                                    "size":{
+                                    "width":100
+                                    },
+                                    "validations":{
+                                    "required":false
+                                    }
+                                    }
+                                  	]
+                      }]
+            }]
+  }
+                                    
+                                  
