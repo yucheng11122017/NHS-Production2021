@@ -2737,6 +2737,29 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
 				LastUpgradeCheck = 0700;
+				TargetAttributes = {
+					2226CA9B655BA21666F3E054 = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					2F2BB5C8BB4789603D767210 = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					4DDCB962297EAD930BB64064 = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					5396CCE7DAE8E0290E6D2C5D = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					655C4F3E1F8F1F5A5352093B = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					90577D45856062FA2F24FEFA = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					CF696438D4DD3B199CD38857 = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+				};
 			};
 			buildConfigurationList = 3A1D5B4B39480FD0940AEF60 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -3331,6 +3354,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F6F410BC4040E7B29F3272FC /* HYPMathParser.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -3348,6 +3372,7 @@
 				MODULEMAP_FILE = "Target Support Files/HYPMathParser/HYPMathParser.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = HYPMathParser;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3389,6 +3414,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 96F7DF8B7762CB784230CEE7 /* HYPNorwegianSSN.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -3406,6 +3432,7 @@
 				MODULEMAP_FILE = "Target Support Files/HYPNorwegianSSN/HYPNorwegianSSN.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = HYPNorwegianSSN;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3605,6 +3632,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 96F7DF8B7762CB784230CEE7 /* HYPNorwegianSSN.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -3622,6 +3650,7 @@
 				MODULEMAP_FILE = "Target Support Files/HYPNorwegianSSN/HYPNorwegianSSN.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = HYPNorwegianSSN;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3634,6 +3663,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F6F410BC4040E7B29F3272FC /* HYPMathParser.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -3651,6 +3681,7 @@
 				MODULEMAP_FILE = "Target Support Files/HYPMathParser/HYPMathParser.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = HYPMathParser;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3663,6 +3694,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2919C1087498548B40C2BC50 /* NSDictionary-ANDYSafeValue.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -3680,6 +3712,7 @@
 				MODULEMAP_FILE = "Target Support Files/NSDictionary-ANDYSafeValue/NSDictionary-ANDYSafeValue.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = NSDictionary_ANDYSafeValue;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3808,6 +3841,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E20CB3FFEB868C59903150B4 /* NSString-HYPRelationshipParser.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -3825,6 +3859,7 @@
 				MODULEMAP_FILE = "Target Support Files/NSString-HYPRelationshipParser/NSString-HYPRelationshipParser.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = NSString_HYPRelationshipParser;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3866,6 +3901,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 418C2238E8A0E65F7C8DA753 /* HYP8601.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -3883,6 +3919,7 @@
 				MODULEMAP_FILE = "Target Support Files/HYP8601/HYP8601.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = HYP8601;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -4111,6 +4148,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E20CB3FFEB868C59903150B4 /* NSString-HYPRelationshipParser.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4128,6 +4166,7 @@
 				MODULEMAP_FILE = "Target Support Files/NSString-HYPRelationshipParser/NSString-HYPRelationshipParser.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = NSString_HYPRelationshipParser;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -4169,6 +4208,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D67FB2A8D48BC58F9B930862 /* Hex.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -4186,6 +4226,7 @@
 				MODULEMAP_FILE = "Target Support Files/Hex/Hex.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = Hex;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -4511,6 +4552,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D67FB2A8D48BC58F9B930862 /* Hex.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4528,6 +4570,7 @@
 				MODULEMAP_FILE = "Target Support Files/Hex/Hex.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = Hex;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -4540,6 +4583,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2919C1087498548B40C2BC50 /* NSDictionary-ANDYSafeValue.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -4557,6 +4601,7 @@
 				MODULEMAP_FILE = "Target Support Files/NSDictionary-ANDYSafeValue/NSDictionary-ANDYSafeValue.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = NSDictionary_ANDYSafeValue;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -4569,6 +4614,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 418C2238E8A0E65F7C8DA753 /* HYP8601.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -4586,6 +4632,7 @@
 				MODULEMAP_FILE = "Target Support Files/HYP8601/HYP8601.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = HYP8601;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -4689,6 +4736,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 186241B474814D6A6D6D0D3E /* HYPNorwegianAccountNumber.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4706,6 +4754,7 @@
 				MODULEMAP_FILE = "Target Support Files/HYPNorwegianAccountNumber/HYPNorwegianAccountNumber.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = HYPNorwegianAccountNumber;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -4718,6 +4767,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 186241B474814D6A6D6D0D3E /* HYPNorwegianAccountNumber.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -4735,6 +4785,7 @@
 				MODULEMAP_FILE = "Target Support Files/HYPNorwegianAccountNumber/HYPNorwegianAccountNumber.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = HYPNorwegianAccountNumber;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
