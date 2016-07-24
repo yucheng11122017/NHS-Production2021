@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5396CCE7DAE8E0290E6D2C5D"
+               BlueprintIdentifier = "C728193E23357C033C252ED7"
                BuildableName = "NSDictionary_ANDYSafeValue.framework"
                BlueprintName = "NSDictionary-ANDYSafeValue"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5396CCE7DAE8E0290E6D2C5D"
+            BlueprintIdentifier = "C728193E23357C033C252ED7"
             BuildableName = "NSDictionary_ANDYSafeValue.framework"
             BlueprintName = "NSDictionary-ANDYSafeValue"
             ReferencedContainer = "container:Pods.xcodeproj">

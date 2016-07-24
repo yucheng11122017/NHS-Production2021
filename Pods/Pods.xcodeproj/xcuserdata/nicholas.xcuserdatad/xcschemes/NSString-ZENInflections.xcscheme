@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2D732B0F76BF82192A213B5A"
+               BlueprintIdentifier = "83F2EB7DE202CE0CA4A3FED0"
                BuildableName = "NSString_ZENInflections.framework"
                BlueprintName = "NSString-ZENInflections"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2D732B0F76BF82192A213B5A"
+            BlueprintIdentifier = "83F2EB7DE202CE0CA4A3FED0"
             BuildableName = "NSString_ZENInflections.framework"
             BlueprintName = "NSString-ZENInflections"
             ReferencedContainer = "container:Pods.xcodeproj">

@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E043F7AEF371C869B741BFB2"
+               BlueprintIdentifier = "735E528EB33493F0DC942A17"
                BuildableName = "NSDictionary_HYPNestedAttributes.framework"
                BlueprintName = "NSDictionary-HYPNestedAttributes"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E043F7AEF371C869B741BFB2"
+            BlueprintIdentifier = "735E528EB33493F0DC942A17"
             BuildableName = "NSDictionary_HYPNestedAttributes.framework"
             BlueprintName = "NSDictionary-HYPNestedAttributes"
             ReferencedContainer = "container:Pods.xcodeproj">

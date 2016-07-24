@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ABFD2577464B4DE5D326AB41"
+               BlueprintIdentifier = "6A6041BB9A8B3387D837127A"
                BuildableName = "UIViewController_HYPKeyboardToolbar.framework"
                BlueprintName = "UIViewController-HYPKeyboardToolbar"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ABFD2577464B4DE5D326AB41"
+            BlueprintIdentifier = "6A6041BB9A8B3387D837127A"
             BuildableName = "UIViewController_HYPKeyboardToolbar.framework"
             BlueprintName = "UIViewController-HYPKeyboardToolbar"
             ReferencedContainer = "container:Pods.xcodeproj">

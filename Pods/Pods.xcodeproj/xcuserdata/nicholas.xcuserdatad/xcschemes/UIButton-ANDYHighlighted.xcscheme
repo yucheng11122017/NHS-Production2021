@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3A1005F24F6EB6DA52846858"
+               BlueprintIdentifier = "C8B6C6098A995F2883DEFFF3"
                BuildableName = "UIButton_ANDYHighlighted.framework"
                BlueprintName = "UIButton-ANDYHighlighted"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3A1005F24F6EB6DA52846858"
+            BlueprintIdentifier = "C8B6C6098A995F2883DEFFF3"
             BuildableName = "UIButton_ANDYHighlighted.framework"
             BlueprintName = "UIButton-ANDYHighlighted"
             ReferencedContainer = "container:Pods.xcodeproj">

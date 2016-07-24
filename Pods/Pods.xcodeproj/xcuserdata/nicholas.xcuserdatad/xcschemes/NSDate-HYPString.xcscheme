@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DA05BA3036887159D0594837"
+               BlueprintIdentifier = "A5C0124F2FC7C91D5BFAC259"
                BuildableName = "NSDate_HYPString.framework"
                BlueprintName = "NSDate-HYPString"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DA05BA3036887159D0594837"
+            BlueprintIdentifier = "A5C0124F2FC7C91D5BFAC259"
             BuildableName = "NSDate_HYPString.framework"
             BlueprintName = "NSDate-HYPString"
             ReferencedContainer = "container:Pods.xcodeproj">

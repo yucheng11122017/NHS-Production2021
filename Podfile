@@ -9,6 +9,7 @@ abstract_target 'CocoaPods' do
   pod 'NSDate-HYPString'
   pod 'NSDictionary-HYPImmutable'
   pod 'HYPImagePicker'
+  pod 'AFNetworking', '~> 3.1'
 
   target 'NHS' do
     # Uncomment this line if you're using Swift or would like to use dynamic frameworks
