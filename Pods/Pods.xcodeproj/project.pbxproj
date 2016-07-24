@@ -2985,6 +2985,29 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
 				LastUpgradeCheck = 0700;
+				TargetAttributes = {
+					2226CA9B655BA21666F3E054 = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					2F2BB5C8BB4789603D767210 = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					4DDCB962297EAD930BB64064 = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					5396CCE7DAE8E0290E6D2C5D = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					655C4F3E1F8F1F5A5352093B = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					90577D45856062FA2F24FEFA = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+					CF696438D4DD3B199CD38857 = {
+						DevelopmentTeam = MWF73R64GS;
+					};
+				};
 			};
 			buildConfigurationList = 18CD314CD5290319FFE0E81A /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -3626,6 +3649,7 @@
 				MODULEMAP_FILE = "Target Support Files/HYPNorwegianSSN/HYPNorwegianSSN.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = HYPNorwegianSSN;
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3825,6 +3849,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CEF4A517E07960D68E986B0F /* Pods-NHSUITests.debug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -3858,6 +3883,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 475606D4F5511CD6F0A385BE /* UIButton-ANDYHighlighted.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -3887,6 +3913,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D7B0D8F554E80A0FE58BBF09 /* NSDate-HYPString.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4032,6 +4059,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5460C497D8C0A0216F0C814B /* HYP8601.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -4090,6 +4118,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FF14B09D2807D61250441A2F /* HYPNorwegianAccountNumber.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4326,6 +4355,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5460C497D8C0A0216F0C814B /* HYP8601.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4384,6 +4414,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E2A63556CE83A5FF70A55B0F /* NSString-HYPFormula.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -4742,6 +4773,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E602607701A7341A1270AA56 /* Pods-NHSUITests.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4775,6 +4807,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 072E2A87FBCE170C918B4DC3 /* NSDictionary-HYPNestedAttributes.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -4804,6 +4837,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E30ED5DC47B6984ED65DC59D /* HYPImagePicker.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4962,6 +4996,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FEFCA0072A1C30B071ACC732 /* NSString-ZENInflections.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -4991,6 +5026,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 072E2A87FBCE170C918B4DC3 /* NSDictionary-HYPNestedAttributes.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
