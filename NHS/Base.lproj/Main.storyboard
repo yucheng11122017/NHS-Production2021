@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="VRC-uk-dfE">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="VRC-uk-dfE">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Home Page-->
@@ -82,7 +83,7 @@
         <!--Pre-Registration List-->
         <scene sceneID="fdc-x9-7WQ">
             <objects>
-                <tableViewController id="7ZX-WM-BXG" sceneMemberID="viewController">
+                <tableViewController id="7ZX-WM-BXG" customClass="PatientPreRegTableViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="q3J-Jh-w4z">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -109,10 +110,49 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <segue destination="hTm-Z1-GNs" kind="show" identifier="preRegPatientListToPatientDataSegue" id="FCW-lB-SWi"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Esh-rj-buo" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="291" y="58"/>
+        </scene>
+        <!--Patient Details-->
+        <scene sceneID="rSc-OC-Db8">
+            <objects>
+                <viewController id="hTm-Z1-GNs" customClass="PreRegPatientDetailsViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="VLh-v2-0ak"/>
+                        <viewControllerLayoutGuide type="bottom" id="jHQ-xH-uVl"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="7rJ-Ej-Vmw">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Patient Data:" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="DoF-Fh-BCa">
+                                <rect key="frame" x="0.0" y="64" width="600" height="536"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="DoF-Fh-BCa" firstAttribute="top" secondItem="VLh-v2-0ak" secondAttribute="bottom" id="9bW-NV-qxx"/>
+                            <constraint firstItem="DoF-Fh-BCa" firstAttribute="leading" secondItem="7rJ-Ej-Vmw" secondAttribute="leadingMargin" constant="-20" id="AzH-yr-5Bl"/>
+                            <constraint firstItem="DoF-Fh-BCa" firstAttribute="bottom" secondItem="jHQ-xH-uVl" secondAttribute="top" id="c7e-SK-iwJ"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="DoF-Fh-BCa" secondAttribute="trailing" constant="-20" id="qzb-zQ-DYv"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Patient Details" id="5Da-63-xv5"/>
+                    <connections>
+                        <outlet property="textView" destination="DoF-Fh-BCa" id="Sd3-ch-BdG"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hcy-Fs-r1l" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1049" y="-475"/>
         </scene>
         <!--Pre Registration View Controller-->
         <scene sceneID="O1U-Sw-QGF">
@@ -146,12 +186,12 @@
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5pO-Jp-CQe" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1014" y="74"/>
+            <point key="canvasLocation" x="1084" y="238"/>
         </scene>
         <!--Screening List-->
         <scene sceneID="DfH-18-phz">
             <objects>
-                <tableViewController id="3ah-3q-ezO" sceneMemberID="viewController">
+                <tableViewController id="3ah-3q-ezO" customClass="PatientScreeningListTableViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="f5S-ku-WDD">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

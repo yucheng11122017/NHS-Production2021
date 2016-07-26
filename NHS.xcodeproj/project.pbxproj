@@ -36,6 +36,9 @@
 		E1EFB0931D433C3400510532 /* PatientScreeningListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1EFB0921D433C3400510532 /* PatientScreeningListTableViewController.m */; };
 		E1EFB0961D4341B700510532 /* ScreeningSectionsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1EFB0951D4341B700510532 /* ScreeningSectionsTableViewController.m */; };
 		E1EFB0991D43423400510532 /* ScreeningQuestionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1EFB0981D43423400510532 /* ScreeningQuestionViewController.m */; };
+		E1FCF9321D45B77F00478F7B /* ServerComm.m in Sources */ = {isa = PBXBuildFile; fileRef = E1FCF9311D45B77F00478F7B /* ServerComm.m */; };
+		E1FCF9351D45BBFC00478F7B /* PatientPreRegTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1FCF9341D45BBFC00478F7B /* PatientPreRegTableViewController.m */; };
+		E1FCF9381D45DE2000478F7B /* PreRegPatientDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1FCF9371D45DE2000478F7B /* PreRegPatientDetailsViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,6 +105,12 @@
 		E1EFB0951D4341B700510532 /* ScreeningSectionsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreeningSectionsTableViewController.m; sourceTree = "<group>"; };
 		E1EFB0971D43423400510532 /* ScreeningQuestionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreeningQuestionViewController.h; sourceTree = "<group>"; };
 		E1EFB0981D43423400510532 /* ScreeningQuestionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreeningQuestionViewController.m; sourceTree = "<group>"; };
+		E1FCF9301D45B77F00478F7B /* ServerComm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerComm.h; sourceTree = "<group>"; };
+		E1FCF9311D45B77F00478F7B /* ServerComm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerComm.m; sourceTree = "<group>"; };
+		E1FCF9331D45BBFC00478F7B /* PatientPreRegTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PatientPreRegTableViewController.h; sourceTree = "<group>"; };
+		E1FCF9341D45BBFC00478F7B /* PatientPreRegTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PatientPreRegTableViewController.m; sourceTree = "<group>"; };
+		E1FCF9361D45DE2000478F7B /* PreRegPatientDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreRegPatientDetailsViewController.h; sourceTree = "<group>"; };
+		E1FCF9371D45DE2000478F7B /* PreRegPatientDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreRegPatientDetailsViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,16 +202,10 @@
 				E1334EDF1D432B5800A43539 /* Login.json */,
 				E1334EE01D432B5800A43539 /* Pre-registration.json */,
 				E1E690961D4345F2007FEC1C /* Screening JSON */,
+				E1FCF92F1D45B76100478F7B /* Models */,
 				E120E4091D431E9B002DBC7E /* AppDelegate.h */,
 				E120E40A1D431E9B002DBC7E /* AppDelegate.m */,
-				E1334EE51D432CAA00A43539 /* PreRegistrationViewController.h */,
-				E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */,
-				E1EFB0911D433C3400510532 /* PatientScreeningListTableViewController.h */,
-				E1EFB0921D433C3400510532 /* PatientScreeningListTableViewController.m */,
-				E1EFB0941D4341B700510532 /* ScreeningSectionsTableViewController.h */,
-				E1EFB0951D4341B700510532 /* ScreeningSectionsTableViewController.m */,
-				E1EFB0971D43423400510532 /* ScreeningQuestionViewController.h */,
-				E1EFB0981D43423400510532 /* ScreeningQuestionViewController.m */,
+				E1FCF92E1D45B75200478F7B /* ViewControllers */,
 				E120E40F1D431E9B002DBC7E /* Main.storyboard */,
 				E120E4121D431E9B002DBC7E /* Assets.xcassets */,
 				E120E4141D431E9B002DBC7E /* LaunchScreen.storyboard */,
@@ -246,6 +249,34 @@
 				E1E690991D4345FC007FEC1C /* Residents Particulars.json */,
 			);
 			name = "Screening JSON";
+			sourceTree = "<group>";
+		};
+		E1FCF92E1D45B75200478F7B /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				E1334EE51D432CAA00A43539 /* PreRegistrationViewController.h */,
+				E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */,
+				E1FCF9331D45BBFC00478F7B /* PatientPreRegTableViewController.h */,
+				E1FCF9341D45BBFC00478F7B /* PatientPreRegTableViewController.m */,
+				E1FCF9361D45DE2000478F7B /* PreRegPatientDetailsViewController.h */,
+				E1FCF9371D45DE2000478F7B /* PreRegPatientDetailsViewController.m */,
+				E1EFB0911D433C3400510532 /* PatientScreeningListTableViewController.h */,
+				E1EFB0921D433C3400510532 /* PatientScreeningListTableViewController.m */,
+				E1EFB0941D4341B700510532 /* ScreeningSectionsTableViewController.h */,
+				E1EFB0951D4341B700510532 /* ScreeningSectionsTableViewController.m */,
+				E1EFB0971D43423400510532 /* ScreeningQuestionViewController.h */,
+				E1EFB0981D43423400510532 /* ScreeningQuestionViewController.m */,
+			);
+			name = ViewControllers;
+			sourceTree = "<group>";
+		};
+		E1FCF92F1D45B76100478F7B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E1FCF9301D45B77F00478F7B /* ServerComm.h */,
+				E1FCF9311D45B77F00478F7B /* ServerComm.m */,
+			);
+			name = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -530,6 +561,9 @@
 				E1EFB0931D433C3400510532 /* PatientScreeningListTableViewController.m in Sources */,
 				E1EFB0991D43423400510532 /* ScreeningQuestionViewController.m in Sources */,
 				E1334EE71D432CAA00A43539 /* PreRegistrationViewController.m in Sources */,
+				E1FCF9381D45DE2000478F7B /* PreRegPatientDetailsViewController.m in Sources */,
+				E1FCF9321D45B77F00478F7B /* ServerComm.m in Sources */,
+				E1FCF9351D45BBFC00478F7B /* PatientPreRegTableViewController.m in Sources */,
 				E1EFB0961D4341B700510532 /* ScreeningSectionsTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
