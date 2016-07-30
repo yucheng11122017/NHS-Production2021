@@ -10,6 +10,7 @@ abstract_target 'CocoaPods' do
   pod 'NSDictionary-HYPImmutable'
   pod 'HYPImagePicker'
   pod 'AFNetworking', '~> 3.1'
+  pod 'XLForm', '~> 3.2'
 
   target 'NHS' do
     # Uncomment this line if you're using Swift or would like to use dynamic frameworks
