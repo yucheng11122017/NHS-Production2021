@@ -88,9 +88,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <searchBar key="tableHeaderView" contentMode="redraw" id="iBG-eB-xmC">
+                            <rect key="frame" x="0.0" y="64" width="600" height="44"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <textInputTraits key="textInputTraits"/>
+                            <connections>
+                                <outlet property="delegate" destination="7ZX-WM-BXG" id="Acs-DO-Vo2"/>
+                            </connections>
+                        </searchBar>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="Soz-uh-dWO">
-                                <rect key="frame" x="0.0" y="92" width="600" height="44"/>
+                                <rect key="frame" x="0.0" y="136" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Soz-uh-dWO" id="u5A-aU-0QG">
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="43"/>
@@ -106,15 +114,26 @@
                     <navigationItem key="navigationItem" title="Pre-Registration List" id="Jsa-Uo-91f">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="sV4-ob-2rf">
                             <connections>
-                                <segue destination="eqp-S0-fJw" kind="presentation" id="Ek9-RR-70D"/>
+                                <action selector="addBtnPressed:" destination="7ZX-WM-BXG" id="V3p-wt-Bmf"/>
+                                <segue destination="2yp-yu-OdE" kind="show" id="bTs-vX-wVb"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="searchDisplayController" destination="WeB-Sw-Zuk" id="9ce-R5-FgP"/>
                         <segue destination="hTm-Z1-GNs" kind="show" identifier="preRegPatientListToPatientDataSegue" id="FCW-lB-SWi"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Esh-rj-buo" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="WeB-Sw-Zuk">
+                    <connections>
+                        <outlet property="delegate" destination="7ZX-WM-BXG" id="Doi-9s-ni5"/>
+                        <outlet property="searchBar" destination="iBG-eB-xmC" id="IWA-hM-v2d"/>
+                        <outlet property="searchContentsController" destination="7ZX-WM-BXG" id="qEu-2b-4Ew"/>
+                        <outlet property="searchResultsDataSource" destination="7ZX-WM-BXG" id="jcC-AH-8M1"/>
+                        <outlet property="searchResultsDelegate" destination="7ZX-WM-BXG" id="o7B-AR-G1U"/>
+                    </connections>
+                </searchDisplayController>
             </objects>
             <point key="canvasLocation" x="291" y="58"/>
         </scene>
@@ -186,7 +205,60 @@
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5pO-Jp-CQe" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1084" y="238"/>
+            <point key="canvasLocation" x="1718" y="-234"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="5uC-Ep-V9e">
+            <objects>
+                <navigationController id="6lt-nE-hrg" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="5Ly-Fg-5bi">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="n7l-82-fcl" kind="relationship" relationship="rootViewController" id="cmM-5I-ViY"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aD4-Bp-RRJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1697" y="1396"/>
+        </scene>
+        <!--Pre Reg Form View Controller-->
+        <scene sceneID="tWp-1V-9Cg">
+            <objects>
+                <viewController id="2yp-yu-OdE" customClass="PreRegFormViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="8t5-2L-Ogt"/>
+                        <viewControllerLayoutGuide type="bottom" id="DXH-0N-Fck"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="b11-UQ-ynv">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lme-GW-AsE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1039" y="178"/>
+        </scene>
+        <!--Temp View Controller-->
+        <scene sceneID="s1V-Pz-l58">
+            <objects>
+                <viewController id="n7l-82-fcl" customClass="tempViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="ztE-4j-b7t"/>
+                        <viewControllerLayoutGuide type="bottom" id="lV1-Io-gfd"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="h5q-6W-mCM">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="hhT-oi-4nC"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="UAq-2F-I7s" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-877" y="2042"/>
         </scene>
         <!--Screening List-->
         <scene sceneID="DfH-18-phz">

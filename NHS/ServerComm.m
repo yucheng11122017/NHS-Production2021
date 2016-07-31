@@ -44,7 +44,7 @@
     if(self) {
         
         self.responseSerializer = [AFJSONResponseSerializer serializer];
-        self.requestSerializer = [AFHTTPRequestSerializer serializer];
+        self.requestSerializer = [AFJSONRequestSerializer serializer];
         self.responseSerializer.acceptableContentTypes = [NSSet setWithArray:@[@"text/html",@"application/json"]];
         
     }
@@ -75,20 +75,137 @@
       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
     
     NSInteger opCode = 52;
-    NSDictionary *dict = [[NSDictionary alloc]
+    NSDictionary *url = [[NSDictionary alloc]
                           initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *param = [[NSMutableDictionary alloc] init];
-    NSDictionary *param2 = [[NSMutableDictionary alloc] init];
+    NSDictionary *dict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    param = @{@"resident_id" : patientID};
-    param2 = @{@"data": param};
+    dict = @{@"resident_id" : patientID};
+    dataDict = @{@"data": dict};
     
-    [self GET:[dict objectForKey:@"op_code"]
-   parameters:param2
+    NSLog(@"%@",dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+   parameters:dataDict
      progress:progressBlock
       success:successBlock
       failure:[self checkForBadHTTP:failBlock]];
 }
+
+#pragma mark - Pre-registration methods
+
+- (void)postPersonalInfoWithDict:(NSDictionary *) personalInfoDict
+                      progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 53;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    
+    dataDict = @{@"data": personalInfoDict};
+    
+    NSLog(@"%@", dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+   parameters:dataDict
+     progress:progressBlock
+      success:successBlock
+      failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void)postSpokenLangWithDict:(NSDictionary *) spokenLangDict
+                   progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                    successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                    andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 54;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    
+    dataDict = @{@"data": spokenLangDict};
+    
+    NSLog(@"%@", dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void)postContactInfoWithDict:(NSDictionary *) contactInfoDict
+                 progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                  andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 55;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    
+    dataDict = @{@"data": contactInfoDict};
+    
+    NSLog(@"%@", dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void)postReqServWithDict:(NSDictionary *) reqServDict
+                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 56;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    
+    dataDict = @{@"data": reqServDict};
+    
+    NSLog(@"%@", dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void)postOthersWithDict:(NSDictionary *) othersDict
+              progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+               successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+               andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 57;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    
+    dataDict = @{@"data": othersDict};
+    
+    NSLog(@"%@", dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+#pragma mark -
+
 
 // returns a base64 encoded string of given NSData.
 - (NSString *)base64forData:(NSData *)theData {

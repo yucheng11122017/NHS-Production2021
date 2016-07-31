@@ -45,7 +45,34 @@
 - (void)getPatientFacetimeAddress:(NSInteger)patientID
                         notifName:(NSString *)notifName;
 
-#pragma mark Activity Selection methods
+#pragma mark - Pre-Registration
+
+- (void)postPersonalInfoWithDict:(NSDictionary *) personalInfoDict
+                     progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+- (void)postSpokenLangWithDict:(NSDictionary *) spokenLangDict
+                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+- (void)postContactInfoWithDict:(NSDictionary *) contactInfoDict
+                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+- (void)postReqServWithDict:(NSDictionary *) reqServDict
+                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+- (void)postOthersWithDict:(NSDictionary *) othersDict
+              progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+               successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+               andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+#pragma mark - Activity Selection methods
 
 - (void)getAllActivitySelectionsForPatientID:(NSInteger)patientID
                                    notifName:(NSString *)notifName;

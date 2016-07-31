@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "07EBDB8E3558D5B90B099444"
+               BlueprintIdentifier = "5393F8499CE9239336405992"
                BuildableName = "NSString_HYPWordExtractor.framework"
                BlueprintName = "NSString-HYPWordExtractor"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "07EBDB8E3558D5B90B099444"
+            BlueprintIdentifier = "5393F8499CE9239336405992"
             BuildableName = "NSString_HYPWordExtractor.framework"
             BlueprintName = "NSString-HYPWordExtractor"
             ReferencedContainer = "container:Pods.xcodeproj">

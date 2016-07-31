@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6C83D646AE44542E0BB38FFD"
+               BlueprintIdentifier = "D8C47413CFD26C7A51889551"
                BuildableName = "NSString_HYPFormula.framework"
                BlueprintName = "NSString-HYPFormula"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6C83D646AE44542E0BB38FFD"
+            BlueprintIdentifier = "D8C47413CFD26C7A51889551"
             BuildableName = "NSString_HYPFormula.framework"
             BlueprintName = "NSString-HYPFormula"
             ReferencedContainer = "container:Pods.xcodeproj">

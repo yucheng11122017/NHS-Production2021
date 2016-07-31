@@ -1,0 +1,6 @@
+framework module Pods_CocoaPods_NHS {
+  umbrella header "Pods-CocoaPods-NHS-umbrella.h"
+
+  export *
+  module * { export * }
+}

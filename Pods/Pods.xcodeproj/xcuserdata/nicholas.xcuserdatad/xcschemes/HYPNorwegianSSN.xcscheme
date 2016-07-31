@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '5183D7C901D91CA85E1F1F3A'
+               BlueprintIdentifier = 'AE5BA80F56A8460D6BC8F558'
                BlueprintName = 'HYPNorwegianSSN'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'HYPNorwegianSSN.framework'>

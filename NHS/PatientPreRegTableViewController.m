@@ -9,6 +9,7 @@
 #import "PatientPreRegTableViewController.h"
 #import "PreRegPatientDetailsViewController.h"
 #import "ServerComm.h"
+#import "PreRegFormViewController.h"
 
 @interface PatientPreRegTableViewController ()
 
@@ -18,6 +19,7 @@
 
 @implementation PatientPreRegTableViewController {
     NSNumber *selectedPatientID;
+    NSArray *searchResults;
 }
 
 - (void)viewDidLoad {
@@ -44,7 +46,12 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 3;
+    if (tableView == self.searchDisplayController.searchResultsTableView) {
+        return [searchResults count];
+        
+    } else {
+        return [self.patientNames count];
+    }
 }
 
 
@@ -57,9 +64,11 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
     }
-    NSDictionary* patient = self.patients[indexPath.row];
-    
-    [cell.textLabel setText:[patient objectForKey:@"resident_name"]];
+    if(tableView == self.searchDisplayController.searchResultsTableView) {
+        [cell.textLabel setText:[searchResults objectAtIndex:indexPath.row]];
+    } else {
+        [cell.textLabel setText:[self.patientNames objectAtIndex:indexPath.row]];
+    }
     
     
     return cell;
@@ -75,6 +84,9 @@
     //    [self.navigationController popViewControllerAnimated:YES];      //Go back to Assessment Page
 }
 
+- (IBAction)addBtnPressed:(id)sender {
+    
+}
 
 
 /*
@@ -121,10 +133,16 @@
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
+        int i;
         NSArray *patients = responseObject[0];      //somehow double brackets... (())
 //        self.patients = [self createPatients:patients];
         self.patients = [[NSMutableArray alloc] initWithArray:patients];
         NSLog(@"%@", patients);
+        for (i=0; i<[self.patients count]; i++) {
+            [self.patientNames addObject:[[self.patients objectAtIndex:i] objectForKey:@"resident_name"]];
+        }
+        NSLog(@"%@", self.patientNames);
+        
 //        [[AppData sharedAppData] setPatients:self.patients];
         [self.tableView reloadData];
     };
@@ -144,6 +162,25 @@
     [client getPatient:[self progressBlock]
           successBlock:[self successBlock]
           andFailBlock:[self errorBlock]];
+}
+
+#pragma mark - Search stuffs
+
+-(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
+{
+    [self filterContentForSearchText:searchString
+                               scope:[[self.searchDisplayController.searchBar scopeButtonTitles]
+                                      objectAtIndex:[self.searchDisplayController.searchBar
+                                                     selectedScopeButtonIndex]]];
+    
+    return YES;
+}
+
+
+- (void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope
+{
+    NSPredicate *resultPredicate = [NSPredicate predicateWithFormat:@"name contains[c] %@", searchText];
+    searchResults = [self.patientNames filteredArrayUsingPredicate:resultPredicate];
 }
 
 #pragma mark - Util methods

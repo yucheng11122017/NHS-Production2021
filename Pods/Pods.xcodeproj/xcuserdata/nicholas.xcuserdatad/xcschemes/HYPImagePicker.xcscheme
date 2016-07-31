@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '5CBB0CB7753666D832A073A1'
+               BlueprintIdentifier = '874D8FCC09AB9DBA2C091041'
                BlueprintName = 'HYPImagePicker'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'HYPImagePicker.framework'>
