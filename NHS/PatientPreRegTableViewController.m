@@ -14,24 +14,35 @@
 @interface PatientPreRegTableViewController ()
 
 @property (strong, nonatomic) NSMutableArray *patientNames;
+@property (strong, nonatomic) NSMutableDictionary *patientNameWithSection;
 
 @end
 
 @implementation PatientPreRegTableViewController {
     NSNumber *selectedPatientID;
     NSArray *searchResults;
+    NSArray *patientSectionTitles;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.patientNames = [[NSMutableArray alloc] init];
-    [self getAllPatients];
+    self.patientNameWithSection = [[NSMutableDictionary alloc] init];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(refreshTable:)
+                                                 name:@"refreshPreRegPatientTable"
+                                               object:nil];
     
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+    [self getAllPatients];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -42,16 +53,25 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
+    return [patientSectionTitles count];
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return [patientSectionTitles objectAtIndex:section];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (tableView == self.searchDisplayController.searchResultsTableView) {
-        return [searchResults count];
-        
-    } else {
-        return [self.patientNames count];
-    }
+
+    // Return the number of rows in the section.
+    NSString *sectionTitle = [patientSectionTitles objectAtIndex:section];
+    NSArray *sectionPatient = [self.patientNameWithSection objectForKey:sectionTitle];
+    return [sectionPatient count];
+}
+
+- (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
+{
+    return patientSectionTitles;
 }
 
 
@@ -64,12 +84,12 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
     }
-    if(tableView == self.searchDisplayController.searchResultsTableView) {
-        [cell.textLabel setText:[searchResults objectAtIndex:indexPath.row]];
-    } else {
-        [cell.textLabel setText:[self.patientNames objectAtIndex:indexPath.row]];
-    }
     
+    // Configure the cell...
+    NSString *sectionTitle = [patientSectionTitles objectAtIndex:indexPath.section];
+    NSArray *patientNamesInSection = [self.patientNameWithSection objectForKey:sectionTitle];
+    NSString *patientName = [patientNamesInSection objectAtIndex:indexPath.row];
+    cell.textLabel.text = patientName;
     
     return cell;
 }
@@ -127,23 +147,24 @@
 
 - (void (^)(NSProgress *downloadProgress))progressBlock {
     return ^(NSProgress *downloadProgress) {
-        NSLog(@"Patients GET Request Started. In Progress.");
+//        NSLog(@"Patients GET Request Started. In Progress.");
     };
 }
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         int i;
+        [self.patientNames removeAllObjects];   //reset this array first
         NSArray *patients = responseObject[0];      //somehow double brackets... (())
-//        self.patients = [self createPatients:patients];
         self.patients = [[NSMutableArray alloc] initWithArray:patients];
-        NSLog(@"%@", patients);
+        
         for (i=0; i<[self.patients count]; i++) {
             [self.patientNames addObject:[[self.patients objectAtIndex:i] objectForKey:@"resident_name"]];
         }
-        NSLog(@"%@", self.patientNames);
+        //sort alphabetically
+        self.patientNames = [[self.patientNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] mutableCopy];
         
-//        [[AppData sharedAppData] setPatients:self.patients];
+        [self putNamesIntoSections];
         [self.tableView reloadData];
     };
 }
@@ -227,6 +248,37 @@
 //}
 
 
+- (void)refreshTable:(NSNotification *) notification{
+    NSLog(@"refresh");
+    [self getAllPatients];
+}
+
+- (void) putNamesIntoSections {
+    NSArray *letters = [@"A B C D E F G H I J K L M N O P Q R S T U V W X Y Z" componentsSeparatedByString:@" "];
+    NSMutableArray *temp = [[NSMutableArray alloc] init];
+    BOOL found = FALSE;
+    NSLog(@"%@", letters);
+    
+    for(int i=0;i<26;i++) {
+        for (int j=0; j<[self.patientNames count]; j++) {
+            if([[[self.patientNames objectAtIndex:j] uppercaseString] hasPrefix:[[letters objectAtIndex:i] uppercaseString]]) {
+//                NSLog(@"%d %d", i,j);
+                [temp addObject:[self.patientNames objectAtIndex:j]];
+                found = TRUE;
+            }
+            if(j==([self.patientNames count]-1)) {  //reached the end
+                if (found) {
+                    [self.patientNameWithSection setObject:temp forKey:[letters objectAtIndex:i]];
+                    temp = [temp mutableCopy];
+                    [temp removeAllObjects];
+                }
+            }
+        }
+        found = FALSE;
+    }
+    NSLog(@"%@", self.patientNameWithSection);
+    patientSectionTitles = [[self.patientNameWithSection allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+}
 
 #pragma mark - Navigation
 
