@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		45E30D748D4D9DB15E36E079 /* Pods_CocoaPods_NHS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF146E69B77C3775C935F8C /* Pods_CocoaPods_NHS.framework */; };
 		7178DCB2261E43BF5671CFA5 /* Pods_NHSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 645A46836680739EAF744E2F /* Pods_NHSTests.framework */; };
+		8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E28D5521D54C9F8006BDF8F /* SearchResultsTableController.m */; };
 		C3C2F30AA2C4B174444C3807 /* Pods_NHSUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 209345AB6DD8B9F1E078D209 /* Pods_NHSUITests.framework */; };
 		E10412101D4C8EFA0024663B /* PreRegFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E104120F1D4C8EFA0024663B /* PreRegFormViewController.m */; };
 		E10412131D4C92CB0024663B /* tempViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E10412121D4C92CB0024663B /* tempViewController.m */; };
@@ -68,6 +69,8 @@
 		46E041C7C0BB3C7FF9496A21 /* Pods-NHSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NHSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NHSTests/Pods-NHSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		4D09CFA97E8A9CD583C600DF /* Pods-NHSUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NHSUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NHSUITests/Pods-NHSUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		645A46836680739EAF744E2F /* Pods_NHSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NHSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E28D5511D54C9F8006BDF8F /* SearchResultsTableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchResultsTableController.h; sourceTree = "<group>"; };
+		8E28D5521D54C9F8006BDF8F /* SearchResultsTableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchResultsTableController.m; sourceTree = "<group>"; };
 		BBF146E69B77C3775C935F8C /* Pods_CocoaPods_NHS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CocoaPods_NHS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4C8AA7ED6BECF1390F4A15E /* Pods-NHSUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NHSUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-NHSUITests/Pods-NHSUITests.release.xcconfig"; sourceTree = "<group>"; };
 		E104120E1D4C8EFA0024663B /* PreRegFormViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreRegFormViewController.h; sourceTree = "<group>"; };
@@ -264,6 +267,8 @@
 				E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */,
 				E1FCF9331D45BBFC00478F7B /* PatientPreRegTableViewController.h */,
 				E1FCF9341D45BBFC00478F7B /* PatientPreRegTableViewController.m */,
+				8E28D5511D54C9F8006BDF8F /* SearchResultsTableController.h */,
+				8E28D5521D54C9F8006BDF8F /* SearchResultsTableController.m */,
 				E104120E1D4C8EFA0024663B /* PreRegFormViewController.h */,
 				E104120F1D4C8EFA0024663B /* PreRegFormViewController.m */,
 				E10412111D4C92CB0024663B /* tempViewController.h */,
@@ -571,6 +576,7 @@
 				E1EFB0931D433C3400510532 /* PatientScreeningListTableViewController.m in Sources */,
 				E10412101D4C8EFA0024663B /* PreRegFormViewController.m in Sources */,
 				E1EFB0991D43423400510532 /* ScreeningQuestionViewController.m in Sources */,
+				8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */,
 				E10412131D4C92CB0024663B /* tempViewController.m in Sources */,
 				E1334EE71D432CAA00A43539 /* PreRegistrationViewController.m in Sources */,
 				E1FCF9381D45DE2000478F7B /* PreRegPatientDetailsViewController.m in Sources */,
