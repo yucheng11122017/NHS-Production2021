@@ -20,9 +20,16 @@
     [super viewDidLoad];
     [self getPatientData];
     NSLog(@"Patient %@ selected!", self.patientID);
-
-    
     // Do any additional setup after loading the view.
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+//    self.navigationController.navigationBar.backItem.title = @"Back";
+}
+
+- (void) viewWillDisappear:(BOOL)animated {
+    [super viewWillAppear:animated];
 }
 
 - (void)didReceiveMemoryWarning {

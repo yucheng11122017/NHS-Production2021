@@ -9,7 +9,7 @@
         <!--Home Page-->
         <scene sceneID="Oay-3M-OHN">
             <objects>
-                <viewController id="rpZ-vG-ijl" sceneMemberID="viewController">
+                <viewController id="rpZ-vG-ijl" customClass="HomeViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="7dO-VS-mcK"/>
                         <viewControllerLayoutGuide type="bottom" id="Fmo-jK-Afc"/>
@@ -112,21 +112,12 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="searchDisplayController" destination="WeB-Sw-Zuk" id="9ce-R5-FgP"/>
-                        <segue destination="hTm-Z1-GNs" kind="show" identifier="preRegPatientListToPatientDataSegue" id="FCW-lB-SWi"/>
+                        <segue destination="Ohg-wG-Qdy" kind="show" identifier="preRegPatientListToPatientDataSegue" id="HQb-A3-e91"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Esh-rj-buo" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <searchDisplayController id="WeB-Sw-Zuk">
-                    <connections>
-                        <outlet property="delegate" destination="7ZX-WM-BXG" id="Doi-9s-ni5"/>
-                        <outlet property="searchContentsController" destination="7ZX-WM-BXG" id="qEu-2b-4Ew"/>
-                        <outlet property="searchResultsDataSource" destination="7ZX-WM-BXG" id="jcC-AH-8M1"/>
-                        <outlet property="searchResultsDelegate" destination="7ZX-WM-BXG" id="o7B-AR-G1U"/>
-                    </connections>
-                </searchDisplayController>
             </objects>
-            <point key="canvasLocation" x="291" y="58"/>
+            <point key="canvasLocation" x="227" y="23"/>
         </scene>
         <!--Patient Details-->
         <scene sceneID="rSc-OC-Db8">
@@ -140,7 +131,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Patient Data:" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="DoF-Fh-BCa">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" text="Patient Data:" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="DoF-Fh-BCa">
                                 <rect key="frame" x="0.0" y="64" width="600" height="536"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -162,7 +153,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hcy-Fs-r1l" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1049" y="-475"/>
+            <point key="canvasLocation" x="1587" y="-305"/>
         </scene>
         <!--Pre Registration View Controller-->
         <scene sceneID="O1U-Sw-QGF">
@@ -214,6 +205,24 @@
             </objects>
             <point key="canvasLocation" x="-1697" y="1396"/>
         </scene>
+        <!--Pre Reg Display Form View Controller-->
+        <scene sceneID="4rm-ZH-i06">
+            <objects>
+                <viewController id="Ohg-wG-Qdy" customClass="PreRegDisplayFormViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="A1J-ak-Y1c"/>
+                        <viewControllerLayoutGuide type="bottom" id="tpq-Lq-q4B"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="OX0-L9-ekV">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vnB-Om-oFu" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="942" y="-380"/>
+        </scene>
         <!--Pre Reg Form View Controller-->
         <scene sceneID="tWp-1V-9Cg">
             <objects>
@@ -230,7 +239,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lme-GW-AsE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1039" y="178"/>
+            <point key="canvasLocation" x="986" y="296"/>
         </scene>
         <!--Temp View Controller-->
         <scene sceneID="s1V-Pz-l58">

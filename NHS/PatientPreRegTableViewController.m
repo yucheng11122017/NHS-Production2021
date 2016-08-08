@@ -23,7 +23,8 @@
 @property BOOL searchControllerWasActive;
 @property BOOL searchControllerSearchFieldWasFirstResponder;
 @property (strong, nonatomic) NSMutableArray *patientNames;
-@property (strong, nonatomic) NSMutableDictionary *patientNameWithSection;
+@property (strong, nonatomic) NSMutableArray *patientRegTimestamp;
+@property (strong, nonatomic) NSMutableDictionary *patientsGroupedInSections;
 
 @end
 
@@ -35,7 +36,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.patientNames = [[NSMutableArray alloc] init];
-    self.patientNameWithSection = [[NSMutableDictionary alloc] init];
+    self.patientRegTimestamp = [[NSMutableArray alloc] init];
+    self.patientsGroupedInSections = [[NSMutableDictionary alloc] init];
+    
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(refreshTable:)
@@ -53,6 +56,7 @@
     self.searchController.delegate = self;
     self.searchController.dimsBackgroundDuringPresentation = YES; // default is YES
     self.searchController.searchBar.delegate = self; // so we can monitor text changes + others
+    self.definesPresentationContext = TRUE;     //SUPER IMPORTANT, if not the searchBar won't go away when didSelectRow
     
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -62,12 +66,17 @@
 }
 
 - (void) viewWillAppear:(BOOL)animated {
+    self.navigationItem.title = @"Pre-Registration";
+    
+    [super viewWillAppear:animated];
     [self getAllPatients];
+    
 }
 
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-
+    //REMINDER: navigationController.navigationBar.backItem only is initiated after viewDidAppear!
+//    self.navigationController.navigationBar.backItem.title = @"Home";
     // restore the searchController's active state
     if (self.searchControllerWasActive) {
         self.searchController.active = self.searchControllerWasActive;
@@ -78,6 +87,11 @@
             _searchControllerSearchFieldWasFirstResponder = NO;
         }
     }
+}
+
+- (void) viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    self.navigationItem.title = @"Back";
 }
 
 - (void)didReceiveMemoryWarning {
@@ -100,7 +114,7 @@
 
     // Return the number of rows in the section.
     NSString *sectionTitle = [patientSectionTitles objectAtIndex:section];
-    NSArray *sectionPatient = [self.patientNameWithSection objectForKey:sectionTitle];
+    NSArray *sectionPatient = [self.patientsGroupedInSections objectForKey:sectionTitle];
     return [sectionPatient count];
 }
 
@@ -116,35 +130,30 @@
 
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
     }
     
     // Configure the cell...
     NSString *sectionTitle = [patientSectionTitles objectAtIndex:indexPath.section];
-    NSArray *patientNamesInSection = [self.patientNameWithSection objectForKey:sectionTitle];
-    NSString *patientName = [patientNamesInSection objectAtIndex:indexPath.row];
+    NSArray *patientsInSection = [self.patientsGroupedInSections objectForKey:sectionTitle];
+    NSString *patientName = [[patientsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
+    NSString *lastUpdatedTS = [[patientsInSection objectAtIndex:indexPath.row] objectForKey:@"last_updated_ts"];
     cell.textLabel.text = patientName;
-    
+    cell.detailTextLabel.text = lastUpdatedTS;
+
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSString *selectedPatientName = [[NSString alloc] init];
+    NSString *selectedPatientName;
     NSDictionary *selectedPatient = [[NSDictionary alloc] init];
 
     
     if (tableView == self.tableView) {
-        selectedPatientName = [self findPatientNameFromSectionRow:indexPath];
-        
-        if (tableView == self.tableView) {
-            for(int i=0;i<[self.patients count]; i++) {
-                if([selectedPatientName isEqualToString:[[self.patients objectAtIndex:i] objectForKey:@"resident_name"]]) {
-                    selectedPatientID = [[self.patients objectAtIndex:i] objectForKey:@"resident_id"];
-                    break;
-                }
-            }
-        }
+        selectedPatient = [self findPatientNameFromSectionRow:indexPath];
+        selectedPatientName = [selectedPatient objectForKey:@"resident_name"];
+        selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
     } else {
         selectedPatient = self.resultsTableController.filteredProducts[indexPath.row];
         selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
@@ -207,12 +216,20 @@
     return ^(NSURLSessionDataTask *task, id responseObject){
         int i;
         [self.patientNames removeAllObjects];   //reset this array first
+        [self.patientRegTimestamp removeAllObjects];   //reset this array first
         NSArray *patients = responseObject[0];      //somehow double brackets... (())
         self.patients = [[NSMutableArray alloc] initWithArray:patients];
         
+        NSSortDescriptor *sortDescriptor;
+        sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"resident_name" ascending:YES];
+        NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
+        self.patients = [[self.patients sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
+        
         for (i=0; i<[self.patients count]; i++) {
             [self.patientNames addObject:[[self.patients objectAtIndex:i] objectForKey:@"resident_name"]];
+            [self.patientRegTimestamp addObject:[[self.patients objectAtIndex:i] objectForKey:@"last_updated_ts"]];
         }
+        
         //sort alphabetically
         self.patientNames = [[self.patientNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] mutableCopy];
         
@@ -343,66 +360,6 @@
     [tableController.tableView reloadData];
 }
 
-
-#pragma mark - UIStateRestoration
-
-// we restore several items for state restoration:
-//  1) Search controller's active state,
-//  2) search text,
-//  3) first responder
-
-NSString *const ViewControllerTitleKey = @"ViewControllerTitleKey";
-NSString *const SearchControllerIsActiveKey = @"SearchControllerIsActiveKey";
-NSString *const SearchBarTextKey = @"SearchBarTextKey";
-NSString *const SearchBarIsFirstResponderKey = @"SearchBarIsFirstResponderKey";
-
-- (void)encodeRestorableStateWithCoder:(NSCoder *)coder {
-    [super encodeRestorableStateWithCoder:coder];
-    
-    // encode the view state so it can be restored later
-    
-    // encode the title
-    [coder encodeObject:self.title forKey:ViewControllerTitleKey];
-    
-    UISearchController *searchController = self.searchController;
-    
-    // encode the search controller's active state
-    BOOL searchDisplayControllerIsActive = searchController.isActive;
-    [coder encodeBool:searchDisplayControllerIsActive forKey:SearchControllerIsActiveKey];
-    
-    // encode the first responser status
-    if (searchDisplayControllerIsActive) {
-        [coder encodeBool:[searchController.searchBar isFirstResponder] forKey:SearchBarIsFirstResponderKey];
-    }
-    
-    // encode the search bar text
-    [coder encodeObject:searchController.searchBar.text forKey:SearchBarTextKey];
-}
-
-- (void)decodeRestorableStateWithCoder:(NSCoder *)coder {
-    [super decodeRestorableStateWithCoder:coder];
-    
-    // restore the title
-    self.title = [coder decodeObjectForKey:ViewControllerTitleKey];
-    
-    // restore the active state:
-    // we can't make the searchController active here since it's not part of the view
-    // hierarchy yet, instead we do it in viewWillAppear
-    //
-    _searchControllerWasActive = [coder decodeBoolForKey:SearchControllerIsActiveKey];
-    
-    // restore the first responder status:
-    // we can't make the searchController first responder here since it's not part of the view
-    // hierarchy yet, instead we do it in viewWillAppear
-    //
-    _searchControllerSearchFieldWasFirstResponder = [coder decodeBoolForKey:SearchBarIsFirstResponderKey];
-    
-    // restore the text in the search field
-    self.searchController.searchBar.text = [coder decodeObjectForKey:SearchBarTextKey];
-}
-
-
-
 #pragma mark - Util methods
 
 //- (NSMutableArray *)createPatients:(NSArray *)patients {
@@ -461,13 +418,12 @@ NSString *const SearchBarIsFirstResponderKey = @"SearchBarIsFirstResponderKey";
     for(int i=0;i<26;i++) {
         for (int j=0; j<[self.patientNames count]; j++) {
             if([[[self.patientNames objectAtIndex:j] uppercaseString] hasPrefix:[[letters objectAtIndex:i] uppercaseString]]) {
-//                NSLog(@"%d %d", i,j);
-                [temp addObject:[self.patientNames objectAtIndex:j]];
+                [temp addObject:[self.patients objectAtIndex:j]];
                 found = TRUE;
             }
             if(j==([self.patientNames count]-1)) {  //reached the end
                 if (found) {
-                    [self.patientNameWithSection setObject:temp forKey:[letters objectAtIndex:i]];
+                    [self.patientsGroupedInSections setObject:temp forKey:[letters objectAtIndex:i]];
                     temp = [temp mutableCopy];
                     [temp removeAllObjects];
                 }
@@ -475,20 +431,78 @@ NSString *const SearchBarIsFirstResponderKey = @"SearchBarIsFirstResponderKey";
         }
         found = FALSE;
     }
-    NSLog(@"%@", self.patientNameWithSection);
-    patientSectionTitles = [[self.patientNameWithSection allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    NSLog(@"%@", self.patientsGroupedInSections);
+    patientSectionTitles = [[self.patientsGroupedInSections allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];     //get the keys in alphabetical order
 }
 
-- (NSString *) findPatientNameFromSectionRow: (NSIndexPath *)indexPath{
+- (NSDictionary *) findPatientNameFromSectionRow: (NSIndexPath *)indexPath{
     NSInteger section = indexPath.section;
     NSInteger row = indexPath.row;
     
     NSString *sectionAlphabet = [[NSString alloc] initWithString:[patientSectionTitles objectAtIndex:section]];
-    NSArray *namesWithAlphabet = [self.patientNameWithSection objectForKey:sectionAlphabet];
+    NSArray *patientsWithAlphabet = [self.patientsGroupedInSections objectForKey:sectionAlphabet];
     
-    return [[NSString alloc]initWithString:[namesWithAlphabet objectAtIndex:row]];
+    return [patientsWithAlphabet objectAtIndex:row];
     
 }
+
+#pragma mark - UIStateRestoration
+
+// we restore several items for state restoration:
+//  1) Search controller's active state,
+//  2) search text,
+//  3) first responder
+
+NSString *const ViewControllerTitleKey = @"ViewControllerTitleKey";
+NSString *const SearchControllerIsActiveKey = @"SearchControllerIsActiveKey";
+NSString *const SearchBarTextKey = @"SearchBarTextKey";
+NSString *const SearchBarIsFirstResponderKey = @"SearchBarIsFirstResponderKey";
+
+- (void)encodeRestorableStateWithCoder:(NSCoder *)coder {
+    [super encodeRestorableStateWithCoder:coder];
+    
+    // encode the view state so it can be restored later
+    
+    // encode the title
+    [coder encodeObject:self.title forKey:ViewControllerTitleKey];
+    
+    UISearchController *searchController = self.searchController;
+    
+    // encode the search controller's active state
+    BOOL searchDisplayControllerIsActive = searchController.isActive;
+    [coder encodeBool:searchDisplayControllerIsActive forKey:SearchControllerIsActiveKey];
+    
+    // encode the first responser status
+    if (searchDisplayControllerIsActive) {
+        [coder encodeBool:[searchController.searchBar isFirstResponder] forKey:SearchBarIsFirstResponderKey];
+    }
+    
+    // encode the search bar text
+    [coder encodeObject:searchController.searchBar.text forKey:SearchBarTextKey];
+}
+
+- (void)decodeRestorableStateWithCoder:(NSCoder *)coder {
+    [super decodeRestorableStateWithCoder:coder];
+    
+    // restore the title
+    self.title = [coder decodeObjectForKey:ViewControllerTitleKey];
+    
+    // restore the active state:
+    // we can't make the searchController active here since it's not part of the view
+    // hierarchy yet, instead we do it in viewWillAppear
+    //
+    _searchControllerWasActive = [coder decodeBoolForKey:SearchControllerIsActiveKey];
+    
+    // restore the first responder status:
+    // we can't make the searchController first responder here since it's not part of the view
+    // hierarchy yet, instead we do it in viewWillAppear
+    //
+    _searchControllerSearchFieldWasFirstResponder = [coder decodeBoolForKey:SearchBarIsFirstResponderKey];
+    
+    // restore the text in the search field
+    self.searchController.searchBar.text = [coder decodeObjectForKey:SearchBarTextKey];
+}
+
 
 #pragma mark - Navigation
 

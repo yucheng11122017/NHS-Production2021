@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		45E30D748D4D9DB15E36E079 /* Pods_CocoaPods_NHS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF146E69B77C3775C935F8C /* Pods_CocoaPods_NHS.framework */; };
 		7178DCB2261E43BF5671CFA5 /* Pods_NHSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 645A46836680739EAF744E2F /* Pods_NHSTests.framework */; };
+		8E25276A1D5766C400ACEE92 /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E2527691D5766C400ACEE92 /* HomeViewController.m */; };
+		8E25276D1D57891700ACEE92 /* PreRegDisplayFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E25276C1D57891700ACEE92 /* PreRegDisplayFormViewController.m */; };
 		8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E28D5521D54C9F8006BDF8F /* SearchResultsTableController.m */; };
 		C3C2F30AA2C4B174444C3807 /* Pods_NHSUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 209345AB6DD8B9F1E078D209 /* Pods_NHSUITests.framework */; };
 		E10412101D4C8EFA0024663B /* PreRegFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E104120F1D4C8EFA0024663B /* PreRegFormViewController.m */; };
@@ -69,6 +71,10 @@
 		46E041C7C0BB3C7FF9496A21 /* Pods-NHSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NHSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NHSTests/Pods-NHSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		4D09CFA97E8A9CD583C600DF /* Pods-NHSUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NHSUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NHSUITests/Pods-NHSUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		645A46836680739EAF744E2F /* Pods_NHSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NHSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E2527681D5766C400ACEE92 /* HomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
+		8E2527691D5766C400ACEE92 /* HomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HomeViewController.m; sourceTree = "<group>"; };
+		8E25276B1D57891700ACEE92 /* PreRegDisplayFormViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreRegDisplayFormViewController.h; sourceTree = "<group>"; };
+		8E25276C1D57891700ACEE92 /* PreRegDisplayFormViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreRegDisplayFormViewController.m; sourceTree = "<group>"; };
 		8E28D5511D54C9F8006BDF8F /* SearchResultsTableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchResultsTableController.h; sourceTree = "<group>"; };
 		8E28D5521D54C9F8006BDF8F /* SearchResultsTableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchResultsTableController.m; sourceTree = "<group>"; };
 		BBF146E69B77C3775C935F8C /* Pods_CocoaPods_NHS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CocoaPods_NHS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,6 +156,47 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8E2527651D57600200ACEE92 /* Pre-Registration */ = {
+			isa = PBXGroup;
+			children = (
+				E1FCF9331D45BBFC00478F7B /* PatientPreRegTableViewController.h */,
+				E1FCF9341D45BBFC00478F7B /* PatientPreRegTableViewController.m */,
+				8E28D5511D54C9F8006BDF8F /* SearchResultsTableController.h */,
+				8E28D5521D54C9F8006BDF8F /* SearchResultsTableController.m */,
+				E104120E1D4C8EFA0024663B /* PreRegFormViewController.h */,
+				E104120F1D4C8EFA0024663B /* PreRegFormViewController.m */,
+				8E25276B1D57891700ACEE92 /* PreRegDisplayFormViewController.h */,
+				8E25276C1D57891700ACEE92 /* PreRegDisplayFormViewController.m */,
+				E1FCF9361D45DE2000478F7B /* PreRegPatientDetailsViewController.h */,
+				E1FCF9371D45DE2000478F7B /* PreRegPatientDetailsViewController.m */,
+			);
+			name = "Pre-Registration";
+			sourceTree = "<group>";
+		};
+		8E2527661D57600900ACEE92 /* Screening */ = {
+			isa = PBXGroup;
+			children = (
+				E1EFB0911D433C3400510532 /* PatientScreeningListTableViewController.h */,
+				E1EFB0921D433C3400510532 /* PatientScreeningListTableViewController.m */,
+				E1EFB0941D4341B700510532 /* ScreeningSectionsTableViewController.h */,
+				E1EFB0951D4341B700510532 /* ScreeningSectionsTableViewController.m */,
+				E1EFB0971D43423400510532 /* ScreeningQuestionViewController.h */,
+				E1EFB0981D43423400510532 /* ScreeningQuestionViewController.m */,
+			);
+			name = Screening;
+			sourceTree = "<group>";
+		};
+		8E2527671D57603A00ACEE92 /* Unused */ = {
+			isa = PBXGroup;
+			children = (
+				E10412111D4C92CB0024663B /* tempViewController.h */,
+				E10412121D4C92CB0024663B /* tempViewController.m */,
+				E1334EE51D432CAA00A43539 /* PreRegistrationViewController.h */,
+				E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */,
+			);
+			name = Unused;
+			sourceTree = "<group>";
+		};
 		D2341D3E54ED753361BC20FE /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -208,6 +255,7 @@
 		E120E4051D431E9B002DBC7E /* NHS */ = {
 			isa = PBXGroup;
 			children = (
+				8E2527671D57603A00ACEE92 /* Unused */,
 				E1334EDF1D432B5800A43539 /* Login.json */,
 				E1334EE01D432B5800A43539 /* Pre-registration.json */,
 				E1E690961D4345F2007FEC1C /* Screening JSON */,
@@ -263,24 +311,10 @@
 		E1FCF92E1D45B75200478F7B /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				E1334EE51D432CAA00A43539 /* PreRegistrationViewController.h */,
-				E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */,
-				E1FCF9331D45BBFC00478F7B /* PatientPreRegTableViewController.h */,
-				E1FCF9341D45BBFC00478F7B /* PatientPreRegTableViewController.m */,
-				8E28D5511D54C9F8006BDF8F /* SearchResultsTableController.h */,
-				8E28D5521D54C9F8006BDF8F /* SearchResultsTableController.m */,
-				E104120E1D4C8EFA0024663B /* PreRegFormViewController.h */,
-				E104120F1D4C8EFA0024663B /* PreRegFormViewController.m */,
-				E10412111D4C92CB0024663B /* tempViewController.h */,
-				E10412121D4C92CB0024663B /* tempViewController.m */,
-				E1FCF9361D45DE2000478F7B /* PreRegPatientDetailsViewController.h */,
-				E1FCF9371D45DE2000478F7B /* PreRegPatientDetailsViewController.m */,
-				E1EFB0911D433C3400510532 /* PatientScreeningListTableViewController.h */,
-				E1EFB0921D433C3400510532 /* PatientScreeningListTableViewController.m */,
-				E1EFB0941D4341B700510532 /* ScreeningSectionsTableViewController.h */,
-				E1EFB0951D4341B700510532 /* ScreeningSectionsTableViewController.m */,
-				E1EFB0971D43423400510532 /* ScreeningQuestionViewController.h */,
-				E1EFB0981D43423400510532 /* ScreeningQuestionViewController.m */,
+				8E2527651D57600200ACEE92 /* Pre-Registration */,
+				8E2527661D57600900ACEE92 /* Screening */,
+				8E2527681D5766C400ACEE92 /* HomeViewController.h */,
+				8E2527691D5766C400ACEE92 /* HomeViewController.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -575,6 +609,7 @@
 				E120E4081D431E9B002DBC7E /* main.m in Sources */,
 				E1EFB0931D433C3400510532 /* PatientScreeningListTableViewController.m in Sources */,
 				E10412101D4C8EFA0024663B /* PreRegFormViewController.m in Sources */,
+				8E25276D1D57891700ACEE92 /* PreRegDisplayFormViewController.m in Sources */,
 				E1EFB0991D43423400510532 /* ScreeningQuestionViewController.m in Sources */,
 				8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */,
 				E10412131D4C92CB0024663B /* tempViewController.m in Sources */,
@@ -583,6 +618,7 @@
 				E1FCF9321D45B77F00478F7B /* ServerComm.m in Sources */,
 				E1FCF9351D45BBFC00478F7B /* PatientPreRegTableViewController.m in Sources */,
 				E1EFB0961D4341B700510532 /* ScreeningSectionsTableViewController.m in Sources */,
+				8E25276A1D5766C400ACEE92 /* HomeViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
