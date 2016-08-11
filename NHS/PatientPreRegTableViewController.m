@@ -431,7 +431,7 @@
         }
         found = FALSE;
     }
-    NSLog(@"%@", self.patientsGroupedInSections);
+//    NSLog(@"%@", self.patientsGroupedInSections);
     patientSectionTitles = [[self.patientsGroupedInSections allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];     //get the keys in alphabetical order
 }
 

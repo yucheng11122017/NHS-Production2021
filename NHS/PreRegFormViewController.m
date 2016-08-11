@@ -36,11 +36,11 @@ NSString *const kAddStreet = @"addressstreet";
 NSString *const kAddBlock = @"addressblock";
 NSString *const kAddUnit = @"addressunit";
 NSString *const kAddPostCode = @"addresspostcode";
-NSString *const kReqServOthers = @"reqservothers";
 NSString *const kPhleb = @"phleb";
 NSString *const kFOBT = @"fobt";
 NSString *const kDental = @"dental";
 NSString *const kEye = @"eye";
+NSString *const kReqServOthers = @"reqservothers";
 NSString *const kPrefDate = @"preferreddate";
 NSString *const kPrefTime = @"preferredtime";
 NSString *const kNeighbourhood = @"neighbourhood";
@@ -223,6 +223,7 @@ typedef enum preRegSection {
 //    [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqServOthers rowType:XLFormRowDescriptorTypeText];
     [[row cellConfig] setObject:@"Add other services" forKey:@"textField.placeholder"];
+    section.multivaluedTag = @"otherservices";
     section.multivaluedRowTemplate = row;
     
     // Others - Section
@@ -232,6 +233,7 @@ typedef enum preRegSection {
     
     // Date
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kPrefDate rowType:XLFormRowDescriptorTypeDateInline title:@"Preferred Date"];
+    [row.cellConfigAtConfigure setObject:[NSDate new] forKey:@"minimumDate"];
     row.value = [NSDate new];
     row.required = YES;
     [section addFormRow:row];
@@ -416,6 +418,7 @@ typedef enum preRegSection {
 }
 
 - (NSDictionary *) preparePersonalInfoDict {
+
     
     NSDictionary *personalInfoDict = [[NSDictionary alloc] init];
     NSDictionary *dict = [[NSDictionary alloc] init];
@@ -512,6 +515,13 @@ typedef enum preRegSection {
     
     contactInfoDict = @{@"contact_info":dict};
     
+    NSMutableArray *otherServicesArray = [[NSMutableArray alloc] initWithArray:[[self.form formValues]objectForKey:@"otherservices"]];
+    [otherServicesArray removeObjectsInArray:@[@0,@0,@0,@0]];
+#warning though the code is ready, yet API no where to insert other required services.
+    NSString *otherServices = @"0";
+    if([otherServicesArray count] > 1) {
+        otherServices = @"1";
+    }
     //Required Services
     localDateTime = [NSDate dateWithTimeInterval:1.0 sinceDate:localDateTime];      //add a second
     dict = @{@"resident_id":self.resident_id,
@@ -519,7 +529,7 @@ typedef enum preRegSection {
              @"fobt":[[self.form formValues] objectForKey:@"fobt"],
              @"dental":[[self.form formValues] objectForKey:@"dental"],
              @"eye":[[self.form formValues] objectForKey:@"eye"],
-             @"other_services":@"",
+             @"other_services":otherServices,
              @"ts":[localDateTime description]
              };
     
@@ -530,12 +540,20 @@ typedef enum preRegSection {
     reqServDict = @{@"required_services":dict};
     
     //Others
+    NSNumber *nineToEleven = @0, *elevenToOne = @0, *OneToThree = @0;
+    NSArray *timeSlotChoice = [[self.form formValues] objectForKey:@"preferredtime"];
+    for (i=0; i<[timeSlotChoice count]; i++) {
+        if ([[timeSlotChoice objectAtIndex:i] isEqualToString:@"9-11"]) nineToEleven = @1;
+        else if ([[timeSlotChoice objectAtIndex:i] isEqualToString:@"11-1"]) elevenToOne = @1;
+        else if ([[timeSlotChoice objectAtIndex:i] isEqualToString:@"1-3"]) OneToThree = @1;
+
+    }
     localDateTime = [NSDate dateWithTimeInterval:1.0 sinceDate:localDateTime];      //add a second
     dict = @{@"resident_id":self.resident_id,
              @"pref_date":[[[self.form formValues] objectForKey:@"preferreddate"] description],
-//             @"pref_time":[NSString stringWithFormat:@"%@", [[[self.form formValues] objectForKey:@"preferredtime"] formValue]],
-#warning need to update this once op-code 57 updated...
-             @"pref_time":[NSString stringWithFormat:@"9-11"],      //FOR NOW!
+             @"time_slot_9_11":nineToEleven,
+             @"time_slot_11_1":elevenToOne,
+             @"time_slot_1_3":OneToThree,
              @"neighbourhood":[[self.form formValues] objectForKey:@"neighbourhood"],
              @"remarks":@"",
              @"ts":[localDateTime description]

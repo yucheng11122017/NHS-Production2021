@@ -22,6 +22,7 @@ NSString *const qAddStreet = @"addressstreet";
 NSString *const qAddBlock = @"addressblock";
 NSString *const qAddUnit = @"addressunit";
 NSString *const qAddPostCode = @"addresspostcode";
+NSString *const qInsertedOtherReqServ = @"insertedotherreqserv";
 NSString *const qReqServOthers = @"reqservothers";
 NSString *const qPhleb = @"phleb";
 NSString *const qFOBT = @"fobt";
@@ -110,6 +111,7 @@ typedef enum preRegSection {
 @property (nonatomic) preRegSection *preRegSection;
 @property (strong, nonatomic) NSMutableArray *completePreRegForm;
 @property (strong, nonatomic) NSDictionary *retrievedPatientDictionary;
+@property (strong, nonatomic) XLFormDescriptor * formDescriptor;
 
 
 @end
@@ -121,22 +123,27 @@ typedef enum preRegSection {
 {
     NSDictionary *personal_info = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"personal_info"]];
     NSDictionary *contact_info = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"contact_info"]];
-//    NSDictionary *others_prereg = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"others_prereg"]];
+    NSDictionary *others_prereg = [[NSDictionary alloc] init];
+    
+    
+    if ([self.retrievedPatientDictionary objectForKey:@"others_prereg"] != (id)[NSNull null]) { //make sure not NULL first
+        others_prereg = [self.retrievedPatientDictionary objectForKey:@"others_prereg"];
+    }
     NSDictionary *required_services = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"required_services"]];
     NSDictionary *spoken_lang = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"spoken_lang"]];
     
     
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Pre-reg Form"];
+    self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Pre-reg Form"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
-    [formDescriptor setDisabled:YES];
+    [self.formDescriptor setDisabled:YES];
     
-    formDescriptor.assignFirstResponderOnShow = YES;
+    self.formDescriptor.assignFirstResponderOnShow = YES;
     
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Personal Info"];
-    [formDescriptor addFormSection:section];
+    [self.formDescriptor addFormSection:section];
     
     // Name
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qName rowType:XLFormRowDescriptorTypeText title:@"Patient Name"];
@@ -161,27 +168,31 @@ typedef enum preRegSection {
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qDOB rowType:XLFormRowDescriptorTypeText title:@"DOB Year"];
     row.required = YES;
     row.value = [personal_info objectForKey:@"birth_year"];
+//    row. = [personal_info objectForKey:@"birth_year"];
     [section addFormRow:row];
-    
     
     // Spoken Language - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Spoken Language *"];
-    [formDescriptor addFormSection:section];
+    [self.formDescriptor addFormSection:section];
     
     XLFormRowDescriptor * spokenLangRow;
     spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:qSpokenLanguage rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language"];
     spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
-    row.required = YES;
+    spokenLangRow.required = YES;
+    spokenLangRow.value = [self getSpokenLangArray:spoken_lang];
     [section addFormRow:spokenLangRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qSpokenLangOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
     row.required = NO;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", spokenLangRow];
+    if ([spoken_lang objectForKey:@"lang_others_text"] != (id)[NSNull null]) {  //if not null
+        row.value = [spoken_lang objectForKey:@"lang_others_text"];
+    }
     [section addFormRow:row];
     
     // Contact Info - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Contact Info"];
-    [formDescriptor addFormSection:section];
+    [self.formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qContactNumber rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     row.required = YES;
@@ -213,23 +224,28 @@ typedef enum preRegSection {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Required Services"
                                              sectionOptions:XLFormSectionOptionCanInsert
                                           sectionInsertMode:XLFormSectionInsertModeButton];
-    [formDescriptor addFormSection:section];
+    [self.formDescriptor addFormSection:section];
     
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qPhleb rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Phleb"];
-    row.value = @(NO);
+    row.value = [required_services objectForKey:@"pleb"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qFOBT rowType:XLFormRowDescriptorTypeBooleanCheck title:@"FOBT"];
-    row.value = @(NO);
+    row.value = [required_services objectForKey:@"fobt"];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qDental rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental"];
-    row.value = @(NO);
+    row.value = [required_services objectForKey:@"dental"];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qEye rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Eye"];
-    row.value = @(NO);
+    row.value = [required_services objectForKey:@"eye"];
     [section addFormRow:row];
     
+    if ([[required_services objectForKey:@"other_services"] isEqualToString:@"1"]) {    //only if database indicate that the other_services was indeed inserted...
+        row = [XLFormRowDescriptor formRowDescriptorWithTag:qInsertedOtherReqServ rowType:XLFormRowDescriptorTypeText];
+        row.value = @"X-Ray";
+        [section addFormRow:row];
+    }
     //    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqServOthers rowType:XLFormRowDescriptorTypeTextView title:@"Others: -"];
     //    [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qReqServOthers rowType:XLFormRowDescriptorTypeText];
@@ -238,13 +254,16 @@ typedef enum preRegSection {
     
     // Others - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Others"];
-    [formDescriptor addFormSection:section];
+    [self.formDescriptor addFormSection:section];
     
     
     // Date
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qPrefDate rowType:XLFormRowDescriptorTypeDateInline title:@"Preferred Date"];
-    row.value = [NSDate new];
     row.required = YES;
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"yyyy-MM-dd";
+    NSDate *date = [dateFormatter dateFromString:[others_prereg objectForKey:@"pref_date"]];
+    row.value = date;
     [section addFormRow:row];
     
     //    // Preferred Time
@@ -252,6 +271,7 @@ typedef enum preRegSection {
     preferredTimeRow = [XLFormRowDescriptor formRowDescriptorWithTag:qPrefTime rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Preferred Time"];
     preferredTimeRow.selectorOptions = @[@"9-11", @"11-1", @"1-3"];
     preferredTimeRow.required = YES;
+    preferredTimeRow.value = [self getPreferredTimeArray:others_prereg];
     [section addFormRow:preferredTimeRow];
     
     //    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPrefTime rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Preferred Time"];
@@ -265,14 +285,23 @@ typedef enum preRegSection {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qNeighbourhood rowType:XLFormRowDescriptorTypeText title:@"Neighbourhood"];
     row.required = YES;
+    row.value = [others_prereg objectForKey:@"neighbourhood"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qRemarks rowType:XLFormRowDescriptorTypeTextView title:@"Remarks:-"];
     row.required = NO;
+    NSString *remarks = [others_prereg objectForKey:@"remarks"];
+    
+    if (remarks == (id)[NSNull null] || remarks.length == 0 ) {
+        row.value = @"";
+        NSLog(@"NULL found");
+    } else {
+        row.value = [others_prereg objectForKey:@"remarks"];
+    }
     [section addFormRow:row];
     
     
-    return [super initWithForm:formDescriptor];
+    return [super initWithForm:self.formDescriptor];
     
 }
 
@@ -281,7 +310,9 @@ typedef enum preRegSection {
     flag = false;
     self.retrievedPatientDictionary = [[NSDictionary alloc] init];
     [self getPatientData];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editPressed:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain
+                                                                             target:self
+                                                                             action:@selector(editPressed:)];
     self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
     self.completePreRegForm = [[NSMutableArray alloc] init];
@@ -319,7 +350,10 @@ typedef enum preRegSection {
 
 -(void)editPressed:(UIBarButtonItem * __unused)button
 {
-#warning currently do nothing
+    [button setTitle:@"Save"];
+    self.form.disabled = !self.form.disabled;
+    [self.tableView endEditing:YES];
+    [self.tableView reloadData];
 //    NSArray * validationErrors = [self formValidationErrors];
 //    if (validationErrors.count > 0){
 //        [self showFormValidationError:[validationErrors firstObject]];
@@ -440,6 +474,30 @@ typedef enum preRegSection {
 
 
 #pragma mark -
+- (NSArray *) getSpokenLangArray: (NSDictionary *) spoken_lang {
+    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
+    if([[spoken_lang objectForKey:@"lang_canto"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
+    if([[spoken_lang objectForKey:@"lang_english"] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
+    if([[spoken_lang objectForKey:@"lang_hindi"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
+    if([[spoken_lang objectForKey:@"lang_hokkien"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
+    if([[spoken_lang objectForKey:@"lang_malay"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
+    if([[spoken_lang objectForKey:@"lang_mandrin"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
+    if([[spoken_lang objectForKey:@"lang_others"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
+    if([[spoken_lang objectForKey:@"lang_tamil"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
+    if([[spoken_lang objectForKey:@"lang_teochew"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
+    
+    return spokenLangArray;
+}
+
+- (NSArray *) getPreferredTimeArray: (NSDictionary *) others_prereg {
+    NSMutableArray *preferredTimeArray = [[NSMutableArray alloc] init];
+    if([[others_prereg objectForKey:@"time_slot_9_11"] isEqualToString:@"1"]) [preferredTimeArray addObject:@"9-11"];
+    if([[others_prereg objectForKey:@"time_slot_11_1"] isEqualToString:@"1"]) [preferredTimeArray addObject:@"11-1"];
+    if([[others_prereg objectForKey:@"time_slot_1_3"] isEqualToString:@"1"]) [preferredTimeArray addObject:@"1-3"];
+    
+    return preferredTimeArray;
+}
+
 - (NSDictionary *) preparePersonalInfoDict {
     
     NSDictionary *personalInfoDict = [[NSDictionary alloc] init];
@@ -537,6 +595,13 @@ typedef enum preRegSection {
     
     contactInfoDict = @{@"contact_info":dict};
     
+    NSMutableArray *otherServicesArray = [[NSMutableArray alloc] initWithArray:[[self.form formValues]objectForKey:@"otherservices"]];
+    [otherServicesArray removeObjectsInArray:@[@0,@0,@0,@0]];
+#warning though the code is ready, yet API no where to insert other required services.
+    NSString *otherServices = @"0";
+    if([otherServicesArray count] > 1) {
+        otherServices = @"1";
+    }
     //Required Services
     localDateTime = [NSDate dateWithTimeInterval:1.0 sinceDate:localDateTime];      //add a second
     dict = @{@"resident_id":self.resident_id,
@@ -544,7 +609,7 @@ typedef enum preRegSection {
              @"fobt":[[self.form formValues] objectForKey:@"fobt"],
              @"dental":[[self.form formValues] objectForKey:@"dental"],
              @"eye":[[self.form formValues] objectForKey:@"eye"],
-             @"other_services":@"",
+             @"other_services":otherServices,
              @"ts":[localDateTime description]
              };
     
@@ -555,12 +620,20 @@ typedef enum preRegSection {
     reqServDict = @{@"required_services":dict};
     
     //Others
+    NSNumber *nineToEleven = @0, *elevenToOne = @0, *OneToThree = @0;
+    NSArray *timeSlotChoice = [[self.form formValues] objectForKey:@"preferredtime"];
+    for (i=0; i<[timeSlotChoice count]; i++) {
+        if ([[timeSlotChoice objectAtIndex:i] isEqualToString:@"9-11"]) nineToEleven = @1;
+        else if ([[timeSlotChoice objectAtIndex:i] isEqualToString:@"11-1"]) elevenToOne = @1;
+        else if ([[timeSlotChoice objectAtIndex:i] isEqualToString:@"1-3"]) OneToThree = @1;
+        
+    }
     localDateTime = [NSDate dateWithTimeInterval:1.0 sinceDate:localDateTime];      //add a second
     dict = @{@"resident_id":self.resident_id,
              @"pref_date":[[[self.form formValues] objectForKey:@"preferreddate"] description],
-             //             @"pref_time":[NSString stringWithFormat:@"%@", [[[self.form formValues] objectForKey:@"preferredtime"] formValue]],
-#warning need to update this once op-code 57 updated...
-             @"pref_time":[NSString stringWithFormat:@"9-11"],      //FOR NOW!
+             @"time_slot_9_11":nineToEleven,
+             @"time_slot_11_1":elevenToOne,
+             @"time_slot_1_3":OneToThree,
              @"neighbourhood":[[self.form formValues] objectForKey:@"neighbourhood"],
              @"remarks":@"",
              @"ts":[localDateTime description]
@@ -580,7 +653,6 @@ typedef enum preRegSection {
     
     return self.completePreRegForm;
 }
-
 
 #pragma mark - Downloading Patient Details
 - (void)getPatientData {
