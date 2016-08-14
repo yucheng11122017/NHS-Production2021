@@ -37,6 +37,7 @@ PODS:
   - HYPMathParser (0.4.1)
   - HYPNorwegianAccountNumber (1.2.1)
   - HYPNorwegianSSN (1.10.2)
+  - MBProgressHUD (1.0.0)
   - NSDate-HYPString (0.2)
   - NSDictionary-ANDYSafeValue (0.3.1)
   - NSDictionary-HYPImmutable (0.2)
@@ -58,6 +59,7 @@ DEPENDENCIES:
   - AFNetworking (~> 3.1)
   - Form
   - HYPImagePicker
+  - MBProgressHUD (~> 1.0.0)
   - NSDate-HYPString
   - NSDictionary-HYPImmutable
   - XLForm (from `https://github.com/xmartlabs/XLForm.git`)
@@ -80,6 +82,7 @@ SPEC CHECKSUMS:
   HYPMathParser: 146a4981427a0b46cc9af823b210bfefdf0a7107
   HYPNorwegianAccountNumber: b0062d7419d217123dff0ef04f1931ed5f1e3bbf
   HYPNorwegianSSN: 1eb54f1488ac24cdd7d0aee34e10d0f826c27fc1
+  MBProgressHUD: 4890f671c94e8a0f3cf959aa731e9de2f036d71a
   NSDate-HYPString: b87cf854edd44ec1e186b32526c601502180846d
   NSDictionary-ANDYSafeValue: 2d7adf339b6e302d71fec5f1d71ae00aacda993e
   NSDictionary-HYPImmutable: 5ab45ed9d8127636467736b51700d886bfcc48db
@@ -95,6 +98,6 @@ SPEC CHECKSUMS:
   UIViewController-HYPKeyboardToolbar: d5cb85447caeaf9e0e7ed575ce3b1576c7d53dd8
   XLForm: 2250b4e96ab8ffa5f3355838c79edd90de451782
 
-PODFILE CHECKSUM: 174650b4fee52bcdc2154c5b3c1540f4b2e31305
+PODFILE CHECKSUM: 8a33528c04ba9d40abaf8c0b0cfd226d362c1f1a
 
 COCOAPODS: 1.0.1

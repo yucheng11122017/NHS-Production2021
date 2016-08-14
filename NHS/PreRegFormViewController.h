@@ -11,4 +11,17 @@
 
 @interface PreRegFormViewController : XLFormViewController
 
+@property (strong, nonatomic) NSNumber* patientDataLocalOrServer;
+@property (strong, nonatomic) NSNumber* patientLocalFileIndex;
+@property (strong, nonatomic) NSNumber * loadDataFlag;
+
+- (void) setPatientLocalFileIndex:(NSNumber *) patientLocalFileIndex;
+- (void) setAsPatientDataLocal:(NSNumber *) patientDataLocalOrServer;
+- (void) setLoadDataFlag:(NSNumber*) loadDataFlag;
+
+typedef enum patientDataSource {
+    server,
+    local
+} patientDataSource;
+
 @end

@@ -42,66 +42,6 @@ typedef enum preRegSection {
     others
 } preRegSection;
 
-//#pragma mark - NSValueTransformer
-//
-//@interface NSArrayValueTrasformer : NSValueTransformer
-//@end
-//
-//@implementation NSArrayValueTrasformer
-//
-//+ (Class)transformedValueClass
-//{
-//    return [NSString class];
-//}
-//
-//+ (BOOL)allowsReverseTransformation
-//{
-//    return NO;
-//}
-//
-//- (id)transformedValue:(id)value
-//{
-//    if (!value) return nil;
-//    if ([value isKindOfClass:[NSArray class]]){
-//        NSArray * array = (NSArray *)value;
-//        return [NSString stringWithFormat:@"%@ Item%@", @(array.count), array.count > 1 ? @"s" : @""];
-//    }
-//    if ([value isKindOfClass:[NSString class]])
-//    {
-//        return [NSString stringWithFormat:@"%@", value];        //removed the word transformed
-//    }
-//    return nil;
-//}
-//
-//@end
-//
-//
-//@interface ISOLanguageCodesValueTranformer : NSValueTransformer
-//@end
-//
-//@implementation ISOLanguageCodesValueTranformer
-//
-//+ (Class)transformedValueClass
-//{
-//    return [NSString class];
-//}
-//
-//+ (BOOL)allowsReverseTransformation
-//{
-//    return NO;
-//}
-//
-//- (id)transformedValue:(id)value
-//{
-//    if (!value) return nil;
-//    if ([value isKindOfClass:[NSString class]]){
-//        return [[NSLocale currentLocale] displayNameForKey:NSLocaleLanguageCode value:value];
-//    }
-//    return nil;
-//}
-//
-//@end
-
 
 @interface PreRegDisplayFormViewController () {
     bool flag;
@@ -118,19 +58,47 @@ typedef enum preRegSection {
 
 @implementation PreRegDisplayFormViewController
 
+-(void)viewDidLoad
+{
+    flag = false;
+    self.retrievedPatientDictionary = [[NSDictionary alloc] init];
+    [self getPatientData];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain
+                                                                             target:self
+                                                                             action:@selector(editPressed:)];
+    self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Back" style:UIBarButtonItemStylePlain target:self action:@selector(backBtnPressed:)];
+    self.completePreRegForm = [[NSMutableArray alloc] init];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(submitOtherSections:)
+                                                 name:@"submitOtherSections"
+                                               object:nil];
+    
+    double delayInSeconds = 2.0;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
+        XLFormDescriptor *form = [self init];       //must init first before [super viewDidLoad]
+        [super viewDidLoad];
+    });
+    
+}
 
 -(id)init
 {
     NSDictionary *personal_info = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"personal_info"]];
-    NSDictionary *contact_info = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"contact_info"]];
-    NSDictionary *others_prereg = [[NSDictionary alloc] init];
+    NSDictionary *spoken_lang, *required_services, *contact_info, *others_prereg;
     
+    contact_info = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"contact_info"]];
     
-    if ([self.retrievedPatientDictionary objectForKey:@"others_prereg"] != (id)[NSNull null]) { //make sure not NULL first
-        others_prereg = [self.retrievedPatientDictionary objectForKey:@"others_prereg"];
+    if([self.retrievedPatientDictionary objectForKey:@"others_prereg"] != (id)[NSNull null]) {
+        others_prereg = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"others_prereg"]];
     }
-    NSDictionary *required_services = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"required_services"]];
-    NSDictionary *spoken_lang = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"spoken_lang"]];
+    spoken_lang = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"spoken_lang"]];
+    
+    if([self.retrievedPatientDictionary objectForKey:@"required_services"] != (id)[NSNull null]) {
+        required_services = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"required_services"]];
+    }
     
     
     self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Pre-reg Form"];
@@ -148,27 +116,28 @@ typedef enum preRegSection {
     // Name
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qName rowType:XLFormRowDescriptorTypeText title:@"Patient Name"];
     row.required = YES;
-    row.value = [personal_info objectForKey:@"resident_name"];
+    row.value = [personal_info objectForKey:@"resident_name"]? [personal_info objectForKey:@"resident_name"]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qNRIC rowType:XLFormRowDescriptorTypeText title:@"NRIC"];
     row.required = YES;
-    row.value = [personal_info objectForKey:@"nric"];
+    row.value = [personal_info objectForKey:@"nric"]? [personal_info objectForKey:@"nric"]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qGender rowType:XLFormRowDescriptorTypeSelectorPickerViewInline title:@"Gender"];
     row.selectorOptions = @[@"Male", @"Female"];
-    if ([[personal_info objectForKey:@"gender"] isEqualToString:@"M"]) {
-        row.value = @"Male";
-    } else {
-        row.value = @"Female";
+    if ([personal_info objectForKey:@"nric"]!= (id)[NSNull null]) {
+        if ([[personal_info objectForKey:@"gender"] isEqualToString:@"M"]) {
+            row.value = @"Male";
+        } else {
+            row.value = @"Female";
+        }
     }
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qDOB rowType:XLFormRowDescriptorTypeText title:@"DOB Year"];
     row.required = YES;
-    row.value = [personal_info objectForKey:@"birth_year"];
-//    row. = [personal_info objectForKey:@"birth_year"];
+    row.value = [personal_info objectForKey:@"birth_year"]? [personal_info objectForKey:@"birth_year"]:@"";
     [section addFormRow:row];
     
     // Spoken Language - Section
@@ -179,7 +148,9 @@ typedef enum preRegSection {
     spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:qSpokenLanguage rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language"];
     spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
     spokenLangRow.required = YES;
-    spokenLangRow.value = [self getSpokenLangArray:spoken_lang];
+    if ([spoken_lang objectForKey:@"lang_canto"] != (id)[NSNull null]) {
+        spokenLangRow.value = [self getSpokenLangArray:spoken_lang];
+    }
     [section addFormRow:spokenLangRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qSpokenLangOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
@@ -196,27 +167,27 @@ typedef enum preRegSection {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qContactNumber rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     row.required = YES;
-    row.value = [contact_info objectForKey:@"contact_no"];
+    row.value = [contact_info objectForKey:@"contact_no"]? [contact_info objectForKey:@"contact_no"]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qAddStreet rowType:XLFormRowDescriptorTypeText title:@"Address Street"];
     row.required = YES;
-    row.value = [contact_info objectForKey:@"address_street"];
+    row.value = [contact_info objectForKey:@"address_street"]? [contact_info objectForKey:@"address_street"]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qAddUnit rowType:XLFormRowDescriptorTypeText title:@"Address Block"];
     row.required = YES;
-    row.value = [contact_info objectForKey:@"address_block"];
+    row.value = [contact_info objectForKey:@"address_block"]? [contact_info objectForKey:@"address_block"]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qAddBlock rowType:XLFormRowDescriptorTypeText title:@"Address Unit"];
     row.required = YES;
-    row.value = [contact_info objectForKey:@"address_unit"];
+    row.value = [contact_info objectForKey:@"address_unit"]? [contact_info objectForKey:@"address_unit"]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qAddPostCode rowType:XLFormRowDescriptorTypeNumber title:@"Address Post Code"];
     row.required = YES;
-    row.value = [contact_info objectForKey:@"address_postcode"];
+    row.value = [contact_info objectForKey:@"address_postcode"]? [contact_info objectForKey:@"address_postcode"]:@"";
     [section addFormRow:row];
     
     // Required Services - Section
@@ -228,26 +199,38 @@ typedef enum preRegSection {
     
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qPhleb rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Phleb"];
-    row.value = [required_services objectForKey:@"pleb"];
+    if (required_services != (id)[NSNull null]) {
+        row.value = [required_services objectForKey:@"pleb"];
+    }
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qFOBT rowType:XLFormRowDescriptorTypeBooleanCheck title:@"FOBT"];
-    row.value = [required_services objectForKey:@"fobt"];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:qDental rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental"];
-    row.value = [required_services objectForKey:@"dental"];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:qEye rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Eye"];
-    row.value = [required_services objectForKey:@"eye"];
+    if (required_services != (id)[NSNull null]) {
+        row.value = [required_services objectForKey:@"fobt"];
+    }
     [section addFormRow:row];
     
-    if ([[required_services objectForKey:@"other_services"] isEqualToString:@"1"]) {    //only if database indicate that the other_services was indeed inserted...
-        row = [XLFormRowDescriptor formRowDescriptorWithTag:qInsertedOtherReqServ rowType:XLFormRowDescriptorTypeText];
-        row.value = @"X-Ray";
-        [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:qDental rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental"];
+    if (required_services != (id)[NSNull null]) {
+        row.value = [required_services objectForKey:@"dental"];
     }
-    //    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqServOthers rowType:XLFormRowDescriptorTypeTextView title:@"Others: -"];
-    //    [section addFormRow:row];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:qEye rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Eye"];
+    if (required_services != (id)[NSNull null]) {
+        row.value = [required_services objectForKey:@"eye"];
+    }
+    [section addFormRow:row];
+    
+    if (required_services != (id)[NSNull null]) {
+        if ([required_services objectForKey:@"other_services"] != (id)[NSNull null]) {
+            if ([[required_services objectForKey:@"other_services"] isEqualToString:@"1"]) {    //only if database indicate that the other_services was indeed inserted...
+                row = [XLFormRowDescriptor formRowDescriptorWithTag:qInsertedOtherReqServ rowType:XLFormRowDescriptorTypeText];
+                row.value = @"Extra";
+                [section addFormRow:row];
+            }
+        }
+    }
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qReqServOthers rowType:XLFormRowDescriptorTypeText];
     [[row cellConfig] setObject:@"Add other services" forKey:@"textField.placeholder"];
     section.multivaluedRowTemplate = row;
@@ -262,8 +245,10 @@ typedef enum preRegSection {
     row.required = YES;
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.dateFormat = @"yyyy-MM-dd";
-    NSDate *date = [dateFormatter dateFromString:[others_prereg objectForKey:@"pref_date"]];
-    row.value = date;
+    if ([others_prereg objectForKey:@"pref_date"] != (id)[NSNull null]) {
+        row.value = [dateFormatter dateFromString:[others_prereg objectForKey:@"pref_date"]];
+
+    }
     [section addFormRow:row];
     
     //    // Preferred Time
@@ -271,30 +256,30 @@ typedef enum preRegSection {
     preferredTimeRow = [XLFormRowDescriptor formRowDescriptorWithTag:qPrefTime rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Preferred Time"];
     preferredTimeRow.selectorOptions = @[@"9-11", @"11-1", @"1-3"];
     preferredTimeRow.required = YES;
-    preferredTimeRow.value = [self getPreferredTimeArray:others_prereg];
+    if(others_prereg != (id)[NSNull null]) {
+        if ([others_prereg objectForKey:@"time_slot_9_11"] != (id)[NSNull null]) {
+            preferredTimeRow.value = [self getPreferredTimeArray:others_prereg];
+        }
+    }
     [section addFormRow:preferredTimeRow];
-    
-    //    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPrefTime rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Preferred Time"];
-    //    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"9-11"],
-    //                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"11-1"],
-    //                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"1-3"]
-    //                            ];
-    //    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"9-11"];
-    //    row.required = YES;
-    //    [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qNeighbourhood rowType:XLFormRowDescriptorTypeText title:@"Neighbourhood"];
     row.required = YES;
-    row.value = [others_prereg objectForKey:@"neighbourhood"];
+    if(others_prereg != (id)[NSNull null]) {
+        row.value = [others_prereg objectForKey:@"neighbourhood"]? [others_prereg objectForKey:@"neighbourhood"]:@"";
+    }
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qRemarks rowType:XLFormRowDescriptorTypeTextView title:@"Remarks:-"];
     row.required = NO;
-    NSString *remarks = [others_prereg objectForKey:@"remarks"];
+    NSString *remarks;
+    if(others_prereg != (id)[NSNull null]) {
+        remarks = [others_prereg objectForKey:@"remarks"];
+    }
     
     if (remarks == (id)[NSNull null] || remarks.length == 0 ) {
         row.value = @"";
-        NSLog(@"NULL found");
+        NSLog(@"remarks is NULL");
     } else {
         row.value = [others_prereg objectForKey:@"remarks"];
     }
@@ -305,46 +290,21 @@ typedef enum preRegSection {
     
 }
 
--(void)viewDidLoad
-{
-    flag = false;
-    self.retrievedPatientDictionary = [[NSDictionary alloc] init];
-    [self getPatientData];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain
-                                                                             target:self
-                                                                             action:@selector(editPressed:)];
-    self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
-    self.completePreRegForm = [[NSMutableArray alloc] init];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(submitOtherSections:)
-                                                 name:@"submitOtherSections"
-                                               object:nil];
-    
-    double delayInSeconds = 2.0;
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-    dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
-        XLFormDescriptor *form = [self init];       //must init first before [super viewDidLoad]
-        [super viewDidLoad];
-    });
-    
-}
-
 -(void)backBtnPressed:(id)sender
 {
-    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Cancel", nil)
-                                                                              message:@"Are you sure?"
-                                                                       preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil)
-                                                        style:UIAlertActionStyleDefault
-                                                      handler:^(UIAlertAction * action) {
-                                                          [self.navigationController popViewControllerAnimated:YES];
-                                                      }]];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil)
-                                                        style:UIAlertActionStyleCancel
-                                                      handler:nil]];
-    [self presentViewController:alertController animated:YES completion:nil];
+//    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Cancel", nil)
+//                                                                              message:@"Are you sure?"
+//                                                                       preferredStyle:UIAlertControllerStyleAlert];
+//    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil)
+//                                                        style:UIAlertActionStyleDefault
+//                                                      handler:^(UIAlertAction * action) {
+//                                                          
+//                                                      }]];
+//    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil)
+//                                                        style:UIAlertActionStyleCancel
+//                                                      handler:nil]];
+//    [self presentViewController:alertController animated:YES completion:nil];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 
@@ -451,6 +411,27 @@ typedef enum preRegSection {
     };
 }
 
+- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"unsuccessful");
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+    };
+}
+
+#pragma mark Downloading Blocks
+
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSArray *data = responseObject;      //somehow double brackets... (())
+        self.retrievedPatientDictionary = data[0];
+        NSLog(@"%@", self.retrievedPatientDictionary);
+        flag = true;
+        
+    };
+}
+
 - (void (^)(NSURLSessionDataTask *task, id responseObject))personalInfoSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         NSLog(@"Personal info submission success");
@@ -463,15 +444,6 @@ typedef enum preRegSection {
                                                           userInfo:nil];
     };
 }
-
-- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
-    return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"unsuccessful");
-        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
-        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
-    };
-}
-
 
 #pragma mark -
 - (NSArray *) getSpokenLangArray: (NSDictionary *) spoken_lang {
@@ -656,31 +628,12 @@ typedef enum preRegSection {
 
 #pragma mark - Downloading Patient Details
 - (void)getPatientData {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getPatientDataWithPatientID:self.patientID
-                          progressBlock:[self progressBlock]
-                           successBlock:[self downloadSuccessBlock]
-                           andFailBlock:[self errorBlock]];
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client getPatientDataWithPatientID:self.patientID
+                              progressBlock:[self progressBlock]
+                               successBlock:[self downloadSuccessBlock]
+                               andFailBlock:[self errorBlock]];
 }
-
-
-#pragma mark - Downloading Blocks
-
-
-- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSuccessBlock {
-    return ^(NSURLSessionDataTask *task, id responseObject){
-        NSArray *data = responseObject;      //somehow double brackets... (())
-        self.retrievedPatientDictionary = data[0];
-        NSLog(@"%@", self.retrievedPatientDictionary);
-        flag = true;
-        
-    };
-}
-
-
-
-
-
 
 
 @end

@@ -11,6 +11,15 @@
 #import "ServerComm.h"
 #import "PreRegFormViewController.h"
 #import "SearchResultsTableController.h"
+#import "Reachability.h"
+
+typedef enum getDataState {
+    inactive,
+    started,
+    failed,
+    successful
+} getDataState;
+
 
 @interface PatientPreRegTableViewController () <UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating>
 
@@ -25,19 +34,40 @@
 @property (strong, nonatomic) NSMutableArray *patientNames;
 @property (strong, nonatomic) NSMutableArray *patientRegTimestamp;
 @property (strong, nonatomic) NSMutableDictionary *patientsGroupedInSections;
+@property (strong, nonatomic) NSArray *localSavedFilename;
 
 @end
 
 @implementation PatientPreRegTableViewController {
     NSNumber *selectedPatientID;
     NSArray *patientSectionTitles;
+    NSNumber *patientDataLocalOrServer;
+    BOOL loadDataFlag;
+    NetworkStatus status;
+    int fetchDataState;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    fetchDataState = inactive;
+    // Initialize the refresh control.
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    self.refreshControl.backgroundColor = [UIColor colorWithRed:0 green:146/255.0 blue:255/255.0 alpha:1];
+    self.refreshControl.tintColor = [UIColor whiteColor];
+    [self.refreshControl addTarget:self
+                            action:@selector(refreshConnectionAndTable)
+                  forControlEvents:UIControlEventValueChanged];
+    
+    Reachability *reachability = [Reachability reachabilityForInternetConnection];
+    [reachability startNotifier];
+    
+    status = [reachability currentReachabilityStatus];
+    [self processConnectionStatus];
+
     self.patientNames = [[NSMutableArray alloc] init];
     self.patientRegTimestamp = [[NSMutableArray alloc] init];
     self.patientsGroupedInSections = [[NSMutableDictionary alloc] init];
+    self.localSavedFilename = [[NSArray alloc] init];
     
     
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -69,7 +99,9 @@
     self.navigationItem.title = @"Pre-Registration";
     
     [super viewWillAppear:animated];
-    [self getAllPatients];
+//    [self getAllPatients];
+    fetchDataState = started;
+    [self getLocalSavedData];
     
 }
 
@@ -99,25 +131,98 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void) refreshConnectionAndTable {
+    status = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
+    [self processConnectionStatus];
+    
+    
+}
+
+- (void) processConnectionStatus {
+    if(status == NotReachable)
+    {
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"No Internet!", nil)
+                                                                                  message:@"You're not connected to Internet."
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction){
+                                                              [self.refreshControl endRefreshing];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+    else if (status == ReachableViaWiFi)
+    {
+        NSLog(@"Wifi");
+        [self getAllPatients];
+    }
+    else if (status == ReachableViaWWAN)
+    {
+        NSLog(@"3G");
+        [self getAllPatients];
+    }
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return [patientSectionTitles count];
+    if (fetchDataState == failed) {
+        if ([self.localSavedFilename count] > 0) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    } else {
+        if ([self.localSavedFilename count] > 0) {
+            return ([patientSectionTitles count]+1);
+        } else {
+            return [patientSectionTitles count];    //alphabets + locally saved files
+        }
+    }
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    return [patientSectionTitles objectAtIndex:section];
+    if ([self.localSavedFilename count] > 0) {
+        if (section == 0) {
+            return @"Drafts";
+        } else {
+            NSInteger newSection = section-1;
+            if (newSection == 16) {
+                NSLog(@"16");
+            }
+            return [patientSectionTitles objectAtIndex:(newSection)];    //because first section is for drafts.
+        }
+        
+    } else {
+        return [patientSectionTitles objectAtIndex:section];
+    }
+    
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-
-    // Return the number of rows in the section.
-    NSString *sectionTitle = [patientSectionTitles objectAtIndex:section];
-    NSArray *sectionPatient = [self.patientsGroupedInSections objectForKey:sectionTitle];
-    return [sectionPatient count];
+    NSString *sectionTitle;
+    NSArray *sectionPatient;
+    
+    if ([self.localSavedFilename count] > 0) {
+        if(section == 0) {
+            return [self.localSavedFilename count];
+        } else {
+            // Return the number of rows in the section.
+            sectionTitle = [patientSectionTitles objectAtIndex:(section-1)];    //first section reserved for drafts.
+            sectionPatient = [self.patientsGroupedInSections objectForKey:sectionTitle];
+            return [sectionPatient count];
+        }
+    } else {    //no draft files
+        sectionTitle = [patientSectionTitles objectAtIndex:section];
+        sectionPatient = [self.patientsGroupedInSections objectForKey:sectionTitle];
+        return [sectionPatient count];
+    }
 }
 
+//Indexing purpose!
 - (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
 {
     return patientSectionTitles;
@@ -134,13 +239,27 @@
     }
     
     // Configure the cell...
-    NSString *sectionTitle = [patientSectionTitles objectAtIndex:indexPath.section];
+    NSString *sectionTitle;
+    
+    if ([self.localSavedFilename count] > 0) { //if there are local saved data...
+        if (indexPath.section == 0) {   //section for Drafts
+            NSRange range = [[self.localSavedFilename objectAtIndex:indexPath.row] rangeOfString:@"_"];
+            NSString *displayText = [[self.localSavedFilename objectAtIndex:indexPath.row] substringToIndex:(range.location)];
+            cell.textLabel.text = displayText;
+            cell.detailTextLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
+            return cell;
+        } else {
+            sectionTitle = [patientSectionTitles objectAtIndex:(indexPath.section-1)];  //update sectionlist
+        }
+    } else {
+        sectionTitle = [patientSectionTitles objectAtIndex:indexPath.section];
+    }
     NSArray *patientsInSection = [self.patientsGroupedInSections objectForKey:sectionTitle];
     NSString *patientName = [[patientsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
     NSString *lastUpdatedTS = [[patientsInSection objectAtIndex:indexPath.row] objectForKey:@"last_updated_ts"];
     cell.textLabel.text = patientName;
     cell.detailTextLabel.text = lastUpdatedTS;
-
+    
     return cell;
 }
 
@@ -148,25 +267,44 @@
     
     NSString *selectedPatientName;
     NSDictionary *selectedPatient = [[NSDictionary alloc] init];
-
-    
-    if (tableView == self.tableView) {
-        selectedPatient = [self findPatientNameFromSectionRow:indexPath];
-        selectedPatientName = [selectedPatient objectForKey:@"resident_name"];
-        selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
-    } else {
-        selectedPatient = self.resultsTableController.filteredProducts[indexPath.row];
-        selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
+    if ([self.localSavedFilename count] > 0) {
+        if (indexPath.section == 0) {   //part of the drafts...
+            selectedPatientID = [NSNumber numberWithInteger:indexPath.row];
+            patientDataLocalOrServer = [NSNumber numberWithInt:local];
+            loadDataFlag = YES;
+            
+            [self performSegueWithIdentifier:@"preRegPatientListToPatientFormSegue" sender:self];
+            NSLog(@"Continue Form segue performed!");
+            
+            [tableView deselectRowAtIndexPath:indexPath animated:NO];
+            
+        }
+    }
+    else {  //no saved draft
+        if (tableView == self.tableView) {      //not in the searchResult view
+            selectedPatient = [self findPatientNameFromSectionRow:indexPath];
+            selectedPatientName = [selectedPatient objectForKey:@"resident_name"];
+            selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
+            
+        } else {
+            selectedPatient = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
+            selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
+        }
+        
+        [self performSegueWithIdentifier:@"preRegPatientListToPatientDataSegue" sender:self];
+        NSLog(@"View submitted Form segue performed!");
+        
+        [tableView deselectRowAtIndexPath:indexPath animated:NO];
     }
     
-    [self performSegueWithIdentifier:@"preRegPatientListToPatientDataSegue" sender:self];
-    NSLog(@"segue performed!");
+    
 
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 
 - (IBAction)addBtnPressed:(id)sender {
-    
+    loadDataFlag = NO;
+    [self performSegueWithIdentifier:@"preRegPatientListToPatientFormSegue" sender:self];
+    NSLog(@"Form segue performed!");
 }
 
 
@@ -235,17 +373,28 @@
         
         [self putNamesIntoSections];
         [self.tableView reloadData];
+        [self.refreshControl endRefreshing];
     };
 }
 
 - (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"Patients data fetch was unsuccessful1");
+        NSLog(@"Patients data fetch was unsuccessful!");
+        fetchDataState = failed;
+        [self.tableView reloadData];
     };
 }
 
 
 #pragma mark - Patient API
+
+- (void)getLocalSavedData {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    self.localSavedFilename = [fileManager contentsOfDirectoryAtPath:documentsDirectory
+                                                      error:nil];
+}
 
 - (void)getAllPatients {
     ServerComm *client = [ServerComm sharedServerCommInstance];
@@ -436,7 +585,13 @@
 }
 
 - (NSDictionary *) findPatientNameFromSectionRow: (NSIndexPath *)indexPath{
-    NSInteger section = indexPath.section;
+    
+    NSInteger section;
+    if ([self.localSavedFilename count] > 0) {
+        section = indexPath.section - 1;
+    } else {
+        section = indexPath.section;
+    }
     NSInteger row = indexPath.row;
     
     NSString *sectionAlphabet = [[NSString alloc] initWithString:[patientSectionTitles objectAtIndex:section]];
@@ -510,9 +665,15 @@ NSString *const SearchBarIsFirstResponderKey = @"SearchBarIsFirstResponderKey";
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     //     Get the new view controller using [segue destinationViewController].
     //     Pass the selected object to the new view controller.
-    if ([segue.destinationViewController respondsToSelector:@selector(setPatientID:)]) {
+    if ([segue.destinationViewController respondsToSelector:@selector(setPatientID:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setPatientID:)
                                               withObject:selectedPatientID];
+    }
+    
+    if ([segue.destinationViewController respondsToSelector:@selector(setPatientDataLocalOrServer:)]) { //continue form
+        [segue.destinationViewController performSelector:@selector(setPatientDataLocalOrServer:)
+                                              withObject:patientDataLocalOrServer];
+        [segue.destinationViewController performSelector:@selector(setLoadDataFlag:) withObject:[NSNumber numberWithBool:loadDataFlag]];
     }
     
 }

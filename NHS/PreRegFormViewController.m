@@ -8,44 +8,13 @@
 
 #import "PreRegFormViewController.h"
 #import "ServerComm.h"
+#import "MBProgressHUD.h"
 
 //XLForms stuffs
 #import "XLForm.h"
-//#import "XLForm/InputsFormViewController.h"
-//#import "SelectorsFormViewController.h"
-//#import "OthersFormViewController.h"
-//#import "DatesFormViewController.h"
-//#import "MultiValuedFormViewController.h"
-//#import "ExamplesFormViewController.h"
-//#import "NativeEventFormViewController.h"
-///#import "UICustomizationFormViewController.h"
-//#import "CustomRowsViewController.h"
-//#import "AccessoryViewFormViewController.h"
-//#import "PredicateFormViewController.h"
-//#import "FormattersViewController.h"
+#import "AppConstants.h"
+
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
-
-NSString *const kName = @"name";
-NSString *const kNRIC = @"nric";
-NSString *const kGender = @"gender";
-NSString *const kDOB = @"dob";
-NSString *const kSpokenLanguage = @"spokenlanguage";
-NSString *const kSpokenLangOthers = @"spokenlangothers";
-NSString *const kContactNumber = @"contactnumber";
-NSString *const kAddStreet = @"addressstreet";
-NSString *const kAddBlock = @"addressblock";
-NSString *const kAddUnit = @"addressunit";
-NSString *const kAddPostCode = @"addresspostcode";
-NSString *const kPhleb = @"phleb";
-NSString *const kFOBT = @"fobt";
-NSString *const kDental = @"dental";
-NSString *const kEye = @"eye";
-NSString *const kReqServOthers = @"reqservothers";
-NSString *const kPrefDate = @"preferreddate";
-NSString *const kPrefTime = @"preferredtime";
-NSString *const kNeighbourhood = @"neighbourhood";
-NSString *const kRemarks = @"remarks";
-
 
 typedef enum preRegSection {
     personalInfo,
@@ -116,15 +85,41 @@ typedef enum preRegSection {
 @end
 
 
-@interface PreRegFormViewController ()
+@interface PreRegFormViewController () {
+    int successCounter;
+    MBProgressHUD *hud;
+}
 
 @property (strong, nonatomic) NSNumber *resident_id;
 @property (nonatomic) preRegSection *preRegSection;
 @property (strong, nonatomic) NSMutableArray *completePreRegForm;
+@property (strong, nonatomic) NSDictionary *retrievedPatientDictionary;
+@property (strong, nonatomic) NSString *loadedFilepath;
 
 @end
 
 @implementation PreRegFormViewController 
+
+-(void)viewDidLoad
+{
+    [self loadDraftIfAny];
+    XLFormDescriptor *form = [self init];       //must init first before [super viewDidLoad]
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitPressed:)];
+    self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
+    self.completePreRegForm = [[NSMutableArray alloc] init];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(submitOtherSections:)
+                                                 name:@"submittingOtherSections"
+                                               object:nil];
+    [super viewDidLoad];
+}
+
+//- (void) viewWillDisappear:(BOOL)animated {
+//    [super viewWillDisappear:animated];
+//    self.navigationItem.title = @"Back";        //to shorten
+//}
 
 -(id)init
 {
@@ -142,19 +137,22 @@ typedef enum preRegSection {
     // Name
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeText title:@"Patient Name"];
     row.required = YES;
+    row.value = [self.retrievedPatientDictionary objectForKey:kName]? [self.retrievedPatientDictionary objectForKey:kName]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC rowType:XLFormRowDescriptorTypeText title:@"NRIC"];
+    row.value = [self.retrievedPatientDictionary objectForKey:kNRIC]? [self.retrievedPatientDictionary objectForKey:kNRIC]:@"";
     row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorPickerViewInline title:@"Gender"];
     row.selectorOptions = @[@"Male", @"Female"];
-    row.value = @"Male";
+    row.value = [self.retrievedPatientDictionary objectForKey:kGender]? [self.retrievedPatientDictionary objectForKey:kGender]:@"Male";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDOB rowType:XLFormRowDescriptorTypeText title:@"DOB Year"];
     row.required = YES;
+    row.value = [self.retrievedPatientDictionary objectForKey:kDOB]? [self.retrievedPatientDictionary objectForKey:kDOB]:@"";
     [section addFormRow:row];
     
     
@@ -166,6 +164,7 @@ typedef enum preRegSection {
     spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLanguage rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language"];
     spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
     row.required = YES;
+    spokenLangRow.value = [self.retrievedPatientDictionary objectForKey:kSpokenLanguage]? [self.retrievedPatientDictionary objectForKey:kSpokenLanguage]:@[] ;
     [section addFormRow:spokenLangRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLangOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
@@ -179,22 +178,27 @@ typedef enum preRegSection {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kContactNumber rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     row.required = YES;
+    row.value = [self.retrievedPatientDictionary objectForKey:kContactNumber]? [self.retrievedPatientDictionary objectForKey:kContactNumber]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddStreet rowType:XLFormRowDescriptorTypeText title:@"Address Street"];
     row.required = YES;
+    row.value = [self.retrievedPatientDictionary objectForKey:kAddStreet]? [self.retrievedPatientDictionary objectForKey:kAddStreet]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddUnit rowType:XLFormRowDescriptorTypeText title:@"Address Block"];
     row.required = YES;
+    row.value = [self.retrievedPatientDictionary objectForKey:kAddUnit]? [self.retrievedPatientDictionary objectForKey:kAddUnit]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddBlock rowType:XLFormRowDescriptorTypeText title:@"Address Unit"];
     row.required = YES;
+    row.value = [self.retrievedPatientDictionary objectForKey:kAddBlock]? [self.retrievedPatientDictionary objectForKey:kAddBlock]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddPostCode rowType:XLFormRowDescriptorTypeNumber title:@"Address Post Code"];
     row.required = YES;
+    row.value = [self.retrievedPatientDictionary objectForKey:kAddPostCode]? [self.retrievedPatientDictionary objectForKey:kAddPostCode]:@"";
     [section addFormRow:row];
     
     // Required Services - Section
@@ -206,17 +210,17 @@ typedef enum preRegSection {
 
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhleb rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Phleb"];
-    row.value = @(NO);
+    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:0]:@(NO);
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFOBT rowType:XLFormRowDescriptorTypeBooleanCheck title:@"FOBT"];
-    row.value = @(NO);
+    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:1]:@(NO);
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDental rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental"];
-    row.value = @(NO);
+    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:2]:@(NO);
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEye rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Eye"];
-    row.value = @(NO);
+    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:3]:@(NO);
     [section addFormRow:row];
     
 //    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqServOthers rowType:XLFormRowDescriptorTypeTextView title:@"Others: -"];
@@ -234,8 +238,9 @@ typedef enum preRegSection {
     // Date
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kPrefDate rowType:XLFormRowDescriptorTypeDateInline title:@"Preferred Date"];
     [row.cellConfigAtConfigure setObject:[NSDate new] forKey:@"minimumDate"];
-    row.value = [NSDate new];
     row.required = YES;
+    NSDate *date = [self.retrievedPatientDictionary objectForKey:kPrefDate]? [self.retrievedPatientDictionary objectForKey:kPrefDate]: [NSDate new];
+    row.value = date;
     [section addFormRow:row];
     
 //    // Preferred Time
@@ -243,6 +248,7 @@ typedef enum preRegSection {
     preferredTimeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPrefTime rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Preferred Time"];
     preferredTimeRow.selectorOptions = @[@"9-11", @"11-1", @"1-3"];
     preferredTimeRow.required = YES;
+    preferredTimeRow.value = [self.retrievedPatientDictionary objectForKey:kPrefTime]? [self.retrievedPatientDictionary objectForKey:kPrefTime]:@[];
     [section addFormRow:preferredTimeRow];
     
 //    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPrefTime rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Preferred Time"];
@@ -256,10 +262,12 @@ typedef enum preRegSection {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourhood rowType:XLFormRowDescriptorTypeText title:@"Neighbourhood"];
     row.required = YES;
+    row.value = [self.retrievedPatientDictionary objectForKey:kNeighbourhood]? [self.retrievedPatientDictionary objectForKey:kNeighbourhood]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kRemarks rowType:XLFormRowDescriptorTypeTextView title:@"Remarks:-"];
     row.required = NO;
+    row.value = [self.retrievedPatientDictionary objectForKey:kRemarks]? [self.retrievedPatientDictionary objectForKey:kRemarks]:@"";
     [section addFormRow:row];
     
     
@@ -267,34 +275,49 @@ typedef enum preRegSection {
     
 }
 
--(void)viewDidLoad
-{
-    XLFormDescriptor *form = [self init];       //must init first before [super viewDidLoad]
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitPressed:)];
-    self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
-    self.completePreRegForm = [[NSMutableArray alloc] init];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(submitOtherSections:)
-                                                 name:@"submitOtherSections"
-                                               object:nil];
-    [super viewDidLoad];
+- (void) loadDraftIfAny {
+    if (self.loadDataFlag == [NSNumber numberWithBool:YES]) {
+        if (self.patientDataLocalOrServer == [NSNumber numberWithInt:local]) {
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = [paths objectAtIndex:0];
+            NSFileManager *fileManager = [[NSFileManager alloc] init];
+            NSArray *localFiles = [fileManager contentsOfDirectoryAtPath:documentsDirectory
+                                                                   error:nil];
+            NSString *filename = [localFiles objectAtIndex:[self.patientLocalFileIndex intValue]];
+            self.loadedFilepath = [[NSString alloc] initWithString:[documentsDirectory stringByAppendingPathComponent:filename]];
+            self.retrievedPatientDictionary = [NSDictionary dictionaryWithContentsOfFile:self.loadedFilepath];
+            NSLog(@"%@", self.retrievedPatientDictionary);
+        }
+    } else {
+        //do nothing
+    }
 }
+
+# pragma mark - Buttons
 
 -(void)backBtnPressed:(id)sender
 {
-    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Cancel", nil)
-                                            message:@"Are you sure?"
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Are you sure?", nil)
+                                            message:@""
                                             preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil)
-        style:UIAlertActionStyleDefault
-        handler:^(UIAlertAction * action) {
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Delete Draft", nil)
+        style:UIAlertActionStyleDestructive
+        handler:^(UIAlertAction * deleteDraftAction) {
+            [self deleteDraft];
             [self.navigationController popViewControllerAnimated:YES];
     }]];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil)
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
                                                         style:UIAlertActionStyleCancel
                                                       handler:nil]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save Draft", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * saveDraftAction) {
+                                                          [self saveDraft];
+                                                          [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                                                                 object:nil
+                                                                  userInfo:nil];
+                                                          [self.navigationController popViewControllerAnimated:YES];
+                                                      }]];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
@@ -307,6 +330,10 @@ typedef enum preRegSection {
         return;
     }
     [self.tableView endEditing:YES];
+    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    
+    // Set the label text.
+    hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
     [self submitPersonalInfo:[self preparePersonalInfoDict]];
     
 //#if __IPHONE_OS_VERSION_MAX_ALLOWED < 80000
@@ -336,10 +363,74 @@ typedef enum preRegSection {
 //        [message show];
 //    }
 //#endif
-    
-    [self.navigationController popViewControllerAnimated:YES];
 }
 
+#pragma mark UIAlertAction methods
+
+- (void) saveDraft {
+    NSMutableDictionary *formValuesDict = [[self.form formValues] mutableCopy];
+    if ([formValuesDict objectForKey:kName] == [NSNull null])        //if NULL, cannot store in local directory
+        [formValuesDict removeObjectForKey:kName];
+    if ([formValuesDict objectForKey:kSpokenLanguage] == [NSNull null]) {
+        [formValuesDict removeObjectForKey:kSpokenLanguage];
+    }
+    // get current date/time
+    NSDate *today = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
+    NSString *ts = [[localDateTime description] stringByReplacingOccurrencesOfString:@" +0000" withString:@""];
+    NSString *nric = [[[self.form formValues] objectForKey:@"nric"] stringByAppendingString:@"_"];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *filename = [nric stringByAppendingString:ts]; //Eg. S12313K_datetime
+    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];
+    
+    //Save the form locally on the iPhone
+    [formValuesDict writeToFile:filePath atomically:YES];
+}
+
+- (void) deleteDraft {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *nric = [[self.form formValues] objectForKey:@"nric"];
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    NSArray *localSavedFilenames = [fileManager contentsOfDirectoryAtPath:documentsDirectory
+                                                               error:nil];
+    NSString *filename;
+    for (NSString* item in localSavedFilenames)
+    {
+        if ([item rangeOfString:nric].location != NSNotFound)
+            filename = item;
+        else
+            return;     //nothing to delete
+    }
+    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];
+    NSError *error;
+    BOOL success = [fileManager removeItemAtPath:filePath error:&error];
+    if (success) {
+        NSLog(@"Draft deleted!");
+    }
+    else
+    {
+        NSLog(@"Could not delete file -:%@ ",[error localizedDescription]);
+    }
+}
+
+- (void) removeDraftAfterSubmission {
+    NSError *error;
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    BOOL success = [fileManager removeItemAtPath:self.loadedFilepath error:&error];
+    if (success) {
+        NSLog(@"Draft deleted!");
+    }
+    else
+    {
+        NSLog(@"Could not delete file -:%@ ",[error localizedDescription]);
+    }}
+
+#pragma mark - Post data to server methods
 - (void) submitPersonalInfo:(NSDictionary *) dict {
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client postPersonalInfoWithDict:dict
@@ -374,9 +465,6 @@ typedef enum preRegSection {
                       andFailBlock:[self errorBlock]];
 }
 
-- (void) submitContactInfo: (NSTimer *) time{
-    
-}
 #pragma mark - Blocks
 
 - (void (^)(NSProgress *downloadProgress))progressBlock {
@@ -388,10 +476,30 @@ typedef enum preRegSection {
 - (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         NSLog(@"%@", responseObject);
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
-                                                            object:nil
-                                                          userInfo:nil];
+        successCounter++;
+        if(successCounter == 4) {
+            NSLog(@"SUBMISSION SUCCESSFUL!!");
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [hud hideAnimated:YES];
+            });
+            if (self.loadDataFlag == [NSNumber numberWithBool:YES]) {       //if this draft is loaded and submitted,now delete!
+                [self removeDraftAfterSubmission];
+            }
+            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
+                message:@"Pre-registration successful!"
+                 preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                style:UIAlertActionStyleDefault
+                handler:^(UIAlertAction * okAction) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                        object:nil
+                        userInfo:nil];
+                    [self.navigationController popViewControllerAnimated:YES];
+                }]];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
+
 
     };
 }
@@ -402,21 +510,26 @@ typedef enum preRegSection {
         self.resident_id = [responseObject objectForKey:@"resident_id"];
         NSLog(@"I'm resident %@", self.resident_id);
         
-        //after success submitting personal info, get resident_id and submit the rest
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"submitOtherSections"
-            object:nil
-            userInfo:nil];
+        successCounter = 0; //preparing for the rest of the submission
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"submittingOtherSections" object:nil];
     };
 }
 
 - (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"unsuccessful");
+        NSLog(@"&******UNSUCCESSFUL SUBMISSION******!!");
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                                                            object:nil
+                                                          userInfo:nil];
+        [self.navigationController popViewControllerAnimated:YES];
     };
 }
 
+#pragma mark - Dictionary methods
 - (NSDictionary *) preparePersonalInfoDict {
 
     
@@ -516,7 +629,7 @@ typedef enum preRegSection {
     contactInfoDict = @{@"contact_info":dict};
     
     NSMutableArray *otherServicesArray = [[NSMutableArray alloc] initWithArray:[[self.form formValues]objectForKey:@"otherservices"]];
-    [otherServicesArray removeObjectsInArray:@[@0,@0,@0,@0]];
+    [otherServicesArray removeObjectsInRange:NSMakeRange(0, 4)];
 #warning though the code is ready, yet API no where to insert other required services.
     NSString *otherServices = @"0";
     if([otherServicesArray count] > 1) {
@@ -525,10 +638,10 @@ typedef enum preRegSection {
     //Required Services
     localDateTime = [NSDate dateWithTimeInterval:1.0 sinceDate:localDateTime];      //add a second
     dict = @{@"resident_id":self.resident_id,
-             @"pleb":[[self.form formValues] objectForKey:@"phleb"],
-             @"fobt":[[self.form formValues] objectForKey:@"fobt"],
-             @"dental":[[self.form formValues] objectForKey:@"dental"],
-             @"eye":[[self.form formValues] objectForKey:@"eye"],
+             @"pleb":[[[self.form formValues] objectForKey:@"otherservices"] objectAtIndex:0],
+             @"fobt":[[[self.form formValues] objectForKey:@"otherservices"] objectAtIndex:1],
+             @"dental":[[[self.form formValues] objectForKey:@"otherservices"] objectAtIndex:2],
+             @"eye":[[[self.form formValues] objectForKey:@"otherservices"] objectAtIndex:3],
              @"other_services":otherServices,
              @"ts":[localDateTime description]
              };
@@ -573,8 +686,4 @@ typedef enum preRegSection {
     
     return self.completePreRegForm;
 }
-
-
-
-
 @end
