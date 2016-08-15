@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "84D4C7D71D0A8B942B627C6E"
+               BlueprintIdentifier = "8548D27C4C28C5793D0FDA57"
                BuildableName = "NSJSONSerialization_ANDYJSONFile.framework"
                BlueprintName = "NSJSONSerialization-ANDYJSONFile"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "84D4C7D71D0A8B942B627C6E"
+            BlueprintIdentifier = "8548D27C4C28C5793D0FDA57"
             BuildableName = "NSJSONSerialization_ANDYJSONFile.framework"
             BlueprintName = "NSJSONSerialization-ANDYJSONFile"
             ReferencedContainer = "container:Pods.xcodeproj">

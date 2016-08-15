@@ -12,7 +12,6 @@
 		8E25276A1D5766C400ACEE92 /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E2527691D5766C400ACEE92 /* HomeViewController.m */; };
 		8E25276D1D57891700ACEE92 /* PreRegDisplayFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E25276C1D57891700ACEE92 /* PreRegDisplayFormViewController.m */; };
 		8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E28D5521D54C9F8006BDF8F /* SearchResultsTableController.m */; };
-		8EC56F7E1D60A18F00938C2A /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56F7D1D60A18F00938C2A /* Reachability.m */; };
 		8EC56F811D60B88D00938C2A /* ScreeningFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56F801D60B88D00938C2A /* ScreeningFormViewController.m */; };
 		8EC56F841D60B8D600938C2A /* ScreeningFormSectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56F831D60B8D600938C2A /* ScreeningFormSectionViewController.m */; };
 		8EC56F871D60C16300938C2A /* ScreeningSectionTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56F861D60C16300938C2A /* ScreeningSectionTableViewController.m */; };
@@ -30,6 +29,7 @@
 		E1334EE21D432B5800A43539 /* Login.json in Resources */ = {isa = PBXBuildFile; fileRef = E1334EDF1D432B5800A43539 /* Login.json */; };
 		E1334EE31D432B5800A43539 /* Pre-registration.json in Resources */ = {isa = PBXBuildFile; fileRef = E1334EE01D432B5800A43539 /* Pre-registration.json */; };
 		E1334EE71D432CAA00A43539 /* PreRegistrationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */; };
+		E1A4F0DC1D61CB8A00EE9BBB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = E1A4F0DB1D61CB8A00EE9BBB /* Reachability.m */; };
 		E1A987441D4327FE005FC83D /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873A1D4327FE005FC83D /* Assets */; };
 		E1A987451D4327FE005FC83D /* Basic-ObjC in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873B1D4327FE005FC83D /* Basic-ObjC */; };
 		E1A987461D4327FE005FC83D /* Basic-Swift in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873C1D4327FE005FC83D /* Basic-Swift */; };
@@ -80,8 +80,6 @@
 		8E25276C1D57891700ACEE92 /* PreRegDisplayFormViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreRegDisplayFormViewController.m; sourceTree = "<group>"; };
 		8E28D5511D54C9F8006BDF8F /* SearchResultsTableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchResultsTableController.h; sourceTree = "<group>"; };
 		8E28D5521D54C9F8006BDF8F /* SearchResultsTableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchResultsTableController.m; sourceTree = "<group>"; };
-		8EC56F7C1D60A18F00938C2A /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = ../../../../Downloads/Reachability/Reachability/Reachability.h; sourceTree = "<group>"; };
-		8EC56F7D1D60A18F00938C2A /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = ../../../../Downloads/Reachability/Reachability/Reachability.m; sourceTree = "<group>"; };
 		8EC56F7F1D60B88D00938C2A /* ScreeningFormViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreeningFormViewController.h; sourceTree = "<group>"; };
 		8EC56F801D60B88D00938C2A /* ScreeningFormViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreeningFormViewController.m; sourceTree = "<group>"; };
 		8EC56F821D60B8D600938C2A /* ScreeningFormSectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreeningFormSectionViewController.h; sourceTree = "<group>"; };
@@ -114,6 +112,8 @@
 		E1334EE01D432B5800A43539 /* Pre-registration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "Pre-registration.json"; sourceTree = "<group>"; };
 		E1334EE51D432CAA00A43539 /* PreRegistrationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreRegistrationViewController.h; sourceTree = "<group>"; };
 		E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreRegistrationViewController.m; sourceTree = "<group>"; };
+		E1A4F0DA1D61CB8A00EE9BBB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		E1A4F0DB1D61CB8A00EE9BBB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		E1A9873A1D4327FE005FC83D /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
 		E1A9873B1D4327FE005FC83D /* Basic-ObjC */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Basic-ObjC"; sourceTree = "<group>"; };
 		E1A9873C1D4327FE005FC83D /* Basic-Swift */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Basic-Swift"; sourceTree = "<group>"; };
@@ -335,8 +335,8 @@
 			children = (
 				8EC56F881D60CDBB00938C2A /* AppConstants.h */,
 				8EC56F891D60CDBB00938C2A /* AppConstants.m */,
-				8EC56F7C1D60A18F00938C2A /* Reachability.h */,
-				8EC56F7D1D60A18F00938C2A /* Reachability.m */,
+				E1A4F0DA1D61CB8A00EE9BBB /* Reachability.h */,
+				E1A4F0DB1D61CB8A00EE9BBB /* Reachability.m */,
 				E1FCF9301D45B77F00478F7B /* ServerComm.h */,
 				E1FCF9311D45B77F00478F7B /* ServerComm.m */,
 			);
@@ -625,7 +625,6 @@
 				E120E4081D431E9B002DBC7E /* main.m in Sources */,
 				E1EFB0931D433C3400510532 /* PatientScreeningListTableViewController.m in Sources */,
 				E10412101D4C8EFA0024663B /* PreRegFormViewController.m in Sources */,
-				8EC56F7E1D60A18F00938C2A /* Reachability.m in Sources */,
 				8E25276D1D57891700ACEE92 /* PreRegDisplayFormViewController.m in Sources */,
 				8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */,
 				E10412131D4C92CB0024663B /* tempViewController.m in Sources */,
@@ -636,6 +635,7 @@
 				8EC56F841D60B8D600938C2A /* ScreeningFormSectionViewController.m in Sources */,
 				8EC56F811D60B88D00938C2A /* ScreeningFormViewController.m in Sources */,
 				E1FCF9351D45BBFC00478F7B /* PatientPreRegTableViewController.m in Sources */,
+				E1A4F0DC1D61CB8A00EE9BBB /* Reachability.m in Sources */,
 				8E25276A1D5766C400ACEE92 /* HomeViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

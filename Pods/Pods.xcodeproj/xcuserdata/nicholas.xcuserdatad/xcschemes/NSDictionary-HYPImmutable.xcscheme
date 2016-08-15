@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7794D3159EB6DCA705815D36"
+               BlueprintIdentifier = "C3A41C12B25AB56E8579353E"
                BuildableName = "NSDictionary_HYPImmutable.framework"
                BlueprintName = "NSDictionary-HYPImmutable"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "7794D3159EB6DCA705815D36"
+            BlueprintIdentifier = "C3A41C12B25AB56E8579353E"
             BuildableName = "NSDictionary_HYPImmutable.framework"
             BlueprintName = "NSDictionary-HYPImmutable"
             ReferencedContainer = "container:Pods.xcodeproj">

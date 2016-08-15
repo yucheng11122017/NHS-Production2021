@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '4955DCC8566BD1DE64B8F947'
+               BlueprintIdentifier = '235FA2A44065D51BE923452F'
                BlueprintName = 'HYPMathParser'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'HYPMathParser.framework'>

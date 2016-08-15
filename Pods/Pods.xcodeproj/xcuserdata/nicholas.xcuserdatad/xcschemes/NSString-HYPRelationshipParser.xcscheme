@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1645A9EF04B72996107F8F46"
+               BlueprintIdentifier = "138F2AB146EF5122CCDB2EF4"
                BuildableName = "NSString_HYPRelationshipParser.framework"
                BlueprintName = "NSString-HYPRelationshipParser"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "1645A9EF04B72996107F8F46"
+            BlueprintIdentifier = "138F2AB146EF5122CCDB2EF4"
             BuildableName = "NSString_HYPRelationshipParser.framework"
             BlueprintName = "NSString-HYPRelationshipParser"
             ReferencedContainer = "container:Pods.xcodeproj">
