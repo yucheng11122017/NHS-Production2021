@@ -302,6 +302,7 @@ typedef enum getDataState {
 }
 
 - (IBAction)addBtnPressed:(id)sender {
+    [self.refreshControl endRefreshing];    //stop refreshing
     loadDataFlag = NO;
     [self performSegueWithIdentifier:@"preRegPatientListToPatientFormSegue" sender:self];
     NSLog(@"Form segue performed!");

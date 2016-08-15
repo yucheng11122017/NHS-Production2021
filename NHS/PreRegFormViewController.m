@@ -326,9 +326,20 @@ typedef enum preRegSection {
 {
     NSArray * validationErrors = [self formValidationErrors];
     if (validationErrors.count > 0){
-        [self showFormValidationError:[validationErrors firstObject]];
+        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+            cell.backgroundColor = [UIColor orangeColor];
+            [UIView animateWithDuration:0.3 animations:^{
+                cell.backgroundColor = [UIColor whiteColor];
+            }];
+        }];
         return;
     }
+//    if (validationErrors.count > 0){
+//        [self showFormValidationError:[validationErrors firstObject]];
+//        return;
+//    }
     [self.tableView endEditing:YES];
     hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
     
