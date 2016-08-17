@@ -44,6 +44,32 @@ NSString *const kBpDiastolicAvg = @"bp_diastolic_avg";
 NSString *const kBpSystolic3 = @"bp_systolic3";
 NSString *const kBpDiastolic3 = @"bp_diastolic3";
 
+//Screening of Risk Factors
+NSString *const kExYesNo = @"ex_yes_no";
+NSString *const kExNoWhy = @"ex_no_why";
+NSString *const kExNoOthers = @"ex_no_others";
+NSString *const kSmoking = @"smoking";
+NSString *const kSmokingNumYears = @"smoking_num_years";
+NSString *const kTypeOfSmoke = @"smoking_type";
+NSString *const kSmokeNumSticks = @"smoking_num_sticks";
+NSString *const kSmokeAfterWaking = @"smoking_after_waking";
+NSString *const kSmokingRefrain = @"smoking_refrain";
+NSString *const kSmokingWhichNotGiveUp = @"smoking_which_not_give_up";
+NSString *const kSmokingMornFreq = @"smoking_morn_freq";
+NSString *const kSmokingSickInBed = @"smoking_sick_in_bed";
+NSString *const kSmokingAttemptedQuit = @"smoking_attempted_quit";
+NSString *const kSmokingNumQuitAttempts = @"smoking_num_quit_attempts";
+NSString *const kSmokingIntentionsToCut = @"smoking_intentions_to_cut";
+NSString *const kSmokingHowQuit = @"smoking_how_quit";
+NSString *const kSmokingWhyQuit = @"smoking_why_quit";
+NSString *const kAlcoholHowOften = @"alcohol_how_often";
+NSString *const kAlcoholNumYears = @"alcohol_num_years";
+NSString *const kAlcoholConsumpn = @"alcohol_consumpn";
+NSString *const kAlcoholPreference = @"alcohol_preference";
+NSString *const kAlcoholIntentToCut = @"alcohol_intent_to_cut";
+
+
+
 
 
 
@@ -64,7 +90,7 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
             break;
         case 2: form = [self initClinicalResults];
             break;
-        case 3:
+        case 3: form = [self initScreeningOfRiskFactors];
             break;
         case 4: form = [self initDiabetesMellitus];
             break;
@@ -131,7 +157,7 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     // Name
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeText title:@"Patient Name"];
     row.required = YES;
-//    row.value = [self.retrievedPatientDictionary objectForKey:kName]? [self.retrievedPatientDictionary objectForKey:kName]:@"";
+    //    row.value = [self.retrievedPatientDictionary objectForKey:kName]? [self.retrievedPatientDictionary objectForKey:kName]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorPickerViewInline title:@"Gender"];
@@ -141,13 +167,13 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC rowType:XLFormRowDescriptorTypeText title:@"NRIC"];
-//    row.value = [self.retrievedPatientDictionary objectForKey:kNRIC]? [self.retrievedPatientDictionary objectForKey:kNRIC]:@"";
+    //    row.value = [self.retrievedPatientDictionary objectForKey:kNRIC]? [self.retrievedPatientDictionary objectForKey:kNRIC]:@"";
     row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDOB rowType:XLFormRowDescriptorTypeText title:@"DOB Year"];
     row.required = YES;
-//    row.value = [self.retrievedPatientDictionary objectForKey:kDOB]? [self.retrievedPatientDictionary objectForKey:kDOB]:@"";
+    //    row.value = [self.retrievedPatientDictionary objectForKey:kDOB]? [self.retrievedPatientDictionary objectForKey:kDOB]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kContactNumber rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
@@ -174,7 +200,7 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLanguage rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language"];
     spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
     row.required = YES;
-//    spokenLangRow.value = [self.retrievedPatientDictionary objectForKey:kSpokenLanguage]? [self.retrievedPatientDictionary objectForKey:kSpokenLanguage]:@[] ;
+    //    spokenLangRow.value = [self.retrievedPatientDictionary objectForKey:kSpokenLanguage]? [self.retrievedPatientDictionary objectForKey:kSpokenLanguage]:@[] ;
     [section addFormRow:spokenLangRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLangOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
@@ -218,7 +244,7 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     row.required = YES;
     //    row.value = [self.retrievedPatientDictionary objectForKey:kAddStreet]? [self.retrievedPatientDictionary objectForKey:kAddStreet]:@"";
     [section addFormRow:row];
-
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddBlock rowType:XLFormRowDescriptorTypeText title:@"Address (Block)"];
     row.required = YES;
     //    row.value = [self.retrievedPatientDictionary objectForKey:kAddUnit]? [self.retrievedPatientDictionary objectForKey:kAddUnit]:@"";
@@ -226,7 +252,7 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddUnit rowType:XLFormRowDescriptorTypeText title:@"Address (Unit) - {With #}"];
     row.required = YES;
-//    row.value = [self.retrievedPatientDictionary objectForKey:kAddBlock]? [self.retrievedPatientDictionary objectForKey:kAddBlock]:@"";
+    //    row.value = [self.retrievedPatientDictionary objectForKey:kAddBlock]? [self.retrievedPatientDictionary objectForKey:kAddBlock]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddYears rowType:XLFormRowDescriptorTypeText title:@"Address (years stayed)"];
@@ -253,7 +279,7 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     row.value = @1;
     [section addFormRow:row];
     
-
+    
     return [super initWithForm:formDescriptor];
 }
 
@@ -288,7 +314,7 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     height.required = YES;
     height.value = @0;
     [section addFormRow:height];
-
+    
     XLFormRowDescriptor *weight;
     weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeight rowType:XLFormRowDescriptorTypeNumber title:@"Weight (kg)"];
     weight.required = YES;
@@ -406,19 +432,301 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
             diastolic_avg.value = @(([diastolic_1.value integerValue]+ [diastolic_2.value integerValue])/2);
         }
     };
-
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic3 rowType:XLFormRowDescriptorTypeNumber title:@"Repeat BP Taking (3rd Systolic)"];
     row.required = NO;
     [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
     [section addFormRow:row];
-
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic3 rowType:XLFormRowDescriptorTypeNumber title:@"Repeat BP Taking (3rd Diastolic)"];
     [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
     row.required = NO;
     [section addFormRow:row];
     
-     return [super initWithForm:formDescriptor];
+    return [super initWithForm:formDescriptor];
     
+}
+
+-(id)initScreeningOfRiskFactors {
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Screening of Risk Factors"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    // Exercise - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Exercise"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Exercise (Do you participate in any form of physical activity, for at least 20 min per occasion, 3 o more days a week?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kExYesNo rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.value = @"NO";
+    [section addFormRow:row];
+    
+    
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kExNoWhy rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Exercise (If no, why not?)"];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Because of health condition"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"No time"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Too troublesome"],
+                            ];
+    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"No time"];   //default value
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Exercise (If no, why not? - Others)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kExNoOthers
+                                                rowType:XLFormRowDescriptorTypeTextView];
+    [row.cellConfigAtConfigure setObject:@"Type your other reasons here" forKey:@"textView.placeholder"];
+    
+    [section addFormRow:row];
+    
+    // Smoking - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Smoking"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmoking
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@"What is your smoking status?"];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Smokes at least once a day"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Smokes but not everyday"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Ex-smoker, now quit"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Never smoked"]
+                            ];
+    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Never smoked"];   //default value
+    row.required = YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If smoking currently, how many years have you been smoking for?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingNumYears rowType:XLFormRowDescriptorTypeNumber title:@"Year(s)"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If smoking currently, what do you smoke? (can tick more than one option)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kTypeOfSmoke rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
+    row.selectorOptions = @[@"Cigarettes", @"Pipe", @"self-rolled leaves \"ang hoon\"", @"Shisha", @"Cigars", @"E-cigarettes", @"Others"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If smoking currently, how many sticks do you smoke a day (average)?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeNumSticks rowType:XLFormRowDescriptorTypeNumber title:@"Stick(s)"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If smoking currently, how soon after waking do you smoke your first cigarette?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeAfterWaking
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Within 5 mins"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"5-30 mins"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"More than 30 mins"]];
+    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"More than 30 mins"];   //default value
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If smoking currently, do you find it difficult to refrain from smoking in places where it is forbidden/not allowed?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingRefrain rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.value = @"NO";
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If smoking currently, which cigarette would you hate to give up?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhichNotGiveUp
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"The first in the morning"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Any other"]];
+    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"The first in the morning"];   //default value
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If smoking currently, do you smoke more frequently in the morning?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingMornFreq rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.value = @"NO";
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If smoking currently, do you smoke even if you are sick in bed most of the day?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingSickInBed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.value = @"NO";
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If smoking currently, have you attempted to quit before, in the past year?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingAttemptedQuit rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.value = @"NO";
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If you have attempted to quit in the past year, how many quit attempts did you make?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingNumQuitAttempts rowType:XLFormRowDescriptorTypeNumber title:@"Attempt(s)"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If smoking currently, what are your intentions towards quitting/cutting down in the forseeable future?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingIntentionsToCut
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I plan to quit in the next 12 months"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I plan to quit, but not within the next 12 months"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I do not plan to quit, but I intend to cut down"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I do not plan to quit or cut down"]
+                            ];
+    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I do not plan to quit or cut down"];   //default value
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If ex-smoker, how did you quit smoking? (can tick more than one)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingHowQuit rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
+    row.selectorOptions = @[@"By myself", @"By joining a smoking cessation programme", @"By taking medication", @"With encouragement of family/friends", @"Others (specify)____"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If ex-smoker, why did you choose to quit? (can tick more than one)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhyQuit rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
+    row.selectorOptions = @[@"Health/medical reasons", @"Side effects (eg. Odour)", @"Learnt about harm of smoking", @"Family/friends' advice", @"Too expensive", @"Others (Specify)____"];
+    [section addFormRow:row];
+    
+    
+    // Alcohol - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Alcohol"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"How often do you consume alcohol?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAlcoholHowOften
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@">4 days a week"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"1-4 days a week"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"<3 days a month"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Not drinking"]];
+    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Not drinking"];   //default value
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"If drinking, how many years have you been drinking for?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAlcoholNumYears rowType:XLFormRowDescriptorTypeNumber title:@"Year(s)"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Have you consumed 5 or more drinks (male) or 4 or more drinks (female) in any one dirnking session in the past month? (1 alcoholic drink refers to 1 can/small bottle of beer or one glass of wine)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAlcoholConsumpn rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.value = @"NO";
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"What is your preferred alcoholic drink? (choose only one)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAlcoholPreference
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Beer"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Wine"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Rice Wine"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Spirits"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Stout"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"No preference"]];
+    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Beer"];   //default value
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"What are your intentions towards quitting/cutting down in the forseeable future?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAlcoholIntentToCut
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I plan to quit in the next 12 months"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I plan to quit, but not within the next 12 months"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I do not plan to quit, but I intend to cut down"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I do not plan to quit or cut down"]];
+    [section addFormRow:row];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    return [super initWithForm:formDescriptor];
 }
 
 -(id)initDiabetesMellitus {
@@ -440,9 +748,9 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
-                                                rowType:XLFormRowDescriptorTypeBooleanSwitch
-                                                  title:@"Yes/No"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.value = @"NO";
     row.required = YES;
     [section addFormRow:row];
     
@@ -454,9 +762,10 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
-                                                rowType:XLFormRowDescriptorTypeBooleanSwitch
-                                                  title:@"Yes/No"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.value = @"NO";
+    [section addFormRow:row];
     [section addFormRow:row];
     
     
@@ -466,9 +775,9 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
-                                                rowType:XLFormRowDescriptorTypeBooleanSwitch
-                                                  title:@"Yes/No"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.value = @"NO";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
@@ -477,9 +786,9 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
-                                                rowType:XLFormRowDescriptorTypeBooleanSwitch
-                                                  title:@"Yes/No"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.value = @"NO";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
@@ -488,20 +797,22 @@ NSString *const kBpDiastolic3 = @"bp_diastolic3";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
-                                                rowType:XLFormRowDescriptorTypeBooleanSwitch
-                                                  title:@"Yes/No"];
+    // Segmented Control
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.value = @"NO";
+    [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
 }
 /*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
 
 @end
