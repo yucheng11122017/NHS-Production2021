@@ -424,8 +424,7 @@ typedef enum preRegSection {
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
-        NSArray *data = responseObject;      //somehow double brackets... (())
-        self.retrievedPatientDictionary = data[0];
+        self.retrievedPatientDictionary = [responseObject objectForKey:@"0"];
         NSLog(@"%@", self.retrievedPatientDictionary);
         flag = true;
         

@@ -68,8 +68,53 @@ NSString *const kAlcoholConsumpn = @"alcohol_consumpn";
 NSString *const kAlcoholPreference = @"alcohol_preference";
 NSString *const kAlcoholIntentToCut = @"alcohol_intent_to_cut";
 
+//Hyperlipidemia
+NSString *const kLipidHasInformed = @"lipid_has_informed";
+NSString *const kLipidCheckedBlood = @"lipid_checked_blood";
+NSString *const kLipidSeeingDocRegularly = @"lipid_seeing_doc_regularly";
+NSString *const kLipidCurrentlyPrescribed = @"lipid_currently_prescribed";
+NSString *const kLipidTakingRegularly = @"lipid_taking_regularly";
+NSString *const kQuestionOne = @"q1";
+NSString *const kQuestionTwo = @"q2";
+NSString *const kQuestionThree = @"q3";
+NSString *const kQuestionFour = @"q4";
+NSString *const kQuestionFive = @"q5";
 
+//HyperTension
+NSString *const kHTHasInformed = @"tension_has_informed";
+NSString *const kHTCheckedBP = @"tension_checked_blood";
+NSString *const kHTSeeingDocRegularly = @"tension_seeing_doc_regularly";
+NSString *const kHTCurrentlyPrescribed = @"tension_currently_prescribed";
+NSString *const kHTTakingRegularly = @"tension_taking_regularly";
 
+//Cancer Screening
+NSString *const kMultiCancerDiagnosed = @"multi_cancer_diagnosed";
+NSString *const kPapSmear = @"pap_smear";
+NSString *const kFobt = @"fobt";
+
+//Other Medical Issues
+NSString *const kHeartAttack = @"heart_attack";
+NSString *const kHeartFailure = @"heart_failure";
+NSString *const kCopd = @"copd";
+NSString *const kAsthma = @"asthma";
+NSString *const kStroke = @"stroke";
+NSString *const kDementia = @"dementia";
+NSString *const kHemiplegia = @"hemiplegia";
+NSString *const kSolidOrganCancer = @"solid_organ_cancer";
+NSString *const kBloodCancer = @"blood_cancer";
+NSString *const kMetastaticCancer = @"metastatic_cancer";
+NSString *const kDiabetesWODamage = @"diabetes_wo_damage";
+NSString *const kDiabetesWDamage = @"diabetes_w_damage";
+NSString *const kKidneyFailure = @"kidney_failure";
+NSString *const kPepticUlcer = @"peptic_ulcer";
+NSString *const kMildLiver = @"mild_liver";
+NSString *const kModerateSevereLiver = @"moderate_severe_liver";
+NSString *const kVascularDisease = @"vascular_disease";
+NSString *const kTissueDisease = @"tissue_disease";
+NSString *const kOsteoarthritis = @"osteoarthritis";
+NSString *const kAids = @"aids";
+NSString *const kOtherMedIssues = @"other_medical_issues";
+NSString *const kNA = @"NA";
 
 
 
@@ -94,8 +139,17 @@ NSString *const kAlcoholIntentToCut = @"alcohol_intent_to_cut";
             break;
         case 4: form = [self initDiabetesMellitus];
             break;
+        case 5: form = [self initHyperlipidemia];
+            break;
+        case 6: form = [self initHypertension];
+            break;
+        case 7: form = [self initCancerScreening];
+            break;
+        case 8: form = [self initOtherMedicalIssues];
+            break;
             
     }
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitPressed:)];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -104,6 +158,11 @@ NSString *const kAlcoholIntentToCut = @"alcohol_intent_to_cut";
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(void)submitPressed:(UIBarButtonItem * __unused)button
+{
+    NSLog(@"%@", [self.form formValues]);
 }
 
 -(id)initNeighbourhood
@@ -712,20 +771,6 @@ NSString *const kAlcoholIntentToCut = @"alcohol_intent_to_cut";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I do not plan to quit or cut down"]];
     [section addFormRow:row];
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     return [super initWithForm:formDescriptor];
 }
 
@@ -766,7 +811,6 @@ NSString *const kAlcoholIntentToCut = @"alcohol_intent_to_cut";
     row.selectorOptions = @[@"YES", @"NO"];
     row.value = @"NO";
     [section addFormRow:row];
-    [section addFormRow:row];
     
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
@@ -805,6 +849,332 @@ NSString *const kAlcoholIntentToCut = @"alcohol_intent_to_cut";
     
     return [super initWithForm:formDescriptor];
 }
+
+-(id) initHyperlipidemia {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Hyperlipidemia"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    // Hyperlipidemia - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    //    section.footerTitle = @"This is a long text that will appear on section footer";
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Has a western-trained doctor ever told you that you have high cholesterol?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *hasInformed = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    hasInformed.selectorOptions = @[@"YES", @"NO"];
+    hasInformed.required = YES;
+    [section addFormRow:hasInformed];
+    
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Have you checked your blood cholesterol in the past 3 years?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidCheckedBlood
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"No"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Yes"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Yes, 3 yrs ago"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Yes, < 1 yr ago"]];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
+    [section addFormRow:row];
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Are you seeing your doctor regularly? (regular = every 6 mths or less, or as per doctor scheduled to follow up)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    [section addFormRow:row];
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Are you curently prescribed medication for your high cholesterol?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *prescribed = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    prescribed.selectorOptions = @[@"YES", @"NO"];
+    prescribed.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    [section addFormRow:prescribed];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Are you taking your cholesterol medication regularly?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
+    [section addFormRow:row];
+    
+    // Segmented Control
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
+    [section addFormRow:row];
+
+    
+    return [super initWithForm:formDescriptor];
+}
+
+-(id) initHypertension {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Hypertension"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    // Hyperlipidemia - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    //    section.footerTitle = @"This is a long text that will appear on section footer";
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Has a western-trained doctor ever told you that you have high BP?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    XLFormRowDescriptor *hasInformed = [XLFormRowDescriptor formRowDescriptorWithTag:kHTHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    hasInformed.selectorOptions = @[@"YES", @"NO"];
+    hasInformed.required = YES;
+    [section addFormRow:hasInformed];
+    
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Have you checked your BP in the last 1 year?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    XLFormRowDescriptor *checkedBP = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCheckedBP rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    checkedBP.selectorOptions = @[@"YES", @"NO"];
+    [section addFormRow:checkedBP];
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Are you seeing your doctor regularly for your high BP?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHTSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
+    [section addFormRow:row];
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Are you curently prescribed medication for your high BP?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *prescribed = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    prescribed.selectorOptions = @[@"YES", @"NO"];
+    prescribed.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
+    [section addFormRow:prescribed];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Are you taking your BP medication regularly?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
+    [section addFormRow:row];
+    
+    // Segmented Control
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHTTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
+    [section addFormRow:row];
+    
+    
+    return [super initWithForm:formDescriptor];
+}
+
+-(id) initCancerScreening {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Cancer Screening"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    // Hyperlipidemia - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    //    section.footerTitle = @"This is a long text that will appear on section footer";
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Have you ever been diagnosed with any of these cancers? (tick all that apply)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiCancerDiagnosed rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
+    row.selectorOptions = @[@"Cervical (子宫颈癌)", @"Breast (乳腺癌)", @"Colorectal (大肠癌)"];
+    [section addFormRow:row];
+    
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Do you go for a pap smear regularly? (once every 3 years for sexually active ladies ≤ 69 years old)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    XLFormRowDescriptor *checkedBP = [XLFormRowDescriptor formRowDescriptorWithTag:kPapSmear rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    checkedBP.selectorOptions = @[@"YES", @"NO", @"N.A."];
+    [section addFormRow:checkedBP];
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Do you go for regular mammograms? (Once every 2 yeas for ladies aged 40-49; yearly for ladies ≥ 50)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHTSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO", @"N.A."];
+    [section addFormRow:row];
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Do you go for FOBT regularly? (once a year for ≥ 50)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *prescribed = [XLFormRowDescriptor formRowDescriptorWithTag:kFobt rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    prescribed.selectorOptions = @[@"YES", @"NO", @"N.A."];
+    [section addFormRow:prescribed];
+    
+    return [super initWithForm:formDescriptor];
+}
+
+-(id) initOtherMedicalIssues {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Other Medical Issues"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    // Introduction - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Introduction"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Charlson Comorbidity Index. Ask the resident, \"what medical conditions do you have?\". Compare against the list below and tick the condition if present. You can tick more than 1 box."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    // Heart - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Heart"];
+    [formDescriptor addFormSection:section];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHeartAttack rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Heart Attack (心脏发作)"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHeartFailure rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Heart Failure (心脏病)"];
+    [section addFormRow:row];
+    
+    // Lung - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Lung"];
+    [formDescriptor addFormSection:section];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCopd rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Chronic Pulmonary Disease (COPD) (慢性肺部疾病)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAsthma rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Asthma (气喘)"];
+    [section addFormRow:row];
+    
+    // Brain - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Brain"];
+    [formDescriptor addFormSection:section];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kStroke rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Stroke (脑中风)"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDementia rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dementia (老人痴呆症)"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHemiplegia rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Hemiplegia (偏痴)"];
+    [section addFormRow:row];
+    
+    // Cancer - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Cancer"];
+    [formDescriptor addFormSection:section];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSolidOrganCancer rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Solid organ cancer (实体器官癌症)"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBloodCancer rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Blood cancer (eg. Leukemia/Lymphoma) (血症)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMetastaticCancer rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Metastatic cancer (转移癌)"];
+    [section addFormRow:row];
+    
+    // DM and Renal - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Cancer"];
+    [formDescriptor addFormSection:section];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesWODamage rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Diabetes, without end-organ damage (eg. retinopathy, kidney problems, heart problems, amputation, strokes) (糖尿病－无器官受损）"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesWDamage rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Diabetes, w/ end organ damage (糖尿病－有器官受损)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKidneyFailure rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Kidney failure (肾功能衰竭)"];
+    [section addFormRow:row];
+    
+    // Git and Liver - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Git and Liver"];
+    [formDescriptor addFormSection:section];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPepticUlcer rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Peptic Ulcer Disease (消化性溃疡病)"];
+    [section addFormRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMildLiver rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Mid Liver Disease (肝病)"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kModerateSevereLiver rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Moderate-to-severe liver disease (has jaundice or ascites) (严重肝病)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    // Misc - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Misc"];
+    [formDescriptor addFormSection:section];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kVascularDisease rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Peripheral Vascular Disease (血管疾病)"];
+    [section addFormRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kTissueDisease rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Connective Tissue Disease (eg.Rheumatoid Arthritis (风湿关节炎)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kOsteoarthritis rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Osteoarthritis (骨性关节炎)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAids rowType:XLFormRowDescriptorTypeBooleanCheck title:@"AIDS (爱滋病)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive rowType:XLFormRowDescriptorTypeInfo title:@"Other medical conditions:"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    
+//    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kOtherMedIssues rowType:XLFormRowDescriptorTypeTextView title:@""];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [row.cellConfigAtConfigure setObject:@"Other medical conditions:(specify)" forKey:@"textView.placeholder"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"N.A."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    return [super initWithForm:formDescriptor];
+}
+
 /*
  #pragma mark - Navigation
  

@@ -356,7 +356,7 @@ typedef enum getDataState {
         int i;
         [self.patientNames removeAllObjects];   //reset this array first
         [self.patientRegTimestamp removeAllObjects];   //reset this array first
-        NSArray *patients = responseObject[0];      //somehow double brackets... (())
+        NSArray *patients = [responseObject objectForKey:@"0"];      //somehow double brackets... (())
         self.patients = [[NSMutableArray alloc] initWithArray:patients];
         
         NSSortDescriptor *sortDescriptor;
