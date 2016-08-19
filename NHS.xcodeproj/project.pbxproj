@@ -36,6 +36,7 @@
 		E1334EE21D432B5800A43539 /* Login.json in Resources */ = {isa = PBXBuildFile; fileRef = E1334EDF1D432B5800A43539 /* Login.json */; };
 		E1334EE31D432B5800A43539 /* Pre-registration.json in Resources */ = {isa = PBXBuildFile; fileRef = E1334EE01D432B5800A43539 /* Pre-registration.json */; };
 		E1334EE71D432CAA00A43539 /* PreRegistrationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */; };
+		E13B8F0B1D66F62900C3A81D /* UIScrollViewWithTouchesBegan.m in Sources */ = {isa = PBXBuildFile; fileRef = E13B8F0A1D66F62900C3A81D /* UIScrollViewWithTouchesBegan.m */; };
 		E1A4F0DC1D61CB8A00EE9BBB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = E1A4F0DB1D61CB8A00EE9BBB /* Reachability.m */; };
 		E1A4F0DF1D66BC5A00EE9BBB /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1A4F0DE1D66BC5A00EE9BBB /* LoginViewController.m */; };
 		E1A4F0E11D66BE2000EE9BBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1A4F0E01D66BE2000EE9BBB /* Assets.xcassets */; };
@@ -127,6 +128,8 @@
 		E1334EE01D432B5800A43539 /* Pre-registration.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "Pre-registration.json"; sourceTree = "<group>"; };
 		E1334EE51D432CAA00A43539 /* PreRegistrationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreRegistrationViewController.h; sourceTree = "<group>"; };
 		E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreRegistrationViewController.m; sourceTree = "<group>"; };
+		E13B8F091D66F62900C3A81D /* UIScrollViewWithTouchesBegan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIScrollViewWithTouchesBegan.h; sourceTree = "<group>"; };
+		E13B8F0A1D66F62900C3A81D /* UIScrollViewWithTouchesBegan.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIScrollViewWithTouchesBegan.m; sourceTree = "<group>"; };
 		E1A4F0DA1D61CB8A00EE9BBB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		E1A4F0DB1D61CB8A00EE9BBB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		E1A4F0DD1D66BC5A00EE9BBB /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
@@ -375,6 +378,8 @@
 				E1A4F0DB1D61CB8A00EE9BBB /* Reachability.m */,
 				E1FCF9301D45B77F00478F7B /* ServerComm.h */,
 				E1FCF9311D45B77F00478F7B /* ServerComm.m */,
+				E13B8F091D66F62900C3A81D /* UIScrollViewWithTouchesBegan.h */,
+				E13B8F0A1D66F62900C3A81D /* UIScrollViewWithTouchesBegan.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -661,6 +666,7 @@
 				E120E4081D431E9B002DBC7E /* main.m in Sources */,
 				E1EFB0931D433C3400510532 /* PatientScreeningListTableViewController.m in Sources */,
 				E10412101D4C8EFA0024663B /* PreRegFormViewController.m in Sources */,
+				E13B8F0B1D66F62900C3A81D /* UIScrollViewWithTouchesBegan.m in Sources */,
 				8E25276D1D57891700ACEE92 /* PreRegDisplayFormViewController.m in Sources */,
 				8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */,
 				E1A4F0DF1D66BC5A00EE9BBB /* LoginViewController.m in Sources */,

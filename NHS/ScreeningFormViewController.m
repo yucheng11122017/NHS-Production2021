@@ -79,6 +79,17 @@ NSString *const kQuestionTwo = @"q2";
 NSString *const kQuestionThree = @"q3";
 NSString *const kQuestionFour = @"q4";
 NSString *const kQuestionFive = @"q5";
+NSString *const kQuestionSix = @"q6";
+NSString *const kQuestionSeven = @"q7";
+NSString *const kQuestionEight = @"q8";
+NSString *const kQuestionNine = @"q9";
+NSString *const kQuestionTen = @"q10";
+NSString *const kQuestionEleven = @"q11";
+NSString *const kQuestionTwelve = @"q12";
+NSString *const kQuestionThirteen = @"q13";
+NSString *const kQuestionFourteen = @"q14";
+NSString *const kQuestionFifteen = @"q15";
+
 
 //HyperTension
 NSString *const kHTHasInformed = @"tension_has_informed";
@@ -131,6 +142,56 @@ NSString *const kSelfCare = @"self_care";
 NSString *const kUsualActivities = @"usual_activities";
 NSString *const kPain = @"pain";
 NSString *const kPainDuration = @"pain_duration";
+NSString *const kHealthToday = @"health_today";
+NSString *const kParkTime = @"park_time";
+NSString *const kFeelSafe = @"feel_safe";
+NSString *const kCrimeLow = @"crime_low";
+NSString *const kDrunkenPpl = @"drunken_ppl";
+NSString *const kBrokenBottles = @"broken_bottles";
+NSString *const kUnclearSigns = @"unclear_signs";
+NSString *const kHomelessPpl = @"homeless_ppl";
+NSString *const kPublicTrans = @"public_trans";
+NSString *const kSeeDoc = @"see_doc";
+NSString *const kBuyMedi = @"buy_medi";
+NSString *const kGrocery = @"grocery";
+NSString *const kCommCentre = @"comm_centre";
+NSString *const kSSCentres = @"ss_centres";
+NSString *const kBankingPost = @"banking_post";
+NSString *const kReligiousPlaces = @"religious_places";
+NSString *const kInteract = @"interact";
+NSString *const kSafePlaces = @"safe_places";
+
+//Demographics
+NSString *const kCitizenship = @"citizenship";
+NSString *const kReligion = @"religion";
+NSString *const kReligionOthers = @"religion_others";
+
+//Current Physical Issues
+NSString *const kMultiADL = @"multi_adl";
+
+//Current Socioeconomic Situation
+NSString *const kMultiPlan = @"multi_plan";
+NSString *const kCPFAmt = @"cpf_amt";
+NSString *const kChasColour = @"chas_colour";
+NSString *const kHouseCoping = @"house_coping";
+NSString *const kHouseCopingReason = @"house_coping_reason";
+NSString *const kHouseCopingReasonOthers = @"house_coping_reason_others";
+NSString *const kEmployStatus = @"employ_status";
+NSString *const kEmployStatusOthers = @"employ_status_others";
+NSString *const kManageExpenses = @"manage_expenses";
+NSString *const kHouseholdIncome = @"household_income";
+NSString *const kPplInHouse = @"ppl_in_house";
+NSString *const kAnyAssist = @"any_assist";
+NSString *const kSeekHelp = @"seek_help";
+NSString *const kHelpType = @"help_type";
+NSString *const kHelpOrg = @"help_org";
+NSString *const kHelpDescribe = @"help_describe";
+NSString *const kHelpAmt = @"help_amt";
+NSString *const kHelpPeriod = @"help_period";
+NSString *const kHelpHelpful = @"help_helpful";
+
+
+
 
 @interface ScreeningFormViewController ()
 
@@ -164,7 +225,12 @@ NSString *const kPainDuration = @"pain_duration";
             break;
         case 10: form = [self initMyHealthAndMyNeighbourhood];
             break;
-            
+        case 11: form = [self initDemographics];
+            break;
+        case 12: form = [self initCurrentPhysicalIssues];
+            break;
+        case 13: form = [self initCurrentSocioSituation];
+            break;
     }
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitPressed:)];
     
@@ -1032,6 +1098,11 @@ NSString *const kPainDuration = @"pain_duration";
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
+    // Introduction - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Note:"];
+    section.footerTitle = @"Do note the screening criteria below to avoid embarrassment (e.g. asking a male resident about his Pap smear)";
+    [formDescriptor addFormSection:section];
+    
     // Hyperlipidemia - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     //    section.footerTitle = @"This is a long text that will appear on section footer";
@@ -1369,20 +1440,372 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
                                                   title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
     [section addFormRow:row];
+    
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Your health today"];
+    section.footerTitle = @"100 means the BEST health you can imagine.\n0 means the WORST health you can imagine.";
+    [formDescriptor addFormSection:section];
 
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"We would like to know how good or bad your health is TODAY. The scale is numbered from 0 to 100"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHealthToday rowType:XLFormRowDescriptorTypeNumber title:@""];
+#warning  need to do validation criterias. between 0 - 100
+    row.required = YES;
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
     
     
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Park"];
+    [formDescriptor addFormSection:section];
     
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"How long does it take (mins) for you to reach to a park or rest areas where you like to walk and enjoy yourself, playing sports or games, from your house?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kParkTime rowType:XLFormRowDescriptorTypeNumber title:@""];
+#warning  need to do validation criterias. between 0 - 100
+    row.required = YES;
+    [section addFormRow:row];
     
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Tick all that applies"];
+    [formDescriptor addFormSection:section];
     
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelSafe rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel safe when I walk around my neighbouhood by myself at night."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
     
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCrimeLow rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel that crime rate (i.e.m damage or stealing) is low in my neighbourhood."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
     
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDrunkenPpl rowType:XLFormRowDescriptorTypeBooleanCheck title:@"In the morning, or later in the day, I can see drunken people on the street in my neighbourhood."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBrokenBottles rowType:XLFormRowDescriptorTypeBooleanCheck title:@"In my neighbourhood, there are broken bottles or trash lying around."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUnclearSigns rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I and my visitors have been lost because of no or unclear signs of directions."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHomelessPpl rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I see destitute or homeless people walking or sitting around in my neighbourhood."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPublicTrans rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to take public transportations in my neighbourhood (i.e. bus stops, MRT)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSeeDoc rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to see a doctor in my neighbourhood."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBuyMedi rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to buy medication in my neighbourhood."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kGrocery rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to do grocery shopping in my neighbourhood."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCommCentre rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit community centres in my neighbourhood."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSSCentres rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit social service centres (i.e. Senior Activity Centres, Family Service Centres) in my neighbourhood."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBankingPost rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit banking and post services (banks, post offices, etc.)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReligiousPlaces rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit religious places (i.e., temples, churches, synagogue, etc.)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kInteract rowType:XLFormRowDescriptorTypeBooleanCheck title:@"The people in my neighbourhood actively interact with each other (i.e., playing sports together, having meals together, etc.)."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSafePlaces rowType:XLFormRowDescriptorTypeBooleanCheck title:@"There are plenty of safe places to walk or play outdoors in my neighbourhood."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    return [super initWithForm:formDescriptor];
+}
 
+-(id) initDemographics {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Demographics"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCitizenship rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Citizenship"];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Singaporean"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Foreigner"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Permanent Resident"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Stateless"]
+                            ];
+    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Singaporean"];   //default value
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *religionRow = [XLFormRowDescriptor formRowDescriptorWithTag:kReligion rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Religion"];
+    religionRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Buddhism"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Taoism"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Islam"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Christianity"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Hinduism"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"No religion"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(6) displayText:@"Others"]
+                            ];
+    [section addFormRow:religionRow];
+    
+    XLFormRowDescriptor *religionOthers = [XLFormRowDescriptor formRowDescriptorWithTag:kReligionOthers rowType:XLFormRowDescriptorTypeText title:@"Other Religion"];
+#warning not sure why cannot hide this...
+    religionOthers.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", religionRow];
+    [section addFormRow:religionOthers];
+    
+    
+    return [super initWithForm:formDescriptor];
+}
+
+- (id) initCurrentPhysicalIssues {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Current Physical Issues"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"NOTE"];
+    section.footerTitle = @"Non-medical barriers have to be addressed in order to improve the resident's health. A multi-disciplinary team is required for this section.";
+    [formDescriptor addFormSection:section];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Activities of Daily Living"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Can you perform the following activities without assistance? (Tick those activities that the resident CAN perform on his/her own)."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiADL rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Activities"];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Bathe/Shower"],
+                                    [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Dress"],
+                                    [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Eat"],
+                                    [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Personal Hygiene and Grooming"],
+                                    [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Toileting"],
+                                    [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Transfer/Walk"]];
+    [section addFormRow:row];
+    
     return [super initWithForm:formDescriptor];
 }
 
 
-
+- (id) initCurrentSocioSituation {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Current Socioeconomic Issues"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"NOTE"];
+    section.footerTitle = @"Non-medical barriers have to be addressed in order to improve the resident's health. A multi-disciplinary team is required for this section.";
+    [formDescriptor addFormSection:section];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    section.footerTitle = @"If interesed in CHAS, visit Pub Med booth at Triage";
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiPlan rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Do you have the following?"];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Medisave"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Insurance Coverage"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"CPF pay outs"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Pioneer Generation Package (PGP)"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Community Health Assist Scheme (CHAS)"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"If no, will you like to apply for CHAS?"]];
+    [section addFormRow:row];
+    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne rowType:XLFormRowDescriptorTypeInfo title:@""];
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiADL rowType:XLFormRowDescriptorTypeBooleanCheck title:@"];
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiADL rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Insurance Coverage"];
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiADL rowType:XLFormRowDescriptorTypeBooleanCheck title:@"CPF pay outs"];
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiADL rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Pioneer Generation Package (PGP)"];
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiADL rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Community Health Assist Scheme (CHAS)"];
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiADL rowType:XLFormRowDescriptorTypeBooleanCheck title:@"If no, will you like to apply for CHAS? (If interesed, visit Pub Med booth at Triage)"];
+//    [section addFormRow:row];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    
+    // New section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne rowType:XLFormRowDescriptorTypeInfo title:@"If you have CPF pay outs, what is the amount?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCPFAmt rowType:XLFormRowDescriptorTypeNumber title:@"Amount"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"If you have the CHAS card, what colour is it?"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kChasColour rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@" "];
+    row.selectorOptions = @[@"Blue", @"Orange"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree rowType:XLFormRowDescriptorTypeInfo title:@"Is your household currently coping in terms of financial expenses?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    XLFormRowDescriptor *financeCopingRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHouseCoping rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    financeCopingRow.selectorOptions = @[@"YES", @"NO"];
+    financeCopingRow.required = YES;
+    [section addFormRow:financeCopingRow];
+    
+    XLFormRowDescriptor *notCopingReasonRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHouseCopingReason rowType:XLFormRowDescriptorTypeSelectorPush title:@"If no, why?"];
+    notCopingReasonRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Medical expenses"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Daily living expenses"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Arrears / Debts"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Others"]];
+    notCopingReasonRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", financeCopingRow];
+    [section addFormRow:notCopingReasonRow];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHouseCopingReasonOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    [row.cellConfigAtConfigure setObject:@"Other reason" forKey:@"textField.placeholder"];
+#warning Cannot hide at the moment
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", notCopingReasonRow];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour rowType:XLFormRowDescriptorTypeInfo title:@"What is your employment status?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    XLFormRowDescriptor *EmployStatusRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployStatus rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    EmployStatusRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Full time employed"],
+                                           [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Part time employed"],
+                                           [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Unemployed due to disability"],
+                                           [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Unemployed but able to work"],
+                                           [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Housewife/Homemaker"],
+                                           [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Retiree"],
+                                           [XLFormOptionsObject formOptionsObjectWithValue:@(6) displayText:@"Student"],
+                                           [XLFormOptionsObject formOptionsObjectWithValue:@(7) displayText:@"Others"]];
+    [section addFormRow:EmployStatusRow];
+    EmployStatusRow.required = YES;
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployStatusOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    [row.cellConfigAtConfigure setObject:@"Please specify" forKey:@"textField.placeholder"];
+#warning Cannot hide at the moment
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", EmployStatusRow];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive rowType:XLFormRowDescriptorTypeInfo title:@"If unemployed, how does resident manage his/her expenses?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kManageExpenses rowType:XLFormRowDescriptorTypeTextView title:@""];
+    [row.cellConfigAtConfigure setObject:@"(max 2 lines)" forKey:@"textView.placeholder"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix rowType:XLFormRowDescriptorTypeInfo title:@"What is your average monthly household income?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHouseholdIncome rowType:XLFormRowDescriptorTypeNumber title:@"$"];
+    row.required = YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSeven rowType:XLFormRowDescriptorTypeInfo title:@"How many people are there in your household?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPplInHouse rowType:XLFormRowDescriptorTypeNumber title:@"No. of person(s):"];
+    row.required = YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight rowType:XLFormRowDescriptorTypeInfo title:@"Is your household receiving or has received any form of social or financial assistance?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    XLFormRowDescriptor *financeAssist = [XLFormRowDescriptor formRowDescriptorWithTag:kAnyAssist rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    financeAssist.selectorOptions = @[@"YES", @"NO"];
+    [section addFormRow:financeAssist];
+    
+    XLFormRowDescriptor *qSeekHelpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionNine rowType:XLFormRowDescriptorTypeInfo title:@"If no, do you know who to approach if you need help? (e.g. financial, social services)"];
+    qSeekHelpRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    qSeekHelpRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", financeAssist];
+    [section addFormRow:qSeekHelpRow];
+    XLFormRowDescriptor *seekHelpSegmentRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSeekHelp rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    seekHelpSegmentRow.selectorOptions = @[@"YES", @"NO"];
+    seekHelpSegmentRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", financeAssist];
+    [section addFormRow:seekHelpSegmentRow];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTen rowType:XLFormRowDescriptorTypeInfo title:@"If yes, Details of financial/social assistance received  - Type )"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHelpType rowType:XLFormRowDescriptorTypeText title:@""];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEleven rowType:XLFormRowDescriptorTypeInfo title:@"If yes, Details of financial/social assistance received  - Organisation )"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHelpOrg rowType:XLFormRowDescriptorTypeText title:@""];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwelve rowType:XLFormRowDescriptorTypeInfo title:@"If yes, help rendered:"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHelpDescribe rowType:XLFormRowDescriptorTypeTextView title:@""];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [row.cellConfigAtConfigure setObject:@"Describe the help you received..." forKey:@"textView.placeholder"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThirteen rowType:XLFormRowDescriptorTypeInfo title:@"If yes, Details of financial/social assistance received - Amount per month (if applicable)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHelpAmt rowType:XLFormRowDescriptorTypeNumber title:@""];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFourteen rowType:XLFormRowDescriptorTypeInfo title:@"If yes, Details of financial/social assistance received - Period"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHelpPeriod rowType:XLFormRowDescriptorTypeText title:@""];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [row.cellConfigAtConfigure setObject:@"Specify the period here" forKey:@"textField.placeholder"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFifteen rowType:XLFormRowDescriptorTypeInfo title:@"If yes, has the assistance rendered been helpful? (elaboration in social report)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHelpHelpful rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
+    [section addFormRow:row];
+    
+    
+    
+    
+    
+    return [super initWithForm:formDescriptor];
+}
 /*
  #pragma mark - Navigation
  
