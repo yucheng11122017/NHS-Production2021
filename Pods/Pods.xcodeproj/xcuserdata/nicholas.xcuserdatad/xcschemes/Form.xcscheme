@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '3B15206C62C3538B92674647'
+               BlueprintIdentifier = '54B53B601F542C5D9BD67DFC'
                BlueprintName = 'Form'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'Form.framework'>

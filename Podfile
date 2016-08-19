@@ -10,6 +10,7 @@ abstract_target 'CocoaPods' do
   pod 'NSDictionary-HYPImmutable'
   pod 'HYPImagePicker'
   pod 'AFNetworking', '~> 3.1'
+  pod 'RNCryptor', '~> 2.2'
   pod 'XLForm', :git => 'https://github.com/xmartlabs/XLForm.git'
   pod 'MBProgressHUD', '~> 1.0.0'
 

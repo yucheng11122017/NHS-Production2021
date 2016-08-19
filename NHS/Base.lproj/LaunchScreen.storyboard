@@ -17,11 +17,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eZN-mz-tMU">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="NHS background" translatesAutoresizingMaskIntoConstraints="NO" id="eZN-mz-tMU">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="eZN-mz-tMU" secondAttribute="trailing" id="2BC-74-M8G"/>
+                            <constraint firstItem="eZN-mz-tMU" firstAttribute="bottom" secondItem="xb3-aO-Qok" secondAttribute="top" id="Uij-WN-5NQ"/>
+                            <constraint firstItem="eZN-mz-tMU" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="fm5-nx-SEP"/>
+                            <constraint firstItem="eZN-mz-tMU" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="rWt-Ng-gGt"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -29,4 +35,7 @@
             <point key="canvasLocation" x="53" y="375"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="NHS background" width="736" height="736"/>
+    </resources>
 </document>

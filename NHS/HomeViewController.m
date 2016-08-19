@@ -21,6 +21,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     self.navigationItem.title = @"Home Page";
+    [self.navigationController setNavigationBarHidden:NO];
+    self.navigationItem.hidesBackButton = YES;
     [super viewWillAppear:animated];
 }
 
@@ -32,6 +34,10 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+- (IBAction)logoutBtnPressed:(UIButton *)sender {
+    NSLog(@"logout pressed");
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 /*

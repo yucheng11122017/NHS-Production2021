@@ -30,7 +30,6 @@
 		E120E4081D431E9B002DBC7E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E4071D431E9B002DBC7E /* main.m */; };
 		E120E40B1D431E9B002DBC7E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E40A1D431E9B002DBC7E /* AppDelegate.m */; };
 		E120E4111D431E9B002DBC7E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E120E40F1D431E9B002DBC7E /* Main.storyboard */; };
-		E120E4131D431E9B002DBC7E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E120E4121D431E9B002DBC7E /* Assets.xcassets */; };
 		E120E4161D431E9B002DBC7E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E120E4141D431E9B002DBC7E /* LaunchScreen.storyboard */; };
 		E120E4211D431E9B002DBC7E /* NHSTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E4201D431E9B002DBC7E /* NHSTests.m */; };
 		E120E42C1D431E9B002DBC7E /* NHSUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E42B1D431E9B002DBC7E /* NHSUITests.m */; };
@@ -38,6 +37,8 @@
 		E1334EE31D432B5800A43539 /* Pre-registration.json in Resources */ = {isa = PBXBuildFile; fileRef = E1334EE01D432B5800A43539 /* Pre-registration.json */; };
 		E1334EE71D432CAA00A43539 /* PreRegistrationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */; };
 		E1A4F0DC1D61CB8A00EE9BBB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = E1A4F0DB1D61CB8A00EE9BBB /* Reachability.m */; };
+		E1A4F0DF1D66BC5A00EE9BBB /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1A4F0DE1D66BC5A00EE9BBB /* LoginViewController.m */; };
+		E1A4F0E11D66BE2000EE9BBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1A4F0E01D66BE2000EE9BBB /* Assets.xcassets */; };
 		E1A987441D4327FE005FC83D /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873A1D4327FE005FC83D /* Assets */; };
 		E1A987451D4327FE005FC83D /* Basic-ObjC in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873B1D4327FE005FC83D /* Basic-ObjC */; };
 		E1A987461D4327FE005FC83D /* Basic-Swift in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873C1D4327FE005FC83D /* Basic-Swift */; };
@@ -114,7 +115,6 @@
 		E120E4091D431E9B002DBC7E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E120E40A1D431E9B002DBC7E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		E120E4101D431E9B002DBC7E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		E120E4121D431E9B002DBC7E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E120E4151D431E9B002DBC7E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E120E4171D431E9B002DBC7E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E120E41C1D431E9B002DBC7E /* NHSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NHSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -129,6 +129,9 @@
 		E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreRegistrationViewController.m; sourceTree = "<group>"; };
 		E1A4F0DA1D61CB8A00EE9BBB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		E1A4F0DB1D61CB8A00EE9BBB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		E1A4F0DD1D66BC5A00EE9BBB /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
+		E1A4F0DE1D66BC5A00EE9BBB /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
+		E1A4F0E01D66BE2000EE9BBB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E1A9873A1D4327FE005FC83D /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
 		E1A9873B1D4327FE005FC83D /* Basic-ObjC */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Basic-ObjC"; sourceTree = "<group>"; };
 		E1A9873C1D4327FE005FC83D /* Basic-Swift */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Basic-Swift"; sourceTree = "<group>"; };
@@ -306,8 +309,8 @@
 				E120E40A1D431E9B002DBC7E /* AppDelegate.m */,
 				E1FCF92E1D45B75200478F7B /* ViewControllers */,
 				E120E40F1D431E9B002DBC7E /* Main.storyboard */,
-				E120E4121D431E9B002DBC7E /* Assets.xcassets */,
 				E120E4141D431E9B002DBC7E /* LaunchScreen.storyboard */,
+				E1A4F0E01D66BE2000EE9BBB /* Assets.xcassets */,
 				E120E4171D431E9B002DBC7E /* Info.plist */,
 				E120E4061D431E9B002DBC7E /* Supporting Files */,
 			);
@@ -357,6 +360,8 @@
 				8E2527661D57600900ACEE92 /* Screening */,
 				8E2527681D5766C400ACEE92 /* HomeViewController.h */,
 				8E2527691D5766C400ACEE92 /* HomeViewController.m */,
+				E1A4F0DD1D66BC5A00EE9BBB /* LoginViewController.h */,
+				E1A4F0DE1D66BC5A00EE9BBB /* LoginViewController.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -496,13 +501,13 @@
 				E1A987481D4327FE005FC83D /* Images in Resources */,
 				E1A987491D4327FE005FC83D /* iPhone-Storyboard in Resources */,
 				E1A9874B1D4327FE005FC83D /* ModalForm in Resources */,
-				E120E4131D431E9B002DBC7E /* Assets.xcassets in Resources */,
 				E1334EE21D432B5800A43539 /* Login.json in Resources */,
 				E1E6909C1D4345FC007FEC1C /* Residents Particulars.json in Resources */,
 				E1A9874A1D4327FE005FC83D /* LoginDemo in Resources */,
 				E1A9874C1D4327FE005FC83D /* Payment in Resources */,
 				E1334EE31D432B5800A43539 /* Pre-registration.json in Resources */,
 				E120E4111D431E9B002DBC7E /* Main.storyboard in Resources */,
+				E1A4F0E11D66BE2000EE9BBB /* Assets.xcassets in Resources */,
 				E1A987461D4327FE005FC83D /* Basic-Swift in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -658,6 +663,7 @@
 				E10412101D4C8EFA0024663B /* PreRegFormViewController.m in Sources */,
 				8E25276D1D57891700ACEE92 /* PreRegDisplayFormViewController.m in Sources */,
 				8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */,
+				E1A4F0DF1D66BC5A00EE9BBB /* LoginViewController.m in Sources */,
 				E10412131D4C92CB0024663B /* tempViewController.m in Sources */,
 				E1334EE71D432CAA00A43539 /* PreRegistrationViewController.m in Sources */,
 				E1FCF9381D45DE2000478F7B /* PreRegPatientDetailsViewController.m in Sources */,
