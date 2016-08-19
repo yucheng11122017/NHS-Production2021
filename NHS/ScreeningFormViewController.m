@@ -190,6 +190,35 @@ NSString *const kHelpAmt = @"help_amt";
 NSString *const kHelpPeriod = @"help_period";
 NSString *const kHelpHelpful = @"help_helpful";
 
+//Social Support Assessment
+NSString *const kHasCaregiver = @"has_caregiver";
+NSString *const kCaregiverName = @"caregiver_name";
+NSString *const kCaregiverRs = @"caregiver_rs";
+NSString *const kCaregiverContactNum = @"caregiver_contact_num";
+NSString *const kCaregiverNric = @"caregiver_nric";
+NSString *const kCaregiverAddress = @"caregiver_address";
+NSString *const kEContact = @"e_contact";
+NSString *const kEContactName = @"e_contact_name";
+NSString *const kEContactRs = @"e_contact_rs";
+NSString *const kEContactNum = @"e_contact_num";
+NSString *const kEContactNric = @"e_contact_nric";
+NSString *const kEContactAddress = @"e_contact_address";
+NSString *const kGettingSupport = @"getting_suppport";
+NSString *const kMultiSupport = @"multi_support";
+NSString *const kRelativesContact = @"relatives_contact";
+NSString *const kRelativesEase = @"relatives_ease";
+NSString *const kRelativesClose = @"relatives_close";
+NSString *const kFriendsContact = @"friends_contact";
+NSString *const kFriendsEase = @"friends_ease";
+NSString *const kFriendsClose = @"friends_close";
+NSString *const kSocialScore = @"social_score";
+NSString *const kLackCompan = @"lack_compan";
+NSString *const kFeelLeftOut = @"feel_left_out";
+NSString *const kFeelIsolated = @"feel_isolated";
+NSString *const kAwareActivities = @"aware_activities";
+NSString *const kParticipateActivities = @"participate_activities";
+NSString *const kMultiHost = @"multi_host";
+NSString *const kHostOthers = @"host_others";
 
 
 
@@ -230,6 +259,8 @@ NSString *const kHelpHelpful = @"help_helpful";
         case 12: form = [self initCurrentPhysicalIssues];
             break;
         case 13: form = [self initCurrentSocioSituation];
+            break;
+        case 14: form = [self initSocialSupportAssessment];
             break;
     }
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitPressed:)];
@@ -1800,7 +1831,79 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
     [section addFormRow:row];
     
+    return [super initWithForm:formDescriptor];
+}
+
+- (id) initSocialSupportAssessment {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Social Support Assessment"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
     
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"NOTE"];
+    section.footerTitle = @"Non-medical barriers have to be addressed in order to improve the resident's health. A multi-disciplinary team is required for this section.";
+    [formDescriptor addFormSection:section];
+    
+    XLFormSectionDescriptor *hasPriCaregiversection = [XLFormSectionDescriptor formSectionWithTitle:@"Primary Caregiver"];
+    [formDescriptor addFormSection:hasPriCaregiversection];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne rowType:XLFormRowDescriptorTypeInfo title:@"Do you have a Primary Caregiver?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [hasPriCaregiversection addFormRow:row];
+    
+    XLFormRowDescriptor *hasCaregiverRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHasCaregiver rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    hasCaregiverRow.selectorOptions = @[@"YES", @"NO"];
+    [hasPriCaregiversection addFormRow:hasCaregiverRow];
+    
+    XLFormSectionDescriptor *careGiverSection = [XLFormSectionDescriptor formSectionWithTitle:@"Caregiver Details"];
+    careGiverSection.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasCaregiverRow];
+    [formDescriptor addFormSection:careGiverSection];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverName rowType:XLFormRowDescriptorTypeText title:@"Name"];
+    [careGiverSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverRs rowType:XLFormRowDescriptorTypeText title:@"Relationship"];
+    [careGiverSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverContactNum rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    [careGiverSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverNric rowType:XLFormRowDescriptorTypeText title:@"NRIC"];
+    [careGiverSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverAddress rowType:XLFormRowDescriptorTypeText title:@"Address"];
+    [careGiverSection addFormRow:row];
+    
+    XLFormSectionDescriptor *askEmerContactSection = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    askEmerContactSection.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasCaregiverRow];
+    [formDescriptor addFormSection:askEmerContactSection];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"Do you have any emergency contact person?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [askEmerContactSection addFormRow:row];
+    XLFormRowDescriptor *hasEmerContactRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEContact rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    hasEmerContactRow.selectorOptions = @[@"YES", @"NO"];
+    [askEmerContactSection addFormRow:hasEmerContactRow];
+    
+    XLFormSectionDescriptor *EmerContactSection = [XLFormSectionDescriptor formSectionWithTitle:@"Emergency Contact"];
+    EmerContactSection.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasEmerContactRow];
+    [formDescriptor addFormSection:EmerContactSection];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactName rowType:XLFormRowDescriptorTypeText title:@"Name"];
+    [EmerContactSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactRs rowType:XLFormRowDescriptorTypeText title:@"Relationship"];
+    [EmerContactSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactNum rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    [EmerContactSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactNric rowType:XLFormRowDescriptorTypeText title:@"NRIC"];
+    [EmerContactSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactAddress rowType:XLFormRowDescriptorTypeText title:@"Address"];
+    [EmerContactSection addFormRow:row];
     
     
     
