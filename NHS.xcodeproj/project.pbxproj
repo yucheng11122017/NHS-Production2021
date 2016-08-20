@@ -829,7 +829,7 @@
 				);
 				INFOPLIST_FILE = NHS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = NUS.NHS;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.nus.nhs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -846,7 +846,7 @@
 				);
 				INFOPLIST_FILE = NHS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = NUS.NHS;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.nus.nhs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
