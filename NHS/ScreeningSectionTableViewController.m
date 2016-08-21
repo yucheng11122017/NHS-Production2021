@@ -27,7 +27,10 @@
 - (void)viewDidLoad {
     
     self.preRegDictionary = [[NSDictionary alloc] init];
-    [self getPatientData];
+    if ((self.patientID != (id) [NSNull null])&&(self.patientID!=nil)) {
+        [self getPatientData];
+    }
+    
     self.rowTitles = @[@"Neighbourhood",@"Resident Particulars", @"Clinical Results",@"Screening of Risk Factors", @"Diabetes Mellitus", @"Hyperlipidemia", @"Hypertension", @"Cancer Screening", @"Other Medical Issues", @"Primary Care Source", @"My Health and My Neighbourhood", @"Demographics", @"Current Physical Issues", @"Current Socioeconomics Situation", @"Social Support Assessment", @"Referral for Doctor Consultation", @"Submit"];
     
      self.clearsSelectionOnViewWillAppear = YES;
