@@ -220,6 +220,21 @@ NSString *const kParticipateActivities = @"participate_activities";
 NSString *const kMultiHost = @"multi_host";
 NSString *const kHostOthers = @"host_others";
 
+//Referral for Doctor Consult
+NSString *const kReferralChecklist = @"referral_checklist";
+NSString *const kDocConsult = @"doc_consult";
+NSString *const kDocRef = @"doc_ref";
+NSString *const kSeri = @"seri";
+NSString *const kSeriRef = @"seri_ref";
+NSString *const kDentalConsult = @"dental";
+NSString *const kDentalRef = @"dental_ref";
+NSString *const kMammoRef = @"mammo_ref";
+NSString *const kFitKit = @"fit_kit";
+NSString *const kPapSmearRef = @"pap_smear_ref";
+NSString *const kPhlebotomy = @"phleb";
+NSString *const kRefNA = @"na";
+NSString *const kDocNotes = @"doc_notes";
+NSString *const kDocName = @"doc_name";
 
 
 @interface ScreeningFormViewController ()
@@ -262,8 +277,10 @@ NSString *const kHostOthers = @"host_others";
             break;
         case 14: form = [self initSocialSupportAssessment];
             break;
+        case 15: form = [self initRefForDoctorConsult];
+            break;
     }
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitPressed:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(validateBtnPressed:)];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -274,9 +291,52 @@ NSString *const kHostOthers = @"host_others";
     // Dispose of any resources that can be recreated.
 }
 
--(void)submitPressed:(UIBarButtonItem * __unused)button
+-(void)validateBtnPressed:(UIBarButtonItem * __unused)button
 {
     NSLog(@"%@", [self.form formValues]);
+    
+    NSArray * validationErrors = [self formValidationErrors];
+    if (validationErrors.count > 0){
+        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+            cell.backgroundColor = [UIColor orangeColor];
+            [UIView animateWithDuration:0.3 animations:^{
+                cell.backgroundColor = [UIColor whiteColor];
+            }];
+        }];
+        return;
+    } else {
+        UIAlertController *alertController;
+        UIAlertAction *okAction;
+        
+        alertController = [UIAlertController alertControllerWithTitle:@"Validation success"
+                                                              message:@"All required fields are not empty."
+                                                       preferredStyle:UIAlertControllerStyleActionSheet];
+        okAction = [UIAlertAction actionWithTitle:@"OK"
+                                                 style:UIAlertActionStyleCancel
+                                               handler:^(UIAlertAction *action) {
+                                                   // do destructive stuff here
+                                               }];
+
+        // note: you can control the order buttons are shown, unlike UIActionSheet
+        [alertController addAction:okAction];
+        [alertController setModalPresentationStyle:UIModalPresentationPopover];
+        [self presentViewController:alertController animated:YES completion:nil];
+
+    }
+    //    if (validationErrors.count > 0){
+    //        [self showFormValidationError:[validationErrors firstObject]];
+    //        return;
+    //    }
+//    [self.tableView endEditing:YES];
+//    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    
+    // Set the label text.
+//    hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
+//    [self submitPersonalInfo:[self preparePersonalInfoDict]];
+
+    
 }
 
 -(id)initNeighbourhood
@@ -297,19 +357,32 @@ NSString *const kHostOthers = @"host_others";
     
     
     // RowNavigationShowAccessoryView
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourhoodLoc rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Screening Neighbourhood"];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Bukit Merah"],
+    XLFormRowDescriptor *neighbourhoodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourhoodLoc rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Screening Neighbourhood"];
+    neighbourhoodRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Bukit Merah"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Eunos Crescent"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Marine Terrace"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Taman Jurong"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Volunteer Training"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Others"]
                             ];
-    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Bukit Merah"];   //default value
-    [section addFormRow:row];
+    neighbourhoodRow.required = YES;
+    [section addFormRow:neighbourhoodRow];
+    
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourhoodOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    row.hidden = @(YES);
     [section addFormRow:row];
+    
+    neighbourhoodRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        //        bmi.value = @([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2));
+        if (oldValue != newValue) {
+            if ([[neighbourhoodRow.value formValue] isEqual:@5]) {
+                row.hidden = @(NO);
+            } else {
+                row.hidden = @(YES);
+            }
+        }
+    };
     
     return [super initWithForm:formDescriptor];
 }
@@ -333,10 +406,10 @@ NSString *const kHostOthers = @"host_others";
     //    row.value = [self.retrievedPatientDictionary objectForKey:kName]? [self.retrievedPatientDictionary objectForKey:kName]:@"";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorPickerViewInline title:@"Gender"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Gender"];
     row.selectorOptions = @[@"Male", @"Female"];
     //    row.value = [self.retrievedPatientDictionary objectForKey:kGender]? [self.retrievedPatientDictionary objectForKey:kGender]:@"Male";
-    row.value = @"Male";
+    row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC rowType:XLFormRowDescriptorTypeText title:@"NRIC"];
@@ -661,7 +734,6 @@ NSString *const kHostOthers = @"host_others";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kExNoOthers
                                                 rowType:XLFormRowDescriptorTypeTextView];
     [row.cellConfigAtConfigure setObject:@"Type your other reasons here" forKey:@"textView.placeholder"];
-    
     [section addFormRow:row];
     
     // Smoking - Section
@@ -2083,6 +2155,79 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", multiOrgActivitiesRow];
     [section addFormRow:row];
     
+    
+    return [super initWithForm:formDescriptor];
+}
+
+- (id) initRefForDoctorConsult {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Referral for Doctor Consult"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"NOTE"];
+    section.footerTitle = @"If it is appropriate to refer the resident doctor consult:\n- If resident is mobile, accompany him/her to the consultation booths at HQ\n- If resident is not mobile, call Ops to send a doctor to the resident's flat\n- Please refer for consult immediately. Teams that wait till they are done with all other units on their list often find that upon return to a previously-covered unit, the resident has gone out";
+    [formDescriptor addFormSection:section];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"The resident has gone for/received the following: (Check all that apply)"];
+    [formDescriptor addFormSection:section];
+    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReferralChecklist rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Checklist:"];
+//    row.required = YES;
+//    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Doctor's consultation"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Doctor's referral"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"SERI"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"SERI referral"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Dental"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(6) displayText:@"Dental referral"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(7) displayText:@"Mammogram referral"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(8) displayText:@"FIT kit"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(9) displayText:@"Pap smear referral"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(10) displayText:@"Phlebotomy (Blood test)"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(11) displayText:@"N.A."]];
+//    row.required = YES;
+//    [section addFormRow:row];
+//
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocConsult rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Doctor's consultation"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Doctor's referral"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSeri rowType:XLFormRowDescriptorTypeBooleanCheck title:@"SERI"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSeriRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"SERI referral"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentalConsult rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentalRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental referral"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMammoRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Mammogram referal"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFitKit rowType:XLFormRowDescriptorTypeBooleanCheck title:@"FIT kit"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPapSmearRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Pap smear referral"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhlebotomy rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Phlebotomy (Blood test)"];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRefNA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"N.A."];
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Doctor's notes"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocNotes
+                                                rowType:XLFormRowDescriptorTypeTextView];
+    [row.cellConfigAtConfigure setObject:@"Doctor's notes" forKey:@"textView.placeholder"];
+    [section addFormRow:row];
+
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocName
+                                                rowType:XLFormRowDescriptorTypeText title:@"Name of Doctor"];
+    row.required = NO;
+    [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
 }

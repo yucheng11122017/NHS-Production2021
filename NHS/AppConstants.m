@@ -11,6 +11,7 @@
 @implementation AppConstants
 
 /*
+
  * Form Constants
  ********************************************/
 NSString *const kName = @"name";
@@ -33,5 +34,13 @@ NSString *const kPrefDate = @"preferreddate";
 NSString *const kPrefTime = @"preferredtime";
 NSString *const kNeighbourhood = @"neighbourhood";
 NSString *const kRemarks = @"remarks";
+
+
+/* Search Bar constants
+ ********************************************/
+ NSString *const ViewControllerTitleKey = @"ViewControllerTitleKey";
+ NSString *const SearchControllerIsActiveKey = @"SearchControllerIsActiveKey";
+ NSString *const SearchBarTextKey = @"SearchBarTextKey";
+ NSString *const SearchBarIsFirstResponderKey = @"SearchBarIsFirstResponderKey";
 
 @end

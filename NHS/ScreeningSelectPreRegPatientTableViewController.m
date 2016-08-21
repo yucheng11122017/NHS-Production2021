@@ -1,13 +1,12 @@
 //
-//  PatientPreRegTableViewController.m
+//  ScreeningSelectPreRegPatientTableViewController.m
 //  NHS
 //
-//  Created by Nicholas on 7/25/16.
+//  Created by Mac Pro on 8/21/16.
 //  Copyright © 2016 NUS. All rights reserved.
 //
 
-#import "PatientPreRegTableViewController.h"
-#import "PreRegPatientDetailsViewController.h"
+#import "ScreeningSelectPreRegPatientTableViewController.h"
 #import "ServerComm.h"
 #import "PreRegFormViewController.h"
 #import "SearchResultsTableController.h"
@@ -22,7 +21,7 @@ typedef enum getDataState {
 } getDataState;
 
 
-@interface PatientPreRegTableViewController () <UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating>
+@interface ScreeningSelectPreRegPatientTableViewController () <UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating>
 
 @property (nonatomic, strong) UISearchController *searchController;
 
@@ -36,10 +35,11 @@ typedef enum getDataState {
 @property (strong, nonatomic) NSMutableArray *patientRegTimestamp;
 @property (strong, nonatomic) NSMutableDictionary *patientsGroupedInSections;
 @property (strong, nonatomic) NSArray *localSavedFilename;
+@property NSMutableArray *patients;
 
 @end
 
-@implementation PatientPreRegTableViewController {
+@implementation ScreeningSelectPreRegPatientTableViewController {
     NSNumber *selectedPatientID;
     NSArray *patientSectionTitles;
     NSNumber *patientDataLocalOrServer;
@@ -64,7 +64,7 @@ typedef enum getDataState {
     
     status = [reachability currentReachabilityStatus];
     [self processConnectionStatus];
-
+    
     self.patientNames = [[NSMutableArray alloc] init];
     self.patientRegTimestamp = [[NSMutableArray alloc] init];
     self.patientsGroupedInSections = [[NSMutableDictionary alloc] init];
@@ -97,19 +97,17 @@ typedef enum getDataState {
 }
 
 - (void) viewWillAppear:(BOOL)animated {
-    self.navigationItem.title = @"Pre-Registration";
+    self.navigationItem.title = @"Pre-Registration Patient List";
     
     [super viewWillAppear:animated];
-//    [self getAllPatients];
+    //    [self getAllPatients];
     fetchDataState = started;
-    [self getLocalSavedData];
-    
 }
 
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     //REMINDER: navigationController.navigationBar.backItem only is initiated after viewDidAppear!
-//    self.navigationController.navigationBar.backItem.title = @"Home";
+    //    self.navigationController.navigationBar.backItem.title = @"Home";
     // restore the searchController's active state
     if (self.searchControllerWasActive) {
         self.searchController.active = self.searchControllerWasActive;
@@ -124,7 +122,7 @@ typedef enum getDataState {
 
 - (void) viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    self.navigationItem.title = @"Back";
+//    self.navigationItem.title = @"Back";
 }
 
 - (void)didReceiveMemoryWarning {
@@ -169,58 +167,26 @@ typedef enum getDataState {
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if (fetchDataState == failed) {
-        if ([self.localSavedFilename count] > 0) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
+        return 0;
     } else {
-        if ([self.localSavedFilename count] > 0) {
-            return ([patientSectionTitles count]+1);
-        } else {
-            return [patientSectionTitles count];    //alphabets + locally saved files
-        }
+        return [patientSectionTitles count];    //alphabets
     }
+
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    if ([self.localSavedFilename count] > 0) {
-        if (section == 0) {
-            return @"Drafts";
-        } else {
-            NSInteger newSection = section-1;
-            if (newSection == 16) {
-                NSLog(@"16");
-            }
-            return [patientSectionTitles objectAtIndex:(newSection)];    //because first section is for drafts.
-        }
-        
-    } else {
-        return [patientSectionTitles objectAtIndex:section];
-    }
-    
+    return [patientSectionTitles objectAtIndex:section];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSString *sectionTitle;
     NSArray *sectionPatient;
     
-    if ([self.localSavedFilename count] > 0) {
-        if(section == 0) {
-            return [self.localSavedFilename count];
-        } else {
-            // Return the number of rows in the section.
-            sectionTitle = [patientSectionTitles objectAtIndex:(section-1)];    //first section reserved for drafts.
-            sectionPatient = [self.patientsGroupedInSections objectForKey:sectionTitle];
-            return [sectionPatient count];
-        }
-    } else {    //no draft files
-        sectionTitle = [patientSectionTitles objectAtIndex:section];
-        sectionPatient = [self.patientsGroupedInSections objectForKey:sectionTitle];
-        return [sectionPatient count];
-    }
+    sectionTitle = [patientSectionTitles objectAtIndex:section];
+    sectionPatient = [self.patientsGroupedInSections objectForKey:sectionTitle];
+    return [sectionPatient count];
+
 }
 
 //Indexing purpose!
@@ -233,7 +199,7 @@ typedef enum getDataState {
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     static NSString *simpleTableIdentifier = @"SimpleTableItem";
-
+    
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
@@ -242,19 +208,9 @@ typedef enum getDataState {
     // Configure the cell...
     NSString *sectionTitle;
     
-    if ([self.localSavedFilename count] > 0) { //if there are local saved data...
-        if (indexPath.section == 0) {   //section for Drafts
-            NSRange range = [[self.localSavedFilename objectAtIndex:indexPath.row] rangeOfString:@"_"];
-            NSString *displayText = [[self.localSavedFilename objectAtIndex:indexPath.row] substringToIndex:(range.location)];
-            cell.textLabel.text = displayText;
-            cell.detailTextLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
-            return cell;
-        } else {
-            sectionTitle = [patientSectionTitles objectAtIndex:(indexPath.section-1)];  //update sectionlist
-        }
-    } else {
-        sectionTitle = [patientSectionTitles objectAtIndex:indexPath.section];
-    }
+
+    sectionTitle = [patientSectionTitles objectAtIndex:indexPath.section];
+
     NSArray *patientsInSection = [self.patientsGroupedInSections objectForKey:sectionTitle];
     NSString *patientName = [[patientsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
     NSString *lastUpdatedTS = [[patientsInSection objectAtIndex:indexPath.row] objectForKey:@"last_updated_ts"];
@@ -268,88 +224,64 @@ typedef enum getDataState {
     
     NSString *selectedPatientName;
     NSDictionary *selectedPatient = [[NSDictionary alloc] init];
-    if ([self.localSavedFilename count] > 0) {
-        if (indexPath.section == 0) {   //part of the drafts...
-            selectedPatientID = [NSNumber numberWithInteger:indexPath.row];
-            patientDataLocalOrServer = [NSNumber numberWithInt:local];
-            loadDataFlag = YES;
-            
-            [self performSegueWithIdentifier:@"preRegPatientListToPatientFormSegue" sender:self];
-            NSLog(@"Continue Form segue performed!");
-            
-            [tableView deselectRowAtIndexPath:indexPath animated:NO];
-            
-        }
-    }
-    else {  //no saved draft
-        if (tableView == self.tableView) {      //not in the searchResult view
-            selectedPatient = [self findPatientNameFromSectionRow:indexPath];
-            selectedPatientName = [selectedPatient objectForKey:@"resident_name"];
-            selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
-            
-        } else {
-            selectedPatient = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
-            selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
-        }
+
+    if (tableView == self.tableView) {      //not in the searchResult view
+        selectedPatient = [self findPatientNameFromSectionRow:indexPath];
+        selectedPatientName = [selectedPatient objectForKey:@"resident_name"];
+        selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
         
-        [self performSegueWithIdentifier:@"preRegPatientListToPatientDataSegue" sender:self];
-        NSLog(@"View submitted Form segue performed!");
-        
-        [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    } else {
+        selectedPatient = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
+        selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
     }
     
+    [self performSegueWithIdentifier:@"PreRegResidentToScreeningFormSegue" sender:self];
     
-
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    
 }
 
-- (IBAction)addBtnPressed:(id)sender {
-    [self.refreshControl endRefreshing];    //stop refreshing
-    loadDataFlag = NO;
-    [self performSegueWithIdentifier:@"preRegPatientListToPatientFormSegue" sender:self];
-    NSLog(@"Form segue performed!");
-}
-
-
-
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-
-
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-#warning Need to add the delete API (99) here
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }
-//  else if (editingStyle == UITableViewCellEditingStyleInsert) {
-//        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-//    }   
-}
 
 
 /*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
+ // Override to support conditional editing of the table view.
+ - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+ // Return NO if you do not want the specified item to be editable.
+ return YES;
+ }
+ */
 
 /*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
+ // Override to support editing the table view.
+ - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+ if (editingStyle == UITableViewCellEditingStyleDelete) {
+ // Delete the row from the data source
+ [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+ } else if (editingStyle == UITableViewCellEditingStyleInsert) {
+ // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+ }
+ }
+ */
+
+/*
+ // Override to support rearranging the table view.
+ - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+ }
+ */
+
+/*
+ // Override to support conditional rearranging of the table view.
+ - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+ // Return NO if you do not want the item to be re-orderable.
+ return YES;
+ }
+ */
 
 #pragma mark - Blocks
 
 - (void (^)(NSProgress *downloadProgress))progressBlock {
     return ^(NSProgress *downloadProgress) {
-//        NSLog(@"Patients GET Request Started. In Progress.");
+        //        NSLog(@"Patients GET Request Started. In Progress.");
     };
 }
 
@@ -391,14 +323,6 @@ typedef enum getDataState {
 
 #pragma mark - Patient API
 
-- (void)getLocalSavedData {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
-    self.localSavedFilename = [fileManager contentsOfDirectoryAtPath:documentsDirectory
-                                                      error:nil];
-}
-
 - (void)getAllPatients {
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client getPatient:[self progressBlock]
@@ -410,36 +334,6 @@ typedef enum getDataState {
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
     [searchBar resignFirstResponder];
-}
-
-
-#pragma mark - UISearchControllerDelegate
-
-// Called after the search controller's search bar has agreed to begin editing or when
-// 'active' is set to YES.
-// If you choose not to present the controller yourself or do not implement this method,
-// a default presentation is performed on your behalf.
-//
-// Implement this method if the default presentation is not adequate for your purposes.
-//
-- (void)presentSearchController:(UISearchController *)searchController {
-    
-}
-
-- (void)willPresentSearchController:(UISearchController *)searchController {
-    // do something before the search controller is presented
-}
-
-- (void)didPresentSearchController:(UISearchController *)searchController {
-    // do something after the search controller is presented
-}
-
-- (void)willDismissSearchController:(UISearchController *)searchController {
-    // do something before the search controller is dismissed
-}
-
-- (void)didDismissSearchController:(UISearchController *)searchController {
-    // do something after the search controller is dismissed
 }
 
 #pragma mark - UISearchResultsUpdating
@@ -489,11 +383,11 @@ typedef enum getDataState {
         lhs = [NSExpression expressionForKeyPath:@"nric"];
         rhs = [NSExpression expressionForConstantValue:searchString];
         finalPredicate = [NSComparisonPredicate
-                                       predicateWithLeftExpression:lhs
-                                       rightExpression:rhs
-                                       modifier:NSDirectPredicateModifier
-                                       type:NSContainsPredicateOperatorType
-                                       options:NSCaseInsensitivePredicateOption];
+                          predicateWithLeftExpression:lhs
+                          rightExpression:rhs
+                          modifier:NSDirectPredicateModifier
+                          type:NSContainsPredicateOperatorType
+                          options:NSCaseInsensitivePredicateOption];
         [searchItemsPredicate addObject:finalPredicate];
         
         // at this OR predicate to our master AND predicate
@@ -545,7 +439,7 @@ typedef enum getDataState {
 //    } else {
 //        hasCaretaker = NO;
 //    }
-//    
+//
 //    return [[Patient alloc] initWithName:name
 //                                     age:(int)age
 //                                      ID:ID
@@ -583,18 +477,16 @@ typedef enum getDataState {
         }
         found = FALSE;
     }
-//    NSLog(@"%@", self.patientsGroupedInSections);
+    //    NSLog(@"%@", self.patientsGroupedInSections);
     patientSectionTitles = [[self.patientsGroupedInSections allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];     //get the keys in alphabetical order
 }
 
 - (NSDictionary *) findPatientNameFromSectionRow: (NSIndexPath *)indexPath{
     
     NSInteger section;
-    if ([self.localSavedFilename count] > 0) {
-        section = indexPath.section - 1;
-    } else {
-        section = indexPath.section;
-    }
+
+    section = indexPath.section;
+
     NSInteger row = indexPath.row;
     
     NSString *sectionAlphabet = [[NSString alloc] initWithString:[patientSectionTitles objectAtIndex:section]];
@@ -666,19 +558,13 @@ typedef enum getDataState {
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    //     Get the new view controller using [segue destinationViewController].
-    //     Pass the selected object to the new view controller.
+    
     if ([segue.destinationViewController respondsToSelector:@selector(setPatientID:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setPatientID:)
                                               withObject:selectedPatientID];
     }
-    
-    if ([segue.destinationViewController respondsToSelector:@selector(setPatientDataLocalOrServer:)]) { //continue form
-        [segue.destinationViewController performSelector:@selector(setPatientDataLocalOrServer:)
-                                              withObject:patientDataLocalOrServer];
-        [segue.destinationViewController performSelector:@selector(setLoadDataFlag:) withObject:[NSNumber numberWithBool:loadDataFlag]];
-    }
-    
+
 }
+
 
 @end

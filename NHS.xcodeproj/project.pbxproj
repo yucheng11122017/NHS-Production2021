@@ -16,6 +16,7 @@
 		6CFD29C7B37E62DFE01501E8 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5770AFF7723755883767FC00 /* AssetsLibrary.framework */; };
 		7178DCB2261E43BF5671CFA5 /* Pods_NHSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 645A46836680739EAF744E2F /* Pods_NHSTests.framework */; };
 		89436BFEDA11D3AAFB7D890D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C7F3F1B0D84D672E6E35103 /* QuartzCore.framework */; };
+		8E23D5541D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E23D5531D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m */; };
 		8E25276A1D5766C400ACEE92 /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E2527691D5766C400ACEE92 /* HomeViewController.m */; };
 		8E25276D1D57891700ACEE92 /* PreRegDisplayFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E25276C1D57891700ACEE92 /* PreRegDisplayFormViewController.m */; };
 		8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E28D5521D54C9F8006BDF8F /* SearchResultsTableController.m */; };
@@ -90,6 +91,8 @@
 		645A46836680739EAF744E2F /* Pods_NHSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NHSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8964BE86125ACEAAC6F8C79B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		8C7F3F1B0D84D672E6E35103 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		8E23D5521D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreeningSelectPreRegPatientTableViewController.h; sourceTree = "<group>"; };
+		8E23D5531D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreeningSelectPreRegPatientTableViewController.m; sourceTree = "<group>"; };
 		8E2527681D5766C400ACEE92 /* HomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
 		8E2527691D5766C400ACEE92 /* HomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HomeViewController.m; sourceTree = "<group>"; };
 		8E25276B1D57891700ACEE92 /* PreRegDisplayFormViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreRegDisplayFormViewController.h; sourceTree = "<group>"; };
@@ -217,6 +220,8 @@
 			children = (
 				E1EFB0911D433C3400510532 /* PatientScreeningListTableViewController.h */,
 				E1EFB0921D433C3400510532 /* PatientScreeningListTableViewController.m */,
+				8E23D5521D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.h */,
+				8E23D5531D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m */,
 				8EC56F851D60C16300938C2A /* ScreeningSectionTableViewController.h */,
 				8EC56F861D60C16300938C2A /* ScreeningSectionTableViewController.m */,
 				8EC56F7F1D60B88D00938C2A /* ScreeningFormViewController.h */,
@@ -670,6 +675,7 @@
 				8E25276D1D57891700ACEE92 /* PreRegDisplayFormViewController.m in Sources */,
 				8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */,
 				E1A4F0DF1D66BC5A00EE9BBB /* LoginViewController.m in Sources */,
+				8E23D5541D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m in Sources */,
 				E10412131D4C92CB0024663B /* tempViewController.m in Sources */,
 				E1334EE71D432CAA00A43539 /* PreRegistrationViewController.m in Sources */,
 				E1FCF9381D45DE2000478F7B /* PreRegPatientDetailsViewController.m in Sources */,

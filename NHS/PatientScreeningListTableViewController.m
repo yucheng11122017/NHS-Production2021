@@ -99,8 +99,22 @@
 }
 */
 
-- (void) addItem:(UIBarButtonItem *)addButton {
-    NSLog(@"button pressed");
+- (IBAction)addBtnPressed:(UIBarButtonItem *)sender {
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"New screening form", nil)
+                                                                                  message:@"Choose one of the options"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"New resident", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+                                                              [self performSegueWithIdentifier:@"NewScreeningFormSegue" sender:self];
+                                                          }]];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Pre-registered resident", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+                                                                  [self performSegueWithIdentifier:@"SelectPreRegSegue" sender:self];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+
 }
 
 

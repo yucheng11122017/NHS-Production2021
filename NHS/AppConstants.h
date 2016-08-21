@@ -35,4 +35,13 @@ extern NSString *const kPrefTime;
 extern NSString *const kNeighbourhood;
 extern NSString *const kRemarks;
 
+/* Search Bar constants
+ ********************************************/
+extern NSString *const ViewControllerTitleKey;
+extern NSString *const SearchControllerIsActiveKey;
+extern NSString *const SearchBarTextKey;
+extern NSString *const SearchBarIsFirstResponderKey;
+
+
+
 @end

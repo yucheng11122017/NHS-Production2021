@@ -10,4 +10,10 @@
 
 @interface ScreeningSectionTableViewController : UITableViewController
 
+
+@property (strong, nonatomic) NSNumber* patientID;
+
+- (void) setPatientID:(NSNumber *)patientID;
+
+
 @end
