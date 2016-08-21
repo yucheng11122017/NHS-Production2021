@@ -1735,8 +1735,9 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
                                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Retiree"],
                                            [XLFormOptionsObject formOptionsObjectWithValue:@(6) displayText:@"Student"],
                                            [XLFormOptionsObject formOptionsObjectWithValue:@(7) displayText:@"Others"]];
-    [section addFormRow:EmployStatusRow];
     EmployStatusRow.required = YES;
+    [section addFormRow:EmployStatusRow];
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployStatusOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
     [row.cellConfigAtConfigure setObject:@"Please specify" forKey:@"textField.placeholder"];
 #warning Cannot hide at the moment
@@ -1905,6 +1906,182 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactAddress rowType:XLFormRowDescriptorTypeText title:@"Address"];
     [EmerContactSection addFormRow:row];
     
+    
+    //SUPPORT
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Support"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree rowType:XLFormRowDescriptorTypeInfo title:@"Are you getting support from your children/relatives/others"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    XLFormRowDescriptor *getSupportRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGettingSupport rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    getSupportRow.selectorOptions = @[@"YES", @"NO"];
+    [section addFormRow:getSupportRow];
+    
+    XLFormRowDescriptor *multiSupportRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiSupport rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Support in term of:"];
+    multiSupportRow.hidden =[NSString stringWithFormat:@"NOT $%@.value contains 'YES'", getSupportRow];
+    multiSupportRow.selectorOptions = @[@"Care-giving", @"Food", @"Money", @"Others"];
+    [section addFormRow:multiSupportRow];
+    
+    
+    //RELATIVES
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Relatives"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour rowType:XLFormRowDescriptorTypeInfo title:@"How many relatives do you see or hear from at least once a month?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRelativesContact rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
+    row.required = YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive rowType:XLFormRowDescriptorTypeInfo title:@"How many relatives do you feel at ease with that you can talk about private matters?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRelativesEase rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
+    row.required = YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix rowType:XLFormRowDescriptorTypeInfo title:@"How many relatives do you feel close to such that you could call on them for help?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRelativesClose rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
+    row.required = YES;
+    [section addFormRow:row];
+    
+    
+    //FRIENDS
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Friends"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSeven rowType:XLFormRowDescriptorTypeInfo title:@"How many friends do you see or hear from at least once a month?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsContact rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
+    row.required = YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight rowType:XLFormRowDescriptorTypeInfo title:@"How many friends do you feel at ease with that you can talk about private matters?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsEase rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
+    row.required = YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionNine rowType:XLFormRowDescriptorTypeInfo title:@"How many of your friends do you feel close to such that you could call on them for help?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsClose rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
+    row.required = YES;
+    [section addFormRow:row];
+    
+    //SOCIAL SCORE
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Social Score"];
+    [formDescriptor addFormSection:section];
+    XLFormRowDescriptor *socialScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSocialScore rowType:XLFormRowDescriptorTypeText title:@""];
+//    socialScoreRow.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"0"]];
+    socialScoreRow.value = @"not calculating...";
+    [section addFormRow:socialScoreRow];
+    
+    //MEASURING LONELINESS
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Measuring Loneliness"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTen rowType:XLFormRowDescriptorTypeInfo title:@"How often do you feel lack of companionship?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLackCompan rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Hardly Ever"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Sometimes"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Often"]];
+    row.required = YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEleven rowType:XLFormRowDescriptorTypeInfo title:@"How often do you feel left out?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelLeftOut rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Hardly Ever"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Sometimes"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Often"]];
+    row.required = YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwelve rowType:XLFormRowDescriptorTypeInfo title:@"How often do you feel isolated from others?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelIsolated rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Hardly Ever"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Sometimes"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Often"]];
+    row.required = YES;
+    [section addFormRow:row];
+    
+    //Last part
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThirteen rowType:XLFormRowDescriptorTypeInfo title:@"Are you aware of any community activities?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAwareActivities rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFourteen rowType:XLFormRowDescriptorTypeInfo title:@"Do you participate in any community activities?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kParticipateActivities rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row.selectorOptions = @[@"YES", @"NO"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFifteen rowType:XLFormRowDescriptorTypeInfo title:@"Which organisation hosts the activities that you participate in?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    XLFormRowDescriptor *multiOrgActivitiesRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiHost rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
+    multiOrgActivitiesRow.selectorOptions = @[@"Senior Activity Centre (SAC)", @"Family Services Centre (FSC)", @"Community Centre (CC)", @"Residents' Committee (RC)", @"Religious Organisations", @"Self-organised", @"Others"];
+    [section addFormRow:multiOrgActivitiesRow];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHostOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
+    row.required = NO;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", multiOrgActivitiesRow];
+    [section addFormRow:row];
     
     
     return [super initWithForm:formDescriptor];
