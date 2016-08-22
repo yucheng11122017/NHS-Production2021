@@ -155,62 +155,6 @@
     };
 }
 
-//#pragma mark -
-//- (NSArray *) getSpokenLangArray: (NSDictionary *) spoken_lang {
-//    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
-//    if([[spoken_lang objectForKey:@"lang_canto"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
-//    if([[spoken_lang objectForKey:@"lang_english"] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
-//    if([[spoken_lang objectForKey:@"lang_hindi"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
-//    if([[spoken_lang objectForKey:@"lang_hokkien"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
-//    if([[spoken_lang objectForKey:@"lang_malay"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
-//    if([[spoken_lang objectForKey:@"lang_mandrin"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
-//    if([[spoken_lang objectForKey:@"lang_others"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
-//    if([[spoken_lang objectForKey:@"lang_tamil"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
-//    if([[spoken_lang objectForKey:@"lang_teochew"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
-//    
-//    return spokenLangArray;
-//}
-//
-//- (NSArray *) getPreferredTimeArray: (NSDictionary *) others_prereg {
-//    NSMutableArray *preferredTimeArray = [[NSMutableArray alloc] init];
-//    if([[others_prereg objectForKey:@"time_slot_9_11"] isEqualToString:@"1"]) [preferredTimeArray addObject:@"9-11"];
-//    if([[others_prereg objectForKey:@"time_slot_11_1"] isEqualToString:@"1"]) [preferredTimeArray addObject:@"11-1"];
-//    if([[others_prereg objectForKey:@"time_slot_1_3"] isEqualToString:@"1"]) [preferredTimeArray addObject:@"1-3"];
-//    
-//    return preferredTimeArray;
-//}
-//
-//- (NSDictionary *) preparePersonalInfoDict {
-//    
-//    NSDictionary *personalInfoDict = [[NSDictionary alloc] init];
-//    NSDictionary *dict = [[NSDictionary alloc] init];
-//    NSString *gender = [[NSString alloc] init];
-//    
-//    if ([[[self.form formValues] objectForKey:@"gender"] isEqualToString:@"Male"]) {
-//        gender = @"M";
-//    } else {
-//        gender = @"F";
-//    }
-//    // get current date/time
-//    NSDate *today = [NSDate date];
-//    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-//    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
-//    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
-//    
-//    dict = @{@"resident_name":[[self.form formValues] objectForKey:@"name"],
-//             @"nric":[[self.form formValues] objectForKey:@"nric"],
-//             @"gender":gender,
-//             @"birth_year":[[self.form formValues] objectForKey:@"dob"],
-//             @"ts":[localDateTime description]      //changed to NSString
-//             };
-//    
-//    personalInfoDict = @{@"personal_info":dict};
-//    [self.completePreRegForm removeAllObjects];
-//    [self.completePreRegForm addObject:personalInfoDict];
-//    
-//    return personalInfoDict;
-//}
-
 #pragma mark - Downloading Patient Details
 - (void)getPatientData {
     ServerComm *client = [ServerComm sharedServerCommInstance];
@@ -229,6 +173,15 @@
     if ([segue.destinationViewController respondsToSelector:@selector(setSectionID:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setSectionID:)
                                               withObject:selectedRow];
+        
+        if ([selectedRow isEqualToNumber:[NSNumber numberWithInt:1]]) {    //Resident Particulars
+            if ([self.preRegDictionary allKeys]) {
+                [segue.destinationViewController performSelector:@selector(setpreRegParticularsDict:)
+                                                  withObject:self.preRegDictionary];
+            }
+        }
+//        [segue.destinationViewController performSelector:@selector(setResidentPersonalData:)
+//                                              withObject:selectedRow];
     }
 }
 

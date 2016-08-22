@@ -245,6 +245,8 @@ NSString *const kDocName = @"doc_name";
 
 - (void)viewDidLoad {
     XLFormDescriptor *form;
+    NSLog(@"At the resident form");
+    NSLog(@"%@", self.preRegParticularsDict);
     
     switch([self.sectionID integerValue]) {
         case 0: form = [self initNeighbourhood];       //must init first before [super viewDidLoad]
@@ -289,6 +291,10 @@ NSString *const kDocName = @"doc_name";
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void) setpreRegParticularsDict :(NSDictionary *)preRegParticularsDict {
+    self.preRegParticularsDict = [[NSDictionary alloc] initWithDictionary:preRegParticularsDict];
 }
 
 -(void)validateBtnPressed:(UIBarButtonItem * __unused)button

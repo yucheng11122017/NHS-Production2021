@@ -12,7 +12,10 @@
 @interface ScreeningFormViewController : XLFormViewController
 
 @property (strong, nonatomic) NSNumber* sectionID;
+@property (strong, nonatomic) NSDictionary *preRegParticularsDict;
 
 - (void) setSectionID:(NSNumber *)sectionID;
+- (void) setpreRegParticularsDict :(NSDictionary *)preRegParticularsDict;
+
 
 @end
