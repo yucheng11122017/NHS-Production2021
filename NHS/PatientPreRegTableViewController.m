@@ -372,6 +372,7 @@ typedef enum getDataState {
         // Optional label text.
         hud.label.text = NSLocalizedString(@"Done", @"HUD done title");
         
+        
         [hud hideAnimated:YES afterDelay:1.f];
         
     };
