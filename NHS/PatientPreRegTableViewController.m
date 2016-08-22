@@ -392,6 +392,7 @@ typedef enum getDataState {
         self.residents = [[self.residents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
         
         for (i=0; i<[self.residents count]; i++) {
+            NSLog(@"%d", i);
             [self.residentNames addObject:[[self.residents objectAtIndex:i] objectForKey:@"resident_name"]];
             [self.residentRegTimestamp addObject:[[self.residents objectAtIndex:i] objectForKey:@"last_updated_ts"]];
         }
@@ -426,7 +427,7 @@ typedef enum getDataState {
 
 - (void)getAllResidents {
     ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getAllScreeningResidents:[self progressBlock]
+    [client getPatient:[self progressBlock]
           successBlock:[self successBlock]
           andFailBlock:[self errorBlock]];
 }

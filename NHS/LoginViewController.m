@@ -70,7 +70,7 @@
     [super viewDidAppear:animated];
     
     // place cursor at username field and raise the keyboard
-    [self.usernameField becomeFirstResponder];
+//    [self.usernameField becomeFirstResponder];
 }
 
 - (void)didReceiveMemoryWarning {

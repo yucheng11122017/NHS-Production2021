@@ -265,7 +265,7 @@ typedef enum getDataState {
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
     // update the filtered array based on the search text
     NSString *searchText = searchController.searchBar.text;
-    NSMutableArray *searchResults = [self.residents mutableCopy];
+    NSMutableArray *searchResults = [self.screeningResidents mutableCopy];
     
     // strip out all the leading and trailing spaces
     NSString *strippedString = [searchText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -448,16 +448,16 @@ typedef enum getDataState {
         [self.residentNames removeAllObjects];   //reset this array first
         [self.residentScreenTimestamp removeAllObjects];   //reset this array first
         NSArray *patients = [responseObject objectForKey:@"0"];      //somehow double brackets... (())
-        self.residents = [[NSMutableArray alloc] initWithArray:patients];
+        self.screeningResidents = [[NSMutableArray alloc] initWithArray:patients];
         
         NSSortDescriptor *sortDescriptor;
         sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"resident_name" ascending:YES];
         NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
-        self.residents = [[self.residents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
+        self.screeningResidents = [[self.screeningResidents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
         
-        for (i=0; i<[self.residents count]; i++) {
-            [self.residentNames addObject:[[self.residents objectAtIndex:i] objectForKey:@"resident_name"]];
-            [self.residentScreenTimestamp addObject:[[self.residents objectAtIndex:i] objectForKey:@"last_updated_ts"]];
+        for (i=0; i<[self.screeningResidents count]; i++) {
+            [self.residentNames addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:@"resident_name"]];
+            [self.residentScreenTimestamp addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:@"last_updated_ts"]];
         }
         
         //sort alphabetically
@@ -485,7 +485,7 @@ typedef enum getDataState {
     for(int i=0;i<26;i++) {
         for (int j=0; j<[self.residentNames count]; j++) {
             if([[[self.residentNames objectAtIndex:j] uppercaseString] hasPrefix:[[letters objectAtIndex:i] uppercaseString]]) {
-                [temp addObject:[self.residents objectAtIndex:j]];
+                [temp addObject:[self.screeningResidents objectAtIndex:j]];
                 found = TRUE;
             }
             if(j==([self.residentNames count]-1)) {  //reached the end
