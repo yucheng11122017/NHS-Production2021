@@ -37,6 +37,11 @@
                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
+- (void) deleteResidentWithResidentID: (NSNumber *) residentID
+                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
 #pragma mark - Pre-Registration
 
 - (void)postPersonalInfoWithDict:(NSDictionary *) personalInfoDict

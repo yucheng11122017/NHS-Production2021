@@ -237,7 +237,10 @@ NSString *const kDocNotes = @"doc_notes";
 NSString *const kDocName = @"doc_name";
 
 
-@interface ScreeningFormViewController ()
+@interface ScreeningFormViewController () {
+    NSString *gender, *nric, *resident_name, *birth_year, *address_block, *address_postcode, *address_street, *address_unit, *contact_no;
+    NSArray *spoken_lang_value;
+}
 
 @end
 
@@ -247,6 +250,7 @@ NSString *const kDocName = @"doc_name";
     XLFormDescriptor *form;
     NSLog(@"At the resident form");
     NSLog(@"%@", self.preRegParticularsDict);
+    [self getDictionaryIntoVariables];
     
     switch([self.sectionID integerValue]) {
         case 0: form = [self initNeighbourhood];       //must init first before [super viewDidLoad]
@@ -285,6 +289,7 @@ NSString *const kDocName = @"doc_name";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(validateBtnPressed:)];
     
     [super viewDidLoad];
+    
     // Do any additional setup after loading the view.
 }
 
@@ -409,28 +414,28 @@ NSString *const kDocName = @"doc_name";
     // Name
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeText title:@"Patient Name"];
     row.required = YES;
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kName]? [self.retrievedPatientDictionary objectForKey:kName]:@"";
+        row.value = resident_name? resident_name:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Gender"];
     row.selectorOptions = @[@"Male", @"Female"];
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kGender]? [self.retrievedPatientDictionary objectForKey:kGender]:@"Male";
+    row.value = gender? gender:@"Male";
     row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC rowType:XLFormRowDescriptorTypeText title:@"NRIC"];
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kNRIC]? [self.retrievedPatientDictionary objectForKey:kNRIC]:@"";
+    row.value = nric? nric:@"";
     row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDOB rowType:XLFormRowDescriptorTypeText title:@"DOB Year"];
     row.required = YES;
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kDOB]? [self.retrievedPatientDictionary objectForKey:kDOB]:@"";
+    row.value = birth_year? birth_year:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kContactNumber rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     row.required = YES;
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kContactNumber]? [self.retrievedPatientDictionary objectForKey:kContactNumber]:@"";
+    row.value = contact_no? contact_no:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kContactNumber2 rowType:XLFormRowDescriptorTypePhone title:@"Contact Number (2)"];
@@ -452,7 +457,7 @@ NSString *const kDocName = @"doc_name";
     spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLanguage rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language"];
     spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
     row.required = YES;
-    //    spokenLangRow.value = [self.retrievedPatientDictionary objectForKey:kSpokenLanguage]? [self.retrievedPatientDictionary objectForKey:kSpokenLanguage]:@[] ;
+        spokenLangRow.value = spoken_lang_value? spoken_lang_value:@[] ;
     [section addFormRow:spokenLangRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLangOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
@@ -467,7 +472,7 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Single"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Widowed"]
                             ];
-    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Divorced"];   //default value
+    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Single"];   //default value
     row.required = NO;
     [section addFormRow:row];
     
@@ -489,22 +494,22 @@ NSString *const kDocName = @"doc_name";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddPostCode rowType:XLFormRowDescriptorTypeNumber title:@"Address (Post Code)"];
     row.required = YES;
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kAddPostCode]? [self.retrievedPatientDictionary objectForKey:kAddPostCode]:@"";
+    row.value = address_postcode? address_postcode:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddStreet rowType:XLFormRowDescriptorTypeText title:@"Address (Street)"];
     row.required = YES;
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kAddStreet]? [self.retrievedPatientDictionary objectForKey:kAddStreet]:@"";
+    row.value = address_street? address_street:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddBlock rowType:XLFormRowDescriptorTypeText title:@"Address (Block)"];
     row.required = YES;
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kAddUnit]? [self.retrievedPatientDictionary objectForKey:kAddUnit]:@"";
+    row.value = address_block? address_block:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddUnit rowType:XLFormRowDescriptorTypeText title:@"Address (Unit) - {With #}"];
     row.required = YES;
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kAddBlock]? [self.retrievedPatientDictionary objectForKey:kAddBlock]:@"";
+    row.value = address_unit? address_unit:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddYears rowType:XLFormRowDescriptorTypeText title:@"Address (years stayed)"];
@@ -2236,6 +2241,45 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
+}
+
+- (void) getDictionaryIntoVariables {
+    NSDictionary *contact_info = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"contact_info"]];
+    NSDictionary *personal_info = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"personal_info"]];
+    NSDictionary *spoken_lang = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"spoken_lang"]];
+    
+    address_block = [contact_info objectForKey:@"address_block"];
+    address_postcode = [contact_info objectForKey:@"address_postcode"];
+    address_street = [contact_info objectForKey:@"address_street"];
+    address_unit = [contact_info objectForKey:@"address_unit"];
+    contact_no = [contact_info objectForKey:@"contact_no"];
+    
+    birth_year = [personal_info objectForKey:@"birth_year"];
+    gender = [personal_info objectForKey:@"gender"];
+    gender = [gender isEqualToString:@"M"]? @"Male":@"Female";
+    
+    nric = [personal_info objectForKey:@"nric"];
+    resident_name = [personal_info objectForKey:@"resident_name"];
+    
+    if ([spoken_lang objectForKey:@"lang_canto"] != (id)[NSNull null]) {
+        spoken_lang_value = [self getSpokenLangArray:spoken_lang];
+    }
+    
+}
+
+- (NSArray *) getSpokenLangArray: (NSDictionary *) spoken_lang_dictionary {
+    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
+    if([[spoken_lang_dictionary objectForKey:@"lang_canto"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
+    if([[spoken_lang_dictionary objectForKey:@"lang_english"] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
+    if([[spoken_lang_dictionary objectForKey:@"lang_hindi"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
+    if([[spoken_lang_dictionary objectForKey:@"lang_hokkien"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
+    if([[spoken_lang_dictionary objectForKey:@"lang_malay"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
+    if([[spoken_lang_dictionary objectForKey:@"lang_mandrin"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
+    if([[spoken_lang_dictionary objectForKey:@"lang_others"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
+    if([[spoken_lang_dictionary objectForKey:@"lang_tamil"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
+    if([[spoken_lang_dictionary objectForKey:@"lang_teochew"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
+    
+    return spokenLangArray;
 }
 /*
  #pragma mark - Navigation

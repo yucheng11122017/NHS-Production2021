@@ -10,7 +10,7 @@
 
 @interface PatientPreRegTableViewController : UITableViewController
 
-@property NSMutableArray *patients;
+@property NSMutableArray *residents;
 //@property Patient *patientSelected;
 
 @end

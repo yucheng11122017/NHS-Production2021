@@ -86,7 +86,7 @@ typedef enum preRegSection {
 
 
 @interface PreRegFormViewController () {
-    int successCounter;
+    int successCounter, failCounter;
     MBProgressHUD *hud;
 }
 
@@ -186,12 +186,12 @@ typedef enum preRegSection {
     row.value = [self.retrievedPatientDictionary objectForKey:kAddStreet]? [self.retrievedPatientDictionary objectForKey:kAddStreet]:@"";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddUnit rowType:XLFormRowDescriptorTypeText title:@"Address Block"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddBlock rowType:XLFormRowDescriptorTypeText title:@"Address Block"];
     row.required = YES;
     row.value = [self.retrievedPatientDictionary objectForKey:kAddUnit]? [self.retrievedPatientDictionary objectForKey:kAddUnit]:@"";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddBlock rowType:XLFormRowDescriptorTypeText title:@"Address Unit"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddUnit rowType:XLFormRowDescriptorTypeText title:@"Address Unit"];
     row.required = YES;
     row.value = [self.retrievedPatientDictionary objectForKey:kAddBlock]? [self.retrievedPatientDictionary objectForKey:kAddBlock]:@"";
     [section addFormRow:row];
@@ -521,7 +521,7 @@ typedef enum preRegSection {
         self.resident_id = [responseObject objectForKey:@"resident_id"];
         NSLog(@"I'm resident %@", self.resident_id);
         
-        successCounter = 0; //preparing for the rest of the submission
+        successCounter = failCounter = 0; //preparing for the rest of the submission
         
         [[NSNotificationCenter defaultCenter] postNotificationName:@"submittingOtherSections" object:nil];
     };
@@ -529,14 +529,29 @@ typedef enum preRegSection {
 
 - (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"&******UNSUCCESSFUL SUBMISSION******!!");
+        NSLog(@"******UNSUCCESSFUL SUBMISSION******!!");
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+        failCounter++;
+        if (failCounter==1) {
+            [hud hideAnimated:YES];     //stop showing the progressindicator
+            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
+                                                                                      message:@"Form failed to upload!"
+                                                                               preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * okAction) {
+                                                                  //do nothing for now
+                                                              }]];
+            [self presentViewController:alertController animated:YES completion:nil];
+            
+        }
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
-                                                            object:nil
-                                                          userInfo:nil];
-        [self.navigationController popViewControllerAnimated:YES];
+        
+        
+        
+//        [self saveDraft];
     };
 }
 
@@ -642,9 +657,9 @@ typedef enum preRegSection {
     NSMutableArray *otherServicesArray = [[NSMutableArray alloc] initWithArray:[[self.form formValues]objectForKey:@"otherservices"]];
     [otherServicesArray removeObjectsInRange:NSMakeRange(0, 4)];
 #warning though the code is ready, yet API no where to insert other required services.
-    NSString *otherServices = @"0";
+    NSString *otherServices = @"";
     if([otherServicesArray count] > 1) {
-        otherServices = @"1";
+        otherServices = [otherServicesArray objectAtIndex:0];
     }
     //Required Services
     localDateTime = [NSDate dateWithTimeInterval:1.0 sinceDate:localDateTime];      //add a second

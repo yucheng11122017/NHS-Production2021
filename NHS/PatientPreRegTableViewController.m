@@ -13,6 +13,7 @@
 #import "SearchResultsTableController.h"
 #import "Reachability.h"
 #import "AppConstants.h"
+#import "MBProgressHUD.h"
 
 typedef enum getDataState {
     inactive,
@@ -32,17 +33,17 @@ typedef enum getDataState {
 // for state restoration
 @property BOOL searchControllerWasActive;
 @property BOOL searchControllerSearchFieldWasFirstResponder;
-@property (strong, nonatomic) NSMutableArray *patientNames;
-@property (strong, nonatomic) NSMutableArray *patientRegTimestamp;
-@property (strong, nonatomic) NSMutableDictionary *patientsGroupedInSections;
+@property (strong, nonatomic) NSMutableArray *residentNames;
+@property (strong, nonatomic) NSMutableArray *residentRegTimestamp;
+@property (strong, nonatomic) NSMutableDictionary *residentsGroupedInSections;
 @property (strong, nonatomic) NSArray *localSavedFilename;
 
 @end
 
 @implementation PatientPreRegTableViewController {
-    NSNumber *selectedPatientID;
-    NSArray *patientSectionTitles;
-    NSNumber *patientDataLocalOrServer;
+    NSNumber *selectedResidentID;
+    NSArray *residentSectionTitles;
+    NSNumber *residentDataLocalOrServer;
     BOOL loadDataFlag;
     NetworkStatus status;
     int fetchDataState;
@@ -65,9 +66,9 @@ typedef enum getDataState {
     status = [reachability currentReachabilityStatus];
     [self processConnectionStatus];
 
-    self.patientNames = [[NSMutableArray alloc] init];
-    self.patientRegTimestamp = [[NSMutableArray alloc] init];
-    self.patientsGroupedInSections = [[NSMutableDictionary alloc] init];
+    self.residentNames = [[NSMutableArray alloc] init];
+    self.residentRegTimestamp = [[NSMutableArray alloc] init];
+    self.residentsGroupedInSections = [[NSMutableDictionary alloc] init];
     self.localSavedFilename = [[NSArray alloc] init];
     
     
@@ -156,12 +157,12 @@ typedef enum getDataState {
     else if (status == ReachableViaWiFi)
     {
         NSLog(@"Wifi");
-        [self getAllPatients];
+        [self getAllResidents];
     }
     else if (status == ReachableViaWWAN)
     {
         NSLog(@"3G");
-        [self getAllPatients];
+        [self getAllResidents];
     }
 }
 
@@ -177,9 +178,9 @@ typedef enum getDataState {
         }
     } else {
         if ([self.localSavedFilename count] > 0) {
-            return ([patientSectionTitles count]+1);
+            return ([residentSectionTitles count]+1);
         } else {
-            return [patientSectionTitles count];    //alphabets + locally saved files
+            return [residentSectionTitles count];    //alphabets + locally saved files
         }
     }
 }
@@ -194,39 +195,39 @@ typedef enum getDataState {
             if (newSection == 16) {
                 NSLog(@"16");
             }
-            return [patientSectionTitles objectAtIndex:(newSection)];    //because first section is for drafts.
+            return [residentSectionTitles objectAtIndex:(newSection)];    //because first section is for drafts.
         }
         
     } else {
-        return [patientSectionTitles objectAtIndex:section];
+        return [residentSectionTitles objectAtIndex:section];
     }
     
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSString *sectionTitle;
-    NSArray *sectionPatient;
+    NSArray *sectionResident;
     
     if ([self.localSavedFilename count] > 0) {
         if(section == 0) {
             return [self.localSavedFilename count];
         } else {
             // Return the number of rows in the section.
-            sectionTitle = [patientSectionTitles objectAtIndex:(section-1)];    //first section reserved for drafts.
-            sectionPatient = [self.patientsGroupedInSections objectForKey:sectionTitle];
-            return [sectionPatient count];
+            sectionTitle = [residentSectionTitles objectAtIndex:(section-1)];    //first section reserved for drafts.
+            sectionResident = [self.residentsGroupedInSections objectForKey:sectionTitle];
+            return [sectionResident count];
         }
     } else {    //no draft files
-        sectionTitle = [patientSectionTitles objectAtIndex:section];
-        sectionPatient = [self.patientsGroupedInSections objectForKey:sectionTitle];
-        return [sectionPatient count];
+        sectionTitle = [residentSectionTitles objectAtIndex:section];
+        sectionResident = [self.residentsGroupedInSections objectForKey:sectionTitle];
+        return [sectionResident count];
     }
 }
 
 //Indexing purpose!
 - (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
 {
-    return patientSectionTitles;
+    return residentSectionTitles;
 }
 
 
@@ -250,15 +251,15 @@ typedef enum getDataState {
             cell.detailTextLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
             return cell;
         } else {
-            sectionTitle = [patientSectionTitles objectAtIndex:(indexPath.section-1)];  //update sectionlist
+            sectionTitle = [residentSectionTitles objectAtIndex:(indexPath.section-1)];  //update sectionlist
         }
     } else {
-        sectionTitle = [patientSectionTitles objectAtIndex:indexPath.section];
+        sectionTitle = [residentSectionTitles objectAtIndex:indexPath.section];
     }
-    NSArray *patientsInSection = [self.patientsGroupedInSections objectForKey:sectionTitle];
-    NSString *patientName = [[patientsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
-    NSString *lastUpdatedTS = [[patientsInSection objectAtIndex:indexPath.row] objectForKey:@"last_updated_ts"];
-    cell.textLabel.text = patientName;
+    NSArray *residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
+    NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
+    NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"last_updated_ts"];
+    cell.textLabel.text = residentName;
     cell.detailTextLabel.text = lastUpdatedTS;
     
     return cell;
@@ -266,12 +267,12 @@ typedef enum getDataState {
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSString *selectedPatientName;
-    NSDictionary *selectedPatient = [[NSDictionary alloc] init];
+    NSString *selectedResidentName;
+    NSDictionary *selectedResident = [[NSDictionary alloc] init];
     if ([self.localSavedFilename count] > 0) {
         if (indexPath.section == 0) {   //part of the drafts...
-            selectedPatientID = [NSNumber numberWithInteger:indexPath.row];
-            patientDataLocalOrServer = [NSNumber numberWithInt:local];
+            selectedResidentID = [NSNumber numberWithInteger:indexPath.row];
+            residentDataLocalOrServer = [NSNumber numberWithInt:local];
             loadDataFlag = YES;
             
             [self performSegueWithIdentifier:@"preRegPatientListToPatientFormSegue" sender:self];
@@ -283,13 +284,13 @@ typedef enum getDataState {
     }
     else {  //no saved draft
         if (tableView == self.tableView) {      //not in the searchResult view
-            selectedPatient = [self findPatientNameFromSectionRow:indexPath];
-            selectedPatientName = [selectedPatient objectForKey:@"resident_name"];
-            selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
+            selectedResident = [self findResidentInfoFromSectionRow:indexPath];
+            selectedResidentName = [selectedResident objectForKey:@"resident_name"];
+            selectedResidentID = [selectedResident objectForKey:@"resident_id"];
             
         } else {
-            selectedPatient = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
-            selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
+            selectedResident = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
+            selectedResidentID = [selectedResident objectForKey:@"resident_id"];
         }
         
         [self performSegueWithIdentifier:@"preRegPatientListToPatientDataSegue" sender:self];
@@ -322,8 +323,10 @@ typedef enum getDataState {
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
-#warning Need to add the delete API (99) here
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        NSDictionary *residentInfo = [self findResidentInfoFromSectionRow:indexPath];
+        [self deleteResident:[residentInfo objectForKey:@"resident_id"]];
+//        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade]; //no need this for now...
+
     }
 //  else if (editingStyle == UITableViewCellEditingStyleInsert) {
 //        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
@@ -353,26 +356,47 @@ typedef enum getDataState {
     };
 }
 
+- (void (^)(NSURLSessionDataTask *task, id responseObject))deleteSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        [self getAllResidents];
+        
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+        
+        // Set the custom view mode to show any view.
+        hud.mode = MBProgressHUDModeCustomView;
+        // Set an image view with a checkmark.
+        UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        hud.customView = [[UIImageView alloc] initWithImage:image];
+        // Looks a bit nicer if we make it square.
+        hud.square = YES;
+        // Optional label text.
+        hud.label.text = NSLocalizedString(@"Done", @"HUD done title");
+        
+        [hud hideAnimated:YES afterDelay:1.f];
+        
+    };
+}
+
 - (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         int i;
-        [self.patientNames removeAllObjects];   //reset this array first
-        [self.patientRegTimestamp removeAllObjects];   //reset this array first
+        [self.residentNames removeAllObjects];   //reset this array first
+        [self.residentRegTimestamp removeAllObjects];   //reset this array first
         NSArray *patients = [responseObject objectForKey:@"0"];      //somehow double brackets... (())
-        self.patients = [[NSMutableArray alloc] initWithArray:patients];
+        self.residents = [[NSMutableArray alloc] initWithArray:patients];
         
         NSSortDescriptor *sortDescriptor;
         sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"resident_name" ascending:YES];
         NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
-        self.patients = [[self.patients sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
+        self.residents = [[self.residents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
         
-        for (i=0; i<[self.patients count]; i++) {
-            [self.patientNames addObject:[[self.patients objectAtIndex:i] objectForKey:@"resident_name"]];
-            [self.patientRegTimestamp addObject:[[self.patients objectAtIndex:i] objectForKey:@"last_updated_ts"]];
+        for (i=0; i<[self.residents count]; i++) {
+            [self.residentNames addObject:[[self.residents objectAtIndex:i] objectForKey:@"resident_name"]];
+            [self.residentRegTimestamp addObject:[[self.residents objectAtIndex:i] objectForKey:@"last_updated_ts"]];
         }
         
         //sort alphabetically
-        self.patientNames = [[self.patientNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] mutableCopy];
+        self.residentNames = [[self.residentNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] mutableCopy];
         
         [self putNamesIntoSections];
         [self.tableView reloadData];
@@ -399,10 +423,18 @@ typedef enum getDataState {
                                                       error:nil];
 }
 
-- (void)getAllPatients {
+- (void)getAllResidents {
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client getPatient:[self progressBlock]
           successBlock:[self successBlock]
+          andFailBlock:[self errorBlock]];
+}
+
+- (void)deleteResident: (NSNumber *) residentID {
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    [client deleteResidentWithResidentID: residentID
+          progressBlock:[self progressBlock]
+          successBlock:[self deleteSuccessBlock]
           andFailBlock:[self errorBlock]];
 }
 
@@ -447,7 +479,7 @@ typedef enum getDataState {
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
     // update the filtered array based on the search text
     NSString *searchText = searchController.searchBar.text;
-    NSMutableArray *searchResults = [self.patients mutableCopy];
+    NSMutableArray *searchResults = [self.residents mutableCopy];
     
     // strip out all the leading and trailing spaces
     NSString *strippedString = [searchText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -512,7 +544,7 @@ typedef enum getDataState {
     [tableController.tableView reloadData];
 }
 
-#pragma mark - Util methods
+//#pragma mark - Util methods
 
 //- (NSMutableArray *)createPatients:(NSArray *)patients {
 //    NSMutableArray *patObjs = [[NSMutableArray alloc] init];
@@ -551,7 +583,7 @@ typedef enum getDataState {
 //                                      ID:ID
 //                                  height:(int)height
 //                                   level:(int)level
-//                                homeType:homeType
+//                                homeType:hfomeType
 //                            hasCaretaker:hasCaretaker];
 //}
 
@@ -559,7 +591,7 @@ typedef enum getDataState {
 
 - (void)refreshTable:(NSNotification *) notification{
     NSLog(@"refresh");
-    [self getAllPatients];
+    [self getAllResidents];
 }
 
 - (void) putNamesIntoSections {
@@ -568,14 +600,14 @@ typedef enum getDataState {
     BOOL found = FALSE;
     
     for(int i=0;i<26;i++) {
-        for (int j=0; j<[self.patientNames count]; j++) {
-            if([[[self.patientNames objectAtIndex:j] uppercaseString] hasPrefix:[[letters objectAtIndex:i] uppercaseString]]) {
-                [temp addObject:[self.patients objectAtIndex:j]];
+        for (int j=0; j<[self.residentNames count]; j++) {
+            if([[[self.residentNames objectAtIndex:j] uppercaseString] hasPrefix:[[letters objectAtIndex:i] uppercaseString]]) {
+                [temp addObject:[self.residents objectAtIndex:j]];
                 found = TRUE;
             }
-            if(j==([self.patientNames count]-1)) {  //reached the end
+            if(j==([self.residentNames count]-1)) {  //reached the end
                 if (found) {
-                    [self.patientsGroupedInSections setObject:temp forKey:[letters objectAtIndex:i]];
+                    [self.residentsGroupedInSections setObject:temp forKey:[letters objectAtIndex:i]];
                     temp = [temp mutableCopy];
                     [temp removeAllObjects];
                 }
@@ -584,10 +616,10 @@ typedef enum getDataState {
         found = FALSE;
     }
 //    NSLog(@"%@", self.patientsGroupedInSections);
-    patientSectionTitles = [[self.patientsGroupedInSections allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];     //get the keys in alphabetical order
+    residentSectionTitles = [[self.residentsGroupedInSections allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];     //get the keys in alphabetical order
 }
 
-- (NSDictionary *) findPatientNameFromSectionRow: (NSIndexPath *)indexPath{
+- (NSDictionary *) findResidentInfoFromSectionRow: (NSIndexPath *)indexPath{
     
     NSInteger section;
     if ([self.localSavedFilename count] > 0) {
@@ -597,10 +629,10 @@ typedef enum getDataState {
     }
     NSInteger row = indexPath.row;
     
-    NSString *sectionAlphabet = [[NSString alloc] initWithString:[patientSectionTitles objectAtIndex:section]];
-    NSArray *patientsWithAlphabet = [self.patientsGroupedInSections objectForKey:sectionAlphabet];
+    NSString *sectionAlphabet = [[NSString alloc] initWithString:[residentSectionTitles objectAtIndex:section]];
+    NSArray *residentsWithAlphabet = [self.residentsGroupedInSections objectForKey:sectionAlphabet];
     
-    return [patientsWithAlphabet objectAtIndex:row];
+    return [residentsWithAlphabet objectAtIndex:row];
     
 }
 
@@ -670,12 +702,12 @@ typedef enum getDataState {
     //     Pass the selected object to the new view controller.
     if ([segue.destinationViewController respondsToSelector:@selector(setPatientID:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setPatientID:)
-                                              withObject:selectedPatientID];
+                                              withObject:selectedResidentID];
     }
     
     if ([segue.destinationViewController respondsToSelector:@selector(setPatientDataLocalOrServer:)]) { //continue form
         [segue.destinationViewController performSelector:@selector(setPatientDataLocalOrServer:)
-                                              withObject:patientDataLocalOrServer];
+                                              withObject:residentDataLocalOrServer];
         [segue.destinationViewController performSelector:@selector(setLoadDataFlag:) withObject:[NSNumber numberWithBool:loadDataFlag]];
     }
     

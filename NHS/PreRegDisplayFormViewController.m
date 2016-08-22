@@ -9,6 +9,9 @@
 #import "PreRegDisplayFormViewController.h"
 #import "ServerComm.h"
 #import "XLForm.h"
+#import "MBProgressHUD.h"
+
+
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
 NSString *const qName = @"name";
@@ -45,6 +48,8 @@ typedef enum preRegSection {
 
 @interface PreRegDisplayFormViewController () {
     bool flag;
+    MBProgressHUD *hud;
+    int successCounter;
 }
 
 @property (strong, nonatomic) NSNumber *resident_id;
@@ -175,12 +180,12 @@ typedef enum preRegSection {
     row.value = [contact_info objectForKey:@"address_street"]? [contact_info objectForKey:@"address_street"]:@"";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:qAddUnit rowType:XLFormRowDescriptorTypeText title:@"Address Block"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:qAddBlock rowType:XLFormRowDescriptorTypeText title:@"Address Block"];
     row.required = YES;
     row.value = [contact_info objectForKey:@"address_block"]? [contact_info objectForKey:@"address_block"]:@"";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:qAddBlock rowType:XLFormRowDescriptorTypeText title:@"Address Unit"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:qAddUnit rowType:XLFormRowDescriptorTypeText title:@"Address Unit"];
     row.required = YES;
     row.value = [contact_info objectForKey:@"address_unit"]? [contact_info objectForKey:@"address_unit"]:@"";
     [section addFormRow:row];
@@ -310,10 +315,39 @@ typedef enum preRegSection {
 
 -(void)editPressed:(UIBarButtonItem * __unused)button
 {
-    [button setTitle:@"Save"];
+    if(self.form.isDisabled) {
+        [button setTitle:@"Save"];
+    } else {
+        NSArray * validationErrors = [self formValidationErrors];
+        if (validationErrors.count > 0){
+            [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+                UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+                cell.backgroundColor = [UIColor orangeColor];
+                [UIView animateWithDuration:0.3 animations:^{
+                    cell.backgroundColor = [UIColor whiteColor];
+                }];
+            }];
+            return;
+        }
+        //    if (validationErrors.count > 0){
+        //        [self showFormValidationError:[validationErrors firstObject]];
+        //        return;
+        //    }
+        [self.tableView endEditing:YES];
+        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+        
+        // Set the label text.
+        hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
+        [self submitPersonalInfo:[self preparePersonalInfoDict]];
+        
+        [button setTitle:@"Edit"];
+    }
+    
     self.form.disabled = !self.form.disabled;
     [self.tableView endEditing:YES];
     [self.tableView reloadData];
+    
 //    NSArray * validationErrors = [self formValidationErrors];
 //    if (validationErrors.count > 0){
 //        [self showFormValidationError:[validationErrors firstObject]];
@@ -403,19 +437,49 @@ typedef enum preRegSection {
 - (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         NSLog(@"%@", responseObject);
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
-                                                            object:nil
-                                                          userInfo:nil];
-        
+        successCounter++;
+        if(successCounter == 4) {
+            NSLog(@"SUBMISSION SUCCESSFUL!!");
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [hud hideAnimated:YES];
+            });
+            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
+                                                                                      message:@"Pre-registration successful!"
+                                                                               preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * okAction) {
+                                                                  [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                                                                                                                      object:nil
+                                                                                                                    userInfo:nil];
+//                                                                  [self.navigationController popViewControllerAnimated:YES];
+                                                              }]];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
     };
 }
 
 - (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"unsuccessful");
+        NSLog(@"******UNSUCCESSFUL SUBMISSION******!!");
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
-        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+        NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
+        NSLog(@"error: %@", errorString);
+        [hud hideAnimated:YES];     //stop showing the progressindicator
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
+                                                                                  message:@"Update form failed!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                                                                                                                  object:nil
+                                                                                                                userInfo:nil];
+                                                              //                                                                  [self.navigationController popViewControllerAnimated:YES];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
     };
 }
 

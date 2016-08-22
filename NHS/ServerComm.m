@@ -92,6 +92,30 @@
       failure:[self checkForBadHTTP:failBlock]];
 }
 
+- (void) deleteResidentWithResidentID: (NSNumber *) residentID
+            progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+            successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+            andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    NSInteger opCode = 99;
+    
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    NSDictionary *dict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    
+    dict = @{@"resident_id" : residentID};
+    dataDict = @{@"data": dict};
+    
+    NSLog(@"%@",dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+    
+}
+
 #pragma mark - Pre-registration methods
 
 - (void)postPersonalInfoWithDict:(NSDictionary *) personalInfoDict
