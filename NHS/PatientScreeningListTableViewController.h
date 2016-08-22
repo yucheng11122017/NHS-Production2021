@@ -10,4 +10,6 @@
 
 @interface PatientScreeningListTableViewController : UITableViewController
 
+@property NSMutableArray *residents;
+
 @end

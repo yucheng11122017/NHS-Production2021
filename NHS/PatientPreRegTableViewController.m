@@ -74,7 +74,7 @@ typedef enum getDataState {
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(refreshTable:)
-                                                 name:@"refreshPreRegPatientTable"
+                                                 name:@"refreshScreeningResidentTable"
                                                object:nil];
     
     _resultsTableController = [[SearchResultsTableController alloc] init];
@@ -426,7 +426,7 @@ typedef enum getDataState {
 
 - (void)getAllResidents {
     ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getPatient:[self progressBlock]
+    [client getAllScreeningResidents:[self progressBlock]
           successBlock:[self successBlock]
           andFailBlock:[self errorBlock]];
 }

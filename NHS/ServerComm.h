@@ -42,6 +42,7 @@
                         successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                         andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
+
 #pragma mark - Pre-Registration
 
 - (void)postPersonalInfoWithDict:(NSDictionary *) personalInfoDict
@@ -69,6 +70,11 @@
                successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
+
+#pragma mark - Screening API
+- (void)getAllScreeningResidents:(void (^)(NSProgress *downloadProgress))progressBlock
+successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                    andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 //#pragma mark - Activity Selection methods
 //
 //- (void)getAllActivitySelectionsForPatientID:(NSInteger)patientID

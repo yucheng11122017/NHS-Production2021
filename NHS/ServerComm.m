@@ -116,6 +116,24 @@
     
 }
 
+
+#pragma mark - Screening API
+- (void)getAllScreeningResidents:(void (^)(NSProgress *downloadProgress))progressBlock
+      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 101;
+    NSDictionary *dict = [[NSDictionary alloc]
+                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    [self GET:[dict objectForKey:@"op_code"]
+   parameters:NULL
+     progress:progressBlock
+      success:successBlock
+      failure:[self checkForBadHTTP:failBlock]];
+}
+
+
 #pragma mark - Pre-registration methods
 
 - (void)postPersonalInfoWithDict:(NSDictionary *) personalInfoDict
