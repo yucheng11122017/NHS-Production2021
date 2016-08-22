@@ -8,9 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
+
+
+
+
 @interface PatientPreRegTableViewController : UITableViewController
 
 @property NSMutableArray *residents;
 //@property Patient *patientSelected;
+
+
 
 @end

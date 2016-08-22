@@ -26,8 +26,11 @@
 
 - (void)viewDidLoad {
     
+    self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
+    
     self.preRegDictionary = [[NSDictionary alloc] init];
-    if ((self.patientID != (id) [NSNull null])&&(self.patientID!=nil)) {
+    if ([self.residentID intValue]>= 0) {
         [self getPatientData];
     }
     
@@ -124,15 +127,35 @@
 }
 */
 
-#pragma mark Downloading Blocks
+# pragma mark - Buttons
 
-
-- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSuccessBlock {
-    return ^(NSURLSessionDataTask *task, id responseObject){
-        self.preRegDictionary = [responseObject objectForKey:@"0"];
-        NSLog(@"%@", self.preRegDictionary);
-    };
+-(void)backBtnPressed:(id)sender
+{
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Are you sure?", nil)
+                                                                              message:@""
+                                                                       preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Delete Draft", nil)
+                                                        style:UIAlertActionStyleDestructive
+                                                      handler:^(UIAlertAction * deleteDraftAction) {
+//                                                          [self deleteDraft];
+                                                          [self.navigationController popViewControllerAnimated:YES];
+                                                      }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                        style:UIAlertActionStyleCancel
+                                                      handler:nil]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save Draft", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * saveDraftAction) {
+//                                                          [self saveDraft];
+                                                          [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                                                                                                              object:nil
+                                                                                                            userInfo:nil];
+                                                          [self.navigationController popViewControllerAnimated:YES];
+                                                      }]];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
+
+
 
 #pragma mark - Blocks
 
@@ -155,10 +178,18 @@
     };
 }
 
+#pragma mark Downloading Blocks
+- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        self.preRegDictionary = [responseObject objectForKey:@"0"];
+        NSLog(@"%@", self.preRegDictionary);
+    };
+}
+
 #pragma mark - Downloading Patient Details
 - (void)getPatientData {
     ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getPatientDataWithPatientID:self.patientID
+    [client getPatientDataWithPatientID:self.residentID
                           progressBlock:[self progressBlock]
                            successBlock:[self downloadSuccessBlock]
                            andFailBlock:[self errorBlock]];

@@ -234,8 +234,13 @@ typedef enum getDataState {
         selectedPatient = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
         selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
     }
+    NSDictionary *userInfo = @{@"resident_id":selectedPatientID};
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"selectedPreRegResidentToNewScreenForm"
+                                                        object:self
+                                                      userInfo:userInfo];
+    [self dismissViewControllerAnimated:YES completion:nil];
     
-    [self performSegueWithIdentifier:@"PreRegResidentToScreeningFormSegue" sender:self];
+//    [self performSegueWithIdentifier:@"PreRegResidentToScreeningFormSegue" sender:self];
     
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     
@@ -559,11 +564,6 @@ typedef enum getDataState {
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     
-    if ([segue.destinationViewController respondsToSelector:@selector(setPatientID:)]) {    //view submitted form
-        [segue.destinationViewController performSelector:@selector(setPatientID:)
-                                              withObject:selectedPatientID];
-    }
-
 }
 
 

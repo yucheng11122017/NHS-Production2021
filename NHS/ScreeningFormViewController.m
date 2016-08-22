@@ -247,9 +247,8 @@ NSString *const kDocName = @"doc_name";
 @implementation ScreeningFormViewController
 
 - (void)viewDidLoad {
+    
     XLFormDescriptor *form;
-    NSLog(@"At the resident form");
-    NSLog(@"%@", self.preRegParticularsDict);
     [self getDictionaryIntoVariables];
     
     switch([self.sectionID integerValue]) {

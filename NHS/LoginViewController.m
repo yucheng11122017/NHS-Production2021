@@ -9,6 +9,7 @@
 #import "LoginViewController.h"
 #import "AFNetworking.h"
 #import <CommonCrypto/CommonDigest.h>
+#import "MBProgressHUD.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 #define ERROR_MSG_DELAY 5.0f
@@ -16,7 +17,10 @@
 #define USERNAME_TEXTFIELD_TAG 1
 #define PASSWORD_TEXTFIELD_TAG 2
 
-@interface LoginViewController ()
+@interface LoginViewController () {
+    MBProgressHUD *hud;
+}
+
 @property(strong, nonatomic) IBOutlet UIScrollView *scrollViewBackground;
 
 @property(strong, nonatomic) IBOutlet UIImageView *nhsLogoImageView;
@@ -146,6 +150,13 @@
 
 - (IBAction)loginButtonPressed:(id)sender {
     // fetch user entered values
+    
+    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    hud.backgroundView.style = MBProgressHUDBackgroundStyleSolidColor;
+    hud.backgroundView.color = [UIColor colorWithWhite:0.f alpha:0.1f];
+    // Set the label text.
+//    hud.label.text = NSLocalizedString(@"", @"HUD loading title");
+    
     NSString *username = self.usernameField.text; // @"nhs16user2";
     NSString *password = self.passwordField.text; // @"2016user2"
     
@@ -190,6 +201,7 @@
                              withObject:nil
                              afterDelay:ERROR_MSG_DELAY];
               }
+              [hud hideAnimated:YES];   //hide progress indicator
           }
      // print error msg if HTTP failure
           failure:^(NSURLSessionDataTask *_Nullable task, NSError *_Nonnull error) {
@@ -198,6 +210,7 @@
               [[NSString alloc] initWithData:errorData
                                     encoding:NSUTF8StringEncoding];
               NSLog(@"error: %@", errorString);
+              [hud hideAnimated:YES];   //hide progress indicator
           }];
 }
 

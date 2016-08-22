@@ -23,6 +23,7 @@ typedef enum getDataState {
 } getDataState;
 
 
+
 @interface PatientPreRegTableViewController () <UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating>
 
 @property (nonatomic, strong) UISearchController *searchController;
