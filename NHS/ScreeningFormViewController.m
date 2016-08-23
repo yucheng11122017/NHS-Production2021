@@ -61,12 +61,21 @@ NSString *const kSmokingAttemptedQuit = @"smoking_attempted_quit";
 NSString *const kSmokingNumQuitAttempts = @"smoking_num_quit_attempts";
 NSString *const kSmokingIntentionsToCut = @"smoking_intentions_to_cut";
 NSString *const kSmokingHowQuit = @"smoking_how_quit";
+NSString *const kSmokingHowQuitOthers = @"smoking_how_quit_others";
 NSString *const kSmokingWhyQuit = @"smoking_why_quit";
+NSString *const kSmokingWhyQuitOthers = @"smoking_why_quit_others";
 NSString *const kAlcoholHowOften = @"alcohol_how_often";
 NSString *const kAlcoholNumYears = @"alcohol_num_years";
 NSString *const kAlcoholConsumpn = @"alcohol_consumpn";
 NSString *const kAlcoholPreference = @"alcohol_preference";
 NSString *const kAlcoholIntentToCut = @"alcohol_intent_to_cut";
+
+// Diabetes Mellitus
+NSString *const kDiabetesHasInformed = @"diabetes_has_informed";
+NSString *const kDiabetesCheckedBlood = @"diabetes_checked_blood";
+NSString *const kDiabetesSeeingDocRegularly = @"diabetes_seeing_doc_regularly";
+NSString *const kDiabetesCurrentlyPrescribed = @"diabetes_currently_prescribed";
+NSString *const kDiabetesTakingRegularly = @"diabetes_taking_regularly";
 
 //Hyperlipidemia
 NSString *const kLipidHasInformed = @"lipid_has_informed";
@@ -285,7 +294,7 @@ NSString *const kDocName = @"doc_name";
         case 15: form = [self initRefForDoctorConsult];
             break;
     }
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(validateBtnPressed:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Validate" style:UIBarButtonItemStyleDone target:self action:@selector(validateBtnPressed:)];
     
     [super viewDidLoad];
     
@@ -315,30 +324,43 @@ NSString *const kDocName = @"doc_name";
                 cell.backgroundColor = [UIColor whiteColor];
             }];
         }];
+        [self showFormValidationError:[validationErrors firstObject]];
+        
         return;
     } else {
-        UIAlertController *alertController;
-        UIAlertAction *okAction;
+//        UIAlertController *alertController;
+//        UIAlertAction *okAction;
+//        
+//        alertController = [UIAlertController alertControllerWithTitle:@"Validation success"
+//                                                              message:@"All required fields are not empty."
+//                                                       preferredStyle:UIAlertControllerStyleActionSheet];
+//        alertController.view.backgroundColor = [UIColor greenColor];
+//        okAction = [UIAlertAction actionWithTitle:@"OK"
+//                                                 style:UIAlertActionStyleDefault
+//                                               handler:^(UIAlertAction *action) {
+//                                                   // do destructive stuff here
+//                                               }];
+//
+//        // note: you can control the order buttons are shown, unlike UIActionSheet
+//        [alertController addAction:okAction];
+//        [alertController setModalPresentationStyle:UIModalPresentationPopover];
+//        [self presentViewController:alertController animated:YES completion:nil];
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
         
-        alertController = [UIAlertController alertControllerWithTitle:@"Validation success"
-                                                              message:@"All required fields are not empty."
-                                                       preferredStyle:UIAlertControllerStyleActionSheet];
-        okAction = [UIAlertAction actionWithTitle:@"OK"
-                                                 style:UIAlertActionStyleCancel
-                                               handler:^(UIAlertAction *action) {
-                                                   // do destructive stuff here
-                                               }];
-
-        // note: you can control the order buttons are shown, unlike UIActionSheet
-        [alertController addAction:okAction];
-        [alertController setModalPresentationStyle:UIModalPresentationPopover];
-        [self presentViewController:alertController animated:YES completion:nil];
+        // Set the custom view mode to show any view.
+        hud.mode = MBProgressHUDModeCustomView;
+        // Set an image view with a checkmark.
+        UIImage *image = [[UIImage imageNamed:@"ThumbsUp"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+        hud.customView = [[UIImageView alloc] initWithImage:image];
+        // Looks a bit nicer if we make it square.
+        hud.square = YES;
+        
+        hud.backgroundColor = [UIColor clearColor];
+        // Optional label text.
+        hud.label.text = NSLocalizedString(@"Good!", @"HUD done title");
+        [hud hideAnimated:YES afterDelay:1.f];
 
     }
-    //    if (validationErrors.count > 0){
-    //        [self showFormValidationError:[validationErrors firstObject]];
-    //        return;
-    //    }
 //    [self.tableView endEditing:YES];
 //    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
     
@@ -386,7 +408,7 @@ NSString *const kDocName = @"doc_name";
     neighbourhoodRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         //        bmi.value = @([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2));
         if (oldValue != newValue) {
-            if ([[neighbourhoodRow.value formValue] isEqual:@5]) {
+            if ([[newValue formValue] isEqual:@5]) {
                 row.hidden = @(NO);
             } else {
                 row.hidden = @(YES);
@@ -427,7 +449,7 @@ NSString *const kDocName = @"doc_name";
     row.required = YES;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDOB rowType:XLFormRowDescriptorTypeText title:@"DOB Year"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDOB rowType:XLFormRowDescriptorTypeInteger title:@"DOB Year"];
     row.required = YES;
     row.value = birth_year? birth_year:@"";
     [section addFormRow:row];
@@ -435,6 +457,7 @@ NSString *const kDocName = @"doc_name";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kContactNumber rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     row.required = YES;
     row.value = contact_no? contact_no:@"";
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kContactNumber2 rowType:XLFormRowDescriptorTypePhone title:@"Contact Number (2)"];
@@ -491,7 +514,7 @@ NSString *const kDocName = @"doc_name";
     row.required = NO;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddPostCode rowType:XLFormRowDescriptorTypeNumber title:@"Address (Post Code)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddPostCode rowType:XLFormRowDescriptorTypeInteger title:@"Address (Post Code)"];
     row.required = YES;
     row.value = address_postcode? address_postcode:@"";
     [section addFormRow:row];
@@ -728,24 +751,30 @@ NSString *const kDocName = @"doc_name";
     
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kExNoWhy rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"If no, why not?"];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Because of health condition"],
+    XLFormRowDescriptor *exerciseNoWhyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExNoWhy rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"If no, why not?"];
+    exerciseNoWhyRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Because of health condition"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"No time"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Too troublesome"],
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Others"]
                             ];
-    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"No time"];   //default value
-    [section addFormRow:row];
+    exerciseNoWhyRow.value = [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"No time"];   //default value
+    [section addFormRow:exerciseNoWhyRow];
     
-#warning others in previous question!
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"If no, why not? - Others"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kExNoOthers
-                                                rowType:XLFormRowDescriptorTypeTextView];
-    [row.cellConfigAtConfigure setObject:@"Type your other reasons here" forKey:@"textView.placeholder"];
-    [section addFormRow:row];
+    XLFormRowDescriptor *exerciseNoOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExNoOthers
+                                                rowType:XLFormRowDescriptorTypeTextView title:@"Others"];
+    [exerciseNoOthersRow.cellConfigAtConfigure setObject:@"Type your other reasons here" forKey:@"textView.placeholder"];
+    exerciseNoOthersRow.hidden = @(1);  //default hidden
+    [section addFormRow:exerciseNoOthersRow];
+    
+    exerciseNoWhyRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([[newValue formValue] isEqual:@(3)]) {
+                exerciseNoOthersRow.hidden = @(0);
+            } else {
+                exerciseNoOthersRow.hidden = @(1);
+            }
+        }
+    };
     
     // Smoking - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Smoking"];
@@ -759,11 +788,11 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Ex-smoker, now quit"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Never smoked"]
                             ];
-    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Never smoked"];   //default value
+//    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Never smoked"];   //default value
     row.required = YES;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, how many years have you been smoking for?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -772,7 +801,7 @@ NSString *const kDocName = @"doc_name";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingNumYears rowType:XLFormRowDescriptorTypeNumber title:@"Year(s)"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, what do you smoke? (can tick more than one option)"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -782,7 +811,7 @@ NSString *const kDocName = @"doc_name";
     row.selectorOptions = @[@"Cigarettes", @"Pipe", @"self-rolled leaves \"ang hoon\"", @"Shisha", @"Cigars", @"E-cigarettes", @"Others"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, how many sticks do you smoke a day (average)?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -790,7 +819,7 @@ NSString *const kDocName = @"doc_name";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeNumSticks rowType:XLFormRowDescriptorTypeNumber title:@"Stick(s)"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, how soon after waking do you smoke your first cigarette?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -804,7 +833,7 @@ NSString *const kDocName = @"doc_name";
     row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"More than 30 mins"];   //default value
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, do you find it difficult to refrain from smoking in places where it is forbidden/not allowed?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -814,7 +843,7 @@ NSString *const kDocName = @"doc_name";
     row.value = @"NO";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, which cigarette would you hate to give up?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -827,7 +856,7 @@ NSString *const kDocName = @"doc_name";
     row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"The first in the morning"];   //default value
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSeven
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, do you smoke more frequently in the morning?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -837,7 +866,7 @@ NSString *const kDocName = @"doc_name";
     row.value = @"NO";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, do you smoke even if you are sick in bed most of the day?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -847,7 +876,7 @@ NSString *const kDocName = @"doc_name";
     row.value = @"NO";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionNine
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, have you attempted to quit before, in the past year?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -857,7 +886,7 @@ NSString *const kDocName = @"doc_name";
     row.value = @"NO";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTen
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If you have attempted to quit in the past year, how many quit attempts did you make?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -865,7 +894,7 @@ NSString *const kDocName = @"doc_name";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingNumQuitAttempts rowType:XLFormRowDescriptorTypeNumber title:@"Attempt(s)"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEleven
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, what are your intentions towards quitting/cutting down in the forseeable future?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -881,30 +910,38 @@ NSString *const kDocName = @"doc_name";
     row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I do not plan to quit or cut down"];   //default value
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwelve
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If ex-smoker, how did you quit smoking? (can tick more than one)"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingHowQuit rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
-    row.selectorOptions = @[@"By myself", @"By joining a smoking cessation programme", @"By taking medication", @"With encouragement of family/friends", @"Others (specify)____"];
-    [section addFormRow:row];
+    XLFormRowDescriptor *howQuitSmokingRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingHowQuit rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
+    howQuitSmokingRow.selectorOptions = @[@"By myself", @"By joining a smoking cessation programme", @"By taking medication", @"With encouragement of family/friends", @"Others"];
+    [section addFormRow:howQuitSmokingRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    XLFormRowDescriptor *howQuitSmokingOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingHowQuitOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    howQuitSmokingOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", howQuitSmokingRow];
+    [section addFormRow:howQuitSmokingOthersRow];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThirteen
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If ex-smoker, why did you choose to quit? (can tick more than one)"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhyQuit rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
-    row.selectorOptions = @[@"Health/medical reasons", @"Side effects (eg. Odour)", @"Learnt about harm of smoking", @"Family/friends' advice", @"Too expensive", @"Others (Specify)____"];
-    [section addFormRow:row];
+    XLFormRowDescriptor *whyQuitSmokingRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhyQuit rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
+    whyQuitSmokingRow.selectorOptions = @[@"Health/medical reasons", @"Side effects (eg. Odour)", @"Learnt about harm of smoking", @"Family/friends' advice", @"Too expensive", @"Others"];
+    [section addFormRow:whyQuitSmokingRow];
+    
+    XLFormRowDescriptor *whyQuitSmokingOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhyQuitOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    whyQuitSmokingOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", whyQuitSmokingRow];
+    [section addFormRow:whyQuitSmokingOthersRow];
     
     
     // Alcohol - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Alcohol"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFourteen
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"How often do you consume alcohol?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -919,7 +956,7 @@ NSString *const kDocName = @"doc_name";
     row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Not drinking"];   //default value
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If drinking, how many years have you been drinking for?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -927,7 +964,7 @@ NSString *const kDocName = @"doc_name";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAlcoholNumYears rowType:XLFormRowDescriptorTypeNumber title:@"Year(s)"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Have you consumed 5 or more drinks (male) or 4 or more drinks (female) in any one drinking session in the past month? (1 alcoholic drink refers to 1 can/small bottle of beer or one glass of wine)"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -937,7 +974,7 @@ NSString *const kDocName = @"doc_name";
     row.value = @"NO";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"What is your preferred alcoholic drink? (choose only one)"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -954,7 +991,7 @@ NSString *const kDocName = @"doc_name";
     row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Beer"];   //default value
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"What are your intentions towards quitting/cutting down in the forseeable future?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -984,64 +1021,65 @@ NSString *const kDocName = @"doc_name";
     //    section.footerTitle = @"This is a long text that will appear on section footer";
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"1) (a) Has a western-trained doctor ever told you that you have diabetes?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
-    row.value = @"NO";
-    row.required = YES;
-    [section addFormRow:row];
+    XLFormRowDescriptor *hasInformedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    hasInformedRow.selectorOptions = @[@"YES", @"NO"];
+    hasInformedRow.required = YES;
+    [section addFormRow:hasInformedRow];
     
-    
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    XLFormRowDescriptor *hasCheckedBloodQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If no to (a), have you checked your blood sugar in the past 3 years?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
+    hasCheckedBloodQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    hasCheckedBloodQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformedRow];
+    [section addFormRow:hasCheckedBloodQRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
-    row.value = @"NO";
-    [section addFormRow:row];
+    XLFormRowDescriptor *hasCheckedBloodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesCheckedBlood rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    hasCheckedBloodRow.selectorOptions = @[@"YES", @"NO"];
+    hasCheckedBloodRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformedRow];
+    [section addFormRow:hasCheckedBloodRow];
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If yes to (a), are you seeing your doctor regularly for your diabetes?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
-    row.value = @"NO";
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If yes to (a), are you currently prescribed medication for your diabetes?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
-    row.value = @"NO";
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If yes to (a), are you taking your diabetes meds regularly? (≥ 90% of time)"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
     // Segmented Control
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
-    row.value = @"NO";
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
@@ -1456,7 +1494,9 @@ NSString *const kDocName = @"doc_name";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHospitalized rowType:XLFormRowDescriptorTypeNumber title:@"Number of time(s)"];
+    row.required = YES;
     [section addFormRow:row];
+    
     
     
     return [super initWithForm:formDescriptor];
@@ -1475,30 +1515,46 @@ NSString *const kDocName = @"doc_name";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne rowType:XLFormRowDescriptorTypeInfo title:@"Mobility"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMobility
+    
+    XLFormRowDescriptor *mobilityRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMobility
                                                          rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                            title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no problem in walking about"],
+    mobilityRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no problem in walking about"],
                                      [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight problems in walking about"],
                                      [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate problems in walking about"],
                                      [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I have severe problems in walking about"],
                                      [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I am unable to walk about"]];
-    row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"Tap for options"];
-    [section addFormRow:row];
+    mobilityRow.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"Tap for options"];
+    [section addFormRow:mobilityRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne rowType:XLFormRowDescriptorTypeInfo title:@"If you have difficulty walking, what mobility aid are you using?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMobilityAid
+    XLFormRowDescriptor *mobilityAidQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"If you have difficulty walking, what mobility aid are you using?"];
+    mobilityAidQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:mobilityAidQRow];
+    XLFormRowDescriptor *mobilityAidRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMobilityAid
                                                 rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                   title:@""];
-    row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"Tap for options"];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Walking stick/frame"],
+    mobilityAidRow.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"Tap for options"];
+    mobilityAidRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Walking stick/frame"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Wheelchair-bound"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Bedridden"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Have problems walking but do not use aids"]];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne rowType:XLFormRowDescriptorTypeInfo title:@"Self-care"];
+    [section addFormRow:mobilityAidRow];
+    
+    mobilityRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([[newValue formValue] isEqual:@(0)]) {
+                mobilityAidQRow.hidden = @(1);  //hide
+                mobilityAidRow.hidden = @(1);  //hide
+            } else {
+                mobilityAidQRow.hidden = @(0);  //hide
+                mobilityAidRow.hidden = @(0);  //hide
+            }
+        }
+    };
+    
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree rowType:XLFormRowDescriptorTypeInfo title:@"Self-care"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSelfCare
@@ -1512,7 +1568,7 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I am unable to wash or dress myself"]];
     [section addFormRow:row];
 
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"Usual Activities (e.g. work, study, housework, family or leisure activities)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive rowType:XLFormRowDescriptorTypeInfo title:@"Usual Activities (e.g. work, study, housework, family or leisure activities)"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kUsualActivities
@@ -1526,35 +1582,47 @@ NSString *const kDocName = @"doc_name";
 row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"Tap for options"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"Pain / Discomfort"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix rowType:XLFormRowDescriptorTypeInfo title:@"Pain / Discomfort"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPain
+    XLFormRowDescriptor *painRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPain
                                                 rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                   title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no pain or discomfort"],
+    painRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no pain or discomfort"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight pain or discomfort"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate pain or discomfort"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I have severe pain or discomfort"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I have extreme pain or discomfort"]];
-    row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"Tap for options"];
-    [section addFormRow:row];
+                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I have extreme pain or discomfort"]];
+    painRow.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"Tap for options"];
+    [section addFormRow:painRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"Pain / Discomfort (If resident indicates that he/she has pain - My pain has lasted ≥ 3 months)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPainDuration
+    XLFormRowDescriptor *painDurQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"Pain / Discomfort (If resident indicates that he/she has pain - My pain has lasted ≥ 3 months)"];
+    painDurQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:painDurQRow];
+    
+    XLFormRowDescriptor *painDurationRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPainDuration
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                   title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
-    [section addFormRow:row];
+    painDurationRow.selectorOptions = @[@"YES", @"NO"];
+    [section addFormRow:painDurationRow];
     
+    painRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([[newValue formValue] isEqual:@(0)]) {
+                painDurQRow.hidden = @(1);  //hide
+                painDurationRow.hidden = @(1);  //hide
+            } else {
+                painDurQRow.hidden = @(0);  //hide
+                painDurationRow.hidden = @(0);  //hide
+            }
+        }
+    };
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Your health today"];
     section.footerTitle = @"100 means the BEST health you can imagine.\n0 means the WORST health you can imagine.";
     [formDescriptor addFormSection:section];
 
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSeven
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"We would like to know how good or bad your health is TODAY. The scale is numbered from 0 to 100"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -1571,7 +1639,7 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Park"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"How long does it take (mins) for you to reach to a park or rest areas where you like to walk and enjoy yourself, playing sports or games, from your house?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
