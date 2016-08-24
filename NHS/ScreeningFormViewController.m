@@ -20,7 +20,7 @@
 NSString *const kNeighbourhoodLoc = @"neighbourhood_location";
 NSString *const kNeighbourhoodOthers = @"neighbourhood_others";
 NSString *const kContactNumber2 = @"contactnumber2";
-NSString *const kEthnicity = @"ethnicity";
+NSString *const kEthnicity = @"ethnicity_id";
 NSString *const kMaritalStatus = @"marital_status";
 NSString *const kHousingType = @"housing_type";
 NSString *const kHighestEduLvl = @"highest_level_education";
@@ -529,7 +529,7 @@ NSString *const kDocName = @"doc_name";
     row.required = NO;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHousingType rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Housing Type"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHousingType rowType:XLFormRowDescriptorTypeSelectorPush title:@"Housing Type"];
     row.selectorOptions = @[@"Owned, 1-room", @"Owned, 2-room", @"Owned, 3-room", @"Owned, 4-room", @"Owned, 5-room", @"Rental, 1-room", @"Rental, 2-room", @"Rental, 3-room", @"Rental, 4-room"];
     row.required = YES;
     [section addFormRow:row];
@@ -2492,8 +2492,8 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     switch([self.sectionID integerValue]) {
         case 0: [self saveNeighbourhood];
             break;
-//        case 1: form = [self saveResidentParticulars];
-//            break;
+        case 1: [self saveResidentParticulars];
+            break;
 //        case 2: form = [self saveClinicalResults];
 //            break;
 //        case 3: form = [self saveScreeningOfRiskFactors];
@@ -2544,6 +2544,101 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     
 }
 
+- (void) saveResidentParticulars {
+    NSDictionary *fields = [self.form formValues];
+    NSMutableDictionary *resi_particulars = [[self.fullScreeningForm objectForKey:@"resi_particulars"] mutableCopy];
+    
+#warning resident_id part is missing...
+    
+    [resi_particulars setObject:[fields objectForKey:kName] forKey:@"resident_name"];
+    
+    if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
+        [resi_particulars setObject:@"M" forKey:kGender];
+    } else if ([[fields objectForKey:kGender] isEqualToString:@"Female"]) {
+        [resi_particulars setObject:@"F" forKey:kGender];
+    }
+    
+    [resi_particulars setObject:[fields objectForKey:kNRIC] forKey:kNRIC];
+    [resi_particulars setObject:[fields objectForKey:kDOB] forKey:@"birth_year"];
+    [resi_particulars setObject:[fields objectForKey:kContactNumber] forKey:@"contact_no"];
+    [resi_particulars setObject:[fields objectForKey:kAddPostCode] forKey:@"address_postcode"];
+    [resi_particulars setObject:[fields objectForKey:kAddStreet] forKey:@"address_street"];
+    [resi_particulars setObject:[fields objectForKey:kAddBlock] forKey:@"address_block"];
+    [resi_particulars setObject:[fields objectForKey:kAddUnit] forKey:@"address_unit"];
+    [resi_particulars setObject:[fields objectForKey:kConsentNUS] forKey:kConsentNUS];
+    [resi_particulars setObject:[fields objectForKey:kConsentHPB] forKey:kConsentHPB];
+    [resi_particulars setObject:[fields objectForKey:kConsentGoodlife] forKey:kConsentGoodlife];
+    
+    if (([fields objectForKey:kAddYears] != [NSNull null]) && ([fields objectForKey:kAddYears])) {
+        [resi_particulars setObject:[fields objectForKey:kAddYears] forKey:@"address_num_years"];
+    } else {
+        [resi_particulars setObject:@"" forKey:@"address_num_years"];
+    }
+    
+    
+    if (([fields objectForKey:kContactNumber2] != [NSNull null]) && ([fields objectForKey:kContactNumber2])) {
+        [resi_particulars setObject:[fields objectForKey:kContactNumber2] forKey:@"contact_no2"];
+    } else {
+        [resi_particulars setObject:@"" forKey:@"contact_no2"];
+    }
+    
+    if (([fields objectForKey:kSpokenLangOthers] != [NSNull null]) && ([fields objectForKey:kSpokenLangOthers])) {
+        [resi_particulars setObject:[fields objectForKey:kSpokenLangOthers] forKey:@"lang_others_text"];
+    } else {
+        [resi_particulars setObject:@"" forKey:@"lang_others_text"];
+    }
+    
+    NSNumber *ethnicity_id;
+    if ([fields objectForKey:kEthnicity] != [NSNull null]) {
+        ethnicity_id = [[fields objectForKey:kEthnicity] formValue];
+        [resi_particulars setObject:ethnicity_id forKey:kEthnicity];
+    }
+    
+    NSNumber *marital_status;
+    if ([fields objectForKey:kMaritalStatus] != [NSNull null]) {
+        marital_status = [[fields objectForKey:kMaritalStatus] formValue];
+        [resi_particulars setObject:marital_status forKey:kMaritalStatus];
+    }
+    
+    NSNumber *highest_edu_lvl;
+    if ([fields objectForKey:kHighestEduLvl] != [NSNull null]) {
+        highest_edu_lvl = [[fields objectForKey:kHighestEduLvl] formValue];
+        [resi_particulars setObject:highest_edu_lvl forKey:@"highest_edu_lvl"];
+    }
+    
+    if ([[fields objectForKey:kSpokenLanguage] count]!=0) {
+        NSArray *spokenLangArray = [fields objectForKey:kSpokenLanguage];
+        for (int i=0; i<[spokenLangArray count]; i++) {
+            
+            if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Cantonese"]) [resi_particulars setObject:@"1" forKey:@"lang_canto"];
+            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"English"]) [resi_particulars setObject:@"1" forKey:@"lang_english"];
+            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Hindi"]) [resi_particulars setObject:@"1" forKey:@"lang_hindi"];
+            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Hokkien"]) [resi_particulars setObject:@"1" forKey:@"lang_hokkien"];
+            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Malay"]) [resi_particulars setObject:@"1" forKey:@"lang_malay"];
+            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Mandarin"]) [resi_particulars setObject:@"1" forKey:@"lang_mandrin"];
+            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Teochew"]) [resi_particulars setObject:@"1" forKey:@"lang_teochew"];
+            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Others"]) [resi_particulars setObject:@"1" forKey:@"lang_others"];
+        }
+    }
+    
+    NSString *room;
+    NSUInteger loc;
+    if (([fields objectForKey:kHousingType] != [NSNull null]) && ([fields objectForKey:kHousingType])) {
+        NSString *houseType = [fields objectForKey:kHousingType];
+        if ([houseType rangeOfString:@"Owned"].location != NSNotFound) {
+            [resi_particulars setObject:@"0" forKey:@"housing_owned_rented"];
+        } else if ([houseType rangeOfString:@"Rental"].location != NSNotFound) {
+            [resi_particulars setObject:@"1" forKey:@"housing_owned_rented"];
+        }
+        
+        loc = [houseType rangeOfString:@"-"].location;
+        room = [houseType substringWithRange:NSMakeRange(loc-1, 1)];
+        [resi_particulars setObject:room forKey:@"housing_num_rooms"];
+    }
+    
+    [self.fullScreeningForm setObject:resi_particulars forKey:@"resi_particulars"];
+}
+
 - (void) getDictionaryIntoVariables {
 //    NSDictionary *contact_info = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"contact_info"]];
 //    NSDictionary *personal_info = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"personal_info"]];
@@ -2559,7 +2654,14 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     
     birth_year = [resi_particulars objectForKey:@"birth_year"];
     gender = [resi_particulars objectForKey:@"gender"];
-    gender = [gender isEqualToString:@"M"]? @"Male":@"Female";
+    if ([gender isEqualToString:@"M"]) {
+        gender = @"Male";
+    } else if ([gender isEqualToString:@"F"]) {
+        gender = @"Female";
+    } else {
+        gender = @"";
+        
+    }
     
     nric = [resi_particulars objectForKey:@"nric"];
     resident_name = [resi_particulars objectForKey:@"resident_name"];
