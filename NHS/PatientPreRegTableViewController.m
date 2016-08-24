@@ -15,6 +15,10 @@
 #import "AppConstants.h"
 #import "MBProgressHUD.h"
 
+
+#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
+
+
 typedef enum getDataState {
     inactive,
     started,
@@ -38,6 +42,7 @@ typedef enum getDataState {
 @property (strong, nonatomic) NSMutableArray *residentRegTimestamp;
 @property (strong, nonatomic) NSMutableDictionary *residentsGroupedInSections;
 @property (strong, nonatomic) NSArray *localSavedFilename;
+@property (strong, nonatomic) NSDictionary *retrievedResidentDictionary;
 
 @end
 
@@ -47,6 +52,7 @@ typedef enum getDataState {
     NSNumber *residentDataLocalOrServer;
     BOOL loadDataFlag;
     NetworkStatus status;
+    MBProgressHUD *hud;
     int fetchDataState;
 }
 
@@ -293,9 +299,13 @@ typedef enum getDataState {
             selectedResident = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
             selectedResidentID = [selectedResident objectForKey:@"resident_id"];
         }
+        //Show Progress Indicator
+        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+        hud.backgroundView.style = MBProgressHUDBackgroundStyleSolidColor;
+        hud.backgroundView.color = [UIColor colorWithWhite:0.f alpha:0.1f];
         
-        [self performSegueWithIdentifier:@"preRegPatientListToPatientDataSegue" sender:self];
-        NSLog(@"View submitted Form segue performed!");
+        
+        [self getAllDataForOneResident];
         
         [tableView deselectRowAtIndexPath:indexPath animated:NO];
     }
@@ -353,7 +363,7 @@ typedef enum getDataState {
 
 - (void (^)(NSProgress *downloadProgress))progressBlock {
     return ^(NSProgress *downloadProgress) {
-//        NSLog(@"Patients GET Request Started. In Progress.");
+        NSLog(@"progress started...");
     };
 }
 
@@ -361,7 +371,7 @@ typedef enum getDataState {
     return ^(NSURLSessionDataTask *task, id responseObject){
         [self getAllResidents];
         
-        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
         
         // Set the custom view mode to show any view.
         hud.mode = MBProgressHUDModeCustomView;
@@ -415,6 +425,39 @@ typedef enum getDataState {
     };
 }
 
+#pragma mark Downloading Blocks
+
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        self.retrievedResidentDictionary = [responseObject objectForKey:@"0"];
+        NSLog(@"%@", self.retrievedResidentDictionary);
+        [self performSegueWithIdentifier:@"preRegPatientListToPatientDataSegue" sender:self];
+    };
+}
+
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))downloadErrorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"******UNSUCCESSFUL DOWNLOAD******!!");
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
+        NSLog(@"error: %@", errorString);
+        [hud hideAnimated:YES];     //stop showing the progressindicator
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Download Fail", nil)
+                                                                                  message:@"Download form failed!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              [self.tableView reloadData];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    };
+}
+
+
 
 #pragma mark - Patient API
 
@@ -431,6 +474,15 @@ typedef enum getDataState {
     [client getPatient:[self progressBlock]
           successBlock:[self successBlock]
           andFailBlock:[self errorBlock]];
+}
+
+#pragma mark - Downloading Patient Details
+- (void)getAllDataForOneResident {
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    [client getPatientDataWithPatientID:selectedResidentID
+                          progressBlock:[self progressBlock]
+                           successBlock:[self downloadSuccessBlock]
+                           andFailBlock:[self downloadErrorBlock]];
 }
 
 - (void)deleteResident: (NSNumber *) residentID {
@@ -701,11 +753,11 @@ typedef enum getDataState {
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    //     Get the new view controller using [segue destinationViewController].
-    //     Pass the selected object to the new view controller.
-    if ([segue.destinationViewController respondsToSelector:@selector(setPatientID:)]) {    //view submitted form
-        [segue.destinationViewController performSelector:@selector(setPatientID:)
-                                              withObject:selectedResidentID];
+    
+    [hud hideAnimated:YES];
+    if ([segue.identifier isEqualToString:@"preRegPatientListToPatientDataSegue"]) {    //view submitted form
+        [segue.destinationViewController performSelector:@selector(setResidentDictionary:)
+                                              withObject:self.retrievedResidentDictionary];
     }
     
     if ([segue.destinationViewController respondsToSelector:@selector(setPatientDataLocalOrServer:)]) { //continue form

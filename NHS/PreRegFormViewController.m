@@ -116,11 +116,6 @@ typedef enum preRegSection {
     [super viewDidLoad];
 }
 
-//- (void) viewWillDisappear:(BOOL)animated {
-//    [super viewWillDisappear:animated];
-//    self.navigationItem.title = @"Back";        //to shorten
-//}
-
 -(id)init
 {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"New Pre-reg Form"];

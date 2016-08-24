@@ -27,7 +27,6 @@
 		B932B92D80F966731F0F568C /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 474665EE4826B151279871A1 /* CoreText.framework */; };
 		C3C2F30AA2C4B174444C3807 /* Pods_NHSUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 209345AB6DD8B9F1E078D209 /* Pods_NHSUITests.framework */; };
 		E10412101D4C8EFA0024663B /* PreRegFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E104120F1D4C8EFA0024663B /* PreRegFormViewController.m */; };
-		E10412131D4C92CB0024663B /* tempViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E10412121D4C92CB0024663B /* tempViewController.m */; };
 		E120E4081D431E9B002DBC7E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E4071D431E9B002DBC7E /* main.m */; };
 		E120E40B1D431E9B002DBC7E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E40A1D431E9B002DBC7E /* AppDelegate.m */; };
 		E120E4111D431E9B002DBC7E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E120E40F1D431E9B002DBC7E /* Main.storyboard */; };
@@ -112,8 +111,6 @@
 		D6D48DA6CEA8B44D498464D0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E104120E1D4C8EFA0024663B /* PreRegFormViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreRegFormViewController.h; sourceTree = "<group>"; };
 		E104120F1D4C8EFA0024663B /* PreRegFormViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreRegFormViewController.m; sourceTree = "<group>"; };
-		E10412111D4C92CB0024663B /* tempViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tempViewController.h; sourceTree = "<group>"; };
-		E10412121D4C92CB0024663B /* tempViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = tempViewController.m; sourceTree = "<group>"; };
 		E120E4031D431E9A002DBC7E /* NHS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NHS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E120E4071D431E9B002DBC7E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E120E4091D431E9B002DBC7E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -233,8 +230,6 @@
 			children = (
 				E1FCF9361D45DE2000478F7B /* PreRegPatientDetailsViewController.h */,
 				E1FCF9371D45DE2000478F7B /* PreRegPatientDetailsViewController.m */,
-				E10412111D4C92CB0024663B /* tempViewController.h */,
-				E10412121D4C92CB0024663B /* tempViewController.m */,
 				E1334EE51D432CAA00A43539 /* PreRegistrationViewController.h */,
 				E1334EE61D432CAA00A43539 /* PreRegistrationViewController.m */,
 			);
@@ -676,7 +671,6 @@
 				8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */,
 				E1A4F0DF1D66BC5A00EE9BBB /* LoginViewController.m in Sources */,
 				8E23D5541D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m in Sources */,
-				E10412131D4C92CB0024663B /* tempViewController.m in Sources */,
 				E1334EE71D432CAA00A43539 /* PreRegistrationViewController.m in Sources */,
 				E1FCF9381D45DE2000478F7B /* PreRegPatientDetailsViewController.m in Sources */,
 				8EC56F871D60C16300938C2A /* ScreeningSectionTableViewController.m in Sources */,

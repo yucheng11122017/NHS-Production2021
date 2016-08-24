@@ -214,6 +214,7 @@ NSString *const kEContactNric = @"e_contact_nric";
 NSString *const kEContactAddress = @"e_contact_address";
 NSString *const kGettingSupport = @"getting_suppport";
 NSString *const kMultiSupport = @"multi_support";
+NSString *const kSupportOthers = @"support_others";
 NSString *const kRelativesContact = @"relatives_contact";
 NSString *const kRelativesEase = @"relatives_ease";
 NSString *const kRelativesClose = @"relatives_close";
@@ -2065,6 +2066,12 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     multiSupportRow.selectorOptions = @[@"Care-giving", @"Food", @"Money", @"Others"];
     [section addFormRow:multiSupportRow];
     
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSupportOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    [row.cellConfigAtConfigure setObject:@"Specify here" forKey:@"textField.placeholder"];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", multiSupportRow];
+    [section addFormRow:row];
+    
+    
     
     //RELATIVES
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Relatives"];
@@ -2224,6 +2231,10 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     row.required = NO;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", multiOrgActivitiesRow];
     [section addFormRow:row];
+    
+    // Just to avoid keyboard covering the row in the ScrollView
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
     
     
     return [super initWithForm:formDescriptor];

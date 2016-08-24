@@ -255,37 +255,37 @@ typedef enum residentDataSource {
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSString *selectedResidentName;
-    NSDictionary *selectedResident = [[NSDictionary alloc] init];
-    if ([self.localSavedFilename count] > 0) {
-        if (indexPath.section == 0) {   //part of the drafts...
-            selectedResidentID = [NSNumber numberWithInteger:indexPath.row];
-            residentDataLocalOrServer = [NSNumber numberWithInt:local];
-            loadDataFlag = YES;
-            
-            [self performSegueWithIdentifier:@"preRegPatientListToPatientFormSegue" sender:self];
-            NSLog(@"Continue Form segue performed!");
-            
-            [tableView deselectRowAtIndexPath:indexPath animated:NO];
-            
-        }
-    }
-    else {  //no saved draft
-        if (tableView == self.tableView) {      //not in the searchResult view
-            selectedResident = [self findResidentInfoFromSectionRow:indexPath];
-            selectedResidentName = [selectedResident objectForKey:@"resident_name"];
-            selectedResidentID = [selectedResident objectForKey:@"resident_id"];
-            
-        } else {
-            selectedResident = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
-            selectedResidentID = [selectedResident objectForKey:@"resident_id"];
-        }
-        
-        [self performSegueWithIdentifier:@"preRegPatientListToPatientDataSegue" sender:self];
-        NSLog(@"View submitted Form segue performed!");
-        
-        [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    }
+//    NSString *selectedResidentName;
+//    NSDictionary *selectedResident = [[NSDictionary alloc] init];
+//    if ([self.localSavedFilename count] > 0) {
+//        if (indexPath.section == 0) {   //part of the drafts...
+//            selectedResidentID = [NSNumber numberWithInteger:indexPath.row];
+//            residentDataLocalOrServer = [NSNumber numberWithInt:local];
+//            loadDataFlag = YES;
+//            
+//            [self performSegueWithIdentifier:@"preRegPatientListToPatientFormSegue" sender:self];
+//            NSLog(@"Continue Form segue performed!");
+//            
+//            [tableView deselectRowAtIndexPath:indexPath animated:NO];
+//            
+//        }
+//    }
+//    else {  //no saved draft
+//        if (tableView == self.tableView) {      //not in the searchResult view
+//            selectedResident = [self findResidentInfoFromSectionRow:indexPath];
+//            selectedResidentName = [selectedResident objectForKey:@"resident_name"];
+//            selectedResidentID = [selectedResident objectForKey:@"resident_id"];
+//            
+//        } else {
+//            selectedResident = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
+//            selectedResidentID = [selectedResident objectForKey:@"resident_id"];
+//        }
+//        
+//        [self performSegueWithIdentifier:@"preRegPatientListToPatientDataSegue" sender:self];
+//        NSLog(@"View submitted Form segue performed!");
+//        
+//        [tableView deselectRowAtIndexPath:indexPath animated:NO];
+//    }
     
     
     

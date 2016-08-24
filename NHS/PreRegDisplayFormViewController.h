@@ -12,8 +12,9 @@
 @interface PreRegDisplayFormViewController : XLFormViewController
 
 @property (strong, nonatomic) NSNumber* patientID;
+@property (strong, nonatomic) NSDictionary *residentData;
 
 - (void) setPatientID:(NSNumber *)patientID;
-
+- (void) setResidentDictionary: (NSDictionary *) dictionary;
 @end
 

@@ -55,7 +55,6 @@ typedef enum preRegSection {
 @property (strong, nonatomic) NSNumber *resident_id;
 @property (nonatomic) preRegSection *preRegSection;
 @property (strong, nonatomic) NSMutableArray *completePreRegForm;
-@property (strong, nonatomic) NSDictionary *retrievedPatientDictionary;
 @property (strong, nonatomic) XLFormDescriptor * formDescriptor;
 
 
@@ -65,9 +64,14 @@ typedef enum preRegSection {
 
 -(void)viewDidLoad
 {
-    flag = false;
-    self.retrievedPatientDictionary = [[NSDictionary alloc] init];
-    [self getPatientData];
+//    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+//        //Background Thread
+//        dispatch_async(dispatch_get_main_queue(), ^(void){
+//            //Run UI Updates
+//            [self getPatientData];
+//        });
+//    });
+    XLFormDescriptor *form = [self init];       //must init first before [super viewDidLoad]
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain
                                                                              target:self
                                                                              action:@selector(editPressed:)];
@@ -80,29 +84,28 @@ typedef enum preRegSection {
                                                  name:@"submitOtherSections"
                                                object:nil];
     
-    double delayInSeconds = 2.0;
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-    dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
-        XLFormDescriptor *form = [self init];       //must init first before [super viewDidLoad]
-        [super viewDidLoad];
-    });
+    [super viewDidLoad];
     
+}
+
+- (void) setResidentDictionary: (NSDictionary *) dictionary {
+    self.residentData = [[NSDictionary alloc] initWithDictionary:dictionary];
 }
 
 -(id)init
 {
-    NSDictionary *personal_info = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"personal_info"]];
+    NSDictionary *personal_info = [[NSDictionary alloc] initWithDictionary:[self.residentData objectForKey:@"personal_info"]];
     NSDictionary *spoken_lang, *required_services, *contact_info, *others_prereg;
     
-    contact_info = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"contact_info"]];
+    contact_info = [[NSDictionary alloc] initWithDictionary:[self.residentData objectForKey:@"contact_info"]];
     
-    if([self.retrievedPatientDictionary objectForKey:@"others_prereg"] != (id)[NSNull null]) {
-        others_prereg = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"others_prereg"]];
+    if([self.residentData objectForKey:@"others_prereg"] != (id)[NSNull null]) {
+        others_prereg = [[NSDictionary alloc] initWithDictionary:[self.residentData objectForKey:@"others_prereg"]];
     }
-    spoken_lang = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"spoken_lang"]];
+    spoken_lang = [[NSDictionary alloc] initWithDictionary:[self.residentData objectForKey:@"spoken_lang"]];
     
-    if([self.retrievedPatientDictionary objectForKey:@"required_services"] != (id)[NSNull null]) {
-        required_services = [[NSDictionary alloc] initWithDictionary:[self.retrievedPatientDictionary objectForKey:@"required_services"]];
+    if([self.residentData objectForKey:@"required_services"] != (id)[NSNull null]) {
+        required_services = [[NSDictionary alloc] initWithDictionary:[self.residentData objectForKey:@"required_services"]];
     }
     
     
@@ -290,25 +293,14 @@ typedef enum preRegSection {
     }
     [section addFormRow:row];
     
-    
+    NSLog(@"Init form complete!");
     return [super initWithForm:self.formDescriptor];
+    
     
 }
 
 -(void)backBtnPressed:(id)sender
 {
-//    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Cancel", nil)
-//                                                                              message:@"Are you sure?"
-//                                                                       preferredStyle:UIAlertControllerStyleAlert];
-//    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil)
-//                                                        style:UIAlertActionStyleDefault
-//                                                      handler:^(UIAlertAction * action) {
-//                                                          
-//                                                      }]];
-//    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil)
-//                                                        style:UIAlertActionStyleCancel
-//                                                      handler:nil]];
-//    [self presentViewController:alertController animated:YES completion:nil];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -347,44 +339,6 @@ typedef enum preRegSection {
     self.form.disabled = !self.form.disabled;
     [self.tableView endEditing:YES];
     [self.tableView reloadData];
-    
-//    NSArray * validationErrors = [self formValidationErrors];
-//    if (validationErrors.count > 0){
-//        [self showFormValidationError:[validationErrors firstObject]];
-//        return;
-//    }
-//    [self.tableView endEditing:YES];
-//    [self submitPersonalInfo:[self preparePersonalInfoDict]];
-    
-    //#if __IPHONE_OS_VERSION_MAX_ALLOWED < 80000
-    //    UIAlertView *message = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Valid Form", nil)
-    //                                                      message:@"No errors found"
-    //                                                     delegate:nil
-    //                                            cancelButtonTitle:NSLocalizedString(@"OK", nil)
-    //                                            otherButtonTitles:nil];
-    //    [message show];
-    //#else
-    //    if ([UIAlertController class]){
-    //        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Valid Form", nil)
-    //                                                                                  message:@"No errors found"
-    //                                                                           preferredStyle:UIAlertControllerStyleAlert];
-    //        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-    //                                                            style:UIAlertActionStyleDefault
-    //                                                          handler:nil]];
-    //        [self presentViewController:alertController animated:YES completion:nil];
-    //
-    //    }
-    //    else{
-    //        UIAlertView *message = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Valid Form", nil)
-    //                                                          message:@"No errors found"
-    //                                                         delegate:nil
-    //                                                cancelButtonTitle:NSLocalizedString(@"OK", nil)
-    //                                                otherButtonTitles:nil];
-    //        [message show];
-    //    }
-    //#endif
-    
-//    [self.navigationController popViewControllerAnimated:YES];
 }
 
 #pragma mark - Uploading
@@ -394,7 +348,7 @@ typedef enum preRegSection {
     [client postPersonalInfoWithDict:dict
                        progressBlock:[self progressBlock]
                         successBlock:[self personalInfoSuccessBlock]
-                        andFailBlock:[self errorBlock]];
+                        andFailBlock:[self uploadErrorBlock]];
 }
 
 - (void)submitOtherSections:(NSNotification *) notification{
@@ -405,22 +359,22 @@ typedef enum preRegSection {
     [client postSpokenLangWithDict:[self.completePreRegForm objectAtIndex:spokenLang]
                      progressBlock:[self progressBlock]
                       successBlock:[self successBlock]
-                      andFailBlock:[self errorBlock]];
+                      andFailBlock:[self uploadErrorBlock]];
     
     [client postContactInfoWithDict:[self.completePreRegForm objectAtIndex:contactInfo]
                       progressBlock:[self progressBlock]
                        successBlock:[self successBlock]
-                       andFailBlock:[self errorBlock]];
+                       andFailBlock:[self uploadErrorBlock]];
     
     [client postReqServWithDict:[self.completePreRegForm objectAtIndex:reqServ]
                   progressBlock:[self progressBlock]
                    successBlock:[self successBlock]
-                   andFailBlock:[self errorBlock]];
+                   andFailBlock:[self uploadErrorBlock]];
     
     [client postOthersWithDict:[self.completePreRegForm objectAtIndex:others]
                  progressBlock:[self progressBlock]
                   successBlock:[self successBlock]
-                  andFailBlock:[self errorBlock]];
+                  andFailBlock:[self uploadErrorBlock]];
 }
 
 - (void) submitContactInfo: (NSTimer *) time{
@@ -460,7 +414,7 @@ typedef enum preRegSection {
     };
 }
 
-- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
+- (void (^)(NSURLSessionDataTask *task, NSError *error))uploadErrorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
         NSLog(@"******UNSUCCESSFUL SUBMISSION******!!");
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
@@ -483,17 +437,8 @@ typedef enum preRegSection {
     };
 }
 
-#pragma mark Downloading Blocks
 
-
-- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSuccessBlock {
-    return ^(NSURLSessionDataTask *task, id responseObject){
-        self.retrievedPatientDictionary = [responseObject objectForKey:@"0"];
-        NSLog(@"%@", self.retrievedPatientDictionary);
-        flag = true;
-        
-    };
-}
+#pragma mark
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))personalInfoSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
@@ -508,7 +453,7 @@ typedef enum preRegSection {
     };
 }
 
-#pragma mark -
+#pragma mark - prepare JSON methods
 - (NSArray *) getSpokenLangArray: (NSDictionary *) spoken_lang {
     NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
     if([[spoken_lang objectForKey:@"lang_canto"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
@@ -688,15 +633,5 @@ typedef enum preRegSection {
     
     return self.completePreRegForm;
 }
-
-#pragma mark - Downloading Patient Details
-- (void)getPatientData {
-        ServerComm *client = [ServerComm sharedServerCommInstance];
-        [client getPatientDataWithPatientID:self.patientID
-                              progressBlock:[self progressBlock]
-                               successBlock:[self downloadSuccessBlock]
-                               andFailBlock:[self errorBlock]];
-}
-
 
 @end
