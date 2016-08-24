@@ -18,7 +18,7 @@
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
 NSString *const kNeighbourhoodLoc = @"neighbourhood_location";
-NSString *const kNeighbourhoodOthers = @"neighbourhood_location_others";
+NSString *const kNeighbourhoodOthers = @"neighbourhood_others";
 NSString *const kContactNumber2 = @"contactnumber2";
 NSString *const kEthnicity = @"ethnicity";
 NSString *const kMaritalStatus = @"marital_status";
@@ -295,12 +295,26 @@ NSString *const kDocName = @"doc_name";
         case 15: form = [self initRefForDoctorConsult];
             break;
     }
+//    self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
+//    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:@selector(returnBtnPressed:)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Validate" style:UIBarButtonItemStyleDone target:self action:@selector(validateBtnPressed:)];
     
     [super viewDidLoad];
     
     // Do any additional setup after loading the view.
 }
+
+- (void) viewWillDisappear:(BOOL)animated {
+    [self saveEntriesIntoDictionary];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateFullScreeningForm"
+                                                        object:nil
+                                                      userInfo:self.fullScreeningForm];
+    
+    [super viewWillDisappear:animated];
+    
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -310,6 +324,13 @@ NSString *const kDocName = @"doc_name";
 - (void) setpreRegParticularsDict :(NSDictionary *)preRegParticularsDict {
     self.preRegParticularsDict = [[NSDictionary alloc] initWithDictionary:preRegParticularsDict];
 }
+
+#pragma mark - Buttons
+//-(void)returnBtnPressed:(id)sender
+//{
+//    [self.navigationController popViewControllerAnimated:YES];
+//}
+
 
 -(void)validateBtnPressed:(UIBarButtonItem * __unused)button
 {
@@ -380,6 +401,8 @@ NSString *const kDocName = @"doc_name";
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
+    NSDictionary *neighbourhoodDict = [self.fullScreeningForm objectForKey:@"neighbourhood"];
+    
     formDescriptor.assignFirstResponderOnShow = YES;
     
     // Basic Information - Section
@@ -401,11 +424,16 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Others"]
                             ];
     neighbourhoodRow.required = YES;
+    NSArray *options = neighbourhoodRow.selectorOptions;
+    neighbourhoodRow.value = [options objectAtIndex:[[neighbourhoodDict objectForKey:kNeighbourhoodLoc] intValue]];
     [section addFormRow:neighbourhoodRow];
     
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourhoodOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
-    row.hidden = @(YES);
+    row.value = [neighbourhoodDict objectForKey:kNeighbourhoodOthers];
+    if ([row.value length] <= 0) {
+        row.hidden = @(YES);
+    }
     [section addFormRow:row];
     
     neighbourhoodRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -2458,7 +2486,63 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     return [super initWithForm:formDescriptor];
 }
 
-#pragma Dictionary methods
+#pragma mark - Dictionary methods
+
+- (void) saveEntriesIntoDictionary {
+    switch([self.sectionID integerValue]) {
+        case 0: [self saveNeighbourhood];
+            break;
+//        case 1: form = [self saveResidentParticulars];
+//            break;
+//        case 2: form = [self saveClinicalResults];
+//            break;
+//        case 3: form = [self saveScreeningOfRiskFactors];
+//            break;
+//        case 4: form = [self saveDiabetesMellitus];
+//            break;
+//        case 5: form = [self saveHyperlipidemia];
+//            break;
+//        case 6: form = [self saveHypertension];
+//            break;
+//        case 7: form = [self saveCancerScreening];
+//            break;
+//        case 8: form = [self saveOtherMedicalIssues];
+//            break;
+//        case 9: form = [self savePrimaryCareSource];
+//            break;
+//        case 10: form = [self savetMyHealthAndMyNeighbourhood];
+//            break;
+//        case 11: form = [self saveDemographics];
+//            break;
+//        case 12: form = [self saveCurrentPhysicalIssues];
+//            break;
+//        case 13: form = [self saveCurrentSocioSituation];
+//            break;
+//        case 14: form = [self saveSocialSupportAssessment];
+//            break;
+//        case 15: form = [self saveRefForDoctorConsult];
+//            break;
+    }
+}
+
+- (void) saveNeighbourhood {
+    NSDictionary *fields = [self.form formValues];
+    NSMutableDictionary *neighbourhood = [[self.fullScreeningForm objectForKey:@"neighbourhood"] mutableCopy];
+    
+    NSNumber *neighbourhood_loc;
+    if ([fields objectForKey:kNeighbourhoodLoc] != [NSNull null]) {
+        neighbourhood_loc = [[fields objectForKey:kNeighbourhoodLoc] formValue];
+        [neighbourhood setObject:neighbourhood_loc forKey:kNeighbourhoodLoc];
+    }
+    
+    if (([fields objectForKey:kNeighbourhoodOthers] != [NSNull null]) && ([fields objectForKey:kNeighbourhoodOthers])) {
+        [neighbourhood setObject:[fields objectForKey:kNeighbourhoodOthers] forKey:kNeighbourhoodOthers];
+    } else {
+        [neighbourhood setObject:@"" forKey:kNeighbourhoodOthers];
+    }
+    [self.fullScreeningForm setObject:neighbourhood forKey:@"neighbourhood"];
+    
+}
 
 - (void) getDictionaryIntoVariables {
 //    NSDictionary *contact_info = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"contact_info"]];

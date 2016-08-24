@@ -44,6 +44,12 @@
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.navigationItem.title = @"Screening Form";
     [self createEmptyFormWithAllFields];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateFullScreeningForm:)
+                                                 name:@"updateFullScreeningForm"
+                                               object:nil];
+    
     [super viewDidLoad];
 }
 
@@ -158,7 +164,11 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-
+#pragma mark - NSNotification Methods
+- (void) updateFullScreeningForm: (NSNotification *) notification {
+    self.fullScreeningForm = [notification.userInfo mutableCopy];
+    NSLog(@"%@", self.fullScreeningForm);
+}
 
 #pragma mark - Blocks
 
@@ -279,12 +289,12 @@
         [segue.destinationViewController performSelector:@selector(setSectionID:)
                                               withObject:selectedRow];
         
-        if ([selectedRow isEqualToNumber:[NSNumber numberWithInt:1]]) {    //Resident Particulars
+//        if ([selectedRow isEqualToNumber:[NSNumber numberWithInt:1]]) {    //Resident Particulars
             if ([segue.destinationViewController respondsToSelector:@selector(setFullScreeningForm:)]) {
                 [segue.destinationViewController performSelector:@selector(setFullScreeningForm:)
                                                       withObject:self.fullScreeningForm];
             }
-        }
+//        }
 //        [segue.destinationViewController performSelector:@selector(setResidentPersonalData:)
 //                                              withObject:selectedRow];
     }
