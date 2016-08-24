@@ -17,19 +17,21 @@
 
 
 @property (strong, nonatomic) NSArray *rowTitles;
-@property (strong, nonatomic) NSDictionary *preRegDictionary;
+@property (strong, nonatomic) NSMutableDictionary *preRegDictionary;
+@property (strong, nonatomic) NSMutableDictionary *fullScreeningForm;
+
 @end
 
 @implementation ScreeningSectionTableViewController {
     NSNumber *selectedRow;
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad {   //will only happen when it comes from New Resident / Use Existing Resident
     
     self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
     
-    self.preRegDictionary = [[NSDictionary alloc] init];
+    self.preRegDictionary = [[NSMutableDictionary alloc] init];
     if ([self.residentID intValue]>= 0) {
         [self getPatientData];
     }
@@ -41,6 +43,7 @@
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.navigationItem.title = @"Screening Form";
+    [self createEmptyFormWithAllFields];
     [super viewDidLoad];
 }
 
@@ -181,8 +184,10 @@
 #pragma mark Downloading Blocks
 - (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
-        self.preRegDictionary = [responseObject objectForKey:@"0"];
+        self.preRegDictionary = [[responseObject objectForKey:@"0"] mutableCopy];
         NSLog(@"%@", self.preRegDictionary);
+        
+        [self insertResiPartiIntoFullScreeningForm];
     };
 }
 
@@ -193,6 +198,75 @@
                           progressBlock:[self progressBlock]
                            successBlock:[self downloadSuccessBlock]
                            andFailBlock:[self errorBlock]];
+}
+
+
+- (void) createEmptyFormWithAllFields {
+    
+    //ONLY IF FILE IS IN iOS APP
+//    NSString *fileName = @"blankScreeningForm.json";
+//    NSURL *documentsFolderURL = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+//    NSString *filePath = [documentsFolderURL.path stringByAppendingString:fileName];
+//    NSString *jsonString = [[NSString alloc] initWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
+//    NSError *jsonError;
+//    NSMutableDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&jsonError];
+    
+    NSString *fileName = [[NSBundle mainBundle] pathForResource:@"blankScreeningForm"   //load a blank screening form
+                                                         ofType:@"json"];
+    //check file exists
+    if (fileName) {
+        //retrieve file content
+        NSData *data = [[NSData alloc] initWithContentsOfFile:fileName];
+        //convert JSON NSData to a usable NSDictionary
+        NSError *error;
+        self.fullScreeningForm = [[NSMutableDictionary alloc] initWithDictionary:[NSJSONSerialization JSONObjectWithData:data
+                                                              options:0
+                                                                error:&error]];
+        if (error) {
+            NSLog(@"Something went wrong! %@", error.localizedDescription);
+        }
+        else {
+            NSLog(@"%@", self.fullScreeningForm);
+        }
+    }
+    else {
+        NSLog(@"Couldn't find file!");
+    }
+}
+
+- (void) insertResiPartiIntoFullScreeningForm {
+    NSDictionary *contact_info = [self.preRegDictionary objectForKey:@"contact_info"];
+    NSDictionary *personal_info = [self.preRegDictionary objectForKey:@"personal_info"];
+    NSDictionary *spoken_lang = [self.preRegDictionary objectForKey:@"spoken_lang"];
+    NSMutableDictionary *resi_particulars = [[self.fullScreeningForm objectForKey:@"resi_particulars"] mutableCopy];
+    
+    [resi_particulars setObject:[personal_info objectForKey:@"resident_name"] forKey:@"resident_name"];
+    [resi_particulars setObject:[personal_info objectForKey:@"gender"] forKey:@"gender"];
+    [resi_particulars setObject:[personal_info objectForKey:@"nric"] forKey:@"nric"];
+    [resi_particulars setObject:[personal_info objectForKey:@"resident_id"] forKey:@"resident_id"];
+    [resi_particulars setObject:[personal_info objectForKey:@"birth_year"] forKey:@"birth_year"];
+    
+    [resi_particulars setObject:[contact_info objectForKey:@"address_block"] forKey:@"address_block"];
+    [resi_particulars setObject:[contact_info objectForKey:@"address_postcode"] forKey:@"address_postcode"];
+    [resi_particulars setObject:[contact_info objectForKey:@"address_street"] forKey:@"address_street"];
+    [resi_particulars setObject:[contact_info objectForKey:@"address_unit"] forKey:@"address_unit"];
+    [resi_particulars setObject:[contact_info objectForKey:@"contact_no"] forKey:@"contact_no"];
+    
+    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_canto"] forKey:@"lang_canto"];
+    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_english"] forKey:@"lang_english"];
+    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_hindi"] forKey:@"lang_hindi"];
+    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_hokkien"] forKey:@"lang_hokkien"];
+    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_malay"] forKey:@"lang_malay"];
+    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_mandrin"] forKey:@"lang_mandrin"];
+    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_others"] forKey:@"lang_others"];
+    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_others_text"] forKey:@"lang_others_text"];
+    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_tamil"] forKey:@"lang_tamil"];
+    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_teochew"] forKey:@"lang_teochew"];
+    
+    [self.fullScreeningForm setObject:resi_particulars forKey:@"resi_particulars"];     //replace the original form
+    [self.preRegDictionary removeAllObjects];   //clear the array
+    NSLog(@"********** UPDATED SCREENING FORM! ***********\n%@", self.fullScreeningForm);
+    
 }
 
 #pragma mark - Navigation
@@ -206,9 +280,9 @@
                                               withObject:selectedRow];
         
         if ([selectedRow isEqualToNumber:[NSNumber numberWithInt:1]]) {    //Resident Particulars
-            if ([self.preRegDictionary allKeys]) {
-                [segue.destinationViewController performSelector:@selector(setpreRegParticularsDict:)
-                                                  withObject:self.preRegDictionary];
+            if ([segue.destinationViewController respondsToSelector:@selector(setFullScreeningForm:)]) {
+                [segue.destinationViewController performSelector:@selector(setFullScreeningForm:)
+                                                      withObject:self.fullScreeningForm];
             }
         }
 //        [segue.destinationViewController performSelector:@selector(setResidentPersonalData:)

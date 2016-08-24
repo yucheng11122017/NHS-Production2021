@@ -13,9 +13,11 @@
 
 @property (strong, nonatomic) NSNumber* sectionID;
 @property (strong, nonatomic) NSDictionary *preRegParticularsDict;
+@property (strong, nonatomic) NSMutableDictionary *fullScreeningForm;
 
 - (void) setSectionID:(NSNumber *)sectionID;
 - (void) setpreRegParticularsDict :(NSDictionary *)preRegParticularsDict;
+- (void) setFullScreeningForm: (NSMutableDictionary *) dictionary;
 
 
 @end

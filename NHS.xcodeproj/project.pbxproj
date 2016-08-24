@@ -16,6 +16,7 @@
 		6CFD29C7B37E62DFE01501E8 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5770AFF7723755883767FC00 /* AssetsLibrary.framework */; };
 		7178DCB2261E43BF5671CFA5 /* Pods_NHSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 645A46836680739EAF744E2F /* Pods_NHSTests.framework */; };
 		89436BFEDA11D3AAFB7D890D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C7F3F1B0D84D672E6E35103 /* QuartzCore.framework */; };
+		8E0852581D6DCCD7006E68FE /* blankScreeningForm.json in Resources */ = {isa = PBXBuildFile; fileRef = 8E0852571D6DCCD7006E68FE /* blankScreeningForm.json */; };
 		8E23D5541D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E23D5531D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m */; };
 		8E25276A1D5766C400ACEE92 /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E2527691D5766C400ACEE92 /* HomeViewController.m */; };
 		8E25276D1D57891700ACEE92 /* PreRegDisplayFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E25276C1D57891700ACEE92 /* PreRegDisplayFormViewController.m */; };
@@ -86,6 +87,7 @@
 		645A46836680739EAF744E2F /* Pods_NHSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NHSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8964BE86125ACEAAC6F8C79B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		8C7F3F1B0D84D672E6E35103 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		8E0852571D6DCCD7006E68FE /* blankScreeningForm.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = blankScreeningForm.json; sourceTree = "<group>"; };
 		8E23D5521D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreeningSelectPreRegPatientTableViewController.h; sourceTree = "<group>"; };
 		8E23D5531D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreeningSelectPreRegPatientTableViewController.m; sourceTree = "<group>"; };
 		8E2527681D5766C400ACEE92 /* HomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
@@ -291,6 +293,7 @@
 		E120E4051D431E9B002DBC7E /* NHS */ = {
 			isa = PBXGroup;
 			children = (
+				8E0852571D6DCCD7006E68FE /* blankScreeningForm.json */,
 				8E2527671D57603A00ACEE92 /* Unused */,
 				E1334EDF1D432B5800A43539 /* Login.json */,
 				E1334EE01D432B5800A43539 /* Pre-registration.json */,
@@ -495,6 +498,7 @@
 				E1E6909C1D4345FC007FEC1C /* Residents Particulars.json in Resources */,
 				E1A9874A1D4327FE005FC83D /* LoginDemo in Resources */,
 				E1A9874C1D4327FE005FC83D /* Payment in Resources */,
+				8E0852581D6DCCD7006E68FE /* blankScreeningForm.json in Resources */,
 				E1334EE31D432B5800A43539 /* Pre-registration.json in Resources */,
 				E120E4111D431E9B002DBC7E /* Main.storyboard in Resources */,
 				E1A4F0E11D66BE2000EE9BBB /* Assets.xcassets in Resources */,

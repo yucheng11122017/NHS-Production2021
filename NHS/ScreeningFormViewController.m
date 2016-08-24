@@ -372,6 +372,8 @@ NSString *const kDocName = @"doc_name";
     
 }
 
+#pragma mark - Forms methods
+
 -(id)initNeighbourhood
 {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Neighbourhood"];
@@ -2456,41 +2458,45 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     return [super initWithForm:formDescriptor];
 }
 
+#pragma Dictionary methods
+
 - (void) getDictionaryIntoVariables {
-    NSDictionary *contact_info = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"contact_info"]];
-    NSDictionary *personal_info = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"personal_info"]];
-    NSDictionary *spoken_lang = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"spoken_lang"]];
+//    NSDictionary *contact_info = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"contact_info"]];
+//    NSDictionary *personal_info = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"personal_info"]];
+//    NSDictionary *spoken_lang = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"spoken_lang"]];
+
+    NSDictionary *resi_particulars = [self.fullScreeningForm objectForKey:@"resi_particulars"];
     
-    address_block = [contact_info objectForKey:@"address_block"];
-    address_postcode = [contact_info objectForKey:@"address_postcode"];
-    address_street = [contact_info objectForKey:@"address_street"];
-    address_unit = [contact_info objectForKey:@"address_unit"];
-    contact_no = [contact_info objectForKey:@"contact_no"];
+    address_block = [resi_particulars objectForKey:@"address_block"];
+    address_postcode = [resi_particulars objectForKey:@"address_postcode"];
+    address_street = [resi_particulars objectForKey:@"address_street"];
+    address_unit = [resi_particulars objectForKey:@"address_unit"];
+    contact_no = [resi_particulars objectForKey:@"contact_no"];
     
-    birth_year = [personal_info objectForKey:@"birth_year"];
-    gender = [personal_info objectForKey:@"gender"];
+    birth_year = [resi_particulars objectForKey:@"birth_year"];
+    gender = [resi_particulars objectForKey:@"gender"];
     gender = [gender isEqualToString:@"M"]? @"Male":@"Female";
     
-    nric = [personal_info objectForKey:@"nric"];
-    resident_name = [personal_info objectForKey:@"resident_name"];
+    nric = [resi_particulars objectForKey:@"nric"];
+    resident_name = [resi_particulars objectForKey:@"resident_name"];
     
-    if ([spoken_lang objectForKey:@"lang_canto"] != (id)[NSNull null]) {
-        spoken_lang_value = [self getSpokenLangArray:spoken_lang];
+    if ([resi_particulars objectForKey:@"lang_canto"] != (id)[NSNull null]) {
+        spoken_lang_value = [self getSpokenLangArray:resi_particulars];
     }
     
 }
 
-- (NSArray *) getSpokenLangArray: (NSDictionary *) spoken_lang_dictionary {
+- (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
     NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
-    if([[spoken_lang_dictionary objectForKey:@"lang_canto"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
-    if([[spoken_lang_dictionary objectForKey:@"lang_english"] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
-    if([[spoken_lang_dictionary objectForKey:@"lang_hindi"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
-    if([[spoken_lang_dictionary objectForKey:@"lang_hokkien"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
-    if([[spoken_lang_dictionary objectForKey:@"lang_malay"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
-    if([[spoken_lang_dictionary objectForKey:@"lang_mandrin"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
-    if([[spoken_lang_dictionary objectForKey:@"lang_others"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
-    if([[spoken_lang_dictionary objectForKey:@"lang_tamil"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
-    if([[spoken_lang_dictionary objectForKey:@"lang_teochew"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
+    if([[dictionary objectForKey:@"lang_canto"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
+    if([[dictionary objectForKey:@"lang_english"] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
+    if([[dictionary objectForKey:@"lang_hindi"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
+    if([[dictionary objectForKey:@"lang_hokkien"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
+    if([[dictionary objectForKey:@"lang_malay"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
+    if([[dictionary objectForKey:@"lang_mandrin"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
+    if([[dictionary objectForKey:@"lang_others"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
+    if([[dictionary objectForKey:@"lang_tamil"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
+    if([[dictionary objectForKey:@"lang_teochew"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
     
     return spokenLangArray;
 }
