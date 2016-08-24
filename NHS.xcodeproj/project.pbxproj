@@ -41,10 +41,6 @@
 		E1A4F0DF1D66BC5A00EE9BBB /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1A4F0DE1D66BC5A00EE9BBB /* LoginViewController.m */; };
 		E1A4F0E11D66BE2000EE9BBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1A4F0E01D66BE2000EE9BBB /* Assets.xcassets */; };
 		E1A987441D4327FE005FC83D /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873A1D4327FE005FC83D /* Assets */; };
-		E1A987451D4327FE005FC83D /* Basic-ObjC in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873B1D4327FE005FC83D /* Basic-ObjC */; };
-		E1A987461D4327FE005FC83D /* Basic-Swift in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873C1D4327FE005FC83D /* Basic-Swift */; };
-		E1A987471D4327FE005FC83D /* CustomField in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873D1D4327FE005FC83D /* CustomField */; };
-		E1A987481D4327FE005FC83D /* Images in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873E1D4327FE005FC83D /* Images */; };
 		E1A987491D4327FE005FC83D /* iPhone-Storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873F1D4327FE005FC83D /* iPhone-Storyboard */; };
 		E1A9874A1D4327FE005FC83D /* LoginDemo in Resources */ = {isa = PBXBuildFile; fileRef = E1A987401D4327FE005FC83D /* LoginDemo */; };
 		E1A9874B1D4327FE005FC83D /* ModalForm in Resources */ = {isa = PBXBuildFile; fileRef = E1A987411D4327FE005FC83D /* ModalForm */; };
@@ -136,10 +132,6 @@
 		E1A4F0DE1D66BC5A00EE9BBB /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
 		E1A4F0E01D66BE2000EE9BBB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E1A9873A1D4327FE005FC83D /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
-		E1A9873B1D4327FE005FC83D /* Basic-ObjC */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Basic-ObjC"; sourceTree = "<group>"; };
-		E1A9873C1D4327FE005FC83D /* Basic-Swift */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Basic-Swift"; sourceTree = "<group>"; };
-		E1A9873D1D4327FE005FC83D /* CustomField */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CustomField; sourceTree = "<group>"; };
-		E1A9873E1D4327FE005FC83D /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
 		E1A9873F1D4327FE005FC83D /* iPhone-Storyboard */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "iPhone-Storyboard"; sourceTree = "<group>"; };
 		E1A987401D4327FE005FC83D /* LoginDemo */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LoginDemo; sourceTree = "<group>"; };
 		E1A987411D4327FE005FC83D /* ModalForm */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ModalForm; sourceTree = "<group>"; };
@@ -272,10 +264,6 @@
 			isa = PBXGroup;
 			children = (
 				E1A9873A1D4327FE005FC83D /* Assets */,
-				E1A9873B1D4327FE005FC83D /* Basic-ObjC */,
-				E1A9873C1D4327FE005FC83D /* Basic-Swift */,
-				E1A9873D1D4327FE005FC83D /* CustomField */,
-				E1A9873E1D4327FE005FC83D /* Images */,
 				E1A9873F1D4327FE005FC83D /* iPhone-Storyboard */,
 				E1A987401D4327FE005FC83D /* LoginDemo */,
 				E1A987411D4327FE005FC83D /* ModalForm */,
@@ -501,9 +489,6 @@
 				E120E4161D431E9B002DBC7E /* LaunchScreen.storyboard in Resources */,
 				E1E6909B1D4345FC007FEC1C /* Neighbourhood.json in Resources */,
 				E1A987441D4327FE005FC83D /* Assets in Resources */,
-				E1A987471D4327FE005FC83D /* CustomField in Resources */,
-				E1A987451D4327FE005FC83D /* Basic-ObjC in Resources */,
-				E1A987481D4327FE005FC83D /* Images in Resources */,
 				E1A987491D4327FE005FC83D /* iPhone-Storyboard in Resources */,
 				E1A9874B1D4327FE005FC83D /* ModalForm in Resources */,
 				E1334EE21D432B5800A43539 /* Login.json in Resources */,
@@ -513,7 +498,6 @@
 				E1334EE31D432B5800A43539 /* Pre-registration.json in Resources */,
 				E120E4111D431E9B002DBC7E /* Main.storyboard in Resources */,
 				E1A4F0E11D66BE2000EE9BBB /* Assets.xcassets in Resources */,
-				E1A987461D4327FE005FC83D /* Basic-Swift in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

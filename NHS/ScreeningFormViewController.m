@@ -781,162 +781,286 @@ NSString *const kDocName = @"doc_name";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Smoking"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmoking
+    XLFormRowDescriptor *smokingStatusRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmoking
                                                 rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                   title:@"What is your smoking status?"];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Smokes at least once a day"],
+    smokingStatusRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Smokes at least once a day"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Smokes but not everyday"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Ex-smoker, now quit"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Never smoked"]
                             ];
 //    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Never smoked"];   //default value
-    row.required = YES;
-    [section addFormRow:row];
+    smokingStatusRow.required = YES;
+    [section addFormRow:smokingStatusRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
+    XLFormRowDescriptor *smokingNumYearsQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, how many years have you been smoking for?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
+    smokingNumYearsQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingNumYearsQRow.hidden = @(1);
+    [section addFormRow:smokingNumYearsQRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingNumYears rowType:XLFormRowDescriptorTypeNumber title:@"Year(s)"];
-    [section addFormRow:row];
+    XLFormRowDescriptor *smokingNumYearsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingNumYears rowType:XLFormRowDescriptorTypeInteger title:@"Year(s)"];
+    smokingNumYearsRow.hidden = @(1);
+    [section addFormRow:smokingNumYearsRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo
+    XLFormRowDescriptor *smokingTypeOfSmokeQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, what do you smoke? (can tick more than one option)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
+    smokingTypeOfSmokeQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingTypeOfSmokeQRow.hidden = @(1);
+    [section addFormRow:smokingTypeOfSmokeQRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kTypeOfSmoke rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
-    row.selectorOptions = @[@"Cigarettes", @"Pipe", @"self-rolled leaves \"ang hoon\"", @"Shisha", @"Cigars", @"E-cigarettes", @"Others"];
-    [section addFormRow:row];
+    XLFormRowDescriptor *smokingTypeOfSmokeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTypeOfSmoke rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
+    smokingTypeOfSmokeRow.selectorOptions = @[@"Cigarettes", @"Pipe", @"self-rolled leaves \"ang hoon\"", @"Shisha", @"Cigars", @"E-cigarettes", @"Others"];
+    smokingTypeOfSmokeRow.hidden = @(1);
+    [section addFormRow:smokingTypeOfSmokeRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
+    XLFormRowDescriptor *smokingNumSticksQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, how many sticks do you smoke a day (average)?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeNumSticks rowType:XLFormRowDescriptorTypeNumber title:@"Stick(s)"];
-    [section addFormRow:row];
+    smokingNumSticksQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingNumSticksQRow.hidden = @(1);
+    [section addFormRow:smokingNumSticksQRow];
+    XLFormRowDescriptor *smokingNumSticksRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeNumSticks rowType:XLFormRowDescriptorTypeInteger title:@"Stick(s)"];
+    smokingNumSticksRow.hidden = @(1);
+    [section addFormRow:smokingNumSticksRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour
+    XLFormRowDescriptor *smokeAfterWakingQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, how soon after waking do you smoke your first cigarette?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeAfterWaking
-                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+    smokeAfterWakingQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokeAfterWakingQRow.hidden = @(1);
+    [section addFormRow:smokeAfterWakingQRow];
+    XLFormRowDescriptor *smokeAfterWakingRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeAfterWaking
+                                                 rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                   title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Within 5 mins"],
+    smokeAfterWakingRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Within 5 mins"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"5-30 mins"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"More than 30 mins"]];
-    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"More than 30 mins"];   //default value
-    [section addFormRow:row];
+//    smokeAfterWakingRow.value = [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"More than 30 mins"];   //default value
+    smokeAfterWakingRow.hidden = @(1);
+    [section addFormRow:smokeAfterWakingRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
+    XLFormRowDescriptor *smokingRefrainQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, do you find it difficult to refrain from smoking in places where it is forbidden/not allowed?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingRefrain rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
-    row.value = @"NO";
-    [section addFormRow:row];
+    smokingRefrainQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingRefrainQRow.hidden = @(1);
+    [section addFormRow:smokingRefrainQRow];
+    XLFormRowDescriptor *smokingRefrainRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingRefrain rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    smokingRefrainRow.selectorOptions = @[@"YES", @"NO"];
+    smokingRefrainRow.hidden = @(1);
+    [section addFormRow:smokingRefrainRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix
+    XLFormRowDescriptor *smokingWhichNotGiveUpQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, which cigarette would you hate to give up?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhichNotGiveUp
+    smokingWhichNotGiveUpQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingWhichNotGiveUpQRow.hidden = @(1);
+    [section addFormRow:smokingWhichNotGiveUpQRow];
+    XLFormRowDescriptor *smokingWhichNotGiveUpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhichNotGiveUp
                                                 rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                   title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"The first in the morning"],
+    smokingWhichNotGiveUpRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"The first in the morning"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Any other"]];
-    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"The first in the morning"];   //default value
-    [section addFormRow:row];
+//    smokingWhichNotGiveUpRow.value = [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"The first in the morning"];   //default value
+    smokingWhichNotGiveUpRow.hidden = @(1);
+    [section addFormRow:smokingWhichNotGiveUpRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSeven
+    XLFormRowDescriptor *smokingMornFreqQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSeven
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, do you smoke more frequently in the morning?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingMornFreq rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
-    row.value = @"NO";
-    [section addFormRow:row];
+    smokingMornFreqQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingMornFreqQRow.hidden = @(1);
+    [section addFormRow:smokingMornFreqQRow];
+    XLFormRowDescriptor *smokingMornFreqRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingMornFreq rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    smokingMornFreqRow.selectorOptions = @[@"YES", @"NO"];
+    smokingMornFreqRow.hidden = @(1);
+    [section addFormRow:smokingMornFreqRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight
+    XLFormRowDescriptor *smokingSickInBedQRow= [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, do you smoke even if you are sick in bed most of the day?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingSickInBed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
-    row.value = @"NO";
-    [section addFormRow:row];
+    smokingSickInBedQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingSickInBedQRow.hidden = @(1);
+    [section addFormRow:smokingSickInBedQRow];
+    XLFormRowDescriptor *smokingSickInBedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingSickInBed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    smokingSickInBedRow.selectorOptions = @[@"YES", @"NO"];
+    smokingSickInBedRow.hidden = @(1);
+    [section addFormRow:smokingSickInBedRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionNine
+    XLFormRowDescriptor *smokingAttemptedQuitQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionNine
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, have you attempted to quit before, in the past year?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingAttemptedQuit rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
-    row.value = @"NO";
-    [section addFormRow:row];
+    smokingAttemptedQuitQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingAttemptedQuitQRow.hidden = @(1);
+    [section addFormRow:smokingAttemptedQuitQRow];
+    XLFormRowDescriptor *smokingAttemptedQuitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingAttemptedQuit rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    smokingAttemptedQuitRow.selectorOptions = @[@"YES", @"NO"];
+//    smokingAttemptedQuitRow.value = @"NO";
+    smokingAttemptedQuitRow.hidden = @(1);
+    [section addFormRow:smokingAttemptedQuitRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTen
+    XLFormRowDescriptor *smokingNumQuitAttemptsQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTen
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If you have attempted to quit in the past year, how many quit attempts did you make?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingNumQuitAttempts rowType:XLFormRowDescriptorTypeNumber title:@"Attempt(s)"];
-    [section addFormRow:row];
+    smokingNumQuitAttemptsQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingNumQuitAttemptsQRow.hidden = @(1);
+    [section addFormRow:smokingNumQuitAttemptsQRow];
+    XLFormRowDescriptor *smokingNumQuitAttemptsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingNumQuitAttempts rowType:XLFormRowDescriptorTypeNumber title:@"Attempt(s)"];
+    smokingNumQuitAttemptsRow.hidden = @(1);
+    [section addFormRow:smokingNumQuitAttemptsRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEleven
+    XLFormRowDescriptor *smokingIntentionsToCutQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEleven
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, what are your intentions towards quitting/cutting down in the forseeable future?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingIntentionsToCut
+    smokingIntentionsToCutQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingIntentionsToCutQRow.hidden = @(1);
+    [section addFormRow:smokingIntentionsToCutQRow];
+    XLFormRowDescriptor *smokingIntentionsToCutRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingIntentionsToCut
                                                 rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                   title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I plan to quit in the next 12 months"],
+    smokingIntentionsToCutRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I plan to quit in the next 12 months"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I plan to quit, but not within the next 12 months"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I do not plan to quit, but I intend to cut down"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I do not plan to quit or cut down"]
                             ];
-    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I do not plan to quit or cut down"];   //default value
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwelve
+//    smokingIntentionsToCutRow.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I do not plan to quit or cut down"];   //default value
+    smokingIntentionsToCutRow.hidden = @(1);
+    [section addFormRow:smokingIntentionsToCutRow];
+
+    XLFormRowDescriptor *smokingHowQuitQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwelve
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If ex-smoker, how did you quit smoking? (can tick more than one)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    XLFormRowDescriptor *howQuitSmokingRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingHowQuit rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
-    howQuitSmokingRow.selectorOptions = @[@"By myself", @"By joining a smoking cessation programme", @"By taking medication", @"With encouragement of family/friends", @"Others"];
-    [section addFormRow:howQuitSmokingRow];
+    smokingHowQuitQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingHowQuitQRow.hidden = @(1);
+    [section addFormRow:smokingHowQuitQRow];
+    XLFormRowDescriptor *smokingHowQuitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingHowQuit rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
+    smokingHowQuitRow.selectorOptions = @[@"By myself", @"By joining a smoking cessation programme", @"By taking medication", @"With encouragement of family/friends", @"Others"];
+    smokingHowQuitRow.hidden = @(1);
+    [section addFormRow:smokingHowQuitRow];
     
-    XLFormRowDescriptor *howQuitSmokingOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingHowQuitOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
-    howQuitSmokingOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", howQuitSmokingRow];
-    [section addFormRow:howQuitSmokingOthersRow];
+    XLFormRowDescriptor *smokingHowQuitOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingHowQuitOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    smokingHowQuitOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", smokingHowQuitRow];
+    [section addFormRow:smokingHowQuitOthersRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThirteen
+    XLFormRowDescriptor *smokingWhyQuitQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThirteen
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If ex-smoker, why did you choose to quit? (can tick more than one)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    XLFormRowDescriptor *whyQuitSmokingRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhyQuit rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
-    whyQuitSmokingRow.selectorOptions = @[@"Health/medical reasons", @"Side effects (eg. Odour)", @"Learnt about harm of smoking", @"Family/friends' advice", @"Too expensive", @"Others"];
-    [section addFormRow:whyQuitSmokingRow];
+    smokingWhyQuitQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    smokingWhyQuitQRow.hidden = @(1);
+    [section addFormRow:smokingWhyQuitQRow];
+    XLFormRowDescriptor *smokingWhyQuitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhyQuit rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
+    smokingWhyQuitRow.selectorOptions = @[@"Health/medical reasons", @"Side effects (eg. Odour)", @"Learnt about harm of smoking", @"Family/friends' advice", @"Too expensive", @"Others"];
+    smokingWhyQuitRow.hidden = @(1);
+    [section addFormRow:smokingWhyQuitRow];
     
-    XLFormRowDescriptor *whyQuitSmokingOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhyQuitOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
-    whyQuitSmokingOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", whyQuitSmokingRow];
-    [section addFormRow:whyQuitSmokingOthersRow];
+    XLFormRowDescriptor *smokingWhyQuitOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhyQuitOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    smokingWhyQuitOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", smokingWhyQuitRow];
+    [section addFormRow:smokingWhyQuitOthersRow];
     
+    smokingStatusRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if (([[newValue formValue] isEqual:@(0)]) | ([[newValue formValue] isEqual:@(1)])) {    //if status is currently smoking
+                smokingNumYearsQRow.hidden = @(0);  //show
+                smokingNumYearsRow.hidden = @(0);
+                smokingTypeOfSmokeQRow.hidden = @(0);
+                smokingTypeOfSmokeRow.hidden = @(0);
+                smokingNumSticksQRow.hidden = @(0);
+                smokingNumSticksRow.hidden = @(0);
+                smokeAfterWakingQRow.hidden = @(0);
+                smokeAfterWakingRow.hidden = @(0);
+                smokingRefrainQRow.hidden = @(0);
+                smokingRefrainRow.hidden = @(0);
+                smokingWhichNotGiveUpQRow.hidden = @(0);
+                smokingWhichNotGiveUpRow.hidden = @(0);
+                smokingMornFreqQRow.hidden = @(0);
+                smokingMornFreqRow.hidden = @(0);
+                smokingSickInBedQRow.hidden = @(0);
+                smokingSickInBedRow.hidden = @(0);
+                smokingAttemptedQuitQRow.hidden = @(0);
+                smokingAttemptedQuitRow.hidden = @(0);
+                smokingNumQuitAttemptsQRow.hidden = @(0);
+                smokingNumQuitAttemptsRow.hidden = @(0);
+                smokingIntentionsToCutQRow.hidden = @(0);
+                smokingIntentionsToCutRow.hidden = @(0);
+                
+                //hide ex-smoker portion
+                smokingHowQuitQRow.hidden = @(1);
+                smokingHowQuitRow.hidden = @(1);
+                smokingWhyQuitQRow.hidden = @(1);
+                smokingWhyQuitRow.hidden = @(1);
+            } else if([[newValue formValue] isEqual:@(2)]) {    //ex-smoker
+                
+                //hide smoking currently rows
+                smokingNumYearsQRow.hidden = @(1);
+                smokingNumYearsRow.hidden = @(1);
+                smokingTypeOfSmokeQRow.hidden = @(1);
+                smokingTypeOfSmokeRow.hidden = @(1);
+                smokingNumSticksQRow.hidden = @(1);
+                smokingNumSticksRow.hidden = @(1);
+                smokeAfterWakingQRow.hidden = @(1);
+                smokeAfterWakingRow.hidden = @(1);
+                smokingRefrainQRow.hidden = @(1);
+                smokingRefrainRow.hidden = @(1);
+                smokingWhichNotGiveUpQRow.hidden = @(1);
+                smokingWhichNotGiveUpRow.hidden = @(1);
+                smokingMornFreqQRow.hidden = @(1);
+                smokingMornFreqRow.hidden = @(1);
+                smokingSickInBedQRow.hidden = @(1);
+                smokingSickInBedRow.hidden = @(1);
+                smokingAttemptedQuitQRow.hidden = @(1);
+                smokingAttemptedQuitRow.hidden = @(1);
+                smokingNumQuitAttemptsQRow.hidden = @(1);
+                smokingNumQuitAttemptsRow.hidden = @(1);
+                smokingIntentionsToCutQRow.hidden = @(1);
+                smokingIntentionsToCutRow.hidden = @(1);
+                smokingHowQuitQRow.hidden = @(1);
+                smokingHowQuitRow.hidden = @(1);
+                smokingHowQuitOthersRow.hidden = @(1);
+                smokingWhyQuitQRow.hidden = @(1);
+                smokingWhyQuitRow.hidden = @(1);
+                smokingWhyQuitOthersRow.hidden = @(1);
+                
+                //show ex-smoker rows
+                smokingHowQuitQRow.hidden = @(0);
+                smokingHowQuitRow.hidden = @(0);
+                smokingWhyQuitQRow.hidden = @(0);
+                smokingWhyQuitRow.hidden = @(0);
+            }
+            else {  //non-smoker totally
+                smokingNumYearsQRow.hidden = @(1);  //hide
+                smokingNumYearsRow.hidden = @(1);
+                smokingTypeOfSmokeQRow.hidden = @(1);
+                smokingTypeOfSmokeRow.hidden = @(1);
+                smokingNumSticksQRow.hidden = @(1);
+                smokingNumSticksRow.hidden = @(1);
+                smokeAfterWakingQRow.hidden = @(1);
+                smokeAfterWakingRow.hidden = @(1);
+                smokingRefrainQRow.hidden = @(1);
+                smokingRefrainRow.hidden = @(1);
+                smokingWhichNotGiveUpQRow.hidden = @(1);
+                smokingWhichNotGiveUpRow.hidden = @(1);
+                smokingMornFreqQRow.hidden = @(1);
+                smokingMornFreqRow.hidden = @(1);
+                smokingSickInBedQRow.hidden = @(1);
+                smokingSickInBedRow.hidden = @(1);
+                smokingAttemptedQuitQRow.hidden = @(1);
+                smokingAttemptedQuitRow.hidden = @(1);
+                smokingNumQuitAttemptsQRow.hidden = @(1);
+                smokingNumQuitAttemptsRow.hidden = @(1);
+                smokingIntentionsToCutQRow.hidden = @(1);
+                smokingIntentionsToCutRow.hidden = @(1);
+                smokingHowQuitQRow.hidden = @(1);
+                smokingHowQuitRow.hidden = @(1);
+                smokingHowQuitOthersRow.hidden = @(1);
+                smokingWhyQuitQRow.hidden = @(1);
+                smokingWhyQuitRow.hidden = @(1);
+                smokingWhyQuitOthersRow.hidden = @(1);
+            }
+        }
+    };
     
     // Alcohol - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Alcohol"];
@@ -1485,7 +1609,7 @@ NSString *const kDocName = @"doc_name";
                                                   title:@"How many times did you visit A&E in past 6 months?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAneVisit rowType:XLFormRowDescriptorTypeNumber title:@"Number of time(s)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAneVisit rowType:XLFormRowDescriptorTypeInteger title:@"Number of time(s)"];
     row.required = YES;
     [section addFormRow:row];
     
@@ -1494,7 +1618,7 @@ NSString *const kDocName = @"doc_name";
                                                   title:@"How many times have you been hospitalized in past 1 year?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHospitalized rowType:XLFormRowDescriptorTypeNumber title:@"Number of time(s)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHospitalized rowType:XLFormRowDescriptorTypeInteger title:@"Number of time(s)"];
     row.required = YES;
     [section addFormRow:row];
     
@@ -1629,7 +1753,7 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHealthToday rowType:XLFormRowDescriptorTypeNumber title:@""];
-#warning  need to do validation criterias. between 0 - 100
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between 0 and 100" regex:@"^(0|[0-9][0-9]|100)$"]];
     row.required = YES;
     [section addFormRow:row];
     
@@ -1646,7 +1770,6 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kParkTime rowType:XLFormRowDescriptorTypeNumber title:@""];
-#warning  need to do validation criterias. between 0 - 100
     row.required = YES;
     [section addFormRow:row];
     
@@ -1751,9 +1874,18 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     [section addFormRow:religionRow];
     
     XLFormRowDescriptor *religionOthers = [XLFormRowDescriptor formRowDescriptorWithTag:kReligionOthers rowType:XLFormRowDescriptorTypeText title:@"Other Religion"];
-#warning not sure why cannot hide this...
-    religionOthers.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", religionRow];
+    religionOthers.hidden = @(1);
     [section addFormRow:religionOthers];
+    
+    religionRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([[newValue formValue] isEqual:@(6)]) {
+                religionOthers.hidden = @(0);  //show
+            } else {
+                religionOthers.hidden = @(1);  //hide
+            }
+        }
+    };
     
     
     return [super initWithForm:formDescriptor];
@@ -1852,16 +1984,16 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     [section addFormRow:financeCopingRow];
     
     XLFormRowDescriptor *notCopingReasonRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHouseCopingReason rowType:XLFormRowDescriptorTypeMultipleSelector title:@"If no, why?"];
-    notCopingReasonRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Medical expenses"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Daily living expenses"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Arrears / Debts"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Others"]];
+//    notCopingReasonRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Medical expenses"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Daily living expenses"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Arrears / Debts"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Others"]];
+    notCopingReasonRow.selectorOptions = @[@"Medical expenses", @"Daily living expenses", @"Arrears / Debts", @"Others"];
     notCopingReasonRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", financeCopingRow];
     [section addFormRow:notCopingReasonRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHouseCopingReasonOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
     [row.cellConfigAtConfigure setObject:@"Other reason" forKey:@"textField.placeholder"];
-#warning Cannot hide at the moment
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", notCopingReasonRow];
     [section addFormRow:row];
     
@@ -1880,11 +2012,22 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     EmployStatusRow.required = YES;
     [section addFormRow:EmployStatusRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployStatusOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
-    [row.cellConfigAtConfigure setObject:@"Please specify" forKey:@"textField.placeholder"];
-#warning Cannot hide at the moment
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", EmployStatusRow];
-    [section addFormRow:row];
+    XLFormRowDescriptor *EmployStatusOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployStatusOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    [EmployStatusOthersRow.cellConfigAtConfigure setObject:@"Please specify" forKey:@"textField.placeholder"];
+    EmployStatusOthersRow.hidden = @(1);
+    [section addFormRow:EmployStatusOthersRow];
+    
+    EmployStatusRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([[newValue formValue] isEqual:@(7)]) {
+                EmployStatusOthersRow.hidden = @(0);  //show
+            } else {
+                EmployStatusOthersRow.hidden = @(1);  //hide
+            }
+        }
+    };
+    
+    
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive rowType:XLFormRowDescriptorTypeInfo title:@"If unemployed, how does resident manage his/her expenses?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
