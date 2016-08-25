@@ -451,6 +451,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="NHS logo" width="942" height="599"/>
+        <image name="NHS logo" width="736" height="736"/>
     </resources>
 </document>

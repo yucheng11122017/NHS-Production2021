@@ -17,7 +17,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="NHS background" translatesAutoresizingMaskIntoConstraints="NO" id="eZN-mz-tMU">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="NHS App LaunchScreen" translatesAutoresizingMaskIntoConstraints="NO" id="eZN-mz-tMU">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                             </imageView>
                         </subviews>
@@ -36,6 +36,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="NHS background" width="736" height="736"/>
+        <image name="NHS App LaunchScreen" width="720" height="1280"/>
     </resources>
 </document>
