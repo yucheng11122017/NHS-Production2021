@@ -12,8 +12,11 @@
 
 
 @property (strong, nonatomic) NSNumber* residentID;
+@property (strong, nonatomic) NSMutableArray *completionCheck;
 
 - (void) setResidentID:(NSNumber *)residentID;
+//- (void) updateChecklistWithRowNumber:(NSNumber*)row
+//                   value:(NSNumber*)value;
 
 
 @end

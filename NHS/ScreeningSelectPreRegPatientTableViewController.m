@@ -89,6 +89,8 @@ typedef enum getDataState {
     self.searchController.searchBar.delegate = self; // so we can monitor text changes + others
     self.definesPresentationContext = TRUE;     //SUPER IMPORTANT, if not the searchBar won't go away when didSelectRow
     
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(exitViewController:)];
+    
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -128,6 +130,10 @@ typedef enum getDataState {
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void) exitViewController:(id) sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void) refreshConnectionAndTable {
@@ -238,7 +244,9 @@ typedef enum getDataState {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"selectedPreRegResidentToNewScreenForm"
                                                         object:self
                                                       userInfo:userInfo];
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:^(void) {    //dismiss searchBar
+        [self dismissViewControllerAnimated:YES completion:nil];    //dismiss Modal VC
+    }];
     
 //    [self performSegueWithIdentifier:@"PreRegResidentToScreeningFormSegue" sender:self];
     

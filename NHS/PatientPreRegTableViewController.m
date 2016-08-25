@@ -314,15 +314,6 @@ typedef enum getDataState {
 
 }
 
-- (IBAction)addBtnPressed:(id)sender {
-    [self.refreshControl endRefreshing];    //stop refreshing
-    loadDataFlag = NO;
-    [self performSegueWithIdentifier:@"preRegPatientListToPatientFormSegue" sender:self];
-    NSLog(@"Form segue performed!");
-}
-
-
-
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     // Return NO if you do not want the specified item to be editable.
@@ -358,6 +349,14 @@ typedef enum getDataState {
     return YES;
 }
 */
+#pragma mark - Buttons
+
+- (IBAction)addBtnPressed:(id)sender {
+    [self.refreshControl endRefreshing];    //stop refreshing
+    loadDataFlag = NO;
+    [self performSegueWithIdentifier:@"preRegPatientListToPatientFormSegue" sender:self];
+    NSLog(@"Form segue performed!");
+}
 
 #pragma mark - Blocks
 

@@ -49,7 +49,12 @@
                                              selector:@selector(updateFullScreeningForm:)
                                                  name:@"updateFullScreeningForm"
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateCompletionCheck:)
+                                                 name:@"updateCompletionCheck"
+                                               object:nil];
     
+    self.completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,nil];
     [super viewDidLoad];
 }
 
@@ -76,10 +81,15 @@
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
     }
     cell.textLabel.text = [self.rowTitles objectAtIndex:indexPath.row];
-     [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
+//     [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
+    if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    } else {
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
     
     return cell;
 }
@@ -170,6 +180,13 @@
     NSLog(@"%@", self.fullScreeningForm);
 }
 
+- (void) updateCompletionCheck: (NSNotification *) notification {
+    NSLog(@"%@", notification.userInfo);
+    int section = [[notification.userInfo objectForKey:@"section"] intValue];
+    NSNumber *value = [notification.userInfo objectForKey:@"value"];
+    [self.completionCheck replaceObjectAtIndex:section withObject:value];
+    [self.tableView reloadData];
+}
 #pragma mark - Blocks
 
 - (void (^)(NSProgress *downloadProgress))progressBlock {

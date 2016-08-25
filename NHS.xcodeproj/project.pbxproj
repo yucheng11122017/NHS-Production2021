@@ -43,9 +43,6 @@
 		E1A4F0E11D66BE2000EE9BBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1A4F0E01D66BE2000EE9BBB /* Assets.xcassets */; };
 		E1A987441D4327FE005FC83D /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873A1D4327FE005FC83D /* Assets */; };
 		E1A987491D4327FE005FC83D /* iPhone-Storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1A9873F1D4327FE005FC83D /* iPhone-Storyboard */; };
-		E1A9874A1D4327FE005FC83D /* LoginDemo in Resources */ = {isa = PBXBuildFile; fileRef = E1A987401D4327FE005FC83D /* LoginDemo */; };
-		E1A9874B1D4327FE005FC83D /* ModalForm in Resources */ = {isa = PBXBuildFile; fileRef = E1A987411D4327FE005FC83D /* ModalForm */; };
-		E1A9874C1D4327FE005FC83D /* Payment in Resources */ = {isa = PBXBuildFile; fileRef = E1A987421D4327FE005FC83D /* Payment */; };
 		E1A9874D1D4327FE005FC83D /* Source in Resources */ = {isa = PBXBuildFile; fileRef = E1A987431D4327FE005FC83D /* Source */; };
 		E1E6909A1D4345FC007FEC1C /* Clinical Results.json in Resources */ = {isa = PBXBuildFile; fileRef = E1E690971D4345FC007FEC1C /* Clinical Results.json */; };
 		E1E6909B1D4345FC007FEC1C /* Neighbourhood.json in Resources */ = {isa = PBXBuildFile; fileRef = E1E690981D4345FC007FEC1C /* Neighbourhood.json */; };
@@ -135,9 +132,6 @@
 		E1A4F0E01D66BE2000EE9BBB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E1A9873A1D4327FE005FC83D /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
 		E1A9873F1D4327FE005FC83D /* iPhone-Storyboard */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "iPhone-Storyboard"; sourceTree = "<group>"; };
-		E1A987401D4327FE005FC83D /* LoginDemo */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LoginDemo; sourceTree = "<group>"; };
-		E1A987411D4327FE005FC83D /* ModalForm */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ModalForm; sourceTree = "<group>"; };
-		E1A987421D4327FE005FC83D /* Payment */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Payment; sourceTree = "<group>"; };
 		E1A987431D4327FE005FC83D /* Source */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Source; sourceTree = "<group>"; };
 		E1E690971D4345FC007FEC1C /* Clinical Results.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "Clinical Results.json"; path = "Screening JSON/Clinical Results.json"; sourceTree = "<group>"; };
 		E1E690981D4345FC007FEC1C /* Neighbourhood.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = Neighbourhood.json; path = "Screening JSON/Neighbourhood.json"; sourceTree = "<group>"; };
@@ -267,9 +261,6 @@
 			children = (
 				E1A9873A1D4327FE005FC83D /* Assets */,
 				E1A9873F1D4327FE005FC83D /* iPhone-Storyboard */,
-				E1A987401D4327FE005FC83D /* LoginDemo */,
-				E1A987411D4327FE005FC83D /* ModalForm */,
-				E1A987421D4327FE005FC83D /* Payment */,
 				E1A987431D4327FE005FC83D /* Source */,
 				E120E4051D431E9B002DBC7E /* NHS */,
 				E120E41F1D431E9B002DBC7E /* NHSTests */,
@@ -493,11 +484,8 @@
 				E1E6909B1D4345FC007FEC1C /* Neighbourhood.json in Resources */,
 				E1A987441D4327FE005FC83D /* Assets in Resources */,
 				E1A987491D4327FE005FC83D /* iPhone-Storyboard in Resources */,
-				E1A9874B1D4327FE005FC83D /* ModalForm in Resources */,
 				E1334EE21D432B5800A43539 /* Login.json in Resources */,
 				E1E6909C1D4345FC007FEC1C /* Residents Particulars.json in Resources */,
-				E1A9874A1D4327FE005FC83D /* LoginDemo in Resources */,
-				E1A9874C1D4327FE005FC83D /* Payment in Resources */,
 				8E0852581D6DCCD7006E68FE /* blankScreeningForm.json in Resources */,
 				E1334EE31D432B5800A43539 /* Pre-registration.json in Resources */,
 				E120E4111D431E9B002DBC7E /* Main.storyboard in Resources */,
@@ -759,7 +747,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -798,7 +786,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -816,7 +804,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = NHS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = edu.nus.nhs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -834,7 +822,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = NHS/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = edu.nus.nhs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
