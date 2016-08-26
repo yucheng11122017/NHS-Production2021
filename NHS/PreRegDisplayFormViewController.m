@@ -258,9 +258,12 @@ typedef enum preRegSection {
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qPrefDate rowType:XLFormRowDescriptorTypeDateInline title:@"Preferred Date"];
     row.required = YES;
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    
     dateFormatter.dateFormat = @"yyyy-MM-dd";
+    NSDate *oneDayBehind = [dateFormatter dateFromString:[others_prereg objectForKey:@"pref_date"]];
+    NSDate *correctDate = [NSDate dateWithTimeInterval:60*60*8 sinceDate:oneDayBehind];
     if ([others_prereg objectForKey:@"pref_date"] != (id)[NSNull null]) {
-        row.value = [dateFormatter dateFromString:[others_prereg objectForKey:@"pref_date"]];
+        row.value = correctDate;
 
     }
     [section addFormRow:row];
