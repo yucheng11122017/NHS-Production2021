@@ -170,7 +170,8 @@
     self.passwordField.text = @"";
     
     // submit credentials
-    NSString *url = @"https://nus-nhs.ml/volunteerLogin";
+//    NSString *url = @"https://nus-nhs.ml/volunteerLogin"; //for DEV
+    NSString *url = @"https://nhs-som.nus.edu.sg/volunteerLogin";
     NSDictionary *dict = @{ @"username" : username, @"passkey" : passkey };
     NSDictionary *dataDict = @{ @"data" : dict };
     

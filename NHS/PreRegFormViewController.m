@@ -164,6 +164,7 @@ typedef enum preRegSection {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLangOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
     row.required = NO;
+    row.value = [self.retrievedPatientDictionary objectForKey:kSpokenLangOthers]? [self.retrievedPatientDictionary objectForKey:kSpokenLangOthers]:@"" ;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", spokenLangRow];
     [section addFormRow:row];
     
@@ -276,13 +277,14 @@ typedef enum preRegSection {
         if (self.patientDataLocalOrServer == [NSNumber numberWithInt:local]) {
             NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
             NSString *documentsDirectory = [paths objectAtIndex:0];
+            NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Pre-registration"];
             NSFileManager *fileManager = [[NSFileManager alloc] init];
-            NSArray *localFiles = [fileManager contentsOfDirectoryAtPath:documentsDirectory
+            NSArray *localFiles = [fileManager contentsOfDirectoryAtPath:folderPath
                                                                    error:nil];
             NSString *filename = [localFiles objectAtIndex:[self.patientLocalFileIndex intValue]];
-            self.loadedFilepath = [[NSString alloc] initWithString:[documentsDirectory stringByAppendingPathComponent:filename]];
+            self.loadedFilepath = [[NSString alloc] initWithString:[folderPath stringByAppendingPathComponent:filename]];
             self.retrievedPatientDictionary = [NSDictionary dictionaryWithContentsOfFile:self.loadedFilepath];
-            NSLog(@"%@", self.retrievedPatientDictionary);
+            NSLog(@"Retrieved Dictionary from Local File:\n%@", self.retrievedPatientDictionary);
         }
     } else {
         //do nothing
@@ -300,6 +302,9 @@ typedef enum preRegSection {
         style:UIAlertActionStyleDestructive
         handler:^(UIAlertAction * deleteDraftAction) {
             [self deleteDraft];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                                                                object:nil
+                                                              userInfo:nil];
             [self.navigationController popViewControllerAnimated:YES];
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
@@ -308,11 +313,23 @@ typedef enum preRegSection {
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save Draft", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * saveDraftAction) {
-                                                          [self saveDraft];
-                                                          [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
-                                                                 object:nil
-                                                                  userInfo:nil];
-                                                          [self.navigationController popViewControllerAnimated:YES];
+                                                          if ([[self.form formValues] objectForKey:kNRIC] == (id)[NSNull null] || [[[self.form formValues] objectForKey:kNRIC] isEqualToString:@""]) {
+                                                              UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Invalid Save", nil)
+                                                                                                                                        message:@"NRIC cannot be empty for saving."
+                                                                                                                                 preferredStyle:UIAlertControllerStyleAlert];
+                                                              
+                                                              [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                                                                                  style:UIAlertActionStyleDefault
+                                                                                                                handler:^(UIAlertAction * okAction) {
+                                                                                                                }]];
+                                                              [self presentViewController:alertController animated:YES completion:nil];
+                                                          } else {
+                                                              [self saveDraft];
+                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                                                                                                                  object:nil
+                                                                                                                userInfo:nil];
+                                                              [self.navigationController popViewControllerAnimated:YES];
+                                                          }
                                                       }]];
     [self presentViewController:alertController animated:YES completion:nil];
 }
@@ -376,6 +393,7 @@ typedef enum preRegSection {
 #pragma mark UIAlertAction methods
 
 - (void) saveDraft {
+    
     NSMutableDictionary *formValuesDict = [[self.form formValues] mutableCopy];
     if ([formValuesDict objectForKey:kName] == [NSNull null])        //if NULL, cannot store in local directory
         [formValuesDict removeObjectForKey:kName];
@@ -393,8 +411,12 @@ typedef enum preRegSection {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     NSString *filename = [nric stringByAppendingString:ts]; //Eg. S12313K_datetime
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];
+    NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Pre-registration"];
     
+    NSError *error;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:folderPath])
+    [[NSFileManager defaultManager] createDirectoryAtPath:folderPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+    NSString *filePath = [folderPath stringByAppendingPathComponent:filename];
     //Save the form locally on the iPhone
     [formValuesDict writeToFile:filePath atomically:YES];
 }
@@ -402,9 +424,10 @@ typedef enum preRegSection {
 - (void) deleteDraft {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *nric = [[self.form formValues] objectForKey:@"nric"];
+    NSString *nric = [[self.form formValues] objectForKey:kNRIC];
     NSFileManager *fileManager = [[NSFileManager alloc] init];
-    NSArray *localSavedFilenames = [fileManager contentsOfDirectoryAtPath:documentsDirectory
+    NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Pre-registration"];
+    NSArray *localSavedFilenames = [fileManager contentsOfDirectoryAtPath:folderPath
                                                                error:nil];
     NSString *filename;
     for (NSString* item in localSavedFilenames)
@@ -414,11 +437,13 @@ typedef enum preRegSection {
         else
             return;     //nothing to delete
     }
-    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:filename];
+    NSString *filePath = [folderPath stringByAppendingPathComponent:filename];
+    
     NSError *error;
     BOOL success = [fileManager removeItemAtPath:filePath error:&error];
     if (success) {
         NSLog(@"Draft deleted!");
+        
     }
     else
     {
@@ -544,11 +569,7 @@ typedef enum preRegSection {
             [self presentViewController:alertController animated:YES completion:nil];
             
         }
-        
-        
-        
-        
-//        [self saveDraft];
+
     };
 }
 
@@ -652,12 +673,15 @@ typedef enum preRegSection {
     contactInfoDict = @{@"contact_info":dict};
     
     NSMutableArray *otherServicesArray = [[NSMutableArray alloc] initWithArray:[[self.form formValues]objectForKey:@"otherservices"]];
-    [otherServicesArray removeObjectsInRange:NSMakeRange(0, 4)];
-#warning though the code is ready, yet API no where to insert other required services.
+    [otherServicesArray removeObjectsInRange:NSMakeRange(0, 4)];    //remove the first four row values
+    
     NSString *otherServices = @"";
-    if([otherServicesArray count] > 1) {
+    if([otherServicesArray count] == 1) {
         otherServices = [otherServicesArray objectAtIndex:0];
+    } else if ([otherServicesArray count] > 1) {
+        otherServices = [[otherServicesArray valueForKey:@"description"] componentsJoinedByString:@","];
     }
+    
     //Required Services
     localDateTime = [NSDate dateWithTimeInterval:1.0 sinceDate:localDateTime];      //add a second
     dict = @{@"resident_id":self.resident_id,

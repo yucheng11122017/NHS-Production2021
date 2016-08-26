@@ -8,7 +8,8 @@
 
 #import "ServerComm.h"
 
-#define baseURL @"https://nus-nhs.ml/"
+//#define baseURL @"https://nus-nhs.ml/"        //for Development
+#define baseURL @"https://nhs-som.nus.edu.sg/"
 
 @interface ServerComm ()
 

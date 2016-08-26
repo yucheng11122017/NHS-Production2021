@@ -199,10 +199,13 @@ typedef enum preRegSection {
     [section addFormRow:row];
     
     // Required Services - Section
-    //    section = [XLFormSectionDescriptor formSectionWithTitle:@"Required Services"];
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Required Services"
-                                             sectionOptions:XLFormSectionOptionCanInsert
-                                          sectionInsertMode:XLFormSectionInsertModeButton];
+    if ((required_services != (id)[NSNull null])&&([required_services objectForKey:@"other_services"] != (id)[NSNull null]) && (![[required_services objectForKey:@"other_services"] isEqualToString:@""])) {
+        section = [XLFormSectionDescriptor formSectionWithTitle:@"Required Services"];    
+    } else {
+        section = [XLFormSectionDescriptor formSectionWithTitle:@"Required Services"
+                                                 sectionOptions:XLFormSectionOptionCanInsert
+                                              sectionInsertMode:XLFormSectionInsertModeButton];
+    }
     [self.formDescriptor addFormSection:section];
     
     
@@ -231,22 +234,25 @@ typedef enum preRegSection {
     [section addFormRow:row];
     
     if (required_services != (id)[NSNull null]) {
-        if ([required_services objectForKey:@"other_services"] != (id)[NSNull null]) {
-            if ([[required_services objectForKey:@"other_services"] isEqualToString:@"1"]) {    //only if database indicate that the other_services was indeed inserted...
-                row = [XLFormRowDescriptor formRowDescriptorWithTag:qInsertedOtherReqServ rowType:XLFormRowDescriptorTypeText];
-                row.value = @"Extra";
-                [section addFormRow:row];
-            }
+        if (([required_services objectForKey:@"other_services"] != (id)[NSNull null]) && (![[required_services objectForKey:@"other_services"] isEqualToString:@""])) {
+            
+            row = [XLFormRowDescriptor formRowDescriptorWithTag:qReqServOthers rowType:XLFormRowDescriptorTypeText];
+            row.value = [required_services objectForKey:@"other_services"];
+            [section addFormRow:row];
+        } else {
+            row = [XLFormRowDescriptor formRowDescriptorWithTag:qReqServOthers rowType:XLFormRowDescriptorTypeText];
+            [[row cellConfig] setObject:@"Add other services" forKey:@"textField.placeholder"];
+            section.multivaluedRowTemplate = row;
         }
+    } else {
+        row = [XLFormRowDescriptor formRowDescriptorWithTag:qReqServOthers rowType:XLFormRowDescriptorTypeText];
+        [[row cellConfig] setObject:@"Add other services" forKey:@"textField.placeholder"];
+        section.multivaluedRowTemplate = row;
     }
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:qReqServOthers rowType:XLFormRowDescriptorTypeText];
-    [[row cellConfig] setObject:@"Add other services" forKey:@"textField.placeholder"];
-    section.multivaluedRowTemplate = row;
     
     // Others - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Others"];
     [self.formDescriptor addFormSection:section];
-    
     
     // Date
     row = [XLFormRowDescriptor formRowDescriptorWithTag:qPrefDate rowType:XLFormRowDescriptorTypeDateInline title:@"Preferred Date"];
@@ -320,6 +326,7 @@ typedef enum preRegSection {
                     cell.backgroundColor = [UIColor whiteColor];
                 }];
             }];
+            [self showFormValidationError:[validationErrors firstObject]];
             return;
         }
         //    if (validationErrors.count > 0){
@@ -456,24 +463,24 @@ typedef enum preRegSection {
 #pragma mark - prepare JSON methods
 - (NSArray *) getSpokenLangArray: (NSDictionary *) spoken_lang {
     NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
-    if([[spoken_lang objectForKey:@"lang_canto"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
-    if([[spoken_lang objectForKey:@"lang_english"] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
-    if([[spoken_lang objectForKey:@"lang_hindi"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
-    if([[spoken_lang objectForKey:@"lang_hokkien"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
-    if([[spoken_lang objectForKey:@"lang_malay"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
-    if([[spoken_lang objectForKey:@"lang_mandrin"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
-    if([[spoken_lang objectForKey:@"lang_others"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
-    if([[spoken_lang objectForKey:@"lang_tamil"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
-    if([[spoken_lang objectForKey:@"lang_teochew"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
+    if([[spoken_lang objectForKey:@"lang_canto"] isEqualToNumber:@1]) [spokenLangArray addObject:@"Cantonese"];
+    if([[spoken_lang objectForKey:@"lang_english"] isEqualToNumber:@1]) [spokenLangArray addObject:@"English"];
+    if([[spoken_lang objectForKey:@"lang_hindi"] isEqualToNumber:@1]) [spokenLangArray addObject:@"Hindi"];
+    if([[spoken_lang objectForKey:@"lang_hokkien"] isEqualToNumber:@1]) [spokenLangArray addObject:@"Hokkien"];
+    if([[spoken_lang objectForKey:@"lang_malay"] isEqualToNumber:@1]) [spokenLangArray addObject:@"Malay"];
+    if([[spoken_lang objectForKey:@"lang_mandrin"] isEqualToNumber:@1]) [spokenLangArray addObject:@"Mandarin"];
+    if([[spoken_lang objectForKey:@"lang_others"] isEqualToNumber:@1]) [spokenLangArray addObject:@"Others"];
+    if([[spoken_lang objectForKey:@"lang_tamil"] isEqualToNumber:@1]) [spokenLangArray addObject:@"Tamil"];
+    if([[spoken_lang objectForKey:@"lang_teochew"] isEqualToNumber:@1]) [spokenLangArray addObject:@"Teochew"];
     
     return spokenLangArray;
 }
 
 - (NSArray *) getPreferredTimeArray: (NSDictionary *) others_prereg {
     NSMutableArray *preferredTimeArray = [[NSMutableArray alloc] init];
-    if([[others_prereg objectForKey:@"time_slot_9_11"] isEqualToString:@"1"]) [preferredTimeArray addObject:@"9-11"];
-    if([[others_prereg objectForKey:@"time_slot_11_1"] isEqualToString:@"1"]) [preferredTimeArray addObject:@"11-1"];
-    if([[others_prereg objectForKey:@"time_slot_1_3"] isEqualToString:@"1"]) [preferredTimeArray addObject:@"1-3"];
+    if([[others_prereg objectForKey:@"time_slot_9_11"] isEqualToNumber:@1]) [preferredTimeArray addObject:@"9-11"];
+    if([[others_prereg objectForKey:@"time_slot_11_1"] isEqualToNumber:@1]) [preferredTimeArray addObject:@"11-1"];
+    if([[others_prereg objectForKey:@"time_slot_1_3"] isEqualToNumber:@1]) [preferredTimeArray addObject:@"1-3"];
     
     return preferredTimeArray;
 }
@@ -574,13 +581,16 @@ typedef enum preRegSection {
              };
     
     contactInfoDict = @{@"contact_info":dict};
-    
-    NSMutableArray *otherServicesArray = [[NSMutableArray alloc] initWithArray:[[self.form formValues]objectForKey:@"otherservices"]];
-    [otherServicesArray removeObjectsInArray:@[@0,@0,@0,@0]];
-#warning though the code is ready, yet API no where to insert other required services.
-    NSString *otherServices = @"0";
-    if([otherServicesArray count] > 1) {
-        otherServices = @"1";
+//#warning
+//    NSMutableArray *otherServicesArray = [[NSMutableArray alloc] initWithArray:[[self.form formValues]objectForKey:@"otherservices"]];
+//    [otherServicesArray removeObjectsInArray:@[@0,@0,@0,@0]];
+//    NSString *otherServices = @"0";
+//    if([otherServicesArray count] > 1) {
+//        otherServices = @"1";
+//    }
+    NSString *otherServices = @"";
+    if ([[self.form formValues] objectForKey:@"reqservothers"] != nil) {
+        otherServices = [[self.form formValues] objectForKey:@"reqservothers"];
     }
     //Required Services
     localDateTime = [NSDate dateWithTimeInterval:1.0 sinceDate:localDateTime];      //add a second
@@ -593,9 +603,9 @@ typedef enum preRegSection {
              @"ts":[localDateTime description]
              };
     
-    if ([[self.form formValues] objectForKey:@"reqservothers"] != nil) {        //check if it's added first..
-        [dict setValue:[[self.form formValues] objectForKey:@"reqservothers"] forKey:@"other_services"];
-    }
+//    if ([[self.form formValues] objectForKey:@"reqservothers"] != nil) {        //check if it's added first..
+//        [dict setValue:[[self.form formValues] objectForKey:@"reqservothers"] forKey:@"other_services"];
+//    }
     
     reqServDict = @{@"required_services":dict};
     

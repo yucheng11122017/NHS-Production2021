@@ -80,8 +80,8 @@ typedef enum getDataState {
     
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(refreshTable:)
-                                                 name:@"refreshScreeningResidentTable"
+                                             selector:@selector(refreshPreRegResidentTable:)
+                                                 name:@"refreshPreRegPatientTable"
                                                object:nil];
     
     _resultsTableController = [[SearchResultsTableController alloc] init];
@@ -140,11 +140,15 @@ typedef enum getDataState {
     // Dispose of any resources that can be recreated.
 }
 
+- (void)refreshPreRegResidentTable:(NSNotification *) notification{
+    NSLog(@"refresh");
+    [self getLocalSavedData];
+    [self refreshConnectionAndTable];
+}
+
 - (void) refreshConnectionAndTable {
     status = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
     [self processConnectionStatus];
-    
-    
 }
 
 - (void) processConnectionStatus {
@@ -324,6 +328,23 @@ typedef enum getDataState {
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
+        if ([self.localSavedFilename count] > 0) {
+            if (indexPath.section == 0) {   //meaning, drafts
+                NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+                NSString *documentsDirectory = [paths objectAtIndex:0];
+                NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Pre-registration"];
+                
+                NSFileManager *fileManager = [[NSFileManager alloc] init];
+                NSString *filePath = [folderPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@", [self.localSavedFilename objectAtIndex:indexPath.row]]];
+                [fileManager removeItemAtPath:filePath error:NULL];
+                UIAlertView *removeSuccessFulAlert=[[UIAlertView alloc]initWithTitle:@"Delete" message:@"Local Draft deleted!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                [removeSuccessFulAlert show];
+                [self getLocalSavedData];   //no need to reload online content
+                [self.tableView reloadData];
+                return;
+            }
+        }
+        
         // Delete the row from the data source
         NSDictionary *residentInfo = [self findResidentInfoFromSectionRow:indexPath];
         [self deleteResident:[residentInfo objectForKey:@"resident_id"]];
@@ -402,7 +423,6 @@ typedef enum getDataState {
         self.residents = [[self.residents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
         
         for (i=0; i<[self.residents count]; i++) {
-            NSLog(@"%d", i);
             [self.residentNames addObject:[[self.residents objectAtIndex:i] objectForKey:@"resident_name"]];
             [self.residentRegTimestamp addObject:[[self.residents objectAtIndex:i] objectForKey:@"last_updated_ts"]];
         }
@@ -463,8 +483,10 @@ typedef enum getDataState {
 - (void)getLocalSavedData {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Pre-registration"];
+    
     NSFileManager *fileManager = [[NSFileManager alloc] init];
-    self.localSavedFilename = [fileManager contentsOfDirectoryAtPath:documentsDirectory
+    self.localSavedFilename = [fileManager contentsOfDirectoryAtPath:folderPath
                                                       error:nil];
 }
 
@@ -763,6 +785,9 @@ typedef enum getDataState {
         [segue.destinationViewController performSelector:@selector(setPatientDataLocalOrServer:)
                                               withObject:residentDataLocalOrServer];
         [segue.destinationViewController performSelector:@selector(setLoadDataFlag:) withObject:[NSNumber numberWithBool:loadDataFlag]];
+    }
+    if ([segue.destinationViewController respondsToSelector:@selector(setPatientDataLocalOrServer:)]) {
+        [segue.destinationViewController performSelector:@selector(setPatientLocalFileIndex:) withObject:selectedResidentID];
     }
     
 }
