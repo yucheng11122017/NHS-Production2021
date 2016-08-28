@@ -546,7 +546,7 @@ NSString *const kDocName = @"doc_name";
     spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLanguage rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language"];
     spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
     row.required = YES;
-        spokenLangRow.value = spoken_lang_value? spoken_lang_value:@[] ;
+    spokenLangRow.value = spoken_lang_value? spoken_lang_value:@[];
     [section addFormRow:spokenLangRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLangOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
@@ -689,25 +689,25 @@ NSString *const kDocName = @"doc_name";
     [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *systolic_1;
-    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic rowType:XLFormRowDescriptorTypeNumber title:@"BP (1. Systolic number)"];
+    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic rowType:XLFormRowDescriptorTypeInteger title:@"BP (1. Systolic number)"];
     systolic_1.required = YES;
     systolic_1.value = @0;
     [section addFormRow:systolic_1];
     
     XLFormRowDescriptor *diastolic_1;
-    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic rowType:XLFormRowDescriptorTypeNumber title:@"BP (2. Diastolic number)"];
+    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic rowType:XLFormRowDescriptorTypeInteger title:@"BP (2. Diastolic number)"];
     diastolic_1.required = YES;
     diastolic_1.value = @0;
     [section addFormRow:diastolic_1];
     
     XLFormRowDescriptor *height;
-    height = [XLFormRowDescriptor formRowDescriptorWithTag:kHeight rowType:XLFormRowDescriptorTypeNumber title:@"Height (cm)"];
+    height = [XLFormRowDescriptor formRowDescriptorWithTag:kHeight rowType:XLFormRowDescriptorTypeInteger title:@"Height (cm)"];
     height.required = YES;
     height.value = @0;
     [section addFormRow:height];
     
     XLFormRowDescriptor *weight;
-    weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeight rowType:XLFormRowDescriptorTypeNumber title:@"Weight (kg)"];
+    weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeight rowType:XLFormRowDescriptorTypeInteger title:@"Weight (kg)"];
     weight.required = YES;
     weight.value = @0;
     [section addFormRow:weight];
@@ -736,13 +736,13 @@ NSString *const kDocName = @"doc_name";
     };
     
     XLFormRowDescriptor *waist;
-    waist = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistCircum rowType:XLFormRowDescriptorTypeNumber title:@"Waist Circumference (cm)"];
+    waist = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistCircum rowType:XLFormRowDescriptorTypeInteger title:@"Waist Circumference (cm)"];
     waist.required = YES;
     waist.value = @0;
     [section addFormRow:waist];
     
     XLFormRowDescriptor *hip;
-    hip = [XLFormRowDescriptor formRowDescriptorWithTag:kHipCircum rowType:XLFormRowDescriptorTypeNumber title:@"Hip Circumference (cm)"];
+    hip = [XLFormRowDescriptor formRowDescriptorWithTag:kHipCircum rowType:XLFormRowDescriptorTypeInteger title:@"Hip Circumference (cm)"];
     hip.required = YES;
     hip.value = @0;
     [section addFormRow:hip];
@@ -776,13 +776,13 @@ NSString *const kDocName = @"doc_name";
     };
     
     XLFormRowDescriptor *systolic_2;
-    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic2 rowType:XLFormRowDescriptorTypeNumber title:@"Repeat BP Taking (2nd Systolic)"];
+    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic2 rowType:XLFormRowDescriptorTypeInteger title:@"Repeat BP Taking (2nd Systolic)"];
     systolic_2.required = YES;
     systolic_2.value = @0;
     [section addFormRow:systolic_2];
     
     XLFormRowDescriptor *diastolic_2;
-    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic2 rowType:XLFormRowDescriptorTypeNumber title:@"Repeat BP Taking (2nd Diastolic)"];
+    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic2 rowType:XLFormRowDescriptorTypeInteger title:@"Repeat BP Taking (2nd Diastolic)"];
     diastolic_2.required = YES;
     diastolic_2.value = @0;
     [section addFormRow:diastolic_2];
@@ -824,12 +824,12 @@ NSString *const kDocName = @"doc_name";
         }
     };
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic3 rowType:XLFormRowDescriptorTypeNumber title:@"Repeat BP Taking (3rd Systolic)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic3 rowType:XLFormRowDescriptorTypeInteger title:@"Repeat BP Taking (3rd Systolic)"];
     row.required = NO;
     [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic3 rowType:XLFormRowDescriptorTypeNumber title:@"Repeat BP Taking (3rd Diastolic)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic3 rowType:XLFormRowDescriptorTypeInteger title:@"Repeat BP Taking (3rd Diastolic)"];
     [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
     row.required = NO;
     [section addFormRow:row];
@@ -843,6 +843,7 @@ NSString *const kDocName = @"doc_name";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Screening of Risk Factors"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
+    NSDictionary *riskFactrorsDict = [self.fullScreeningForm objectForKey:@"risk_factors"];
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
@@ -850,15 +851,17 @@ NSString *const kDocName = @"doc_name";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Exercise"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Do you participate in any form of physical activity, for at least 20 min per occasion, 3 or more days a week?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kExYesNo rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
-    row.value = @"NO";
-    [section addFormRow:row];
+    XLFormRowDescriptor *exerciseYesNoRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExYesNo rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    exerciseYesNoRow.selectorOptions = @[@"YES", @"NO"];
+    if (![[riskFactrorsDict objectForKey:kExYesNo] isEqualToString:@""]) {
+        exerciseYesNoRow.value = [[riskFactrorsDict objectForKey:kExYesNo] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    [section addFormRow:exerciseYesNoRow];
     
     
     
@@ -869,13 +872,26 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Too troublesome"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Others"]
                             ];
-    exerciseNoWhyRow.value = [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"No time"];   //default value
+    if ([exerciseYesNoRow.value isEqualToString:@"NO"]) {
+        exerciseNoWhyRow.hidden = @(0);
+    } else {
+        exerciseNoWhyRow.hidden = @(1);
+    }
+    NSArray *options = exerciseNoWhyRow.selectorOptions;
+    if (![[riskFactrorsDict objectForKey:kExNoWhy]isEqualToString:@""]) {
+        exerciseNoWhyRow.value = [options objectAtIndex:[[riskFactrorsDict objectForKey:kExNoWhy] integerValue]];
+    }
     [section addFormRow:exerciseNoWhyRow];
     
     XLFormRowDescriptor *exerciseNoOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExNoOthers
                                                 rowType:XLFormRowDescriptorTypeTextView title:@"Others"];
     [exerciseNoOthersRow.cellConfigAtConfigure setObject:@"Type your other reasons here" forKey:@"textView.placeholder"];
-    exerciseNoOthersRow.hidden = @(1);  //default hidden
+    if ([[exerciseNoWhyRow.value formValue] isEqualToNumber:@3]) {
+        exerciseNoOthersRow.hidden = @(0);
+    } else {
+        exerciseNoOthersRow.hidden = @(1);
+    }
+    exerciseNoOthersRow.value = [riskFactrorsDict objectForKey:kExNoOthers];
     [section addFormRow:exerciseNoOthersRow];
     
     exerciseNoWhyRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -883,6 +899,17 @@ NSString *const kDocName = @"doc_name";
             if ([[newValue formValue] isEqual:@(3)]) {
                 exerciseNoOthersRow.hidden = @(0);
             } else {
+                exerciseNoOthersRow.hidden = @(1);
+            }
+        }
+    };
+    
+    exerciseYesNoRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([newValue isEqualToString:@"NO"]) {
+                exerciseNoWhyRow.hidden = @(0);
+            } else {
+                exerciseNoWhyRow.hidden = @(1);
                 exerciseNoOthersRow.hidden = @(1);
             }
         }
@@ -900,7 +927,10 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Ex-smoker, now quit"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Never smoked"]
                             ];
-//    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Never smoked"];   //default value
+    options = smokingStatusRow.selectorOptions;
+    if (![[riskFactrorsDict objectForKey:kSmoking]isEqualToString:@""]) {
+        smokingStatusRow.value = [options objectAtIndex:[[riskFactrorsDict objectForKey:kSmoking] integerValue]];
+    }
     smokingStatusRow.required = YES;
     [section addFormRow:smokingStatusRow];
     
@@ -908,40 +938,45 @@ NSString *const kDocName = @"doc_name";
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, how many years have you been smoking for?"];
     smokingNumYearsQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingNumYearsQRow.hidden = @(1);
     [section addFormRow:smokingNumYearsQRow];
     
     XLFormRowDescriptor *smokingNumYearsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingNumYears rowType:XLFormRowDescriptorTypeInteger title:@"Year(s)"];
-    smokingNumYearsRow.hidden = @(1);
+    if (![[riskFactrorsDict objectForKey:kSmokingNumYears]isEqualToString:@""]) {
+        smokingNumYearsRow.value = [riskFactrorsDict objectForKey:kSmokingNumYears];
+    }
     [section addFormRow:smokingNumYearsRow];
-    
     XLFormRowDescriptor *smokingTypeOfSmokeQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, what do you smoke? (can tick more than one option)"];
     smokingTypeOfSmokeQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingTypeOfSmokeQRow.hidden = @(1);
+
     [section addFormRow:smokingTypeOfSmokeQRow];
     
     XLFormRowDescriptor *smokingTypeOfSmokeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTypeOfSmoke rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
-    smokingTypeOfSmokeRow.selectorOptions = @[@"Cigarettes", @"Pipe", @"self-rolled leaves \"ang hoon\"", @"Shisha", @"Cigars", @"E-cigarettes", @"Others"];
-    smokingTypeOfSmokeRow.hidden = @(1);
+    smokingTypeOfSmokeRow.selectorOptions = @[@"Cigarettes", @"Pipe", @"Self-rolled leaves \"ang hoon\"", @"Shisha", @"Cigars", @"E-cigarettes", @"Others"];
+
+    NSArray *typeOfSmokeArray = [self getTypeOfSmokeFromIndivValues];
+    
+    smokingTypeOfSmokeRow.value = typeOfSmokeArray;
+    
     [section addFormRow:smokingTypeOfSmokeRow];
     
     XLFormRowDescriptor *smokingNumSticksQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, how many sticks do you smoke a day (average)?"];
     smokingNumSticksQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingNumSticksQRow.hidden = @(1);
     [section addFormRow:smokingNumSticksQRow];
     XLFormRowDescriptor *smokingNumSticksRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeNumSticks rowType:XLFormRowDescriptorTypeInteger title:@"Stick(s)"];
-    smokingNumSticksRow.hidden = @(1);
+    
+    smokingNumSticksRow.value = [riskFactrorsDict objectForKey:kSmokeNumSticks];
+    
+    
     [section addFormRow:smokingNumSticksRow];
     
     XLFormRowDescriptor *smokeAfterWakingQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, how soon after waking do you smoke your first cigarette?"];
     smokeAfterWakingQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokeAfterWakingQRow.hidden = @(1);
     [section addFormRow:smokeAfterWakingQRow];
     XLFormRowDescriptor *smokeAfterWakingRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeAfterWaking
                                                  rowType:XLFormRowDescriptorTypeSelectorActionSheet
@@ -949,85 +984,102 @@ NSString *const kDocName = @"doc_name";
     smokeAfterWakingRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Within 5 mins"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"5-30 mins"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"More than 30 mins"]];
-//    smokeAfterWakingRow.value = [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"More than 30 mins"];   //default value
-    smokeAfterWakingRow.hidden = @(1);
+    
+    options = smokeAfterWakingRow.selectorOptions;
+    if (![[riskFactrorsDict objectForKey:kSmokeAfterWaking]isEqualToString:@""]) {
+        smokeAfterWakingRow.value = [options objectAtIndex:[[riskFactrorsDict objectForKey:kSmokeAfterWaking] integerValue]];
+    }
+    
     [section addFormRow:smokeAfterWakingRow];
     
     XLFormRowDescriptor *smokingRefrainQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, do you find it difficult to refrain from smoking in places where it is forbidden/not allowed?"];
     smokingRefrainQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingRefrainQRow.hidden = @(1);
     [section addFormRow:smokingRefrainQRow];
     XLFormRowDescriptor *smokingRefrainRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingRefrain rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     smokingRefrainRow.selectorOptions = @[@"YES", @"NO"];
-    smokingRefrainRow.hidden = @(1);
+    
+    if (![[riskFactrorsDict objectForKey:kSmokingRefrain] isEqualToString:@""]) {
+        smokingRefrainRow.value = [[riskFactrorsDict objectForKey:kSmokingRefrain] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [section addFormRow:smokingRefrainRow];
     
     XLFormRowDescriptor *smokingWhichNotGiveUpQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, which cigarette would you hate to give up?"];
     smokingWhichNotGiveUpQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingWhichNotGiveUpQRow.hidden = @(1);
     [section addFormRow:smokingWhichNotGiveUpQRow];
     XLFormRowDescriptor *smokingWhichNotGiveUpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhichNotGiveUp
                                                 rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                   title:@""];
     smokingWhichNotGiveUpRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"The first in the morning"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Any other"]];
-//    smokingWhichNotGiveUpRow.value = [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"The first in the morning"];   //default value
-    smokingWhichNotGiveUpRow.hidden = @(1);
+                                                 [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Any other"]];
+    //value
+    options = smokingWhichNotGiveUpRow.selectorOptions;
+    if (![[riskFactrorsDict objectForKey:kSmokingWhichNotGiveUp]isEqualToString:@""]) {
+        smokingWhichNotGiveUpRow.value = [options objectAtIndex:[[riskFactrorsDict objectForKey:kSmokingWhichNotGiveUp] integerValue]];
+    }
+    
     [section addFormRow:smokingWhichNotGiveUpRow];
     
     XLFormRowDescriptor *smokingMornFreqQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSeven
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, do you smoke more frequently in the morning?"];
     smokingMornFreqQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingMornFreqQRow.hidden = @(1);
     [section addFormRow:smokingMornFreqQRow];
     XLFormRowDescriptor *smokingMornFreqRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingMornFreq rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     smokingMornFreqRow.selectorOptions = @[@"YES", @"NO"];
-    smokingMornFreqRow.hidden = @(1);
+    //value
+    if (![[riskFactrorsDict objectForKey:kSmokingMornFreq] isEqualToString:@""]) {
+        smokingMornFreqRow.value = [[riskFactrorsDict objectForKey:kSmokingMornFreq] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [section addFormRow:smokingMornFreqRow];
     
     XLFormRowDescriptor *smokingSickInBedQRow= [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, do you smoke even if you are sick in bed most of the day?"];
     smokingSickInBedQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingSickInBedQRow.hidden = @(1);
     [section addFormRow:smokingSickInBedQRow];
     XLFormRowDescriptor *smokingSickInBedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingSickInBed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     smokingSickInBedRow.selectorOptions = @[@"YES", @"NO"];
-    smokingSickInBedRow.hidden = @(1);
+    //value
+    if (![[riskFactrorsDict objectForKey:kSmokingSickInBed] isEqualToString:@""]) {
+        smokingSickInBedRow.value = [[riskFactrorsDict objectForKey:kSmokingSickInBed] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [section addFormRow:smokingSickInBedRow];
     
     XLFormRowDescriptor *smokingAttemptedQuitQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionNine
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, have you attempted to quit before, in the past year?"];
     smokingAttemptedQuitQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingAttemptedQuitQRow.hidden = @(1);
     [section addFormRow:smokingAttemptedQuitQRow];
     XLFormRowDescriptor *smokingAttemptedQuitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingAttemptedQuit rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     smokingAttemptedQuitRow.selectorOptions = @[@"YES", @"NO"];
-//    smokingAttemptedQuitRow.value = @"NO";
-    smokingAttemptedQuitRow.hidden = @(1);
+    
+    //value
+    if (![[riskFactrorsDict objectForKey:kSmokingAttemptedQuit] isEqualToString:@""]) {
+        smokingAttemptedQuitRow.value = [[riskFactrorsDict objectForKey:kSmokingAttemptedQuit] isEqualToString:@"1"]? @"YES":@"NO";
+    }
     [section addFormRow:smokingAttemptedQuitRow];
     
     XLFormRowDescriptor *smokingNumQuitAttemptsQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTen
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If you have attempted to quit in the past year, how many quit attempts did you make?"];
     smokingNumQuitAttemptsQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingNumQuitAttemptsQRow.hidden = @(1);
     [section addFormRow:smokingNumQuitAttemptsQRow];
     XLFormRowDescriptor *smokingNumQuitAttemptsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingNumQuitAttempts rowType:XLFormRowDescriptorTypeNumber title:@"Attempt(s)"];
-    smokingNumQuitAttemptsRow.hidden = @(1);
+    //value
+    smokingNumQuitAttemptsRow.value = [riskFactrorsDict objectForKey:kSmokingNumQuitAttempts];
     [section addFormRow:smokingNumQuitAttemptsRow];
     
     XLFormRowDescriptor *smokingIntentionsToCutQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEleven
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If smoking currently, what are your intentions towards quitting/cutting down in the forseeable future?"];
     smokingIntentionsToCutQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingIntentionsToCutQRow.hidden = @(1);
     [section addFormRow:smokingIntentionsToCutQRow];
     XLFormRowDescriptor *smokingIntentionsToCutRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingIntentionsToCut
                                                 rowType:XLFormRowDescriptorTypeSelectorActionSheet
@@ -1037,15 +1089,18 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I do not plan to quit, but I intend to cut down"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I do not plan to quit or cut down"]
                             ];
-//    smokingIntentionsToCutRow.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I do not plan to quit or cut down"];   //default value
-    smokingIntentionsToCutRow.hidden = @(1);
+    //value
+    options = smokingIntentionsToCutRow.selectorOptions;
+    if (![[riskFactrorsDict objectForKey:kSmokingIntentionsToCut]isEqualToString:@""]) {
+        smokingIntentionsToCutRow.value = [options objectAtIndex:[[riskFactrorsDict objectForKey:kSmokingIntentionsToCut] integerValue]];
+    }
+    
     [section addFormRow:smokingIntentionsToCutRow];
 
     XLFormRowDescriptor *smokingHowQuitQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwelve
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If ex-smoker, how did you quit smoking? (can tick more than one)"];
     smokingHowQuitQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingHowQuitQRow.hidden = @(1);
     [section addFormRow:smokingHowQuitQRow];
     XLFormRowDescriptor *smokingHowQuitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingHowQuit rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
     smokingHowQuitRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"By myself"],
@@ -1054,19 +1109,34 @@ NSString *const kDocName = @"doc_name";
                                          [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"With encouragement of family/friends"],
                                         [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Others"]];
   
-    smokingHowQuitRow.hidden = @(1);
+    //value
+    options = smokingHowQuitRow.selectorOptions;
+    if (![[riskFactrorsDict objectForKey:kSmokingHowQuit]isEqualToString:@""]) {
+        smokingHowQuitRow.value = [options objectAtIndex:[[riskFactrorsDict objectForKey:kSmokingHowQuit] integerValue]];
+    }
+    
     [section addFormRow:smokingHowQuitRow];
     
     XLFormRowDescriptor *smokingHowQuitOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingHowQuitOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
-    smokingHowQuitOthersRow.hidden = @(1);
+    //value
+    smokingHowQuitOthersRow.value = [riskFactrorsDict objectForKey:kSmokingHowQuitOthers];
+    
     [section addFormRow:smokingHowQuitOthersRow];
     
+    if ([[smokingHowQuitRow.value formValue] isEqual:@(4)]) {
+            smokingHowQuitOthersRow.hidden = @(0);
+    }
+    else {
+        smokingHowQuitOthersRow.hidden = @(1);
+    }
     smokingHowQuitRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([[newValue formValue] isEqual:@(4)]) {  //others option
-                smokingHowQuitOthersRow.hidden = @(0);
-            } else {
-                smokingHowQuitOthersRow.hidden = @(1);
+        if (newValue != (id)[NSNull null]) {
+            if (oldValue != newValue) {
+                if ([[newValue formValue] isEqual:@(4)]) {  //others option
+                    smokingHowQuitOthersRow.hidden = @(0);
+                } else {
+                    smokingHowQuitOthersRow.hidden = @(1);
+                }
             }
         }
     };
@@ -1075,7 +1145,6 @@ NSString *const kDocName = @"doc_name";
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If ex-smoker, why did you choose to quit? (can tick more than one)"];
     smokingWhyQuitQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    smokingWhyQuitQRow.hidden = @(1);
     [section addFormRow:smokingWhyQuitQRow];
     XLFormRowDescriptor *smokingWhyQuitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhyQuit rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
     smokingWhyQuitRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"By myself"],
@@ -1084,23 +1153,136 @@ NSString *const kDocName = @"doc_name";
                                           [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Family/friends' advice"],
                                           [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Too expensive"],
                                           [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Others"]];
-    smokingWhyQuitRow.hidden = @(1);
+    
+    options = smokingWhyQuitRow.selectorOptions;
+    if (![[riskFactrorsDict objectForKey:kSmokingWhyQuit]isEqualToString:@""]) {
+        smokingWhyQuitRow.value = [options objectAtIndex:[[riskFactrorsDict objectForKey:kSmokingWhyQuit] integerValue]];
+    }
+    
     [section addFormRow:smokingWhyQuitRow];
     
     XLFormRowDescriptor *smokingWhyQuitOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokingWhyQuitOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
-    smokingWhyQuitOthersRow.hidden = @(1);
+    //value
+    smokingWhyQuitOthersRow.value = [riskFactrorsDict objectForKey:kSmokingWhyQuitOthers];
+    
     [section addFormRow:smokingWhyQuitOthersRow];
+    
+    if ([[smokingWhyQuitRow.value formValue] isEqual:@(5)]) {
+        smokingWhyQuitOthersRow.hidden = @(0);
+    }
+    else {
+        smokingWhyQuitOthersRow.hidden = @(1);
+    }
     
     smokingWhyQuitRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if (oldValue != newValue) {
-            if ([[newValue formValue] isEqual:@(5)]) {  //others option
-                smokingWhyQuitOthersRow.hidden = @(0);
-            } else {
-                smokingWhyQuitOthersRow.hidden = @(1);
+            if (newValue != (id)[NSNull null]) {
+                if ([[newValue formValue] isEqual:@(5)]) {  //others option
+                    smokingWhyQuitOthersRow.hidden = @(0);
+                } else {
+                    smokingWhyQuitOthersRow.hidden = @(1);
+                }
             }
         }
     };
     
+
+    if (([[smokingStatusRow.value formValue] isEqual:@(0)])||([[smokingStatusRow.value formValue] isEqual:@(1)])) {
+        smokingNumYearsQRow.hidden = @(0);  //show
+        smokingNumYearsRow.hidden = @(0);
+        smokingTypeOfSmokeQRow.hidden = @(0);
+        smokingTypeOfSmokeRow.hidden = @(0);
+        smokingNumSticksQRow.hidden = @(0);
+        smokingNumSticksRow.hidden = @(0);
+        smokeAfterWakingQRow.hidden = @(0);
+        smokeAfterWakingRow.hidden = @(0);
+        smokingRefrainQRow.hidden = @(0);
+        smokingRefrainRow.hidden = @(0);
+        smokingWhichNotGiveUpQRow.hidden = @(0);
+        smokingWhichNotGiveUpRow.hidden = @(0);
+        smokingMornFreqQRow.hidden = @(0);
+        smokingMornFreqRow.hidden = @(0);
+        smokingSickInBedQRow.hidden = @(0);
+        smokingSickInBedRow.hidden = @(0);
+        smokingAttemptedQuitQRow.hidden = @(0);
+        smokingAttemptedQuitRow.hidden = @(0);
+        smokingNumQuitAttemptsQRow.hidden = @(0);
+        smokingNumQuitAttemptsRow.hidden = @(0);
+        smokingIntentionsToCutQRow.hidden = @(0);
+        smokingIntentionsToCutRow.hidden = @(0);
+        
+//        //hide ex-smoker portion
+        smokingHowQuitQRow.hidden = @(1);
+        smokingHowQuitRow.hidden = @(1);
+        smokingHowQuitOthersRow.hidden = @(1);
+        smokingWhyQuitQRow.hidden = @(1);
+        smokingWhyQuitRow.hidden = @(1);
+        smokingWhyQuitOthersRow.hidden = @(1);
+    }
+    else if([[smokingStatusRow.value formValue] isEqual:@(2)]) {    //ex-smoker
+        
+        //hide smoking currently rows
+        smokingNumYearsQRow.hidden = @(1);
+        smokingNumYearsRow.hidden = @(1);
+        smokingTypeOfSmokeQRow.hidden = @(1);
+        smokingTypeOfSmokeRow.hidden = @(1);
+        smokingNumSticksQRow.hidden = @(1);
+        smokingNumSticksRow.hidden = @(1);
+        smokeAfterWakingQRow.hidden = @(1);
+        smokeAfterWakingRow.hidden = @(1);
+        smokingRefrainQRow.hidden = @(1);
+        smokingRefrainRow.hidden = @(1);
+        smokingWhichNotGiveUpQRow.hidden = @(1);
+        smokingWhichNotGiveUpRow.hidden = @(1);
+        smokingMornFreqQRow.hidden = @(1);
+        smokingMornFreqRow.hidden = @(1);
+        smokingSickInBedQRow.hidden = @(1);
+        smokingSickInBedRow.hidden = @(1);
+        smokingAttemptedQuitQRow.hidden = @(1);
+        smokingAttemptedQuitRow.hidden = @(1);
+        smokingNumQuitAttemptsQRow.hidden = @(1);
+        smokingNumQuitAttemptsRow.hidden = @(1);
+        smokingIntentionsToCutQRow.hidden = @(1);
+        smokingIntentionsToCutRow.hidden = @(1);
+        
+        //show ex-smoker rows
+        smokingHowQuitQRow.hidden = @(0);
+        smokingHowQuitRow.hidden = @(0);
+        smokingWhyQuitQRow.hidden = @(0);
+        smokingWhyQuitRow.hidden = @(0);
+    }
+    else {
+        smokingNumYearsQRow.hidden = @(1);  //hide
+        smokingNumYearsRow.hidden = @(1);
+        smokingTypeOfSmokeQRow.hidden = @(1);
+        smokingTypeOfSmokeRow.hidden = @(1);
+        smokingNumSticksQRow.hidden = @(1);
+        smokingNumSticksRow.hidden = @(1);
+        smokeAfterWakingQRow.hidden = @(1);
+        smokeAfterWakingRow.hidden = @(1);
+        smokingRefrainQRow.hidden = @(1);
+        smokingRefrainRow.hidden = @(1);
+        smokingWhichNotGiveUpQRow.hidden = @(1);
+        smokingWhichNotGiveUpRow.hidden = @(1);
+        smokingMornFreqQRow.hidden = @(1);
+        smokingMornFreqRow.hidden = @(1);
+        smokingSickInBedQRow.hidden = @(1);
+        smokingSickInBedRow.hidden = @(1);
+        smokingAttemptedQuitQRow.hidden = @(1);
+        smokingAttemptedQuitRow.hidden = @(1);
+        smokingNumQuitAttemptsQRow.hidden = @(1);
+        smokingNumQuitAttemptsRow.hidden = @(1);
+        smokingIntentionsToCutQRow.hidden = @(1);
+        smokingIntentionsToCutRow.hidden = @(1);
+        smokingHowQuitQRow.hidden = @(1);
+        smokingHowQuitRow.hidden = @(1);
+        smokingHowQuitOthersRow.hidden = @(1);
+        smokingWhyQuitQRow.hidden = @(1);
+        smokingWhyQuitRow.hidden = @(1);
+        smokingWhyQuitOthersRow.hidden = @(1);
+    }
+
+
     smokingStatusRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if (oldValue != newValue) {
             if (([[newValue formValue] isEqual:@(0)]) | ([[newValue formValue] isEqual:@(1)])) {    //if status is currently smoking
@@ -1132,7 +1314,8 @@ NSString *const kDocName = @"doc_name";
                 smokingHowQuitRow.hidden = @(1);
                 smokingWhyQuitQRow.hidden = @(1);
                 smokingWhyQuitRow.hidden = @(1);
-            } else if([[newValue formValue] isEqual:@(2)]) {    //ex-smoker
+            }
+            else if([[newValue formValue] isEqual:@(2)]) {    //ex-smoker
                 
                 //hide smoking currently rows
                 smokingNumYearsQRow.hidden = @(1);
@@ -1219,7 +1402,12 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"1-4 days a week"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"<3 days a month"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Not drinking"]];
-    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Not drinking"];   //default value
+    //value
+    options = row.selectorOptions;
+    if (![[riskFactrorsDict objectForKey:kAlcoholHowOften]isEqualToString:@""]) {
+        row.value = [options objectAtIndex:[[riskFactrorsDict objectForKey:kAlcoholHowOften] integerValue]];
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
@@ -1228,6 +1416,7 @@ NSString *const kDocName = @"doc_name";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAlcoholNumYears rowType:XLFormRowDescriptorTypeNumber title:@"Year(s)"];
+    row.value = [riskFactrorsDict objectForKey:kAlcoholNumYears];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo
@@ -1237,7 +1426,12 @@ NSString *const kDocName = @"doc_name";
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAlcoholConsumpn rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
-    row.value = @"NO";
+    
+    //value
+    if (![[riskFactrorsDict objectForKey:kAlcoholConsumpn] isEqualToString:@""]) {
+        row.value = [[riskFactrorsDict objectForKey:kAlcoholConsumpn] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
@@ -1254,7 +1448,13 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Spirits"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Stout"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"No preference"]];
-//    row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Beer"];   //default value
+
+    //value
+    options = row.selectorOptions;
+    if ([self getAlcoholPrefFromIndivValues] < 6) {     //if no value, return 10
+        row.value = [options objectAtIndex:[self getAlcoholPrefFromIndivValues]];
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
@@ -1269,6 +1469,13 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I plan to quit, but not within the next 12 months"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I do not plan to quit, but I intend to cut down"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I do not plan to quit or cut down"]];
+    
+    //value
+    options = row.selectorOptions;
+    if (![[riskFactrorsDict objectForKey:kAlcoholIntentToCut]isEqualToString:@""]) {
+        row.value = [options objectAtIndex:[[riskFactrorsDict objectForKey:kAlcoholIntentToCut] integerValue]];
+    }
+    
     [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
@@ -2059,7 +2266,6 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     return [super initWithForm:formDescriptor];
 }
 
-
 - (id) initCurrentSocioSituation {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Current Socioeconomic Issues"];
     XLFormSectionDescriptor * section;
@@ -2808,7 +3014,7 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
         for(int i=0; i<[smokingTypes count]; i++) {
             if ([[smokingTypes objectAtIndex:i] isEqualToString:@"Cigarettes"]) [risk_factors setObject:@"1" forKey:@"ciggs"];
             else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"Pipe"]) [risk_factors setObject:@"1" forKey:@"pipe"];
-            else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"self-rolled leaves \"ang hoon\""]) [risk_factors setObject:@"1" forKey:@"rolled_leaves"];
+            else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"Self-rolled leaves \"ang hoon\""]) [risk_factors setObject:@"1" forKey:@"rolled_leaves"];
             else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"Shisha"]) [risk_factors setObject:@"1" forKey:@"shisha"];
             else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"Cigars"]) [risk_factors setObject:@"1" forKey:@"cigars"];
             else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"E-cigarettes"]) [risk_factors setObject:@"1" forKey:@"e_ciggs"];
@@ -2837,7 +3043,16 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     [risk_factors setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kAlcoholNumYears] forKey:kAlcoholNumYears];
     [risk_factors setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kAlcoholConsumpn] forKey:kAlcoholConsumpn];
     
-    NSString *alcoholPreference = [self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kSmokingWhichNotGiveUp];
+    NSString *alcoholPreference = [self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kAlcoholPreference];
+    
+    //reset all values first
+    [risk_factors setObject:@"0" forKey:@"beer"];
+    [risk_factors setObject:@"0" forKey:@"wine"];
+    [risk_factors setObject:@"0" forKey:@"rice_wine"];
+    [risk_factors setObject:@"0" forKey:@"spirits"];
+    [risk_factors setObject:@"0" forKey:@"stout"];
+    [risk_factors setObject:@"0" forKey:@"no_pref"];
+    
     if ([alcoholPreference isEqualToString:@"0"]) [risk_factors setObject:@"1" forKey:@"beer"];
     else if ([alcoholPreference isEqualToString:@"1"]) [risk_factors setObject:@"1" forKey:@"wine"];
     else if ([alcoholPreference isEqualToString:@"2"]) [risk_factors setObject:@"1" forKey:@"rice_wine"];
@@ -2947,6 +3162,40 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     if([[dictionary objectForKey:@"lang_teochew"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
     
     return spokenLangArray;
+}
+
+- (NSArray *) getTypeOfSmokeFromIndivValues {
+    NSDictionary *dictionary = [self.fullScreeningForm objectForKey:@"risk_factors"];
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    if([[dictionary objectForKey:@"ciggs"] isEqualToString:@"1"]) [array addObject:@"Cigarettes"];
+    if([[dictionary objectForKey:@"pipe"] isEqualToString:@"1"]) [array addObject:@"Pipe"];
+    if([[dictionary objectForKey:@"rolled_leaves"] isEqualToString:@"1"]) [array addObject:@"Self-rolled leaves \"ang hoon\""];
+    if([[dictionary objectForKey:@"shisha"] isEqualToString:@"1"]) [array addObject:@"Shisha"];
+    if([[dictionary objectForKey:@"cigars"] isEqualToString:@"1"]) [array addObject:@"Cigars"];
+    if([[dictionary objectForKey:@"e_ciggs"] isEqualToString:@"1"]) [array addObject:@"E-cigarettes"];
+    if([[dictionary objectForKey:@"others"] isEqualToString:@"1"]) [array addObject:@"Others"];
+
+    return array;
+}
+
+- (NSInteger) getAlcoholPrefFromIndivValues {
+    NSDictionary *dictionary = [self.fullScreeningForm objectForKey:@"risk_factors"];
+//    NSMutableArray *array = [[NSMutableArray alloc] init];
+//    if([[dictionary objectForKey:@"beer"] isEqualToString:@"1"]) [array addObject:@"Cigarettes"];
+//    if([[dictionary objectForKey:@"wine"] isEqualToString:@"1"]) [array addObject:@"Pipe"];
+//    if([[dictionary objectForKey:@"rice_wine"] isEqualToString:@"1"]) [array addObject:@"Self-rolled leaves \"ang hoon\""];
+//    if([[dictionary objectForKey:@"spirits"] isEqualToString:@"1"]) [array addObject:@"Shisha"];
+//    if([[dictionary objectForKey:@"stout"] isEqualToString:@"1"]) [array addObject:@"Cigars"];
+//    if([[dictionary objectForKey:@"no_pref"] isEqualToString:@"1"]) [array addObject:@"E-cigarettes"];
+    
+    if([[dictionary objectForKey:@"beer"] isEqualToString:@"1"]) return 0;
+    if([[dictionary objectForKey:@"wine"] isEqualToString:@"1"]) return 1;
+    if([[dictionary objectForKey:@"rice_wine"] isEqualToString:@"1"]) return 2;
+    if([[dictionary objectForKey:@"spirits"] isEqualToString:@"1"]) return 3;
+    if([[dictionary objectForKey:@"stout"] isEqualToString:@"1"]) return 4;
+    if([[dictionary objectForKey:@"no_pref"] isEqualToString:@"1"]) return 5;
+
+    return 10;   //default
 }
 /*
  #pragma mark - Navigation
