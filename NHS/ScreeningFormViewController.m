@@ -1596,6 +1596,7 @@ NSString *const kDocName = @"doc_name";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Hyperlipidemia"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
+    NSDictionary *hyperlipidDict = [self.fullScreeningForm objectForKey:@"hyperlipid"];
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
@@ -1613,6 +1614,12 @@ NSString *const kDocName = @"doc_name";
     XLFormRowDescriptor *hasInformed = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     hasInformed.selectorOptions = @[@"YES", @"NO"];
     hasInformed.required = YES;
+    
+    //value
+    if (![[hyperlipidDict objectForKey:@"has_informed"] isEqualToString:@""]) {
+        hasInformed.value = [[hyperlipidDict objectForKey:@"has_informed"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [section addFormRow:hasInformed];
     
     
@@ -1631,6 +1638,13 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Yes, 3 yrs ago"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Yes, < 1 yr ago"]];
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
+    
+    //value
+    NSArray *options = row.selectorOptions;
+    if (![[hyperlipidDict objectForKey:@"checked_blood"]isEqualToString:@""]) {
+        row.value = [options objectAtIndex:[[hyperlipidDict objectForKey:@"checked_blood"] integerValue]];
+    }
+    
     [section addFormRow:row];
     
     
@@ -1642,6 +1656,12 @@ NSString *const kDocName = @"doc_name";
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[hyperlipidDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@""]) {
+        row.value = [[hyperlipidDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
     [section addFormRow:row];
     
@@ -1656,20 +1676,59 @@ NSString *const kDocName = @"doc_name";
     XLFormRowDescriptor *prescribed = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     prescribed.selectorOptions = @[@"YES", @"NO"];
     prescribed.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    
+    //value
+    if (![[hyperlipidDict objectForKey:@"currently_prescribed"] isEqualToString:@""]) {
+        prescribed.value = [[hyperlipidDict objectForKey:@"currently_prescribed"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [section addFormRow:prescribed];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
+    XLFormRowDescriptor *takeRegularlyQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Are you taking your cholesterol medication regularly?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
-    [section addFormRow:row];
+    takeRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
+    [section addFormRow:takeRegularlyQRow];
     
     // Segmented Control
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
-    [section addFormRow:row];
+    XLFormRowDescriptor *takeRegularlyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    takeRegularlyRow.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[hyperlipidDict objectForKey:@"taking_regularly"] isEqualToString:@""]) {
+        takeRegularlyRow.value = [[hyperlipidDict objectForKey:@"taking_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
+    
+    [section addFormRow:takeRegularlyRow];
+    
+    
+    hasInformed.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([newValue isEqualToString:@"NO"]) {
+                takeRegularlyQRow.hidden = @(1);
+                takeRegularlyRow.hidden = @(1);
+            } else {
+                if ([prescribed.value isEqualToString:@"YES"]) {
+                    takeRegularlyQRow.hidden = @(0);
+                    takeRegularlyRow.hidden = @(0);
+                }
+            }
+        }
+    };
+    
+    prescribed.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([newValue isEqualToString:@"YES"]) {
+                takeRegularlyQRow.hidden = @(0);
+                takeRegularlyRow.hidden = @(0);
+            } else {
+                takeRegularlyQRow.hidden = @(1);
+                takeRegularlyRow.hidden = @(1);
+            }
+        }
+    };
 
     
     return [super initWithForm:formDescriptor];
@@ -1679,12 +1738,12 @@ NSString *const kDocName = @"doc_name";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Hypertension"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
+    NSDictionary *hypertensionDict = [self.fullScreeningForm objectForKey:@"hypertension"];
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
-    // Hyperlipidemia - Section
+    // Hypertension - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    //    section.footerTitle = @"This is a long text that will appear on section footer";
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
@@ -1695,6 +1754,12 @@ NSString *const kDocName = @"doc_name";
     XLFormRowDescriptor *hasInformed = [XLFormRowDescriptor formRowDescriptorWithTag:kHTHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     hasInformed.selectorOptions = @[@"YES", @"NO"];
     hasInformed.required = YES;
+    
+    //value
+    if (![[hypertensionDict objectForKey:@"has_informed"] isEqualToString:@""]) {
+        hasInformed.value = [[hypertensionDict objectForKey:@"has_informed"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [section addFormRow:hasInformed];
     
     
@@ -1706,6 +1771,12 @@ NSString *const kDocName = @"doc_name";
     [section addFormRow:row];
     XLFormRowDescriptor *checkedBP = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCheckedBP rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     checkedBP.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[hypertensionDict objectForKey:@"checked_bp"] isEqualToString:@""]) {
+        checkedBP.value = [[hypertensionDict objectForKey:@"checked_bp"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [section addFormRow:checkedBP];
     
     
@@ -1717,6 +1788,12 @@ NSString *const kDocName = @"doc_name";
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHTSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[hypertensionDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@""]) {
+        row.value = [[hypertensionDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
     [section addFormRow:row];
     
@@ -1731,20 +1808,58 @@ NSString *const kDocName = @"doc_name";
     XLFormRowDescriptor *prescribed = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     prescribed.selectorOptions = @[@"YES", @"NO"];
     prescribed.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
+    
+    //value
+    if (![[hypertensionDict objectForKey:@"currently_prescribed"] isEqualToString:@""]) {
+        prescribed.value = [[hypertensionDict objectForKey:@"currently_prescribed"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [section addFormRow:prescribed];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
+    XLFormRowDescriptor *takeRegularlyQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Are you taking your BP medication regularly?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
-    [section addFormRow:row];
+    takeRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
+    [section addFormRow:takeRegularlyQRow];
     
     // Segmented Control
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHTTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
-    [section addFormRow:row];
+    XLFormRowDescriptor *takeRegularlyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHTTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    takeRegularlyRow.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[hypertensionDict objectForKey:@"taking_regularly"] isEqualToString:@""]) {
+        takeRegularlyRow.value = [[hypertensionDict objectForKey:@"taking_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
+    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
+    [section addFormRow:takeRegularlyRow];
+    
+    checkedBP.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([newValue isEqualToString:@"NO"]) {
+                takeRegularlyQRow.hidden = @(1);
+                takeRegularlyRow.hidden = @(1);
+            } else {
+                if ([prescribed.value isEqualToString:@"YES"]) {
+                    takeRegularlyQRow.hidden = @(0);
+                    takeRegularlyRow.hidden = @(0);
+                }
+            }
+        }
+    };
+    
+    prescribed.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([newValue isEqualToString:@"YES"]) {
+                takeRegularlyQRow.hidden = @(0);
+                takeRegularlyRow.hidden = @(0);
+            } else {
+                takeRegularlyQRow.hidden = @(1);
+                takeRegularlyRow.hidden = @(1);
+            }
+        }
+    };
     
     
     return [super initWithForm:formDescriptor];
@@ -2851,10 +2966,10 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
             break;
         case 4: [self saveDiabetesMellitus];
             break;
-//        case 5: form = [self saveHyperlipidemia];
-//            break;
-//        case 6: form = [self saveHypertension];
-//            break;
+        case 5: [self saveHyperlipidemia];
+            break;
+        case 6: [self saveHypertension];
+            break;
 //        case 7: form = [self saveCancerScreening];
 //            break;
 //        case 8: form = [self saveOtherMedicalIssues];
@@ -3111,6 +3226,32 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesTakingRegularly] forKey:@"taking_regularly"];
     
     [self.fullScreeningForm setObject:diabetes_dict forKey:@"diabetes"];
+}
+
+- (void) saveHyperlipidemia {
+    NSDictionary *fields = [self.form formValues];
+    NSMutableDictionary *hyperlipid_dict = [[self.fullScreeningForm objectForKey:@"hyperlipid"] mutableCopy];
+    
+    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidHasInformed] forKey:@"has_informed"];
+    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kLipidCheckedBlood] forKey:@"checked_blood"];
+    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
+    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidCurrentlyPrescribed] forKey:@"currently_prescribed"];
+    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidTakingRegularly] forKey:@"taking_regularly"];
+    
+    [self.fullScreeningForm setObject:hyperlipid_dict forKey:@"hyperlipid"];
+}
+
+- (void) saveHypertension {
+    NSDictionary *fields = [self.form formValues];
+    NSMutableDictionary *hypertension_dict = [[self.fullScreeningForm objectForKey:@"hypertension"] mutableCopy];
+    
+    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTHasInformed] forKey:@"has_informed"];
+    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTCheckedBP] forKey:@"checked_bp"];
+    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
+    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTCurrentlyPrescribed] forKey:@"currently_prescribed"];
+    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTTakingRegularly] forKey:@"taking_regularly"];
+    
+    [self.fullScreeningForm setObject:hypertension_dict forKey:@"hypertension"];
 }
 
 - (NSString *) getStringWithDictionary:(NSDictionary *)dict
