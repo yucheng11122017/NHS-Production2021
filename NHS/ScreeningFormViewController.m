@@ -1486,6 +1486,7 @@ NSString *const kDocName = @"doc_name";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Diabetes Mellitus"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
+    NSDictionary *diabetesDict = [self.fullScreeningForm objectForKey:@"diabetes"];
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
@@ -1502,6 +1503,12 @@ NSString *const kDocName = @"doc_name";
     
     XLFormRowDescriptor *hasInformedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     hasInformedRow.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[diabetesDict objectForKey:@"has_informed"] isEqualToString:@""]) {
+        hasInformedRow.value = [[diabetesDict objectForKey:@"has_informed"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     hasInformedRow.required = YES;
     [section addFormRow:hasInformedRow];
     
@@ -1512,9 +1519,18 @@ NSString *const kDocName = @"doc_name";
     hasCheckedBloodQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformedRow];
     [section addFormRow:hasCheckedBloodQRow];
     
-    XLFormRowDescriptor *hasCheckedBloodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesCheckedBlood rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    hasCheckedBloodRow.selectorOptions = @[@"YES", @"NO"];
+    XLFormRowDescriptor *hasCheckedBloodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesCheckedBlood rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
+    hasCheckedBloodRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"No"],
+                                       [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Yes, 2 yrs ago"],
+                                       [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Yes, 3 yrs ago"],
+                                       [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Yes < 1 yr ago"]];
     hasCheckedBloodRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformedRow];
+    
+    //value
+    NSArray *options = hasCheckedBloodRow.selectorOptions;
+    if (![[diabetesDict objectForKey:@"checked_blood"]isEqualToString:@""]) {
+        hasCheckedBloodRow.value = [options objectAtIndex:[[diabetesDict objectForKey:@"checked_blood"] integerValue]];
+    }
     [section addFormRow:hasCheckedBloodRow];
     
     
@@ -1527,6 +1543,12 @@ NSString *const kDocName = @"doc_name";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[diabetesDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@""]) {
+        row.value = [[diabetesDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
@@ -1539,6 +1561,12 @@ NSString *const kDocName = @"doc_name";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[diabetesDict objectForKey:@"currently_prescribed"] isEqualToString:@""]) {
+        row.value = [[diabetesDict objectForKey:@"currently_prescribed"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
@@ -1552,6 +1580,12 @@ NSString *const kDocName = @"doc_name";
     // Segmented Control
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[diabetesDict objectForKey:@"taking_regularly"] isEqualToString:@""]) {
+        row.value = [[diabetesDict objectForKey:@"taking_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
@@ -2815,8 +2849,8 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
             break;
         case 3: [self saveScreeningOfRiskFactors];
             break;
-//        case 4: form = [self saveDiabetesMellitus];
-//            break;
+        case 4: [self saveDiabetesMellitus];
+            break;
 //        case 5: form = [self saveHyperlipidemia];
 //            break;
 //        case 6: form = [self saveHypertension];
@@ -3066,6 +3100,18 @@ row.value = [XLFormOptionsObject formOptionsObjectWithValue:NULL displayText:@"T
     
 }
 
+- (void) saveDiabetesMellitus {
+    NSDictionary *fields = [self.form formValues];
+    NSMutableDictionary *diabetes_dict = [[self.fullScreeningForm objectForKey:@"diabetes"] mutableCopy];
+    
+    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesHasInformed] forKey:@"has_informed"];
+    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kDiabetesCheckedBlood] forKey:@"checked_blood"];
+    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
+    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesCurrentlyPrescribed] forKey:@"currently_prescribed"];
+    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesTakingRegularly] forKey:@"taking_regularly"];
+    
+    [self.fullScreeningForm setObject:diabetes_dict forKey:@"diabetes"];
+}
 
 - (NSString *) getStringWithDictionary:(NSDictionary *)dict
                                rowType:(NSInteger)type
