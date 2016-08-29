@@ -229,7 +229,7 @@ NSString *const kEContactRs = @"e_contact_rs";
 NSString *const kEContactNum = @"e_contact_num";
 NSString *const kEContactNric = @"e_contact_nric";
 NSString *const kEContactAddress = @"e_contact_address";
-NSString *const kGettingSupport = @"getting_suppport";
+NSString *const kGettingSupport = @"getting_support";
 NSString *const kMultiSupport = @"multi_support";
 NSString *const kSupportOthers = @"support_others";
 NSString *const kRelativesContact = @"relatives_contact";
@@ -2915,6 +2915,7 @@ NSString *const kDocName = @"doc_name";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Social Support Assessment"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
+    NSDictionary *socialSuppAssessmentDict = [self.fullScreeningForm objectForKey:@"social_support"];
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
@@ -2931,6 +2932,12 @@ NSString *const kDocName = @"doc_name";
     
     XLFormRowDescriptor *hasCaregiverRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHasCaregiver rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     hasCaregiverRow.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[socialSuppAssessmentDict objectForKey:kHasCaregiver] isEqualToString:@""]) {
+        hasCaregiverRow.value = [[socialSuppAssessmentDict objectForKey:kHasCaregiver] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [hasPriCaregiversection addFormRow:hasCaregiverRow];
     
     XLFormSectionDescriptor *careGiverSection = [XLFormSectionDescriptor formSectionWithTitle:@"Caregiver Details"];
@@ -2938,18 +2945,23 @@ NSString *const kDocName = @"doc_name";
     [formDescriptor addFormSection:careGiverSection];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverName rowType:XLFormRowDescriptorTypeText title:@"Name"];
+    row.value = [socialSuppAssessmentDict objectForKey:kCaregiverName];
     [careGiverSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverRs rowType:XLFormRowDescriptorTypeText title:@"Relationship"];
+    row.value = [socialSuppAssessmentDict objectForKey:kCaregiverRs];
     [careGiverSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverContactNum rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    row.value = [socialSuppAssessmentDict objectForKey:kCaregiverContactNum];
     [careGiverSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverNric rowType:XLFormRowDescriptorTypeText title:@"NRIC"];
+    row.value = [socialSuppAssessmentDict objectForKey:kCaregiverNric];
     [careGiverSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverAddress rowType:XLFormRowDescriptorTypeText title:@"Address"];
+    row.value = [socialSuppAssessmentDict objectForKey:kCaregiverAddress];
     [careGiverSection addFormRow:row];
     
     XLFormSectionDescriptor *askEmerContactSection = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -2961,6 +2973,12 @@ NSString *const kDocName = @"doc_name";
     [askEmerContactSection addFormRow:row];
     XLFormRowDescriptor *hasEmerContactRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEContact rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     hasEmerContactRow.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[socialSuppAssessmentDict objectForKey:kEContact] isEqualToString:@""]) {
+        hasEmerContactRow.value = [[socialSuppAssessmentDict objectForKey:kEContact] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [askEmerContactSection addFormRow:hasEmerContactRow];
     
     XLFormSectionDescriptor *EmerContactSection = [XLFormSectionDescriptor formSectionWithTitle:@"Emergency Contact"];
@@ -2968,18 +2986,23 @@ NSString *const kDocName = @"doc_name";
     [formDescriptor addFormSection:EmerContactSection];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactName rowType:XLFormRowDescriptorTypeText title:@"Name"];
+    row.value = [socialSuppAssessmentDict objectForKey:kEContactName];
     [EmerContactSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactRs rowType:XLFormRowDescriptorTypeText title:@"Relationship"];
+    row.value = [socialSuppAssessmentDict objectForKey:kEContactRs];
     [EmerContactSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactNum rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    row.value = [socialSuppAssessmentDict objectForKey:kEContactNum];
     [EmerContactSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactNric rowType:XLFormRowDescriptorTypeText title:@"NRIC"];
+    row.value = [socialSuppAssessmentDict objectForKey:kEContactNric];
     [EmerContactSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactAddress rowType:XLFormRowDescriptorTypeText title:@"Address"];
+    row.value = [socialSuppAssessmentDict objectForKey:kEContactAddress];
     [EmerContactSection addFormRow:row];
     
     
@@ -2992,16 +3015,26 @@ NSString *const kDocName = @"doc_name";
     [section addFormRow:row];
     XLFormRowDescriptor *getSupportRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGettingSupport rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     getSupportRow.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[socialSuppAssessmentDict objectForKey:kGettingSupport] isEqualToString:@""]) {
+        getSupportRow.value = [[socialSuppAssessmentDict objectForKey:kGettingSupport] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+
     [section addFormRow:getSupportRow];
     
     XLFormRowDescriptor *multiSupportRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiSupport rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Support in term of:"];
     multiSupportRow.hidden =[NSString stringWithFormat:@"NOT $%@.value contains 'YES'", getSupportRow];
     multiSupportRow.selectorOptions = @[@"Care-giving", @"Food", @"Money", @"Others"];
+    
+    //value
+    multiSupportRow.value = [self getSupportArrayFromDict:socialSuppAssessmentDict andOptions:multiSupportRow.selectorOptions];
     [section addFormRow:multiSupportRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSupportOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
     [row.cellConfigAtConfigure setObject:@"Specify here" forKey:@"textField.placeholder"];
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", multiSupportRow];
+    row.value = [socialSuppAssessmentDict objectForKey:kSupportOthers];
     [section addFormRow:row];
     
     
@@ -3021,6 +3054,14 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
     row.required = YES;
+    
+    //value
+    NSArray *options = row.selectorOptions;
+    if (![[socialSuppAssessmentDict objectForKey:kRelativesContact] isEqualToString:@""]) {
+        int index = [[socialSuppAssessmentDict objectForKey:kRelativesContact] intValue];
+        row.value = [options objectAtIndex:index];
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive rowType:XLFormRowDescriptorTypeInfo title:@"How many relatives do you feel at ease with that you can talk about private matters?"];
@@ -3034,6 +3075,14 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
     row.required = YES;
+    
+    //value
+    options = row.selectorOptions;
+    if (![[socialSuppAssessmentDict objectForKey:kRelativesEase] isEqualToString:@""]) {
+        int index = [[socialSuppAssessmentDict objectForKey:kRelativesEase] intValue];
+        row.value = [options objectAtIndex:index];
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix rowType:XLFormRowDescriptorTypeInfo title:@"How many relatives do you feel close to such that you could call on them for help?"];
@@ -3047,6 +3096,14 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
     row.required = YES;
+    
+    //value
+    options = row.selectorOptions;
+    if (![[socialSuppAssessmentDict objectForKey:kRelativesClose] isEqualToString:@""]) {
+        int index = [[socialSuppAssessmentDict objectForKey:kRelativesClose] intValue];
+        row.value = [options objectAtIndex:index];
+    }
+    
     [section addFormRow:row];
     
     
@@ -3065,6 +3122,14 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
     row.required = YES;
+    
+    //value
+    options = row.selectorOptions;
+    if (![[socialSuppAssessmentDict objectForKey:kFriendsContact] isEqualToString:@""]) {
+        int index = [[socialSuppAssessmentDict objectForKey:kFriendsContact] intValue];
+        row.value = [options objectAtIndex:index];
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight rowType:XLFormRowDescriptorTypeInfo title:@"How many friends do you feel at ease with that you can talk about private matters?"];
@@ -3078,6 +3143,14 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
     row.required = YES;
+    
+    //value
+    options = row.selectorOptions;
+    if (![[socialSuppAssessmentDict objectForKey:kFriendsEase] isEqualToString:@""]) {
+        int index = [[socialSuppAssessmentDict objectForKey:kFriendsEase] intValue];
+        row.value = [options objectAtIndex:index];
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionNine rowType:XLFormRowDescriptorTypeInfo title:@"How many of your friends do you feel close to such that you could call on them for help?"];
@@ -3091,6 +3164,14 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
     row.required = YES;
+    
+    //value
+    options = row.selectorOptions;
+    if (![[socialSuppAssessmentDict objectForKey:kFriendsClose] isEqualToString:@""]) {
+        int index = [[socialSuppAssessmentDict objectForKey:kFriendsClose] intValue];
+        row.value = [options objectAtIndex:index];
+    }
+    
     [section addFormRow:row];
     
     //SOCIAL SCORE
@@ -3098,7 +3179,12 @@ NSString *const kDocName = @"doc_name";
     [formDescriptor addFormSection:section];
     XLFormRowDescriptor *socialScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSocialScore rowType:XLFormRowDescriptorTypeText title:@""];
 //    socialScoreRow.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"0"]];
-    socialScoreRow.value = @"not calculating...";
+    if (![[socialSuppAssessmentDict objectForKey:kSocialScore] isEqualToString:@""]) {
+        socialScoreRow.value = [socialSuppAssessmentDict objectForKey:kSocialScore];
+    } else {
+        socialScoreRow.value = @"not calculating...";
+    }
+    
     [section addFormRow:socialScoreRow];
     
     //MEASURING LONELINESS
@@ -3113,6 +3199,14 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Sometimes"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Often"]];
     row.required = YES;
+    
+    //value
+    options = row.selectorOptions;
+    if (![[socialSuppAssessmentDict objectForKey:kLackCompan] isEqualToString:@""]) {
+        int index = [[socialSuppAssessmentDict objectForKey:kLackCompan] intValue];
+        row.value = [options objectAtIndex:index];
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEleven rowType:XLFormRowDescriptorTypeInfo title:@"How often do you feel left out?"];
@@ -3123,6 +3217,14 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Sometimes"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Often"]];
     row.required = YES;
+    
+    //value
+    options = row.selectorOptions;
+    if (![[socialSuppAssessmentDict objectForKey:kFeelLeftOut] isEqualToString:@""]) {
+        int index = [[socialSuppAssessmentDict objectForKey:kFeelLeftOut] intValue];
+        row.value = [options objectAtIndex:index];
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwelve rowType:XLFormRowDescriptorTypeInfo title:@"How often do you feel isolated from others?"];
@@ -3133,6 +3235,14 @@ NSString *const kDocName = @"doc_name";
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Sometimes"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Often"]];
     row.required = YES;
+    
+    //value
+    options = row.selectorOptions;
+    if (![[socialSuppAssessmentDict objectForKey:kFeelIsolated] isEqualToString:@""]) {
+        int index = [[socialSuppAssessmentDict objectForKey:kFeelIsolated] intValue];
+        row.value = [options objectAtIndex:index];
+    }
+    
     [section addFormRow:row];
     
     //Last part
@@ -3144,6 +3254,12 @@ NSString *const kDocName = @"doc_name";
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAwareActivities rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[socialSuppAssessmentDict objectForKey:kAwareActivities] isEqualToString:@""]) {
+        row.value = [[socialSuppAssessmentDict objectForKey:kAwareActivities] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFourteen rowType:XLFormRowDescriptorTypeInfo title:@"Do you participate in any community activities?"];
@@ -3151,18 +3267,30 @@ NSString *const kDocName = @"doc_name";
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kParticipateActivities rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
+    
+    //value
+    if (![[socialSuppAssessmentDict objectForKey:kParticipateActivities] isEqualToString:@""]) {
+        row.value = [[socialSuppAssessmentDict objectForKey:kParticipateActivities] isEqualToString:@"1"]? @"YES":@"NO";
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFifteen rowType:XLFormRowDescriptorTypeInfo title:@"Which organisation hosts the activities that you participate in?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     XLFormRowDescriptor *multiOrgActivitiesRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiHost rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
-    multiOrgActivitiesRow.selectorOptions = @[@"Senior Activity Centre (SAC)", @"Family Services Centre (FSC)", @"Community Centre (CC)", @"Residents' Committee (RC)", @"Religious Organisations", @"Self-organised", @"Others"];
+    multiOrgActivitiesRow.selectorOptions = @[@"Senior Activity Centre (SAC)", @"Family Services Centre (FSC)", @"Community Centre (CC)", @"Residents' Committee (RC)", @"Religious Organisations", @"Self-organised", @"Others", @"N.A."];
+    
+    //value
+    multiOrgActivitiesRow.value = [self getOrgArrayFromDict:socialSuppAssessmentDict andOptions:multiOrgActivitiesRow.selectorOptions];
+    
     [section addFormRow:multiOrgActivitiesRow];
+    
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHostOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
     row.required = NO;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", multiOrgActivitiesRow];
+    row.value = [socialSuppAssessmentDict objectForKey:@"others_text"];
     [section addFormRow:row];
     
     // Just to avoid keyboard covering the row in the ScrollView
@@ -3741,9 +3869,87 @@ NSString *const kDocName = @"doc_name";
 
 - (void) saveSocialSupportAssessment {
     NSDictionary *fields = [self.form formValues];
-    NSMutableDictionary *demographics_dict = [[self.fullScreeningForm objectForKey:@"social_support"] mutableCopy];
+    NSMutableDictionary *socialSuppAssessment_dict = [[self.fullScreeningForm objectForKey:@"social_support"] mutableCopy];
     
-    [self.fullScreeningForm setObject:demographics_dict forKey:@"social_support"];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHasCaregiver] forKey:kHasCaregiver];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverName] forKey:kCaregiverName];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverRs] forKey:kCaregiverRs];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kCaregiverContactNum] forKey:kCaregiverContactNum];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverNric] forKey:kCaregiverNric];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverAddress] forKey:kCaregiverAddress];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kEContact] forKey:kEContact];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactName] forKey:kEContactName];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactRs] forKey:kEContactRs];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kEContactNum] forKey:kEContactNum];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactNric] forKey:kEContactNric];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactAddress] forKey:kEContactAddress];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kGettingSupport] forKey:kGettingSupport];
+    //Support in terms of..... multi selector
+    
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"care_giving"];
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"food"];
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"money"];
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"others"];
+    
+    if([fields objectForKey:kMultiSupport]!= [NSNull null]) {
+        NSArray *multiSupportArray = [fields objectForKey:kMultiSupport];
+        
+        if ([multiSupportArray count]>0) {
+            for(int i=0;i<[multiSupportArray count];i++) {
+                if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Care-giving"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"care_giving"];
+                else if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Food"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"food"];
+                else if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Money"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"money"];
+                else if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Others"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"others"];
+                
+            }
+        }
+    }
+    
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kSupportOthers] forKey:@"others_text"];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kRelativesContact] forKey:kRelativesContact];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kRelativesEase] forKey:kRelativesEase];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kRelativesClose] forKey:kRelativesClose];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsContact] forKey:kFriendsContact];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsEase] forKey:kFriendsEase];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsClose] forKey:kFriendsClose];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kSocialScore] forKey:kSocialScore];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kLackCompan] forKey:kLackCompan];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFeelLeftOut] forKey:kFeelLeftOut];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFeelIsolated] forKey:kFeelIsolated];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kAwareActivities] forKey:kAwareActivities];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kParticipateActivities] forKey:kParticipateActivities];
+    
+    //reset values first
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"sac"];
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"fsc"];
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"cc"];
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"rc"];
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"ro"];
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"so"];
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"oth"];
+    [socialSuppAssessment_dict setObject:@"0" forKey:@"na"];
+    
+    if([fields objectForKey:kMultiHost]!= [NSNull null]) {
+        NSArray *multiHostArray = [fields objectForKey:kMultiHost];
+        
+        if ([multiHostArray count]>0) {
+            for(int i=0;i<[multiHostArray count];i++) {
+                if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Senior Activity Centre (SAC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"sac"];
+                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Family Services Centre (FSC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"fsc"];
+                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Community Centre (CC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"cc"];
+                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Residents' Committee (RC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"rc"];
+                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Religious Organisations"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"ro"];
+                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Self-organised"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"so"];
+                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Others"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"oth"];
+                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"N.A."]) [socialSuppAssessment_dict setObject:@"1" forKey:@"na"];
+                
+            }
+        }
+    }
+    
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kHostOthers] forKey:kHostOthers];
+
+    [self.fullScreeningForm setObject:socialSuppAssessment_dict forKey:@"social_support"];
 }
 
 - (void) saveRefForDoctorConsult {
@@ -3917,6 +4123,30 @@ NSString *const kDocName = @"doc_name";
     
     return adlArray;
     
+}
+
+- (NSArray *) getSupportArrayFromDict:(NSDictionary *) dictionary andOptions:(NSArray *) options {
+    NSMutableArray *supportArray = [[NSMutableArray alloc] init];
+    if([[dictionary objectForKey:@"care_giving"] isEqualToString:@"1"]) [supportArray addObject:[options objectAtIndex:0]];
+    if([[dictionary objectForKey:@"food"] isEqualToString:@"1"]) [supportArray addObject:[options objectAtIndex:1]];
+    if([[dictionary objectForKey:@"money"] isEqualToString:@"1"]) [supportArray addObject:[options objectAtIndex:2]];
+    if([[dictionary objectForKey:@"others"] isEqualToString:@"1"]) [supportArray addObject:[options objectAtIndex:3]];
+    
+    return supportArray;
+}
+
+- (NSArray *) getOrgArrayFromDict: (NSDictionary *) dictionary andOptions:(NSArray *) options {
+    NSMutableArray *orgArray = [[NSMutableArray alloc] init];
+    if([[dictionary objectForKey:@"sac"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:0]];
+    if([[dictionary objectForKey:@"fsc"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:1]];
+    if([[dictionary objectForKey:@"cc"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:2]];
+    if([[dictionary objectForKey:@"rc"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:3]];
+    if([[dictionary objectForKey:@"ro"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:4]];
+    if([[dictionary objectForKey:@"so"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:5]];
+    if([[dictionary objectForKey:@"oth"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:6]];
+    if([[dictionary objectForKey:@"na"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:7]];
+    
+    return orgArray;
 }
 
 /*
