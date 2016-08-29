@@ -3173,7 +3173,7 @@ NSString *const kDocName = @"doc_name";
     return [super initWithForm:formDescriptor];
 }
 
-#pragma mark - Dictionary methods
+#pragma mark - Save Dictionary methods
 
 - (void) saveEntriesIntoDictionary {
     switch([self.sectionID integerValue]) {
@@ -3571,6 +3571,8 @@ NSString *const kDocName = @"doc_name";
     
     [self.fullScreeningForm setObject:healthNeighbourhood_dict forKey:@"self_rated"];
 }
+
+#pragma mark - Organize Dictionary Methods
 
 - (NSString *) getStringWithDictionary:(NSDictionary *)dict
                                rowType:(NSInteger)type

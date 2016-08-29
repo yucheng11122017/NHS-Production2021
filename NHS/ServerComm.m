@@ -63,7 +63,7 @@
     NSDictionary *dict = [[NSDictionary alloc]
                           initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     
-    [self GET:[dict objectForKey:@"op_code"]
+    [self POST:[dict objectForKey:@"op_code"]
    parameters:NULL
      progress:progressBlock
       success:successBlock
