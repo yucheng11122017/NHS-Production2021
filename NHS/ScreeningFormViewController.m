@@ -267,6 +267,7 @@ NSString *const kDocName = @"doc_name";
 @interface ScreeningFormViewController () {
     NSString *gender, *nric, *resident_name, *birth_year, *address_block, *address_postcode, *address_street, *address_unit, *contact_no;
     NSArray *spoken_lang_value;
+    XLFormRowDescriptor *relativesContactRow, *relativesEaseRow, *relativesCloseRow, *friendsContactRow, *friendsEaseRow, *friendsCloseRow, *socialScoreRow;
 }
 
 @end
@@ -351,74 +352,6 @@ NSString *const kDocName = @"doc_name";
 
 - (void) setpreRegParticularsDict :(NSDictionary *)preRegParticularsDict {
     self.preRegParticularsDict = [[NSDictionary alloc] initWithDictionary:preRegParticularsDict];
-}
-
-#pragma mark - Buttons
-//-(void)returnBtnPressed:(id)sender
-//{
-//    [self.navigationController popViewControllerAnimated:YES];
-//}
-
-
--(void)validateBtnPressed:(UIBarButtonItem * __unused)button
-{
-    NSLog(@"%@", [self.form formValues]);
-    
-    NSArray * validationErrors = [self formValidationErrors];
-    if (validationErrors.count > 0){
-        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
-            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
-            cell.backgroundColor = [UIColor orangeColor];
-            [UIView animateWithDuration:0.3 animations:^{
-                cell.backgroundColor = [UIColor whiteColor];
-            }];
-        }];
-        [self showFormValidationError:[validationErrors firstObject]];
-        
-        return;
-    } else {
-//        UIAlertController *alertController;
-//        UIAlertAction *okAction;
-//        
-//        alertController = [UIAlertController alertControllerWithTitle:@"Validation success"
-//                                                              message:@"All required fields are not empty."
-//                                                       preferredStyle:UIAlertControllerStyleActionSheet];
-//        alertController.view.backgroundColor = [UIColor greenColor];
-//        okAction = [UIAlertAction actionWithTitle:@"OK"
-//                                                 style:UIAlertActionStyleDefault
-//                                               handler:^(UIAlertAction *action) {
-//                                                   // do destructive stuff here
-//                                               }];
-//
-//        // note: you can control the order buttons are shown, unlike UIActionSheet
-//        [alertController addAction:okAction];
-//        [alertController setModalPresentationStyle:UIModalPresentationPopover];
-//        [self presentViewController:alertController animated:YES completion:nil];
-        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-        
-        // Set the custom view mode to show any view.
-        hud.mode = MBProgressHUDModeCustomView;
-        // Set an image view with a checkmark.
-        UIImage *image = [[UIImage imageNamed:@"ThumbsUp"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-        hud.customView = [[UIImageView alloc] initWithImage:image];
-        // Looks a bit nicer if we make it square.
-        hud.square = YES;
-        
-        hud.backgroundColor = [UIColor clearColor];
-        // Optional label text.
-        hud.label.text = NSLocalizedString(@"Good!", @"HUD done title");
-        [hud hideAnimated:YES afterDelay:1.f];
-
-    }
-//    [self.tableView endEditing:YES];
-//    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    
-    // Set the label text.
-//    hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
-//    [self submitPersonalInfo:[self preparePersonalInfoDict]];
-
-    
 }
 
 #pragma mark - Forms methods
@@ -685,6 +618,9 @@ NSString *const kDocName = @"doc_name";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Clinical Results"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
+    NSDictionary *clinicalResultsDict = [[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"clinical_results"];
+    NSArray *bpRecordsArray = [[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"bp_record"];
+    
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
@@ -693,33 +629,38 @@ NSString *const kDocName = @"doc_name";
     [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *systolic_1;
-    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic rowType:XLFormRowDescriptorTypeInteger title:@"BP (1. Systolic number)"];
+    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic rowType:XLFormRowDescriptorTypeNumber title:@"BP (1. Systolic number)"];
     systolic_1.required = YES;
-    systolic_1.value = @0;
+    systolic_1.value = [[bpRecordsArray objectAtIndex:1] objectForKey:@"systolic_bp"];
     [section addFormRow:systolic_1];
     
     XLFormRowDescriptor *diastolic_1;
-    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic rowType:XLFormRowDescriptorTypeInteger title:@"BP (2. Diastolic number)"];
+    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic rowType:XLFormRowDescriptorTypeNumber title:@"BP (2. Diastolic number)"];
     diastolic_1.required = YES;
-    diastolic_1.value = @0;
+    diastolic_1.value = [[bpRecordsArray objectAtIndex:1] objectForKey:@"diastolic_bp"];
     [section addFormRow:diastolic_1];
     
     XLFormRowDescriptor *height;
-    height = [XLFormRowDescriptor formRowDescriptorWithTag:kHeight rowType:XLFormRowDescriptorTypeInteger title:@"Height (cm)"];
+    height = [XLFormRowDescriptor formRowDescriptorWithTag:kHeight rowType:XLFormRowDescriptorTypeNumber title:@"Height (cm)"];
     height.required = YES;
-    height.value = @0;
+    height.value = [clinicalResultsDict objectForKey:@"height_cm"];
     [section addFormRow:height];
     
     XLFormRowDescriptor *weight;
-    weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeight rowType:XLFormRowDescriptorTypeInteger title:@"Weight (kg)"];
+    weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeight rowType:XLFormRowDescriptorTypeNumber title:@"Weight (kg)"];
     weight.required = YES;
-    weight.value = @0;
+    weight.value = [clinicalResultsDict objectForKey:@"weight_kg"];
     [section addFormRow:weight];
     
     XLFormRowDescriptor *bmi;
     bmi = [XLFormRowDescriptor formRowDescriptorWithTag:kBMI rowType:XLFormRowDescriptorTypeText title:@"BMI"];
     bmi.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kHeight, kWeight]];
-    bmi.value = @([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2));
+    //Initial value only
+    if (![[clinicalResultsDict objectForKey:@"bmi"] isEqualToString:@""]) {
+        bmi.value = [clinicalResultsDict objectForKey:@"bmi"];
+    } else {
+        bmi.value = @([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2));
+    }
     [section addFormRow:bmi];
     
     weight.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -740,21 +681,25 @@ NSString *const kDocName = @"doc_name";
     };
     
     XLFormRowDescriptor *waist;
-    waist = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistCircum rowType:XLFormRowDescriptorTypeInteger title:@"Waist Circumference (cm)"];
+    waist = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistCircum rowType:XLFormRowDescriptorTypeNumber title:@"Waist Circumference (cm)"];
     waist.required = YES;
-    waist.value = @0;
+    waist.value = [clinicalResultsDict objectForKey:@"waist_circum"];
     [section addFormRow:waist];
     
     XLFormRowDescriptor *hip;
-    hip = [XLFormRowDescriptor formRowDescriptorWithTag:kHipCircum rowType:XLFormRowDescriptorTypeInteger title:@"Hip Circumference (cm)"];
+    hip = [XLFormRowDescriptor formRowDescriptorWithTag:kHipCircum rowType:XLFormRowDescriptorTypeNumber title:@"Hip Circumference (cm)"];
     hip.required = YES;
-    hip.value = @0;
+    hip.value = [clinicalResultsDict objectForKey:@"hip_circum"];
     [section addFormRow:hip];
     
     XLFormRowDescriptor *waistHipRatio;
     waistHipRatio = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistHipRatio rowType:XLFormRowDescriptorTypeText title:@"Waist : Hip Ratio (cm)"];
     waistHipRatio.required = YES;
     waistHipRatio.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kWaistCircum, kHipCircum]];
+    //Initial value
+    if(![[clinicalResultsDict objectForKey:@"waist_hip_ratio"] isEqualToString:@""]) {
+        waistHipRatio.value = [clinicalResultsDict objectForKey:@"waist_hip_ratio"];
+    }
     [section addFormRow:waistHipRatio];
     
     waist.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -766,6 +711,7 @@ NSString *const kDocName = @"doc_name";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeText title:@"CBG"];
     row.required = YES;
+    row.value = [clinicalResultsDict objectForKey:@"cbg"];
     [section addFormRow:row];
     
     
@@ -780,20 +726,23 @@ NSString *const kDocName = @"doc_name";
     };
     
     XLFormRowDescriptor *systolic_2;
-    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic2 rowType:XLFormRowDescriptorTypeInteger title:@"Repeat BP Taking (2nd Systolic)"];
+    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic2 rowType:XLFormRowDescriptorTypeNumber title:@"Repeat BP Taking (2nd Systolic)"];
     systolic_2.required = YES;
-    systolic_2.value = @0;
+    systolic_2.value = [[bpRecordsArray objectAtIndex:2] objectForKey:@"systolic_bp"];
     [section addFormRow:systolic_2];
     
     XLFormRowDescriptor *diastolic_2;
-    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic2 rowType:XLFormRowDescriptorTypeInteger title:@"Repeat BP Taking (2nd Diastolic)"];
+    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic2 rowType:XLFormRowDescriptorTypeNumber title:@"Repeat BP Taking (2nd Diastolic)"];
     diastolic_2.required = YES;
-    diastolic_2.value = @0;
+    diastolic_2.value = [[bpRecordsArray objectAtIndex:2] objectForKey:@"diastolic_bp"];
     [section addFormRow:diastolic_2];
     
     XLFormRowDescriptor *systolic_avg;
     systolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolicAvg rowType:XLFormRowDescriptorTypeText title:@"BP (Avg. of 1st & 2nd systolic)"];
     systolic_avg.required = YES;
+    if (![[[bpRecordsArray objectAtIndex:0] objectForKey:@"systolic_bp"] isEqualToString:@""]) {
+        systolic_avg.value = [[bpRecordsArray objectAtIndex:0] objectForKey:@"systolic_bp"];
+    }
     systolic_avg.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kBpSystolic, kBpSystolic2]];
     [section addFormRow:systolic_avg];
     
@@ -813,6 +762,9 @@ NSString *const kDocName = @"doc_name";
     XLFormRowDescriptor *diastolic_avg;
     diastolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolicAvg rowType:XLFormRowDescriptorTypeText title:@"BP (Avg. of 1st & 2nd diastolic)"];
     diastolic_avg.required = YES;
+    if (![[[bpRecordsArray objectAtIndex:0] objectForKey:@"diastolic_bp"] isEqualToString:@""]) {
+        diastolic_avg.value = [[bpRecordsArray objectAtIndex:0] objectForKey:@"diastolic_bp"];
+    }
     [section addFormRow:diastolic_avg];
     
     diastolic_avg.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kBpDiastolic, kBpDiastolic2]];        //somehow must disable first ... @.@"
@@ -828,14 +780,16 @@ NSString *const kDocName = @"doc_name";
         }
     };
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic3 rowType:XLFormRowDescriptorTypeInteger title:@"Repeat BP Taking (3rd Systolic)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic3 rowType:XLFormRowDescriptorTypeNumber title:@"Repeat BP Taking (3rd Systolic)"];
     row.required = NO;
     [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
+    row.value = [[bpRecordsArray objectAtIndex:3] objectForKey:@"systolic_bp"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic3 rowType:XLFormRowDescriptorTypeInteger title:@"Repeat BP Taking (3rd Diastolic)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic3 rowType:XLFormRowDescriptorTypeNumber title:@"Repeat BP Taking (3rd Diastolic)"];
     [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
     row.required = NO;
+    row.value = [[bpRecordsArray objectAtIndex:3] objectForKey:@"diastolic_bp"];
     [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
@@ -2840,8 +2794,7 @@ NSString *const kDocName = @"doc_name";
     }
     
     [section addFormRow:seekHelpSegmentRow];
-    
-#warning removed question. INFORM YOGA!
+
 //    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTen rowType:XLFormRowDescriptorTypeInfo title:@"If yes, Details of financial/social assistance received  - Type )"];
 //    row.cellConfig[@"textLabel.numberOfLines"] = @0;
 //    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", financeAssist];
@@ -3046,65 +2999,66 @@ NSString *const kDocName = @"doc_name";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour rowType:XLFormRowDescriptorTypeInfo title:@"How many relatives do you see or hear from at least once a month?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRelativesContact rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+    relativesContactRow = [XLFormRowDescriptor formRowDescriptorWithTag:kRelativesContact rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    relativesContactRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
-    row.required = YES;
+    relativesContactRow.required = YES;
     
     //value
-    NSArray *options = row.selectorOptions;
+    NSArray *options = relativesContactRow.selectorOptions;
     if (![[socialSuppAssessmentDict objectForKey:kRelativesContact] isEqualToString:@""]) {
         int index = [[socialSuppAssessmentDict objectForKey:kRelativesContact] intValue];
-        row.value = [options objectAtIndex:index];
+        relativesContactRow.value = [options objectAtIndex:index];
     }
     
-    [section addFormRow:row];
+    [section addFormRow:relativesContactRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive rowType:XLFormRowDescriptorTypeInfo title:@"How many relatives do you feel at ease with that you can talk about private matters?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRelativesEase rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+    
+    relativesEaseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kRelativesEase rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    relativesEaseRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
-    row.required = YES;
+    relativesEaseRow.required = YES;
     
     //value
-    options = row.selectorOptions;
+    options = relativesEaseRow.selectorOptions;
     if (![[socialSuppAssessmentDict objectForKey:kRelativesEase] isEqualToString:@""]) {
         int index = [[socialSuppAssessmentDict objectForKey:kRelativesEase] intValue];
-        row.value = [options objectAtIndex:index];
+        relativesEaseRow.value = [options objectAtIndex:index];
     }
     
-    [section addFormRow:row];
+    [section addFormRow:relativesEaseRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix rowType:XLFormRowDescriptorTypeInfo title:@"How many relatives do you feel close to such that you could call on them for help?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRelativesClose rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+    relativesCloseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kRelativesClose rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    relativesCloseRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
-    row.required = YES;
+    relativesCloseRow.required = YES;
     
     //value
-    options = row.selectorOptions;
+    options = relativesCloseRow.selectorOptions;
     if (![[socialSuppAssessmentDict objectForKey:kRelativesClose] isEqualToString:@""]) {
         int index = [[socialSuppAssessmentDict objectForKey:kRelativesClose] intValue];
-        row.value = [options objectAtIndex:index];
+        relativesCloseRow.value = [options objectAtIndex:index];
     }
     
-    [section addFormRow:row];
+    [section addFormRow:relativesCloseRow];
     
     
     //FRIENDS
@@ -3114,75 +3068,83 @@ NSString *const kDocName = @"doc_name";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSeven rowType:XLFormRowDescriptorTypeInfo title:@"How many friends do you see or hear from at least once a month?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsContact rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+    friendsContactRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsContact rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    friendsContactRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
-    row.required = YES;
+    friendsContactRow.required = YES;
     
     //value
-    options = row.selectorOptions;
+    options = friendsContactRow.selectorOptions;
     if (![[socialSuppAssessmentDict objectForKey:kFriendsContact] isEqualToString:@""]) {
         int index = [[socialSuppAssessmentDict objectForKey:kFriendsContact] intValue];
-        row.value = [options objectAtIndex:index];
+        friendsContactRow.value = [options objectAtIndex:index];
     }
     
-    [section addFormRow:row];
+    [section addFormRow:friendsContactRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight rowType:XLFormRowDescriptorTypeInfo title:@"How many friends do you feel at ease with that you can talk about private matters?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsEase rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+    friendsEaseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsEase rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    friendsEaseRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
-    row.required = YES;
+    friendsEaseRow.required = YES;
     
     //value
-    options = row.selectorOptions;
+    options = friendsEaseRow.selectorOptions;
     if (![[socialSuppAssessmentDict objectForKey:kFriendsEase] isEqualToString:@""]) {
         int index = [[socialSuppAssessmentDict objectForKey:kFriendsEase] intValue];
-        row.value = [options objectAtIndex:index];
+        friendsEaseRow.value = [options objectAtIndex:index];
     }
     
-    [section addFormRow:row];
+    [section addFormRow:friendsEaseRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionNine rowType:XLFormRowDescriptorTypeInfo title:@"How many of your friends do you feel close to such that you could call on them for help?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsClose rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
+    friendsCloseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsClose rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    friendsCloseRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"None"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"One"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Two"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Three-Four"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Five-Eight"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Nine or more"]];
-    row.required = YES;
+    friendsCloseRow.required = YES;
     
     //value
-    options = row.selectorOptions;
+    options = friendsCloseRow.selectorOptions;
     if (![[socialSuppAssessmentDict objectForKey:kFriendsClose] isEqualToString:@""]) {
         int index = [[socialSuppAssessmentDict objectForKey:kFriendsClose] intValue];
-        row.value = [options objectAtIndex:index];
+        friendsCloseRow.value = [options objectAtIndex:index];
     }
     
-    [section addFormRow:row];
+    [section addFormRow:friendsCloseRow];
     
     //SOCIAL SCORE
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Social Score"];
     [formDescriptor addFormSection:section];
-    XLFormRowDescriptor *socialScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSocialScore rowType:XLFormRowDescriptorTypeText title:@""];
-//    socialScoreRow.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"0"]];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"kComputeScoreButton" rowType:XLFormRowDescriptorTypeButton title:@"Compute Score"];
+    row.action.formSelector = @selector(computeScoreButton:);
+    [section addFormRow:row];
+    
+    socialScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSocialScore rowType:XLFormRowDescriptorTypeText title:@"Computed Social Score"];
+    socialScoreRow.disabled = @(1);
+    socialScoreRow.cellConfig[@"textLabel.textColor"] = [UIColor blackColor];
+    socialScoreRow.cellConfig[@"textField.textColor"] = [UIColor blueColor];
+    [socialScoreRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     if (![[socialSuppAssessmentDict objectForKey:kSocialScore] isEqualToString:@""]) {
         socialScoreRow.value = [socialSuppAssessmentDict objectForKey:kSocialScore];
     } else {
-        socialScoreRow.value = @"not calculating...";
+        socialScoreRow.value = @"";
     }
     
     [section addFormRow:socialScoreRow];
@@ -3305,6 +3267,7 @@ NSString *const kDocName = @"doc_name";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Referral for Doctor Consult"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
+    NSDictionary *refForDocConsultDict = [self.fullScreeningForm objectForKey:@"consult_record"];
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
@@ -3333,26 +3296,37 @@ NSString *const kDocName = @"doc_name";
 //
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocConsult rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Doctor's consultation"];
+    row.value = [refForDocConsultDict objectForKey:kDocConsult];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Doctor's referral"];
+    row.value = [refForDocConsultDict objectForKey:kDocRef];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSeri rowType:XLFormRowDescriptorTypeBooleanCheck title:@"SERI"];
+    row.value = [refForDocConsultDict objectForKey:kSeri];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSeriRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"SERI referral"];
+    row.value = [refForDocConsultDict objectForKey:kSeriRef];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentalConsult rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental"];
+    row.value = [refForDocConsultDict objectForKey:kDentalConsult];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentalRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental referral"];
+    row.value = [refForDocConsultDict objectForKey:kDentalRef];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kMammoRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Mammogram referal"];
+    row.value = [refForDocConsultDict objectForKey:kMammoRef];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFitKit rowType:XLFormRowDescriptorTypeBooleanCheck title:@"FIT kit"];
+    row.value = [refForDocConsultDict objectForKey:kFitKit];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kPapSmearRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Pap smear referral"];
+    row.value = [refForDocConsultDict objectForKey:kPapSmearRef];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhlebotomy rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Phlebotomy (Blood test)"];
+    row.value = [refForDocConsultDict objectForKey:kPhlebotomy];
     [section addFormRow:row];
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kRefNA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"N.A."];
+    row.value = [refForDocConsultDict objectForKey:kRefNA];
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Doctor's notes"];
@@ -3361,6 +3335,7 @@ NSString *const kDocName = @"doc_name";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocNotes
                                                 rowType:XLFormRowDescriptorTypeTextView];
     [row.cellConfigAtConfigure setObject:@"Doctor's notes" forKey:@"textView.placeholder"];
+    row.value = [refForDocConsultDict objectForKey:kDocNotes];
     [section addFormRow:row];
 
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -3369,10 +3344,88 @@ NSString *const kDocName = @"doc_name";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocName
                                                 rowType:XLFormRowDescriptorTypeText title:@"Name of Doctor"];
     row.required = NO;
+    row.value = [refForDocConsultDict objectForKey:kDocName];
     [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
 }
+
+#pragma mark - Buttons
+//-(void)returnBtnPressed:(id)sender
+//{
+//    [self.navigationController popViewControllerAnimated:YES];
+//}
+- (void) computeScoreButton: (XLFormRowDescriptor *)sender {
+    NSInteger score = [[relativesContactRow.value formValue] integerValue] + [[relativesEaseRow.value formValue] integerValue] + [[relativesCloseRow.value formValue] integerValue] + [[friendsContactRow.value formValue] integerValue] + [[friendsEaseRow.value formValue] integerValue] + [[friendsCloseRow.value formValue] integerValue];
+    
+    socialScoreRow.value = [NSString stringWithFormat:@"%ld", (long)score];
+    [self updateFormRow:socialScoreRow];
+    
+    [self deselectFormRow:sender];
+}
+
+-(void)validateBtnPressed:(UIBarButtonItem * __unused)button
+{
+    NSLog(@"%@", [self.form formValues]);
+    
+    NSArray * validationErrors = [self formValidationErrors];
+    if (validationErrors.count > 0){
+        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+            cell.backgroundColor = [UIColor orangeColor];
+            [UIView animateWithDuration:0.3 animations:^{
+                cell.backgroundColor = [UIColor whiteColor];
+            }];
+        }];
+        [self showFormValidationError:[validationErrors firstObject]];
+        
+        return;
+    } else {
+        //        UIAlertController *alertController;
+        //        UIAlertAction *okAction;
+        //
+        //        alertController = [UIAlertController alertControllerWithTitle:@"Validation success"
+        //                                                              message:@"All required fields are not empty."
+        //                                                       preferredStyle:UIAlertControllerStyleActionSheet];
+        //        alertController.view.backgroundColor = [UIColor greenColor];
+        //        okAction = [UIAlertAction actionWithTitle:@"OK"
+        //                                                 style:UIAlertActionStyleDefault
+        //                                               handler:^(UIAlertAction *action) {
+        //                                                   // do destructive stuff here
+        //                                               }];
+        //
+        //        // note: you can control the order buttons are shown, unlike UIActionSheet
+        //        [alertController addAction:okAction];
+        //        [alertController setModalPresentationStyle:UIModalPresentationPopover];
+        //        [self presentViewController:alertController animated:YES completion:nil];
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+        
+        // Set the custom view mode to show any view.
+        hud.mode = MBProgressHUDModeCustomView;
+        // Set an image view with a checkmark.
+        UIImage *image = [[UIImage imageNamed:@"ThumbsUp"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+        hud.customView = [[UIImageView alloc] initWithImage:image];
+        // Looks a bit nicer if we make it square.
+        hud.square = YES;
+        
+        hud.backgroundColor = [UIColor clearColor];
+        // Optional label text.
+        hud.label.text = NSLocalizedString(@"Good!", @"HUD done title");
+        [hud hideAnimated:YES afterDelay:1.f];
+        
+    }
+    //    [self.tableView endEditing:YES];
+    //    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    
+    // Set the label text.
+    //    hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
+    //    [self submitPersonalInfo:[self preparePersonalInfoDict]];
+    
+    
+}
+
+
 
 #pragma mark - Save Dictionary methods
 
@@ -3912,7 +3965,7 @@ NSString *const kDocName = @"doc_name";
     [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsContact] forKey:kFriendsContact];
     [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsEase] forKey:kFriendsEase];
     [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsClose] forKey:kFriendsClose];
-    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kSocialScore] forKey:kSocialScore];
+    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kSocialScore] forKey:kSocialScore];
     [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kLackCompan] forKey:kLackCompan];
     [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFeelLeftOut] forKey:kFeelLeftOut];
     [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFeelIsolated] forKey:kFeelIsolated];
@@ -3954,11 +4007,26 @@ NSString *const kDocName = @"doc_name";
 
 - (void) saveRefForDoctorConsult {
     NSDictionary *fields = [self.form formValues];
-    NSMutableDictionary *demographics_dict = [[self.fullScreeningForm objectForKey:@"consult_record"] mutableCopy];
+    NSMutableDictionary *refForDoctorConsult_dict = [[self.fullScreeningForm objectForKey:@"consult_record"] mutableCopy];
 
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDocConsult] forKey:kDocConsult];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDocRef] forKey:kDocRef];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kSeri] forKey:kSeri];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kSeriRef] forKey:kSeriRef];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDental] forKey:kDental];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDentalRef] forKey:kDentalRef];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kMammoRef] forKey:kMammoRef];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kFitKit] forKey:kFitKit];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kPapSmearRef] forKey:kPapSmearRef];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kPhleb] forKey:kPhleb];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kRefNA] forKey:kRefNA];
     
-    [self.fullScreeningForm setObject:demographics_dict forKey:@"consult_record"];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:TextView formDescriptorWithTag:kDocNotes] forKey:kDocNotes];
+    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:TextView formDescriptorWithTag:kDocName] forKey:kDocName];
+    
+    [self.fullScreeningForm setObject:refForDoctorConsult_dict forKey:@"consult_record"];
 }
+
 
 #pragma mark - Organize Dictionary Methods
 

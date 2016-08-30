@@ -24,6 +24,7 @@
 
 @implementation ScreeningSectionTableViewController {
     NSNumber *selectedRow;
+    BOOL readyToSubmit;
 }
 
 - (void)viewDidLoad {   //will only happen when it comes from New Resident / Use Existing Resident
@@ -36,7 +37,7 @@
         [self getPatientData];
     }
     
-    self.rowTitles = @[@"Neighbourhood",@"Resident Particulars", @"Clinical Results",@"Screening of Risk Factors", @"Diabetes Mellitus", @"Hyperlipidemia", @"Hypertension", @"Cancer Screening", @"Other Medical Issues", @"Primary Care Source", @"My Health and My Neighbourhood", @"Demographics", @"Current Physical Issues", @"Current Socioeconomics Situation", @"Social Support Assessment", @"Referral for Doctor Consultation", @"Submit"];
+    self.rowTitles = @[@"Neighbourhood",@"Resident Particulars", @"Clinical Results",@"Screening of Risk Factors", @"Diabetes Mellitus", @"Hyperlipidemia", @"Hypertension", @"Cancer Screening", @"Other Medical Issues", @"Primary Care Source", @"My Health and My Neighbourhood", @"Demographics", @"Current Physical Issues", @"Current Socioeconomics Situation", @"Social Support Assessment", @"Referral for Doctor Consultation"];
     
      self.clearsSelectionOnViewWillAppear = YES;
     
@@ -54,7 +55,7 @@
                                                  name:@"updateCompletionCheck"
                                                object:nil];
     
-    self.completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,nil];
+    self.completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,nil];
     [super viewDidLoad];
 }
 
@@ -68,48 +69,84 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
+    return 2;   //Submit is in another section
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 17;
+    if(section == 0) return 16;
+    else return 1;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *simpleTableIdentifier = @"SimpleTableItem";
+    static NSString *buttonTableIdentifier = @"SimpleTableButton";
+    UITableViewCell *cell;
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
-    }
-    cell.textLabel.text = [self.rowTitles objectAtIndex:indexPath.row];
-//     [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
-    if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
-        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    if (indexPath.section == 0) {   //for the questionaires
+         cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
+        }
+    
+        cell.textLabel.text = [self.rowTitles objectAtIndex:indexPath.row];
+        //     [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
+        if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        }
     } else {
-        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell = [tableView dequeueReusableCellWithIdentifier:buttonTableIdentifier];
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:buttonTableIdentifier];
+        }
+        
+        cell.textLabel.text = @"Submit";
+        cell.textLabel.textAlignment = NSTextAlignmentCenter;
+        cell.textLabel.textColor = [UIColor whiteColor];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:20];
+        
+        if (readyToSubmit) {    //if enabled
+            cell.backgroundColor = [UIColor colorWithRed:0 green:51/255.0 blue:102/255.0 alpha:1];  //dark blue
+            cell.userInteractionEnabled = YES;
+        }
+        else {  //if disabled
+        cell.userInteractionEnabled = NO;
+        cell.backgroundColor = [UIColor colorWithRed:184/255.0 green:184/255.0 blue:184/255.0 alpha:1];  //grayed out
+        }
     }
     
     return cell;
 }
 
+- (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    // rows in section 0 should not be selectable
+    if ( indexPath.section == 1 ) {
+        if (readyToSubmit) {
+            return indexPath;
+        } else {
+            return nil;
+        }
+    }
+    
+    // By default, allow row to be selected
+    return indexPath;
+}
+
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
-//    if([tableView cellForRowAtIndexPath:indexPath].accessoryType == UITableViewCellAccessoryCheckmark) {
-//        [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryNone;
-//    } else {
-//        [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
-//    }
-
-    
-    selectedRow = [NSNumber numberWithInteger:indexPath.row];
-    
-    [self performSegueWithIdentifier:@"screeningSectionToFormSegue" sender:self];
-    NSLog(@"Form segue performed!");
-
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    if (indexPath.section == 0) {
+        selectedRow = [NSNumber numberWithInteger:indexPath.row];
+        
+        [self performSegueWithIdentifier:@"screeningSectionToFormSegue" sender:self];
+        NSLog(@"Form segue performed!");
+        
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    }
+    else {    //submit button
+        
+    }
 }
 
 /*
@@ -185,6 +222,14 @@
     int section = [[notification.userInfo objectForKey:@"section"] intValue];
     NSNumber *value = [notification.userInfo objectForKey:@"value"];
     [self.completionCheck replaceObjectAtIndex:section withObject:value];
+    int count=0;
+    for (int i=0;i<[self.completionCheck count];i++) {
+        count = count + [[self.completionCheck objectAtIndex:i] intValue];
+    }
+    if (count == [self.completionCheck count]) {
+        readyToSubmit = true;
+    }
+    NSLog(@"count %d", count);
     [self.tableView reloadData];
 }
 #pragma mark - Blocks
