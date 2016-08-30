@@ -290,31 +290,30 @@ typedef enum getDataState {
             NSLog(@"Continue Form segue performed!");
             
             [tableView deselectRowAtIndexPath:indexPath animated:NO];
-            
+            return;
         }
     }
-    else {  //no saved draft
-        if (tableView == self.tableView) {      //not in the searchResult view
-            selectedResident = [self findResidentInfoFromSectionRow:indexPath];
-            selectedResidentName = [selectedResident objectForKey:@"resident_name"];
-            selectedResidentID = [selectedResident objectForKey:@"resident_id"];
-            
-        } else {
-            selectedResident = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
-            selectedResidentID = [selectedResident objectForKey:@"resident_id"];
-        }
-        //Show Progress Indicator
-        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-        hud.backgroundView.style = MBProgressHUDBackgroundStyleSolidColor;
-        hud.backgroundView.color = [UIColor colorWithWhite:0.f alpha:0.1f];
+    
+    if (tableView == self.tableView) {      //not in the searchResult view
+        selectedResident = [self findResidentInfoFromSectionRow:indexPath];
+        selectedResidentName = [selectedResident objectForKey:@"resident_name"];
+        selectedResidentID = [selectedResident objectForKey:@"resident_id"];
         
-        
-        [self getAllDataForOneResident];
-        
-        [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    } else {
+        selectedResident = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
+        selectedResidentID = [selectedResident objectForKey:@"resident_id"];
     }
+    //Show Progress Indicator
+    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    hud.backgroundView.style = MBProgressHUDBackgroundStyleSolidColor;
+    hud.backgroundView.color = [UIColor colorWithWhite:0.f alpha:0.1f];
     
     
+    [self getAllDataForOneResident];
+    
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+
+
 
 }
 

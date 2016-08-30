@@ -75,6 +75,11 @@
 - (void)getAllScreeningResidents:(void (^)(NSProgress *downloadProgress))progressBlock
 successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                     andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+- (void)getSingleScreeningResidentDataWithResidentID:(NSNumber *) residentID
+                                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 //#pragma mark - Activity Selection methods
 //
 //- (void)getAllActivitySelectionsForPatientID:(NSInteger)patientID

@@ -35,7 +35,6 @@
     "address_num_years": "",
     "consent_nus": "",
     "consent_hpb": "",
-    "consent_goodlife": "",
     "is_prereg": "",
     "is_active": "",
     "ts": ""
@@ -229,6 +228,9 @@
     "ts": ""
   },
   "demographics": {
+    "consent_sso": "",
+    "consent_ntuc": "",
+    "consent_fysc": "",
     "resident_id": "",
     "citizenship": "",
     "religion": "",
@@ -256,7 +258,10 @@
     "cpf_amt": "",
     "chas_colour": "",
     "house_coping": "",
-    "house_coping_reason": "",
+    "cant_cope_med": "",
+    "cant_cope_daily": "",
+    "cant_cope_arrears": "",
+    "cant_cope_others": "",
     "house_coping_reason_others": "",
     "employ_status": "",
     "employ_status_others": "",

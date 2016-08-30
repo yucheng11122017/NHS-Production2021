@@ -9,6 +9,7 @@
 #import "ScreeningSectionTableViewController.h"
 #import "ScreeningFormViewController.h"
 #import "ServerComm.h"
+#import "AppConstants.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
@@ -19,6 +20,7 @@
 @property (strong, nonatomic) NSArray *rowTitles;
 @property (strong, nonatomic) NSMutableDictionary *preRegDictionary;
 @property (strong, nonatomic) NSMutableDictionary *fullScreeningForm;
+@property (strong, nonatomic) NSString *loadedFilepath;
 
 @end
 
@@ -32,9 +34,13 @@
     self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
     
+    [self createEmptyFormWithAllFields];
+    
     self.preRegDictionary = [[NSMutableDictionary alloc] init];
     if ([self.residentID intValue]>= 0) {
         [self getPatientData];
+    } else if ([self.residentID intValue] == -2) {
+        [self loadDraftIfAny];
     }
     
     self.rowTitles = @[@"Neighbourhood",@"Resident Particulars", @"Clinical Results",@"Screening of Risk Factors", @"Diabetes Mellitus", @"Hyperlipidemia", @"Hypertension", @"Cancer Screening", @"Other Medical Issues", @"Primary Care Source", @"My Health and My Neighbourhood", @"Demographics", @"Current Physical Issues", @"Current Socioeconomics Situation", @"Social Support Assessment", @"Referral for Doctor Consultation"];
@@ -44,7 +50,7 @@
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     self.navigationItem.title = @"Screening Form";
-    [self createEmptyFormWithAllFields];
+    
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateFullScreeningForm:)
@@ -145,7 +151,7 @@
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
     else {    //submit button
-        
+        //do nothing for now
     }
 }
 
@@ -202,8 +208,8 @@
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save Draft", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * saveDraftAction) {
-//                                                          [self saveDraft];
-                                                          [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                                                          [self saveDraft];
+                                                          [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshScreeningResidentTable"
                                                                                                               object:nil
                                                                                                             userInfo:nil];
                                                           [self.navigationController popViewControllerAnimated:YES];
@@ -232,6 +238,90 @@
     NSLog(@"count %d", count);
     [self.tableView reloadData];
 }
+
+#pragma mark Save,Load & Delete Methods
+
+- (void) saveDraft {
+    
+    // get current date/time
+    NSDate *today = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
+    NSString *ts = [[localDateTime description] stringByReplacingOccurrencesOfString:@" +0000" withString:@""];
+    NSString *nric = [[[self.fullScreeningForm objectForKey:@"resi_particulars"] objectForKey:kNRIC] stringByAppendingString:@"_"];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *filename = [nric stringByAppendingString:ts]; //Eg. S12313K_datetime
+    NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Screening"];
+    
+    NSError *error;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:folderPath])
+        [[NSFileManager defaultManager] createDirectoryAtPath:folderPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+    NSString *filePath = [folderPath stringByAppendingPathComponent:filename];
+    //Save the form locally on the iPhone
+    [self.fullScreeningForm writeToFile:filePath atomically:YES];
+}
+
+- (void) deleteDraft {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *nric = [self.fullScreeningForm objectForKey:kNRIC];
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Pre-registration"];
+    NSArray *localSavedFilenames = [fileManager contentsOfDirectoryAtPath:folderPath
+                                                                    error:nil];
+    NSString *filename;
+    for (NSString* item in localSavedFilenames)
+    {
+        if ([item rangeOfString:nric].location != NSNotFound)
+            filename = item;
+        else
+            return;     //nothing to delete
+    }
+    NSString *filePath = [folderPath stringByAppendingPathComponent:filename];
+    
+    NSError *error;
+    BOOL success = [fileManager removeItemAtPath:filePath error:&error];
+    if (success) {
+        NSLog(@"Draft deleted!");
+        
+    }
+    else
+    {
+        NSLog(@"Could not delete file -:%@ ",[error localizedDescription]);
+    }
+}
+
+- (void) removeDraftAfterSubmission {
+    NSError *error;
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    BOOL success = [fileManager removeItemAtPath:self.loadedFilepath error:&error];
+    if (success) {
+        NSLog(@"Draft deleted!");
+    }
+    else
+    {
+        NSLog(@"Could not delete file -:%@ ",[error localizedDescription]);
+    }
+}
+
+- (void) loadDraftIfAny {
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Screening"];
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    NSArray *localFiles = [fileManager contentsOfDirectoryAtPath:folderPath
+                                                           error:nil];
+    NSString *filename = [localFiles objectAtIndex:[self.residentLocalFileIndex intValue]];
+    self.loadedFilepath = [[NSString alloc] initWithString:[folderPath stringByAppendingPathComponent:filename]];
+    self.fullScreeningForm = [[NSDictionary dictionaryWithContentsOfFile:self.loadedFilepath] mutableCopy];
+    NSLog(@"Retrieved Dictionary from Local File:\n%@", self.fullScreeningForm);
+}
+
+
 #pragma mark - Blocks
 
 - (void (^)(NSProgress *downloadProgress))progressBlock {

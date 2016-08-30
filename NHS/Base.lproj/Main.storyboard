@@ -221,11 +221,12 @@
                     <connections>
                         <segue destination="nRG-LZ-Hpk" kind="show" identifier="NewScreeningFormSegue" id="Lod-au-JK3"/>
                         <segue destination="6lt-nE-hrg" kind="presentation" identifier="SelectPreRegSegue" id="dvx-gg-8NF"/>
+                        <segue destination="nRG-LZ-Hpk" kind="show" identifier="LoadScreeningFormSegue" id="dVH-QH-3V3"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lh5-MQ-aOL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-162" y="1126"/>
+            <point key="canvasLocation" x="-112" y="1145"/>
         </scene>
         <!--Screening Select Pre Reg Patient Table View Controller-->
         <scene sceneID="Uhk-qS-4a0">
@@ -451,6 +452,9 @@
         </scene>
     </scenes>
     <resources>
-        <image name="NHS logo" width="736" height="736"/>
+        <image name="NHS logo" width="942" height="599"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="dVH-QH-3V3"/>
+    </inferredMetricsTieBreakers>
 </document>

@@ -12,6 +12,7 @@
 #import "MBProgressHUD.h"
 #import "AppConstants.h"
 #import "ScreeningSectionTableViewController.h"
+#import "math.h"
 
 //XLForms stuffs
 #import "XLForm.h"
@@ -277,7 +278,7 @@ NSString *const kDocName = @"doc_name";
 - (void)viewDidLoad {
     
     XLFormDescriptor *form;
-    [self getDictionaryIntoVariables];
+//    [self getDictionaryIntoVariables];
     
     switch([self.sectionID integerValue]) {
         case 0: form = [self initNeighbourhood];       //must init first before [super viewDidLoad]
@@ -429,31 +430,36 @@ NSString *const kDocName = @"doc_name";
     // Name
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeText title:@"Patient Name"];
     row.required = YES;
-    row.value = resident_name? resident_name:@"";
+    row.value = [resiPartiDict objectForKey:@"resident_name"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Gender"];
     row.selectorOptions = @[@"Male", @"Female"];
-    row.value = gender? gender:@"Male";
+    NSString *genderMF = [resiPartiDict objectForKey:@"gender"];
+    if ([genderMF isEqualToString:@"M"]) {
+        row.value = @"Male";
+    } else if ([genderMF isEqualToString:@"F"]) {
+        row.value = @"Female";
+    }
     row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC rowType:XLFormRowDescriptorTypeText title:@"NRIC"];
-    row.value = nric? nric:@"";
+    row.value = [resiPartiDict objectForKey:@"nric"];
     row.required = YES;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDOB rowType:XLFormRowDescriptorTypeInteger title:@"DOB Year"];
     row.required = YES;
-    row.value = birth_year? birth_year:@"";
+    row.value = [resiPartiDict objectForKey:@"birth_year"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kContactNumber rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     row.required = YES;
-    row.value = contact_no? contact_no:@"";
+    row.value = [resiPartiDict objectForKey:@"contact_no"];
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
@@ -473,7 +479,7 @@ NSString *const kDocName = @"doc_name";
                             ];
     row.required = NO;
     if ([[resiPartiDict objectForKey:@"ethnicity_id"] isEqualToString:@""]) {
-//        row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Chinese"];   //default value
+
     } else {
         row.value = [row.selectorOptions objectAtIndex:[[resiPartiDict objectForKey:@"ethnicity_id"] integerValue]] ;
     }
@@ -483,13 +489,15 @@ NSString *const kDocName = @"doc_name";
     spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLanguage rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language"];
     spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
     row.required = YES;
-    spokenLangRow.value = spoken_lang_value? spoken_lang_value:@[];
+    spokenLangRow.value = [self getSpokenLangArray:resiPartiDict];
+//    spokenLangRow.value = spoken_lang_value? spoken_lang_value:@[];
     [section addFormRow:spokenLangRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLangOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
     row.required = NO;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", spokenLangRow];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    row.value = [resiPartiDict objectForKey:@"lang_others_text"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kMaritalStatus rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Marital Status"];
@@ -540,25 +548,25 @@ NSString *const kDocName = @"doc_name";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddPostCode rowType:XLFormRowDescriptorTypeInteger title:@"Address (Post Code)"];
     row.required = YES;
-    row.value = address_postcode? address_postcode:@"";
+    row.value = [resiPartiDict objectForKey:@"address_postcode"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddStreet rowType:XLFormRowDescriptorTypeText title:@"Address (Street)"];
     row.required = YES;
-    row.value = address_street? address_street:@"";
+    row.value = [resiPartiDict objectForKey:@"address_street"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddBlock rowType:XLFormRowDescriptorTypeText title:@"Address (Block)"];
     row.required = YES;
-    row.value = address_block? address_block:@"";
+    row.value = [resiPartiDict objectForKey:@"address_block"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddUnit rowType:XLFormRowDescriptorTypeText title:@"Address (Unit) - {With #}"];
     row.required = YES;
-    row.value = address_unit? address_unit:@"";
+    row.value = [resiPartiDict objectForKey:@"address_unit"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
@@ -659,7 +667,9 @@ NSString *const kDocName = @"doc_name";
     if (![[clinicalResultsDict objectForKey:@"bmi"] isEqualToString:@""]) {
         bmi.value = [clinicalResultsDict objectForKey:@"bmi"];
     } else {
-        bmi.value = @([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2));
+        if (!isnan([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2))) {  //check for not nan first!
+            bmi.value = @([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2));
+        }
     }
     [section addFormRow:bmi];
     
@@ -2255,7 +2265,7 @@ NSString *const kDocName = @"doc_name";
     if([[primaryCareDict objectForKey:kCareProviderID] isEqualToString:@""]) {
         providerOthersRow.hidden = @(1);
     } else {
-        if ([[providerOthersRow.value formValue] isEqual:@(5)]) {
+        if ([[careProvider.value formValue] isEqual:@(5)]) {
             providerOthersRow.hidden = @(0);
         } else {
             providerOthersRow.hidden = @(1);
@@ -2525,6 +2535,49 @@ NSString *const kDocName = @"doc_name";
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
+    // Consent - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Consent to share particulars, personal information, screening results and other necessary information with the following"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kConsentNUS rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"SSO @ Taman Jurong / Family Service Centre @ Marine Parade"];
+    row.required = NO;
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    if ([demographicsDict objectForKey:@"consent_sso"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_sso"])) {
+        if (([[demographicsDict objectForKey:@"consent_sso"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_sso"] isEqualToString:@"1"]))
+            row.value = [demographicsDict objectForKey:@"consent_sso"];
+        else
+            row.value = @1;
+    } else {
+        row.value = @1;
+    }
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kConsentHPB rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"NTUC Health Cluster Support @ Taman Jurong / Goodlife"];
+    row.required = NO;
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    if ([demographicsDict objectForKey:@"consent_ntuc"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_ntuc"])) {
+        if (([[demographicsDict objectForKey:@"consent_ntuc"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_ntuc"] isEqualToString:@"1"]))
+            row.value = [demographicsDict objectForKey:@"consent_ntuc"];
+        else
+            row.value = @1;
+    } else {
+        row.value = @1;
+    }
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kConsentHPB rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Fei Yue Family Service Centre / SSO @ Bedok and Geylang Serai"];
+    row.required = NO;
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    if ([demographicsDict objectForKey:@"consent_fysc"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_fysc"])) {
+        if (([[demographicsDict objectForKey:@"consent_fysc"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_fysc"] isEqualToString:@"1"]))
+            row.value = [demographicsDict objectForKey:@"consent_fysc"];
+        else
+            row.value = @1;
+    } else {
+        row.value = @1;
+    }
+    [section addFormRow:row];
+    
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
@@ -2680,11 +2733,8 @@ NSString *const kDocName = @"doc_name";
     notCopingReasonRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", financeCopingRow];
     
     //value
-    NSArray *options = notCopingReasonRow.selectorOptions;
-    if (![[currSocioSituationDict objectForKey:kHouseCopingReason] isEqualToString:@""]) {
-        int index = [[currSocioSituationDict objectForKey:kHouseCopingReason] intValue];
-        notCopingReasonRow.value = @[[options objectAtIndex:index]];
-    }
+    notCopingReasonRow.value = [self getCantCopeArrayFromDict:currSocioSituationDict andOptions:notCopingReasonRow.selectorOptions];
+
     [section addFormRow:notCopingReasonRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHouseCopingReasonOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
@@ -2707,7 +2757,7 @@ NSString *const kDocName = @"doc_name";
                                            [XLFormOptionsObject formOptionsObjectWithValue:@(7) displayText:@"Others"]];
     EmployStatusRow.required = YES;
     //value
-    options = EmployStatusRow.selectorOptions;
+    NSArray *options = EmployStatusRow.selectorOptions;
     if (![[currSocioSituationDict objectForKey:kEmployStatus] isEqualToString:@""]) {
         int index = [[currSocioSituationDict objectForKey:kEmployStatus] intValue];
         EmployStatusRow.value = [options objectAtIndex:index];
@@ -3508,6 +3558,17 @@ NSString *const kDocName = @"doc_name";
     [resi_particulars setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kMaritalStatus] forKey:kMaritalStatus];
     [resi_particulars setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kHighestEduLvl] forKey:@"highest_edu_lvl"];
 
+    //Init them to zero first
+    [resi_particulars setObject:@"0" forKey:@"lang_canto"];
+    [resi_particulars setObject:@"0" forKey:@"lang_english"];
+    [resi_particulars setObject:@"0" forKey:@"lang_hokkien"];
+    [resi_particulars setObject:@"0" forKey:@"lang_hindi"];
+    [resi_particulars setObject:@"0" forKey:@"lang_malay"];
+    [resi_particulars setObject:@"0" forKey:@"lang_mandrin"];
+    [resi_particulars setObject:@"0" forKey:@"lang_tamil"];
+    [resi_particulars setObject:@"0" forKey:@"lang_teochew"];
+    [resi_particulars setObject:@"0" forKey:@"lang_others"];
+    
     if ([[fields objectForKey:kSpokenLanguage] count]!=0) {
         NSArray *spokenLangArray = [fields objectForKey:kSpokenLanguage];
         for (int i=0; i<[spokenLangArray count]; i++) {
@@ -3518,6 +3579,7 @@ NSString *const kDocName = @"doc_name";
             else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Hokkien"]) [resi_particulars setObject:@"1" forKey:@"lang_hokkien"];
             else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Malay"]) [resi_particulars setObject:@"1" forKey:@"lang_malay"];
             else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Mandarin"]) [resi_particulars setObject:@"1" forKey:@"lang_mandrin"];
+            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Tamil"]) [resi_particulars setObject:@"1" forKey:@"lang_tamil"];
             else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Teochew"]) [resi_particulars setObject:@"1" forKey:@"lang_teochew"];
             else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Others"]) [resi_particulars setObject:@"1" forKey:@"lang_others"];
         }
@@ -3592,7 +3654,6 @@ NSString *const kDocName = @"doc_name";
     [individualBpRecord setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kBpDiastolic3] forKey:@"diastolic_bp"];
     [individualBpRecord setObject:@"3" forKey:@"order_num"];
     [individualBpRecord setObject:@"0" forKey:@"is_avg"];
-    //is_avg is missing
     //also timestamp is here..
     [bp_record replaceObjectAtIndex:3 withObject:individualBpRecord];
     
@@ -3893,13 +3954,19 @@ NSString *const kDocName = @"doc_name";
         else if ([[fields objectForKey:kChasColour] isEqualToString:@"N.A."]) [currSocioSituation_dict setObject:@"2" forKey:kChasColour];
     }
     
+    //reset values to 0 first
+    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_med"];
+    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_daily"];
+    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_arrears"];
+    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_others"];
+    
     if ([fields objectForKey:kHouseCopingReason] != (id) [NSNull null]) {
         NSArray *houseCopingArray = [fields objectForKey:kHouseCopingReason];
         for(int i=0;i<[houseCopingArray count];i++) {
-            if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Medical expenses"]) [currSocioSituation_dict setObject:@"0" forKey:kHouseCopingReason];
-            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Daily living expenses"]) [currSocioSituation_dict setObject:@"1" forKey:kHouseCopingReason];
-            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Arrears / Debts"]) [currSocioSituation_dict setObject:@"2" forKey:kHouseCopingReason];
-            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Others"]) [currSocioSituation_dict setObject:@"3" forKey:kHouseCopingReason];
+            if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Medical expenses"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_med"];
+            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Daily living expenses"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_daily"];
+            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Arrears / Debts"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_arrears"];
+            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Others"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_others"];
         }
     }
     [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHouseCoping] forKey:kHouseCoping];
@@ -4087,9 +4154,6 @@ NSString *const kDocName = @"doc_name";
 }
 
 - (void) getDictionaryIntoVariables {
-//    NSDictionary *contact_info = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"contact_info"]];
-//    NSDictionary *personal_info = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"personal_info"]];
-//    NSDictionary *spoken_lang = [NSDictionary dictionaryWithDictionary:[self.preRegParticularsDict objectForKey:@"spoken_lang"]];
 
     NSDictionary *resi_particulars = [self.fullScreeningForm objectForKey:@"resi_particulars"];
     
@@ -4120,16 +4184,29 @@ NSString *const kDocName = @"doc_name";
 
 - (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
     NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
-    if([[dictionary objectForKey:@"lang_canto"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
-    if([[dictionary objectForKey:@"lang_english"] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
-    if([[dictionary objectForKey:@"lang_hindi"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
-    if([[dictionary objectForKey:@"lang_hokkien"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
-    if([[dictionary objectForKey:@"lang_malay"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
-    if([[dictionary objectForKey:@"lang_mandrin"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
-    if([[dictionary objectForKey:@"lang_others"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
-    if([[dictionary objectForKey:@"lang_tamil"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
-    if([[dictionary objectForKey:@"lang_teochew"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
-    
+    if ([[dictionary objectForKey:@"lang_canto"] isKindOfClass:[NSString class]]) {
+
+        if([[dictionary objectForKey:@"lang_canto"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
+        if([[dictionary objectForKey:@"lang_english"] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
+        if([[dictionary objectForKey:@"lang_hindi"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
+        if([[dictionary objectForKey:@"lang_hokkien"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
+        if([[dictionary objectForKey:@"lang_malay"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
+        if([[dictionary objectForKey:@"lang_mandrin"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
+        if([[dictionary objectForKey:@"lang_others"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
+        if([[dictionary objectForKey:@"lang_tamil"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
+        if([[dictionary objectForKey:@"lang_teochew"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
+    }
+    else if ([[dictionary objectForKey:@"lang_english"] isKindOfClass:[NSNumber class]]) {
+        if([[dictionary objectForKey:@"lang_canto"] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
+        if([[dictionary objectForKey:@"lang_english"] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
+        if([[dictionary objectForKey:@"lang_hindi"] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
+        if([[dictionary objectForKey:@"lang_hokkien"] isEqual:@(1)]) [spokenLangArray addObject:@"Hokkien"];
+        if([[dictionary objectForKey:@"lang_malay"] isEqual:@(1)]) [spokenLangArray addObject:@"Malay"];
+        if([[dictionary objectForKey:@"lang_mandrin"] isEqual:@(1)]) [spokenLangArray addObject:@"Mandarin"];
+        if([[dictionary objectForKey:@"lang_others"] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
+        if([[dictionary objectForKey:@"lang_tamil"] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
+        if([[dictionary objectForKey:@"lang_teochew"] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
+    }
     return spokenLangArray;
 }
 
@@ -4202,6 +4279,17 @@ NSString *const kDocName = @"doc_name";
     
     return supportArray;
 }
+
+- (NSArray *) getCantCopeArrayFromDict:(NSDictionary *) dictionary andOptions:(NSArray *) options {
+    NSMutableArray *cantCopeArray = [[NSMutableArray alloc] init];
+    if([[dictionary objectForKey:@"cant_cope_med"] isEqualToString:@"1"]) [cantCopeArray addObject:[options objectAtIndex:0]];
+    if([[dictionary objectForKey:@"cant_cope_daily"] isEqualToString:@"1"]) [cantCopeArray addObject:[options objectAtIndex:1]];
+    if([[dictionary objectForKey:@"cant_cope_arrears"] isEqualToString:@"1"]) [cantCopeArray addObject:[options objectAtIndex:2]];
+    if([[dictionary objectForKey:@"cant_cope_others"] isEqualToString:@"1"]) [cantCopeArray addObject:[options objectAtIndex:3]];
+    
+    return cantCopeArray;
+}
+
 
 - (NSArray *) getOrgArrayFromDict: (NSDictionary *) dictionary andOptions:(NSArray *) options {
     NSMutableArray *orgArray = [[NSMutableArray alloc] init];

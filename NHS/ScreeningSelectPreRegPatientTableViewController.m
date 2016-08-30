@@ -245,7 +245,7 @@ typedef enum getDataState {
                                                         object:self
                                                       userInfo:userInfo];
     [self dismissViewControllerAnimated:YES completion:^(void) {    //dismiss searchBar
-        [self dismissViewControllerAnimated:YES completion:nil];    //dismiss Modal VC
+        [self dismissViewControllerAnimated:NO completion:nil];    //dismiss Modal VC
     }];
     
 //    [self performSegueWithIdentifier:@"PreRegResidentToScreeningFormSegue" sender:self];
