@@ -401,7 +401,6 @@ NSString *const kDocName = @"doc_name";
     [section addFormRow:row];
     
     neighbourhoodRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        //        bmi.value = @([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2));
         if (oldValue != newValue) {
             if ([[newValue formValue] isEqual:@5]) {
                 row.hidden = @(NO);
@@ -664,20 +663,22 @@ NSString *const kDocName = @"doc_name";
     bmi = [XLFormRowDescriptor formRowDescriptorWithTag:kBMI rowType:XLFormRowDescriptorTypeText title:@"BMI"];
     bmi.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kHeight, kWeight]];
     //Initial value only
-    if (![[clinicalResultsDict objectForKey:@"bmi"] isEqualToString:@""]) {
-        bmi.value = [clinicalResultsDict objectForKey:@"bmi"];
-    } else {
-        if (!isnan([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2))) {  //check for not nan first!
-            bmi.value = @([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2));
+    if ([clinicalResultsDict objectForKey:@"bmi"] != [NSNull null]) {
+        if (![[clinicalResultsDict objectForKey:@"bmi"] isEqualToString:@""]) {
+            bmi.value = [clinicalResultsDict objectForKey:@"bmi"];
+        } else {
+            if (!isnan([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2))) {  //check for not nan first!
+                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+            }
         }
     }
     [section addFormRow:bmi];
     
     weight.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        bmi.value = @([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2));
+        bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
     };
     height.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        bmi.value = @([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2));
+        bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
     };
     
     bmi.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -703,7 +704,7 @@ NSString *const kDocName = @"doc_name";
     [section addFormRow:hip];
     
     XLFormRowDescriptor *waistHipRatio;
-    waistHipRatio = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistHipRatio rowType:XLFormRowDescriptorTypeText title:@"Waist : Hip Ratio (cm)"];
+    waistHipRatio = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistHipRatio rowType:XLFormRowDescriptorTypeText title:@"Waist : Hip Ratio"];
     waistHipRatio.required = YES;
     waistHipRatio.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kWaistCircum, kHipCircum]];
     //Initial value
@@ -713,10 +714,10 @@ NSString *const kDocName = @"doc_name";
     [section addFormRow:waistHipRatio];
     
     waist.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        waistHipRatio.value = @([waist.value doubleValue] / [hip.value doubleValue]);
+        waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
     };
     hip.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        waistHipRatio.value = @([waist.value doubleValue] / [hip.value doubleValue]);
+        waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
     };
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeText title:@"CBG"];
@@ -3532,11 +3533,12 @@ NSString *const kDocName = @"doc_name";
     NSMutableDictionary *resi_particulars = [[self.fullScreeningForm objectForKey:@"resi_particulars"] mutableCopy];
     
 #warning resident_id part is missing...
-    
-    if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
-        [resi_particulars setObject:@"M" forKey:kGender];
-    } else if ([[fields objectForKey:kGender] isEqualToString:@"Female"]) {
-        [resi_particulars setObject:@"F" forKey:kGender];
+    if ([fields objectForKey:kGender] != [NSNull null]) {
+        if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
+            [resi_particulars setObject:@"M" forKey:kGender];
+        } else if ([[fields objectForKey:kGender] isEqualToString:@"Female"]) {
+            [resi_particulars setObject:@"F" forKey:kGender];
+        }
     }
     
     [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kName] forKey:@"resident_name"];
