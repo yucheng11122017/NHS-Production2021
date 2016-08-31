@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01C86C761D7725960096379A /* SummaryPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01C86C751D7725960096379A /* SummaryPageViewController.m */; };
 		0365AA69F5F64A154E302724 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8964BE86125ACEAAC6F8C79B /* AVFoundation.framework */; };
 		15939C23012573E7010C5FF7 /* BuddyBuildSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A953ABBE5FC7CBFB590C255 /* BuddyBuildSDK.framework */; };
 		45E30D748D4D9DB15E36E079 /* Pods_CocoaPods_NHS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF146E69B77C3775C935F8C /* Pods_CocoaPods_NHS.framework */; };
@@ -71,6 +72,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		01C86C741D7725960096379A /* SummaryPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SummaryPageViewController.h; sourceTree = "<group>"; };
+		01C86C751D7725960096379A /* SummaryPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SummaryPageViewController.m; sourceTree = "<group>"; };
 		15C05F16B9AA0D95A6AE2EAA /* Pods-CocoaPods-NHS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPods-NHS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPods-NHS/Pods-CocoaPods-NHS.debug.xcconfig"; sourceTree = "<group>"; };
 		209345AB6DD8B9F1E078D209 /* Pods_NHSUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NHSUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		32CF155AD7EB396F62BB8DC1 /* Pods-CocoaPods-NHS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPods-NHS.release.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPods-NHS/Pods-CocoaPods-NHS.release.xcconfig"; sourceTree = "<group>"; };
@@ -209,6 +212,8 @@
 				8EC56F861D60C16300938C2A /* ScreeningSectionTableViewController.m */,
 				8EC56F7F1D60B88D00938C2A /* ScreeningFormViewController.h */,
 				8EC56F801D60B88D00938C2A /* ScreeningFormViewController.m */,
+				01C86C741D7725960096379A /* SummaryPageViewController.h */,
+				01C86C751D7725960096379A /* SummaryPageViewController.m */,
 			);
 			name = Screening;
 			sourceTree = "<group>";
@@ -637,6 +642,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				01C86C761D7725960096379A /* SummaryPageViewController.m in Sources */,
 				E120E40B1D431E9B002DBC7E /* AppDelegate.m in Sources */,
 				8EC56F8A1D60CDBB00938C2A /* AppConstants.m in Sources */,
 				E120E4081D431E9B002DBC7E /* main.m in Sources */,

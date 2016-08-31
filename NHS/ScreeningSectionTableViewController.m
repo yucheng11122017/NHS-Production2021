@@ -8,6 +8,7 @@
 
 #import "ScreeningSectionTableViewController.h"
 #import "ScreeningFormViewController.h"
+#import "SummaryPageViewController.h"
 #import "ServerComm.h"
 #import "AppConstants.h"
 
@@ -62,6 +63,7 @@
                                                object:nil];
     
     self.completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,nil];
+    readyToSubmit = true;
     [super viewDidLoad];
 }
 
@@ -128,13 +130,13 @@
 
 - (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     // rows in section 0 should not be selectable
-    if ( indexPath.section == 1 ) {
-        if (readyToSubmit) {
-            return indexPath;
-        } else {
-            return nil;
-        }
-    }
+//    if ( indexPath.section == 1 ) {
+//        if (readyToSubmit) {
+//            return indexPath;
+//        } else {
+//            return nil;
+//        }
+//    }
     
     // By default, allow row to be selected
     return indexPath;
@@ -151,7 +153,7 @@
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
     else {    //submit button
-        //do nothing for now
+        [self performSegueWithIdentifier:@"ScreeningSectionToSummaryPageSegue" sender:self];
     }
 }
 
@@ -440,15 +442,11 @@
     if ([segue.destinationViewController respondsToSelector:@selector(setSectionID:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setSectionID:)
                                               withObject:selectedRow];
-        
-//        if ([selectedRow isEqualToNumber:[NSNumber numberWithInt:1]]) {    //Resident Particulars
-            if ([segue.destinationViewController respondsToSelector:@selector(setFullScreeningForm:)]) {
-                [segue.destinationViewController performSelector:@selector(setFullScreeningForm:)
-                                                      withObject:self.fullScreeningForm];
-            }
-//        }
-//        [segue.destinationViewController performSelector:@selector(setResidentPersonalData:)
-//                                              withObject:selectedRow];
+    }
+    
+    if ([segue.destinationViewController respondsToSelector:@selector(setFullScreeningForm:)]) {
+        [segue.destinationViewController performSelector:@selector(setFullScreeningForm:)
+                                              withObject:self.fullScreeningForm];
     }
 }
 

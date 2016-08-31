@@ -283,6 +283,9 @@
                             <outlet property="delegate" destination="nRG-LZ-Hpk" id="Gzf-D7-3pm"/>
                         </connections>
                     </tableView>
+                    <connections>
+                        <segue destination="AnT-Sf-0o0" kind="show" identifier="ScreeningSectionToSummaryPageSegue" id="r8t-KI-lSO"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="p9q-dF-195" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -305,6 +308,24 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2xD-9v-bZp" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1445" y="1202"/>
+        </scene>
+        <!--Summary Page View Controller-->
+        <scene sceneID="RWr-69-agU">
+            <objects>
+                <viewController id="AnT-Sf-0o0" customClass="SummaryPageViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="8gc-ch-amN"/>
+                        <viewControllerLayoutGuide type="bottom" id="yP6-Cv-4rT"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="CMG-pS-XBR">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="pm2-G0-qoB" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1445" y="1906"/>
         </scene>
         <!--Login View Controller-->
         <scene sceneID="Czs-aA-wUp">
