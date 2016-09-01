@@ -10,14 +10,25 @@
 #import "ServerComm.h"
 #import "MBProgressHUD.h"
 #import "AppConstants.h"
-#import "math.h"
 
 //XLForms stuffs
 #import "XLForm.h"
+#define remarksTextViewHeight 150
+#define summaryTextViewHeight 500
+#define remarksLabelHeight 20
+
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
-@interface SummaryPageViewController () <UITextViewDelegate>
+@interface SummaryPageViewController () {
+
+    UITextView *summaryTextView;
+    UILabel *remarksLabel;
+    MBProgressHUD *hud;
+}
+@property(strong, nonatomic) UIScrollView *scrollViewBackground;
+@property(strong, nonatomic) UITextView *remarksTextView;
+
 
 
 @end
@@ -28,53 +39,239 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     NSLog(@"%@", self.fullScreeningForm);
+    
+    self.navigationItem.title = @"Summary";
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitPressed:)];
+    
+    [self initScrollView];
+    
+    [self generateSummaryReport];
+    [self initRemarksColumn];
+    
+    [self.scrollViewBackground addSubview:summaryTextView];
+    [self.scrollViewBackground addSubview:remarksLabel];
+    [self.scrollViewBackground addSubview:self.remarksTextView];
+    
+     /* Allow taping anywhere on the screen to hide keyboard */
+     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
+                                    initWithTarget:self
+                                    action:@selector(dismissKeyboard)];
+     
+     [self.view addGestureRecognizer:tap];
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    CGRect contentRect = CGRectZero;
+    for (UIView *view in self.scrollViewBackground.subviews) {
+        contentRect = CGRectUnion(contentRect, view.frame);
+    }
+    self.scrollViewBackground.contentSize = contentRect.size;   //update to the correct size according to content
+    
+    [self registerForKeyboardNotifications];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)viewDidLayoutSubviews {
+    [summaryTextView setContentOffset:CGPointZero animated:NO]; //make subview offset from the navigation bar to be 0
+}
+
+#pragma mark Keyboard Notifs - to adj screen when keyboard comes up
+- (void)registerForKeyboardNotifications {
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(keyboardWasShown:)
+     name:UIKeyboardDidShowNotification
+     object:nil];
+    
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(keyboardWillBeHidden:)
+     name:UIKeyboardWillHideNotification
+     object:nil];
+}
+
+// Called when the UIKeyboardDidShowNotification is sent.
+// If login button is hidden by keyboard, scroll it so it's visible
+- (void)keyboardWasShown:(NSNotification *)aNotification {
+    
+    // get keyboard size
+    NSDictionary *info = [aNotification userInfo];
+    CGSize kbSize =
+    [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    
+    // set kayboard's height as content inset
+    UIEdgeInsets contentInsets = UIEdgeInsetsMake(0.0, 0.0, kbSize.height, 0.0);
+    self.scrollViewBackground.contentInset = contentInsets;
+    self.scrollViewBackground.scrollIndicatorInsets = contentInsets;
+    
+    // If Remarks Text View is hidden by keyboard, scroll it so it's visible
+    CGRect aRect = self.view.frame;
+    aRect.size.height -= kbSize.height;
+    if (!CGRectContainsRect(aRect, self.remarksTextView.frame))
+        [self.scrollViewBackground scrollRectToVisible:self.remarksTextView.frame
+                                              animated:YES];
+}
+
+// Called when the UIKeyboardWillHideNotification is sent
+- (void)keyboardWillBeHidden:(NSNotification *)aNotification {
+    
+    // reset content insets between scrollview and content, to zero
+    UIEdgeInsets contentInsets = UIEdgeInsetsMake(self.navigationController.navigationBar.frame.size.height+10, 0, 0, 0);
+    self.scrollViewBackground.contentInset = contentInsets;
+    self.scrollViewBackground.scrollIndicatorInsets = contentInsets;
+}
+
+#pragma mark Keyboard/ UIButton presses
+
+// this gets called when 'return' or its equivalent button is pressed.
+// return 'YES' to implement its default behaviour (which is to insert line
+// break)
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    
+    [_remarksTextView resignFirstResponder];
+    return NO; // We do not want to insert a line-break.
+}
+
+//Hide Keyboard if anywhere in the screen is tapped
+-(void)dismissKeyboard {
+    [_remarksTextView resignFirstResponder];
+}
+
+#pragma  mark - Label, TextView, Button Init
+- (void) initScrollView {
+    self.scrollViewBackground = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+    
+    self.scrollViewBackground.contentSize = CGSizeMake(self.view.frame.size.width, self.view.frame.size.height);
+    [self.view addSubview:self.scrollViewBackground];
+}
+
+- (void) initRemarksColumn {
+    
+    remarksLabel= [[UILabel alloc] initWithFrame:CGRectMake(10, summaryTextView.frame.origin.y+summaryTextViewHeight+10, self.scrollViewBackground.bounds.size.width-20, remarksLabelHeight)];
+    
+    [remarksLabel setText:@"Remarks"];
+    [remarksLabel setTextColor:[UIColor grayColor]];
+    
+    self.remarksTextView = [[UITextView alloc] initWithFrame:CGRectMake(10, remarksLabel.frame.origin.y+remarksLabel.frame.size.height+10, self.view.bounds.size.width-20, remarksTextViewHeight)];
+    
+    [self.remarksTextView setText:@""];
+    [self.remarksTextView setFont:[UIFont systemFontOfSize:14]];
+    self.remarksTextView.layer.borderWidth = 0.5f;
+    self.remarksTextView.layer.borderColor = [[UIColor grayColor] CGColor];
+    self.remarksTextView.layer.cornerRadius = 8;
+    self.remarksTextView.delegate = self;
+}
+
+- (void) generateSummaryReport {
     NSDictionary *resi_particulars = [self.fullScreeningForm objectForKey:@"resi_particulars"];
     NSDictionary *clinical_results = [[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"clinical_results"];
     NSArray *bp_records = [[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"bp_record"];
+    NSDictionary *risk_factors = [self.fullScreeningForm objectForKey:@"risk_factors"];
+    NSDictionary *diabetes = [self.fullScreeningForm objectForKey:@"diabetes"];
+    NSDictionary *hyperlipid = [self.fullScreeningForm objectForKey:@"hyperlipid"];
+    NSDictionary *hypertension = [self.fullScreeningForm objectForKey:@"hypertension"];
+    NSDictionary *consult_record = [self.fullScreeningForm objectForKey:@"consult_record"];
     
-    
-    //Past History (smoker / drinker / history of diabetes? /  history of hyperlipidemia? / history of hypertension? )
-    //The resident has gone for/received the following: Doctor's Consultation | Doctor's referral | SERI | SERI referral | Dental | Dental referral | Mammogram referral | FIT kit | Pap Smear referral l Phlebotomy (Blood Test) l NA
     //Remarks (problems encountered when filling form / missing information)
-    NSAttributedString *resi_part_header = [[NSAttributedString alloc] initWithString:@"Resident Particulars\n" attributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:14]}];
     
-    NSAttributedString *name = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Name: %@\n",[resi_particulars objectForKey:@"resident_name"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    UIFont* warningFont = [UIFont systemFontOfSize:14];
+    UIColor* redColor = [UIColor colorWithRed:216/255.0 green:0 blue:0 alpha:1.0f];
+    NSDictionary *warningAttrs = @{ NSForegroundColorAttributeName : redColor,
+                                    NSFontAttributeName : warningFont,
+                                    NSTextEffectAttributeName : NSTextEffectLetterpressStyle};
     
-    NSAttributedString *gender = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Gender: %@\n",[resi_particulars objectForKey:@"gender"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    
+    UIColor* headerColor = [UIColor colorWithRed:2/255.0 green:63/255.0 blue:165/255.0 alpha:1.0f];
+    NSDictionary *headerAttrs = @{NSForegroundColorAttributeName : headerColor,
+                                  NSFontAttributeName : [UIFont boldSystemFontOfSize:18]};
+    
+    
+    
+    
+    NSAttributedString *resi_part_header = [[NSAttributedString alloc] initWithString:@"Resident Particulars\n" attributes:headerAttrs];
+    
+    NSAttributedString *name = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Name: %@\n",[resi_particulars objectForKey:@"resident_name"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    
+    NSAttributedString *gender = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Gender: %@\n",[resi_particulars objectForKey:@"gender"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
     
     NSArray *spokenLangArray = [self getSpokenLangArray:resi_particulars];
     NSString *spoken_lang_string = [spokenLangArray componentsJoinedByString:@", "];
     
-    NSAttributedString *spoken_lang = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Spoken Language(s): %@\n",spoken_lang_string] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    NSAttributedString *spoken_lang = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Spoken Language(s): %@\n",spoken_lang_string] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
     
-    NSAttributedString *ethnicity = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Ethnicity: %@\n",[self getEthnicityString:resi_particulars]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    NSAttributedString *ethnicity = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Ethnicity: %@\n",[self getEthnicityString:resi_particulars]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
     
-    NSAttributedString *contac_num = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Contact Number: %@\n",[resi_particulars objectForKey:@"contact_no"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    NSAttributedString *contac_num = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Contact Number: %@\n",[resi_particulars objectForKey:@"contact_no"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
     
-//
-    NSAttributedString *address = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Address: %@, Blk %@, %@, S(%@)\n\n",[resi_particulars objectForKey:@"address_unit"], [resi_particulars objectForKey:@"address_block"], [resi_particulars objectForKey:@"address_street"], [resi_particulars objectForKey:@"address_postcode"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    //
+    NSAttributedString *address = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Address: %@, Blk %@, %@, S(%@)\n\n",[resi_particulars objectForKey:@"address_unit"], [resi_particulars objectForKey:@"address_block"], [resi_particulars objectForKey:@"address_street"], [resi_particulars objectForKey:@"address_postcode"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
     
-    NSAttributedString *clinical_results_header = [[NSAttributedString alloc] initWithString:@"Clinical Findings\n" attributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:14]}];
+    NSAttributedString *clinical_results_header = [[NSAttributedString alloc] initWithString:@"Clinical Findings\n" attributes:headerAttrs];
     
-    NSAttributedString *bp = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Diastolic: %@\nSystolic: %@\n",[bp_records[0] objectForKey:@"diastolic_bp"], [bp_records[0] objectForKey:@"systolic_bp"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    NSAttributedString *bp_systolic;
+    if ([[bp_records[0] objectForKey:@"systolic_bp"] intValue] < 140) {
+        bp_systolic = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Systolic: %@\n",[bp_records[0] objectForKey:@"systolic_bp"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    } else {
+        bp_systolic = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Systolic: %@\n",[bp_records[0] objectForKey:@"systolic_bp"]] attributes:warningAttrs];
+    }
     
-    NSAttributedString *bmi = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"BMI: %@\n",[clinical_results objectForKey:@"bmi"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    NSAttributedString *bp_diastolic;
+    if ([[bp_records[0] objectForKey:@"diastolic_bp"] intValue] < 90) {
+        bp_diastolic = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Diastolic: %@\n",[bp_records[0] objectForKey:@"diastolic_bp"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    } else {
+        bp_diastolic = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Diastolic: %@\n",[bp_records[0] objectForKey:@"diastolic_bp"]] attributes:warningAttrs];
+    }
     
-    NSAttributedString *cbg = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"BMI: %@\n",[clinical_results objectForKey:@"cbg"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    NSAttributedString *bmi;
+    if ([[clinical_results objectForKey:@"bmi"] floatValue] <= 30.0) {
+        bmi = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"BMI: %@\n",[clinical_results objectForKey:@"bmi"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    } else {
+        bmi = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"BMI: %@\n",[clinical_results objectForKey:@"bmi"]] attributes:warningAttrs];
+    }
+    NSAttributedString *cbg;
+    if ([[clinical_results objectForKey:@"bmi"] floatValue] <= 11.1) {
+        cbg = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"CBG: %@\n",[clinical_results objectForKey:@"cbg"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    } else {
+        cbg = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"CBG: %@\n",[clinical_results objectForKey:@"cbg"]] attributes:warningAttrs];
+    }
     
-    NSAttributedString *waist_hip_ratio = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Waist-Hip Ratio: %@\n",[clinical_results objectForKey:@"waist_hip_ratio"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
-//
-//    NSAttributedString *contac_num = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Name: %@\n",[resi_particulars objectForKey:@"contact_no"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:12]}];
+    NSAttributedString *waist_hip_ratio = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Waist-Hip Ratio: %@\n\n",[clinical_results objectForKey:@"waist_hip_ratio"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    
+    NSAttributedString *past_history_header = [[NSAttributedString alloc] initWithString:@"Past History\n" attributes:headerAttrs];
+    
+    NSAttributedString *smoking_status = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"🚬 Smoking: %@\n",[self getSmokingStatusString:risk_factors]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    
+    NSAttributedString *alcohol_status = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"🍺 Alcohol: %@\n",[self getAlcoholHowOftenString:risk_factors]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    
+    NSAttributedString *diabetes_status = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"History of Diabetes: %@\n", [self getYesNoWithString:[diabetes objectForKey:@"has_informed"]]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    
+    NSAttributedString *hyperlipid_status = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"History of Hyperlipidemia: %@\n", [self getYesNoWithString:[hyperlipid objectForKey:@"has_informed"]]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    
+    NSAttributedString *hypertension_status = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"History of Hypertension: %@\n\n", [self getYesNoWithString:[hypertension objectForKey:@"has_informed"]]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    
+    NSAttributedString *doctor_referral_header = [[NSAttributedString alloc] initWithString:@"The resident has gone for/received the following:\n" attributes:headerAttrs];
+    
+    NSAttributedString *doctor_referral_contents = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [self getRefForDocConsultString:consult_record]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
+    
+    
+    //
+    //    NSAttributedString *contac_num = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"Name: %@\n",[resi_particulars objectForKey:@"contact_no"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
     
     
     
     
-//    NSAttributedString *textString =  [[NSAttributedString alloc] initWithString:@"Hello World\n" attributes:@{
-//                                                                                                             NSFontAttributeName: [UIFont fontWithName:@"HoeflerText-Italic" size:12]
-//                                                                                                             }];
-//    NSAttributedString *textString2 =  [[NSAttributedString alloc] initWithString:@"You're beautiful!" attributes:@{
-//                                                                                                             NSFontAttributeName: [UIFont fontWithName:@"HoeflerText-Italic" size:14]
-//                                                                                                             }];
+    //    NSAttributedString *textString =  [[NSAttributedString alloc] initWithString:@"Hello World\n" attributes:@{
+    //                                                                                                             NSFontAttributeName: [UIFont fontWithName:@"HoeflerText-Italic" size:14]
+    //                                                                                                             }];
+    //    NSAttributedString *textString2 =  [[NSAttributedString alloc] initWithString:@"You're beautiful!" attributes:@{
+    //                                                                                                             NSFontAttributeName: [UIFont fontWithName:@"HoeflerText-Italic" size:14]
+    //                                                                                                             }];
     NSTextStorage *textStorage = [[NSTextStorage alloc] initWithAttributedString:resi_part_header];
     [textStorage appendAttributedString:name];
     [textStorage appendAttributedString:gender];
@@ -83,10 +280,19 @@
     [textStorage appendAttributedString:contac_num];
     [textStorage appendAttributedString:address];
     [textStorage appendAttributedString:clinical_results_header];
-    [textStorage appendAttributedString:bp];
+    [textStorage appendAttributedString:bp_systolic];
+    [textStorage appendAttributedString:bp_diastolic];
     [textStorage appendAttributedString:bmi];
     [textStorage appendAttributedString:cbg];
     [textStorage appendAttributedString:waist_hip_ratio];
+    [textStorage appendAttributedString:past_history_header];
+    [textStorage appendAttributedString:smoking_status];
+    [textStorage appendAttributedString:alcohol_status];
+    [textStorage appendAttributedString:diabetes_status];
+    [textStorage appendAttributedString:hyperlipid_status];
+    [textStorage appendAttributedString:hypertension_status];
+    [textStorage appendAttributedString:doctor_referral_header];
+    [textStorage appendAttributedString:doctor_referral_contents];
     
     
     NSLayoutManager *textLayout = [[NSLayoutManager alloc] init];
@@ -99,22 +305,32 @@
     // Instantiate UITextView object using the text container
     
     
-    UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(20, 20, self.view.bounds.size.width-20, self.view.bounds.size.height-20) textContainer:textContainer];
+     summaryTextView = [[UITextView alloc] initWithFrame:CGRectMake(10, 10, self.view.bounds.size.width-20, summaryTextViewHeight) textContainer:textContainer];
     
-    textView.scrollEnabled = YES;
+    summaryTextView.layer.borderWidth = 0.5f;
+    summaryTextView.layer.borderColor = [[UIColor grayColor] CGColor];
+    summaryTextView.layer.cornerRadius = 8;
     
-    [self.view addSubview:textView];
-    
+    summaryTextView.scrollEnabled = NO;
+    summaryTextView.scrollEnabled = YES;
+    summaryTextView.editable = NO;  //make it not editable
 
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+#pragma mark Submit Button
+
+-(void)submitPressed:(UIBarButtonItem * __unused)button {
+    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    
+    // Set the label text.
+    hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
+    
+    
 }
 
 
 
+#pragma mark - Misc. Methods
 
 - (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
     NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
@@ -147,6 +363,49 @@
     return @"";
 }
 
+- (NSString *) getSmokingStatusString: (NSDictionary *) dictionary {
+    if ([[dictionary objectForKey:@"smoking"] isEqualToString:@"0"]) return @"Smokes at least once a day";
+    else if ([[dictionary objectForKey:@"smoking"] isEqualToString:@"1"]) return @"Smokes but not everyday";
+    else if ([[dictionary objectForKey:@"smoking"] isEqualToString:@"2"]) return @"Ex-smoker, now quit";
+    else if ([[dictionary objectForKey:@"smoking"] isEqualToString:@"3"]) return @"Never smoked";
+    
+    return @"";
+}
+
+- (NSString *) getAlcoholHowOftenString: (NSDictionary *) dictionary {
+    if ([[dictionary objectForKey:@"alcohol_how_often"] isEqualToString:@"0"]) return @"More than 4 days a week";
+    else if ([[dictionary objectForKey:@"alcohol_how_often"] isEqualToString:@"1"]) return @"1-4 days a week";
+    else if ([[dictionary objectForKey:@"alcohol_how_often"] isEqualToString:@"2"]) return @"Less than 3 days a month";
+    else if ([[dictionary objectForKey:@"alcohol_how_often"] isEqualToString:@"3"]) return @"Not drinking";
+    
+    return @"";
+}
+
+- (NSString *) getYesNoWithString: (NSString *) stringOneOrZero {
+    if ([stringOneOrZero isEqualToString:@"0"]) return @"NO";
+    if ([stringOneOrZero isEqualToString:@"1"]) return @"YES";
+    
+    return @"";
+}
+
+- (NSString *) getRefForDocConsultString: (NSDictionary *) dictionary {
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+
+        if([[dictionary objectForKey:@"doc_consult"] isEqualToString:@"1"]) [array addObject:@"Doctor's consultation"];
+        if([[dictionary objectForKey:@"doc_ref"] isEqualToString:@"1"]) [array addObject:@"Doctor's referral"];
+        if([[dictionary objectForKey:@"seri"] isEqualToString:@"1"]) [array addObject:@"SERI"];
+        if([[dictionary objectForKey:@"seri_ref"] isEqualToString:@"1"]) [array addObject:@"SERI referral"];
+        if([[dictionary objectForKey:@"dental"] isEqualToString:@"1"]) [array addObject:@"Dental"];
+        if([[dictionary objectForKey:@"dental_ref"] isEqualToString:@"1"]) [array addObject:@"Dental referral"];
+        if([[dictionary objectForKey:@"mammo_ref"] isEqualToString:@"1"]) [array addObject:@"Mammogram referral"];
+        if([[dictionary objectForKey:@"fit_kit"] isEqualToString:@"1"]) [array addObject:@"FIT kit"];
+        if([[dictionary objectForKey:@"pap_smear_ref"] isEqualToString:@"1"]) [array addObject:@"Pap smear referral"];
+        if([[dictionary objectForKey:@"phleb"] isEqualToString:@"1"]) [array addObject:@"Phlebotomy (Blood test)"];
+        if([[dictionary objectForKey:@"na"] isEqualToString:@"1"]) [array addObject:@"N.A."];
+    
+    
+    return [array componentsJoinedByString:@"\n"];;
+}
 /*
 #pragma mark - Navigation
 

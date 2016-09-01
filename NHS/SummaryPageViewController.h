@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SummaryPageViewController : UIViewController
+@interface SummaryPageViewController : UIViewController <UITextViewDelegate>
 
 @property (strong, nonatomic) NSMutableDictionary *fullScreeningForm;
 
