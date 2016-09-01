@@ -14,10 +14,12 @@
 @property (strong, nonatomic) NSNumber* residentID;
 @property (strong, nonatomic) NSNumber* residentLocalFileIndex;
 @property (strong, nonatomic) NSMutableArray *completionCheck;
+@property (strong, nonatomic) NSDictionary *retrievedData;
 
 
 - (void) setResidentLocalFileIndex:(NSNumber *) residentLocalFileIndex;
 - (void) setResidentID:(NSNumber *)residentID;
+- (void) setRetrievedData: (NSDictionary *) dictionary;
 //- (void) updateChecklistWithRowNumber:(NSNumber*)row
 //                   value:(NSNumber*)value;
 

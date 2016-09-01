@@ -28,6 +28,7 @@
 }
 @property(strong, nonatomic) UIScrollView *scrollViewBackground;
 @property(strong, nonatomic) UITextView *remarksTextView;
+@property(strong, nonatomic) NSNumber *resident_id;
 
 
 
@@ -137,6 +138,16 @@
     [_remarksTextView resignFirstResponder];
     return NO; // We do not want to insert a line-break.
 }
+
+- (void)textViewDidChange:(UITextView *)textView
+{
+    CGFloat fixedWidth = textView.frame.size.width;
+    CGSize newSize = [textView sizeThatFits:CGSizeMake(fixedWidth, MAXFLOAT)];
+    CGRect newFrame = textView.frame;
+    newFrame.size = CGSizeMake(fmaxf(newSize.width, fixedWidth), newSize.height);
+    textView.frame = newFrame;
+}
+
 
 //Hide Keyboard if anywhere in the screen is tapped
 -(void)dismissKeyboard {
@@ -325,7 +336,94 @@
     // Set the label text.
     hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
     
+    [self submitResidentParticulars];
     
+    
+}
+
+#pragma mark - Post data to server methods
+- (void) submitResidentParticulars {
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    NSDictionary *dict = [self insertTimestampToDict:[self.fullScreeningForm objectForKey:@"resi_particulars"]];
+    [client postResidentParticularsWithDict:dict
+                      progressBlock:[self progressBlock]
+                       successBlock:[self newEntrySuccessBlock]
+                       andFailBlock:[self errorBlock]];
+}
+
+
+
+#pragma mark - Blocks
+
+- (void (^)(NSProgress *downloadProgress))progressBlock {
+    return ^(NSProgress *downloadProgress) {
+        NSLog(@"POST in progress...");
+    };
+}
+//
+//- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
+//    return ^(NSURLSessionDataTask *task, id responseObject){
+//        NSLog(@"%@", responseObject);
+//        successCounter++;
+//        if(successCounter == 4) {
+//            NSLog(@"SUBMISSION SUCCESSFUL!!");
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                [hud hideAnimated:YES];
+//            });
+//            if (self.loadDataFlag == [NSNumber numberWithBool:YES]) {       //if this draft is loaded and submitted,now delete!
+//                [self removeDraftAfterSubmission];
+//            }
+//            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
+//                                                                                      message:@"Pre-registration successful!"
+//                                                                               preferredStyle:UIAlertControllerStyleAlert];
+//            
+//            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+//                                                                style:UIAlertActionStyleDefault
+//                                                              handler:^(UIAlertAction * okAction) {
+//                                                                  [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+//                                                                                                                      object:nil
+//                                                                                                                    userInfo:nil];
+//                                                                  [self.navigationController popViewControllerAnimated:YES];
+//                                                              }]];
+//            [self presentViewController:alertController animated:YES completion:nil];
+//        }
+//        
+//        
+//    };
+//}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))newEntrySuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"Personal info submission success");
+        self.resident_id = [responseObject objectForKey:@"resident_id"];
+        NSLog(@"I'm resident %@", self.resident_id);
+        
+        [hud hideAnimated:YES];     //stop showing the progressindicator
+        
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"submittingOtherSections" object:nil];
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"******UNSUCCESSFUL SUBMISSION******!!");
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+
+        [hud hideAnimated:YES];     //stop showing the progressindicator
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
+                                                                                  message:@"Form failed to upload!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              //do nothing for now
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+        
+        
+    };
 }
 
 
@@ -405,6 +503,18 @@
     
     
     return [array componentsJoinedByString:@"\n"];;
+}
+
+- (NSDictionary *) insertTimestampToDict:(NSMutableDictionary *) dictionary {
+    // get current date/time
+    NSDate *today = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
+    
+    [dictionary setObject:[localDateTime description] forKey:@"ts"];
+    
+    return dictionary;
 }
 /*
 #pragma mark - Navigation

@@ -37,9 +37,14 @@
     
     [self createEmptyFormWithAllFields];
     
+    
     self.preRegDictionary = [[NSMutableDictionary alloc] init];
     if ([self.residentID intValue]>= 0) {
-        [self getPatientData];
+//        if (self.retrievedData) {
+//            [self insertRequestDataToScreeningForm];
+//        } else {
+            [self getPatientData];
+//        }
     } else if ([self.residentID intValue] == -2) {
         [self loadDraftIfAny];
     }
@@ -190,6 +195,10 @@
     return YES;
 }
 */
+
+//- (void) setRetrievedData:(NSDictionary *)dictionary {
+//    self.retrievedData = dictionary;
+//}
 
 # pragma mark - Buttons
 
@@ -433,6 +442,25 @@
     
 }
 
+- (void) insertRequestDataToScreeningForm {
+    NSArray* keys = [self.retrievedData allKeys];
+    NSString *key;
+    
+    for (key in keys) {
+        if ([self.retrievedData objectForKey:key] != [NSNull null]) {
+            if(![key isEqualToString:@"opcode"]) {
+                //            [self.fullScreeningForm setObject:[self.retrievedData objectForKey:key] forKey:key];
+                NSArray *inDictKeys = [[self.retrievedData objectForKey:key] allKeys];
+                NSString *inDictKey;
+                
+                for (inDictKey in inDictKeys) {
+                    [[self.fullScreeningForm objectForKey:key] setObject:[NSString stringWithFormat:@"%@",[[self.retrievedData objectForKey:key] objectForKey:inDictKey]] forKey:inDictKey];
+                }
+            }
+            
+        }
+    }
+}
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation

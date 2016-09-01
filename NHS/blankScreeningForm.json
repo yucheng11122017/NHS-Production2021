@@ -4,9 +4,7 @@
     "neighbourhood_others": ""
   },
   "resi_particulars": {
-    "id": "",
-    "neighbourhood_location": "",
-    "neighbourhood_others": "",
+    "resident_id": "",
     "resident_name": "",
     "gender": "",
     "nric": "",
@@ -35,8 +33,6 @@
     "address_num_years": "",
     "consent_nus": "",
     "consent_hpb": "",
-    "is_prereg": "",
-    "is_active": "",
     "ts": ""
   },
   "clinical_results": {

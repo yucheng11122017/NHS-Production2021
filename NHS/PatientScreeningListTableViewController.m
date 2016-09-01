@@ -729,6 +729,11 @@ typedef enum residentDataSource {
                                               withObject:selectedResidentID];
     }
     
+    if (self.retrievedResidentData) {
+        [segue.destinationViewController performSelector:@selector(setRetrievedData:)
+                                              withObject:self.retrievedResidentData];
+    }
+    
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentLocalFileIndex:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setResidentLocalFileIndex:)
                                               withObject:draftID];
