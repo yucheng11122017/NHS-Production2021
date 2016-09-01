@@ -167,7 +167,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"neighbourhood":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -207,7 +207,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": dictionary};  //exceptional
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -226,7 +226,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"risk_factors":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -245,7 +245,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"diabetes":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -264,7 +264,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"hyperlipid":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -283,7 +283,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"hypertension":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -302,7 +302,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"cancer":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -321,7 +321,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"others":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -340,7 +340,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"primary_care":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -359,7 +359,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"self_rated":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -378,7 +378,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"demographics":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -397,7 +397,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"adls":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -416,7 +416,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"socioecon":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -435,7 +435,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"social_support":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -454,7 +454,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"consult_record":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -473,7 +473,7 @@
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
     
-    dataDict = @{@"data": dictionary};
+    dataDict = @{@"data": @{@"submit_remarks":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict

@@ -40,11 +40,11 @@
     
     self.preRegDictionary = [[NSMutableDictionary alloc] init];
     if ([self.residentID intValue]>= 0) {
-//        if (self.retrievedData) {
-//            [self insertRequestDataToScreeningForm];
-//        } else {
+        if (self.retrievedData) {
+            [self insertRequestDataToScreeningForm];
+        } else {
             [self getPatientData];
-//        }
+        }
     } else if ([self.residentID intValue] == -2) {
         [self loadDraftIfAny];
     }
@@ -445,22 +445,36 @@
 - (void) insertRequestDataToScreeningForm {
     NSArray* keys = [self.retrievedData allKeys];
     NSString *key;
+    NSDictionary *retrievedSectionsDict;
+    NSMutableDictionary *currentSectionDict = [[NSMutableDictionary alloc] init];
+    
     
     for (key in keys) {
         if ([self.retrievedData objectForKey:key] != [NSNull null]) {
-            if(![key isEqualToString:@"opcode"]) {
-                //            [self.fullScreeningForm setObject:[self.retrievedData objectForKey:key] forKey:key];
-                NSArray *inDictKeys = [[self.retrievedData objectForKey:key] allKeys];
-                NSString *inDictKey;
+            if ([[self.retrievedData objectForKey:key] isKindOfClass:[NSDictionary class]]) {      //double check surely have something
+                retrievedSectionsDict = [self.retrievedData objectForKey:key];
+                currentSectionDict = [[self.fullScreeningForm objectForKey:key] mutableCopy];
+                NSArray *keys2 = [retrievedSectionsDict allKeys];
+                NSString *key2;
                 
-                for (inDictKey in inDictKeys) {
-                    [[self.fullScreeningForm objectForKey:key] setObject:[NSString stringWithFormat:@"%@",[[self.retrievedData objectForKey:key] objectForKey:inDictKey]] forKey:inDictKey];
+                for (key2 in keys2) {
+                    if ([retrievedSectionsDict objectForKey:key2] != [NSNull null]) {
+                        if ([[retrievedSectionsDict objectForKey:key2] isKindOfClass:[NSArray class]]) {    //looking for bp_records
+                            if ([[retrievedSectionsDict objectForKey:key2] count] > 0) {
+                                [currentSectionDict setObject:[retrievedSectionsDict objectForKey:key2] forKey:key2];
+                            }
+                        } else {
+                            [currentSectionDict setObject:[retrievedSectionsDict objectForKey:key2] forKey:key2];
+                        }
+                        
+                    }
                 }
+                [self.fullScreeningForm setObject:currentSectionDict forKey:key];   //copy the mutableCopy to the original
             }
-            
         }
     }
 }
+//[self.fullScreeningForm setObject:[self.retrievedData objectForKey:key] forKey:key];
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation

@@ -25,10 +25,12 @@
     UITextView *summaryTextView;
     UILabel *remarksLabel;
     MBProgressHUD *hud;
+    int successCounter;
+    float timestampSecond;
 }
 @property(strong, nonatomic) UIScrollView *scrollViewBackground;
 @property(strong, nonatomic) UITextView *remarksTextView;
-@property(strong, nonatomic) NSNumber *resident_id;
+@property(strong, nonatomic) NSString *resident_id;
 
 
 
@@ -39,10 +41,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    NSLog(@"%@", self.fullScreeningForm);
+//    NSLog(@"%@", self.fullScreeningForm);
     
     self.navigationItem.title = @"Summary";
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitPressed:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitScreeningPressed:)];
     
     [self initScrollView];
     
@@ -171,7 +173,7 @@
     
     self.remarksTextView = [[UITextView alloc] initWithFrame:CGRectMake(10, remarksLabel.frame.origin.y+remarksLabel.frame.size.height+10, self.view.bounds.size.width-20, remarksTextViewHeight)];
     
-    [self.remarksTextView setText:@""];
+    [self.remarksTextView setText:[[self.fullScreeningForm objectForKey:@"submit_remarks"] objectForKey:@"remarks"]];
     [self.remarksTextView setFont:[UIFont systemFontOfSize:14]];
     self.remarksTextView.layer.borderWidth = 0.5f;
     self.remarksTextView.layer.borderColor = [[UIColor grayColor] CGColor];
@@ -246,7 +248,7 @@
         bmi = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"BMI: %@\n",[clinical_results objectForKey:@"bmi"]] attributes:warningAttrs];
     }
     NSAttributedString *cbg;
-    if ([[clinical_results objectForKey:@"bmi"] floatValue] <= 11.1) {
+    if ([[clinical_results objectForKey:@"cbg"] floatValue] <= 11.1) {
         cbg = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"CBG: %@\n",[clinical_results objectForKey:@"cbg"]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
     } else {
         cbg = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"CBG: %@\n",[clinical_results objectForKey:@"cbg"]] attributes:warningAttrs];
@@ -330,8 +332,10 @@
 
 #pragma mark Submit Button
 
--(void)submitPressed:(UIBarButtonItem * __unused)button {
+-(void)submitScreeningPressed:(UIBarButtonItem * __unused)button {
     hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    
+    [self saveRemarksToDict];
     
     // Set the label text.
     hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
@@ -351,6 +355,123 @@
                        andFailBlock:[self errorBlock]];
 }
 
+- (void) submitAllOtherSections {
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    successCounter = 0;
+    timestampSecond = 0;
+    NSDictionary *dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"neighbourhood"]];
+    NSLog(@"neighbourhood:%@}",dict);
+    [client postNeighbourhoodWithDict:dict
+                              progressBlock:[self progressBlock]
+                               successBlock:[self successBlock]
+                               andFailBlock:[self errorBlock]];
+    
+    dict = [self prepareClinicalResultsDict];
+    [client postClinicalResultsWithDict:dict
+                        progressBlock:[self progressBlock]
+                         successBlock:[self successBlock]
+                         andFailBlock:[self errorBlock]];
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"risk_factors"]];
+    [client postRiskFactorsWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"risk_factors:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"diabetes"]];
+    [client postDiabetesWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"diabetes:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"hyperlipid"]];
+    [client postHyperlipidWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"hyperlipid:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"hypertension"]];
+    [client postHypertensionWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"hypertension:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"cancer"]];
+    [client postCancerWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"cancer:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"others"]];
+    [client postOtherMedIssuesWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"others:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"primary_care"]];
+    [client postPriCareSourceWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"primary_care:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"self_rated"]];
+    [client postMyHealthMyNeighbourhoodWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"self_rated:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"demographics"]];
+    [client postDemographicsWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"demographics:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"adls"]];
+    [client postCurrPhyIssuesWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"adls:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"socioecon"]];
+    [client postCurrSocioSituationWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"socioecon:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"social_support"]];
+    [client postSociSuppAssessWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"social_support:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"consult_record"]];
+    [client postRefForDocConsultWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"consult_record:%@",dict);
+    
+    dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"submit_remarks"]];
+    
+    [client postSubmitRemarksWithDict:dict
+                          progressBlock:[self progressBlock]
+                           successBlock:[self successBlock]
+                           andFailBlock:[self errorBlock]];
+    NSLog(@"submit_remarks:%@",dict);
+}
+
 
 
 #pragma mark - Blocks
@@ -360,45 +481,47 @@
         NSLog(@"POST in progress...");
     };
 }
-//
-//- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
-//    return ^(NSURLSessionDataTask *task, id responseObject){
-//        NSLog(@"%@", responseObject);
-//        successCounter++;
-//        if(successCounter == 4) {
-//            NSLog(@"SUBMISSION SUCCESSFUL!!");
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                [hud hideAnimated:YES];
-//            });
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"%@", responseObject);
+        successCounter++;
+        if(successCounter == 16) {
+            NSLog(@"SUBMISSION SUCCESSFUL!!");
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [hud hideAnimated:YES];
+            });
 //            if (self.loadDataFlag == [NSNumber numberWithBool:YES]) {       //if this draft is loaded and submitted,now delete!
 //                [self removeDraftAfterSubmission];
 //            }
-//            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
-//                                                                                      message:@"Pre-registration successful!"
-//                                                                               preferredStyle:UIAlertControllerStyleAlert];
-//            
-//            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-//                                                                style:UIAlertActionStyleDefault
-//                                                              handler:^(UIAlertAction * okAction) {
-//                                                                  [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
-//                                                                                                                      object:nil
-//                                                                                                                    userInfo:nil];
-//                                                                  [self.navigationController popViewControllerAnimated:YES];
-//                                                              }]];
-//            [self presentViewController:alertController animated:YES completion:nil];
-//        }
-//        
-//        
-//    };
-//}
+            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
+                                                                                      message:@"Screening form upload successful!"
+                                                                               preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * okAction) {
+                                                                  [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshScreeningResidentTable"
+                                                                                                                      object:nil
+                                                                                                                    userInfo:nil];
+                                                                  [self.navigationController popViewControllerAnimated:YES];
+                                                              }]];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
+        
+        
+    };
+}
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))newEntrySuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
-        NSLog(@"Personal info submission success");
+        NSLog(@"Resident Particulars submission success");
         self.resident_id = [responseObject objectForKey:@"resident_id"];
         NSLog(@"I'm resident %@", self.resident_id);
         
-        [hud hideAnimated:YES];     //stop showing the progressindicator
+        [hud hideAnimated:YES];
+        
+        [self submitAllOtherSections];
         
 //        [[NSNotificationCenter defaultCenter] postNotificationName:@"submittingOtherSections" object:nil];
     };
@@ -408,19 +531,20 @@
     return ^(NSURLSessionDataTask *task, NSError *error) {
         NSLog(@"******UNSUCCESSFUL SUBMISSION******!!");
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
-        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+        NSString *errorString = [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
+        NSLog(@"Error: %@", errorString);
 
         [hud hideAnimated:YES];     //stop showing the progressindicator
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
-                                                                                  message:@"Form failed to upload!"
-                                                                           preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * okAction) {
-                                                              //do nothing for now
-                                                          }]];
-        [self presentViewController:alertController animated:YES completion:nil];
+//        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
+//                                                                                  message:@"Form failed to upload!"
+//                                                                           preferredStyle:UIAlertControllerStyleAlert];
+//        
+//        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+//                                                            style:UIAlertActionStyleDefault
+//                                                          handler:^(UIAlertAction * okAction) {
+//                                                              //do nothing for now
+//                                                          }]];
+//        [self presentViewController:alertController animated:YES completion:nil];
         
         
     };
@@ -505,6 +629,38 @@
     return [array componentsJoinedByString:@"\n"];;
 }
 
+- (void) saveRemarksToDict {
+    NSMutableDictionary* dict = [[NSMutableDictionary alloc] initWithDictionary:[self.fullScreeningForm objectForKey:@"submit_remarks"]];
+    [dict setObject:_remarksTextView.text forKey:@"remarks"];
+    [self.fullScreeningForm setObject:dict forKey:@"submit_remarks"];   //put it back to the dictionary;
+}
+
+- (NSDictionary *) prepareClinicalResultsDict {
+    NSMutableDictionary *clinical_results = [[NSMutableDictionary alloc] initWithDictionary:[self.fullScreeningForm objectForKey:@"clinical_results"]];
+    
+    NSMutableArray *bp_records = [[NSMutableArray alloc] initWithArray:[clinical_results objectForKey:@"bp_record"]];
+    NSDictionary *innerClinicalDict = [self insertTimestampAndResidentIDToDict:[clinical_results objectForKey:@"clinical_results"]];
+    NSMutableDictionary *temp = [[NSMutableDictionary alloc] init];
+    
+    // get current date/time
+    NSDate *today = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
+    
+    for(int i=0; i<4;i++) {
+        temp = [[bp_records objectAtIndex:i] mutableCopy];
+        [temp setObject:[localDateTime description] forKey:@"ts"];  //so that all time variable will be the same
+        [temp setObject:self.resident_id forKey:@"resident_id"];
+        [bp_records replaceObjectAtIndex:i withObject:temp];
+    }
+    
+    [clinical_results setObject:innerClinicalDict forKey:@"clinical_results"];
+    [clinical_results setObject:bp_records forKey:@"bp_record"];
+    
+    return clinical_results;
+}
+
 - (NSDictionary *) insertTimestampToDict:(NSMutableDictionary *) dictionary {
     // get current date/time
     NSDate *today = [NSDate date];
@@ -513,6 +669,21 @@
     NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
     
     [dictionary setObject:[localDateTime description] forKey:@"ts"];
+    
+    return dictionary;
+}
+
+- (NSDictionary *) insertTimestampAndResidentIDToDict:(NSMutableDictionary *) dictionary {
+    // get current date/time
+    NSDate *today = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
+    localDateTime = [NSDate dateWithTimeInterval:timestampSecond sinceDate:localDateTime];      //add a second
+    timestampSecond++;  //forcefully make sure that no upload of same timestamp.
+    
+    [dictionary setObject:[localDateTime description] forKey:@"ts"];
+    [dictionary setObject:self.resident_id forKey:@"resident_id"];
     
     return dictionary;
 }
