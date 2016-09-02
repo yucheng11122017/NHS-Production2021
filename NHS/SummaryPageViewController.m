@@ -7,6 +7,7 @@
 //
 
 #import "SummaryPageViewController.h"
+#import "PatientScreeningListTableViewController.h"
 #import "ServerComm.h"
 #import "MBProgressHUD.h"
 #import "AppConstants.h"
@@ -27,6 +28,7 @@
     MBProgressHUD *hud;
     int successCounter;
     float timestampSecond;
+    BOOL errorMsgFlag;
 }
 @property(strong, nonatomic) UIScrollView *scrollViewBackground;
 @property(strong, nonatomic) UITextView *remarksTextView;
@@ -339,7 +341,7 @@
     
     // Set the label text.
     hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
-    
+    errorMsgFlag = NO;
     [self submitResidentParticulars];
     
     
@@ -358,7 +360,7 @@
 - (void) submitAllOtherSections {
     ServerComm *client = [ServerComm sharedServerCommInstance];
     successCounter = 0;
-    timestampSecond = 0;
+    timestampSecond = 1;
     NSDictionary *dict = [self insertTimestampAndResidentIDToDict:[self.fullScreeningForm objectForKey:@"neighbourhood"]];
     NSLog(@"neighbourhood:%@}",dict);
     [client postNeighbourhoodWithDict:dict
@@ -504,7 +506,14 @@
                                                                   [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshScreeningResidentTable"
                                                                                                                       object:nil
                                                                                                                     userInfo:nil];
-                                                                  [self.navigationController popViewControllerAnimated:YES];
+                                                                  NSArray *viewControllers = [[self navigationController] viewControllers];
+                                                                  for( int i=0;i<[viewControllers count];i++){
+                                                                      id obj=[viewControllers objectAtIndex:i];
+                                                                      if([obj isKindOfClass:[PatientScreeningListTableViewController class]]){
+                                                                          [[self navigationController] popToViewController:obj animated:YES];
+                                                                          return;
+                                                                      }
+                                                                  }
                                                               }]];
             [self presentViewController:alertController animated:YES completion:nil];
         }
@@ -535,18 +544,20 @@
         NSLog(@"Error: %@", errorString);
 
         [hud hideAnimated:YES];     //stop showing the progressindicator
-//        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
-//                                                                                  message:@"Form failed to upload!"
-//                                                                           preferredStyle:UIAlertControllerStyleAlert];
-//        
-//        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-//                                                            style:UIAlertActionStyleDefault
-//                                                          handler:^(UIAlertAction * okAction) {
-//                                                              //do nothing for now
-//                                                          }]];
-//        [self presentViewController:alertController animated:YES completion:nil];
-        
-        
+        if (!errorMsgFlag) {
+            errorMsgFlag = YES;
+            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Ooops!", nil)
+                                                                                      message:@"Form failed to upload. Please try again."
+                                                                               preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * okAction) {
+                                                                  //do nothing
+                                                              }]];
+            [self presentViewController:alertController animated:YES completion:nil];
+            
+        }
     };
 }
 
@@ -639,7 +650,7 @@
     NSMutableDictionary *clinical_results = [[NSMutableDictionary alloc] initWithDictionary:[self.fullScreeningForm objectForKey:@"clinical_results"]];
     
     NSMutableArray *bp_records = [[NSMutableArray alloc] initWithArray:[clinical_results objectForKey:@"bp_record"]];
-    NSDictionary *innerClinicalDict = [self insertTimestampAndResidentIDToDict:[clinical_results objectForKey:@"clinical_results"]];
+    NSDictionary *innerClinicalDict = [self insertTimestampAndResidentIDToDict:[[clinical_results objectForKey:@"clinical_results"] mutableCopy]];
     NSMutableDictionary *temp = [[NSMutableDictionary alloc] init];
     
     // get current date/time

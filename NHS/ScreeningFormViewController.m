@@ -664,29 +664,35 @@ NSString *const kDocName = @"doc_name";
     
     XLFormRowDescriptor *bmi;
     bmi = [XLFormRowDescriptor formRowDescriptorWithTag:kBMI rowType:XLFormRowDescriptorTypeText title:@"BMI"];
-    bmi.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kHeight, kWeight]];
+//    bmi.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kHeight, kWeight]];
     //Initial value only
     if ([clinicalResultsDict objectForKey:@"bmi"] != [NSNull null]) {
         if (![[clinicalResultsDict objectForKey:@"bmi"] isEqualToString:@""]) {
-//            bmi.title = [NSString stringWithFormat:@"BMI: %@", [clinicalResultsDict objectForKey:@"bmi"]];
             bmi.value = [clinicalResultsDict objectForKey:@"bmi"];
         } else {
             if (!isnan([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2))) {  //check for not nan first!
-//                bmi.title = [NSString stringWithFormat:@"BMI: %.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
                 bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
             }
         }
     }
-
+    bmi.disabled = @(1);
     [section addFormRow:bmi];
     
     weight.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        bmi.title = [NSString stringWithFormat:@"BMI: %.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
-        bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+        if (oldValue != newValue) {
+            if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
+                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+                [self updateFormRow:bmi];
+            }
+        }
     };
     height.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        bmi.title = [NSString stringWithFormat:@"BMI: %.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
-        bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+        if (oldValue != newValue) {
+            if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
+                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+                [self updateFormRow:bmi];
+            }
+        }
     };
     
     XLFormRowDescriptor *waist;
@@ -704,18 +710,29 @@ NSString *const kDocName = @"doc_name";
     XLFormRowDescriptor *waistHipRatio;
     waistHipRatio = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistHipRatio rowType:XLFormRowDescriptorTypeText title:@"Waist : Hip Ratio"];
     waistHipRatio.required = YES;
-    waistHipRatio.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kWaistCircum, kHipCircum]];
+//    waistHipRatio.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kWaistCircum, kHipCircum]];
     //Initial value
     if(![[clinicalResultsDict objectForKey:@"waist_hip_ratio"] isEqualToString:@""]) {
         waistHipRatio.value = [clinicalResultsDict objectForKey:@"waist_hip_ratio"];
     }
+    waistHipRatio.disabled = @(1);
     [section addFormRow:waistHipRatio];
     
     waist.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
+        if (oldValue != newValue) {
+            if ([waist.value integerValue] != 0 && [hip.value integerValue] != 0) {
+                waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
+                [self updateFormRow:waistHipRatio];
+            }
+        }
     };
     hip.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
+        if (oldValue != newValue) {
+            if ([waist.value integerValue] != 0 && [hip.value integerValue] != 0) {
+                waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
+                [self updateFormRow:waistHipRatio];
+            }
+        }
     };
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeText title:@"CBG"];
