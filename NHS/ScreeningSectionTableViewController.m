@@ -14,6 +14,13 @@
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
+typedef enum typeOfForm {
+    NewScreeningForm,
+    PreRegisteredScreeningForm,
+    LoadedDraftScreeningForm,
+    ViewScreenedScreeningForm
+} typeOfForm;
+
 
 @interface ScreeningSectionTableViewController ()
 
@@ -28,6 +35,7 @@
 @implementation ScreeningSectionTableViewController {
     NSNumber *selectedRow;
     BOOL readyToSubmit;
+    NSInteger formType;
 }
 
 - (void)viewDidLoad {   //will only happen when it comes from New Resident / Use Existing Resident
@@ -35,17 +43,26 @@
     self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
     
+    formType = NewScreeningForm;    //default value
     [self createEmptyFormWithAllFields];
-    
+    readyToSubmit = false;
     
     self.preRegDictionary = [[NSMutableDictionary alloc] init];
+    
+    //positive number -> Pre-reg Resident/Uploaded Screening Form
+    // (-1) New Screeing Form
+    // (-2) Draft
+    
     if ([self.residentID intValue]>= 0) {
         if (self.retrievedData) {
             [self insertRequestDataToScreeningForm];
+            formType = ViewScreenedScreeningForm;
         } else {
-            [self getPatientData];
+            [self getPreRegistrationData];
+            formType = PreRegisteredScreeningForm;
         }
     } else if ([self.residentID intValue] == -2) {
+        formType = LoadedDraftScreeningForm;
         [self loadDraftIfAny];
     }
     
@@ -66,9 +83,32 @@
                                              selector:@selector(updateCompletionCheck:)
                                                  name:@"updateCompletionCheck"
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateFormType:)
+                                                 name:@"formEditedNotification"
+                                               object:nil];
     
-    self.completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,nil];
-    readyToSubmit = true;
+    
+    NSArray *keys = [self.fullScreeningForm allKeys];
+    NSString *key;
+    for (key in keys) {
+        if ([key isEqualToString:@"completion_check"]) {
+            self.completionCheck = [[NSMutableArray alloc] initWithArray:[self.fullScreeningForm objectForKey:@"completion_check"]];
+            break;
+        }
+    }
+    //if initialised previously, won't do it again
+    if (!self.completionCheck) {
+        self.completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,nil];
+    }
+    int count = 0;
+    for (int i=0;i<[self.completionCheck count];i++) {
+        count = count + [[self.completionCheck objectAtIndex:i] intValue];
+    }
+    if (count == [self.completionCheck count]) {
+        readyToSubmit = true;
+    }
+    
     [super viewDidLoad];
 }
 
@@ -135,13 +175,13 @@
 
 - (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     // rows in section 0 should not be selectable
-//    if ( indexPath.section == 1 ) {
-//        if (readyToSubmit) {
-//            return indexPath;
-//        } else {
-//            return nil;
-//        }
-//    }
+    if ( indexPath.section == 1 ) {
+        if (readyToSubmit) {
+            return indexPath;
+        } else {
+            return nil;
+        }
+    }
     
     // By default, allow row to be selected
     return indexPath;
@@ -204,34 +244,46 @@
 
 -(void)backBtnPressed:(id)sender
 {
-    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Are you sure?", nil)
-                                                                              message:@""
-                                                                       preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Delete Draft", nil)
-                                                        style:UIAlertActionStyleDestructive
-                                                      handler:^(UIAlertAction * deleteDraftAction) {
-//                                                          [self deleteDraft];
-                                                          [self.navigationController popViewControllerAnimated:YES];
-                                                      }]];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
-                                                        style:UIAlertActionStyleCancel
-                                                      handler:nil]];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save Draft", nil)
-                                                        style:UIAlertActionStyleDefault
-                                                      handler:^(UIAlertAction * saveDraftAction) {
-                                                          [self saveDraft];
-                                                          [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshScreeningResidentTable"
-                                                                                                              object:nil
-                                                                                                            userInfo:nil];
-                                                          [self.navigationController popViewControllerAnimated:YES];
-                                                      }]];
-    [self presentViewController:alertController animated:YES completion:nil];
+    if (formType != ViewScreenedScreeningForm) {
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Are you sure?", nil)
+                                                                                  message:@""
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Delete Draft", nil)
+                                                            style:UIAlertActionStyleDestructive
+                                                          handler:^(UIAlertAction * deleteDraftAction) {
+                                                              //                                                          [self deleteDraft];
+                                                              [self.navigationController popViewControllerAnimated:YES];
+                                                          }]];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                            style:UIAlertActionStyleCancel
+                                                          handler:nil]];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Save Draft", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * saveDraftAction) {
+                                                              [self saveDraft];
+                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshScreeningResidentTable"
+                                                                                                                  object:nil
+                                                                                                                userInfo:nil];
+                                                              [self.navigationController popViewControllerAnimated:YES];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    } else {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 #pragma mark - NSNotification Methods
 - (void) updateFullScreeningForm: (NSNotification *) notification {
     self.fullScreeningForm = [notification.userInfo mutableCopy];
     NSLog(@"%@", self.fullScreeningForm);
+    
+    if ([self.fullScreeningForm objectForKey:@"resi_particulars"] != [NSNull null]) {   //not null
+        if (![[[self.fullScreeningForm objectForKey:@"resi_particulars"] objectForKey:@"nric"] isEqualToString:@""]) {  //not empty
+            if (formType != ViewScreenedScreeningForm) {
+                [self autoSave];
+            }
+        }
+    }
 }
 
 - (void) updateCompletionCheck: (NSNotification *) notification {
@@ -246,13 +298,48 @@
     if (count == [self.completionCheck count]) {
         readyToSubmit = true;
     }
-    NSLog(@"count %d", count);
     [self.tableView reloadData];
+}
+
+- (void) updateFormType: (NSNotification *) notification {
+    formType = LoadedDraftScreeningForm;        //changed status
 }
 
 #pragma mark Save,Load & Delete Methods
 
+- (void) autoSave {
+    //save completionCheck into fullScreeningForm
+    [self.fullScreeningForm setObject:self.completionCheck forKey:@"completion_check"];
+//    int count;
+
+    NSString *nric = [[[self.fullScreeningForm objectForKey:@"resi_particulars"] objectForKey:kNRIC] stringByAppendingString:@"_"];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *filename = [nric stringByAppendingString:@"autosave"]; //Eg. S12313K_autosave
+    NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Screening"];
+    
+    NSError *error;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:folderPath])
+        [[NSFileManager defaultManager] createDirectoryAtPath:folderPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+    NSString *filePath = [folderPath stringByAppendingPathComponent:filename];
+    
+//    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:folderPath error:NULL];
+//    for (count = 0; count < (int)[directoryContent count]; count++)
+//    {
+//        NSLog(@"File %d: %@", (count + 1), [directoryContent objectAtIndex:count]);
+//    }
+    
+    
+    
+    //Save the form locally on the iPhone
+    [self.fullScreeningForm writeToFile:filePath atomically:YES];
+
+}
+
 - (void) saveDraft {
+    //save completionCheck into fullScreeningForm
+    [self.fullScreeningForm setObject:self.completionCheck forKey:@"completion_check"];
     
     // get current date/time
     NSDate *today = [NSDate date];
@@ -364,8 +451,8 @@
     };
 }
 
-#pragma mark - Downloading Patient Details
-- (void)getPatientData {
+#pragma mark - Downloading Pre-registration data
+- (void) getPreRegistrationData {
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client getPatientDataWithPatientID:self.residentID
                           progressBlock:[self progressBlock]
@@ -484,6 +571,10 @@
     if ([segue.destinationViewController respondsToSelector:@selector(setSectionID:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setSectionID:)
                                               withObject:selectedRow];
+    }
+    if ([segue.destinationViewController respondsToSelector:@selector(setFormType:)]) {    //view submitted form
+        [segue.destinationViewController performSelector:@selector(setFormType:)
+                                              withObject:[NSNumber numberWithInteger:formType]];
     }
     
     if ([segue.destinationViewController respondsToSelector:@selector(setFullScreeningForm:)]) {

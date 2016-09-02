@@ -490,6 +490,7 @@
         successCounter++;
         if(successCounter == 16) {
             NSLog(@"SUBMISSION SUCCESSFUL!!");
+            [self deleteAutoSavedFile];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [hud hideAnimated:YES];
             });
@@ -697,6 +698,41 @@
     [dictionary setObject:self.resident_id forKey:@"resident_id"];
     
     return dictionary;
+}
+
+- (void) deleteAutoSavedFile {
+
+    NSString *nric = [[[self.fullScreeningForm objectForKey:@"resi_particulars"] objectForKey:kNRIC] stringByAppendingString:@"_"];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *filename = [nric stringByAppendingString:@"autosave"]; //Eg. S12313K_autosave
+    NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Screening"];
+    
+    NSError *error;
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    NSString *filePath = [folderPath stringByAppendingPathComponent:filename];
+    
+    BOOL success = [fileManager removeItemAtPath:filePath error:&error];
+    if (success) {
+        NSLog(@"Draft deleted!");
+    }
+    else
+    {
+        NSLog(@"Could not delete file -:%@ ",[error localizedDescription]);
+    }
+    
+    //    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:folderPath error:NULL];
+    //    for (count = 0; count < (int)[directoryContent count]; count++)
+    //    {
+    //        NSLog(@"File %d: %@", (count + 1), [directoryContent objectAtIndex:count]);
+    //    }
+    
+    
+    
+    //Save the form locally on the iPhone
+    [self.fullScreeningForm writeToFile:filePath atomically:YES];
+
 }
 /*
 #pragma mark - Navigation

@@ -12,6 +12,7 @@
 #import "Reachability.h"
 #import "AppConstants.h"
 #import "MBProgressHUD.h"
+#import "ScreeningSectionTableViewController.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
@@ -42,7 +43,7 @@ typedef enum residentDataSource {
 @property (strong, nonatomic) NSMutableArray *residentNames;
 @property (strong, nonatomic) NSMutableArray *residentScreenTimestamp;
 @property (strong, nonatomic) NSMutableDictionary *residentsGroupedInSections;
-@property (strong, nonatomic) NSDictionary *retrievedResidentData;
+@property (strong, nonatomic) NSMutableDictionary *retrievedResidentData;
 @property (strong, nonatomic) NSArray *localSavedFilename;
 
 
@@ -274,6 +275,11 @@ typedef enum residentDataSource {
             return;
         }
     }
+    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    
+    // Set the label text.
+    hud.label.text = NSLocalizedString(@"Loading...", @"HUD loading title");
+    
     if (tableView == self.tableView) {      //not in the searchResult view
         selectedResident = [self findResidentInfoFromSectionRow:indexPath];
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
@@ -359,21 +365,23 @@ typedef enum residentDataSource {
 
 
 - (IBAction)addBtnPressed:(UIBarButtonItem *)sender {
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"New screening form", nil)
-                                                                                  message:@"Choose one of the options"
-                                                                           preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"New resident", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * action) {
-                                                              selectedResidentID = @(-1);
-                                                              [self performSegueWithIdentifier:@"NewScreeningFormSegue" sender:self];
-                                                          }]];
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Pre-registered resident", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * action) {
-                                                                  [self performSegueWithIdentifier:@"SelectPreRegSegue" sender:self];
-                                                          }]];
-        [self presentViewController:alertController animated:YES completion:nil];
+    [self.retrievedResidentData removeAllObjects];  //clear the dictionary
+    
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"New screening form", nil)
+                                                                              message:@"Choose one of the options"
+                                                                       preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"New resident", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * action) {
+                                                          selectedResidentID = @(-1);
+                                                          [self performSegueWithIdentifier:@"NewScreeningFormSegue" sender:self];
+                                                      }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Pre-registered resident", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * action) {
+                                                          [self performSegueWithIdentifier:@"SelectPreRegSegue" sender:self];
+                                                      }]];
+    [self presentViewController:alertController animated:YES completion:nil];
 
 }
 
@@ -635,7 +643,7 @@ typedef enum residentDataSource {
 - (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSingleResidentDataSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         
-        self.retrievedResidentData = [[NSDictionary alloc] initWithDictionary:responseObject];
+        self.retrievedResidentData = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
         NSLog(@"%@", self.retrievedResidentData);
         [self performSegueWithIdentifier:@"LoadScreeningFormSegue" sender:self];
     };
@@ -729,7 +737,7 @@ typedef enum residentDataSource {
                                               withObject:selectedResidentID];
     }
     
-    if (self.retrievedResidentData) {
+    if ([self.retrievedResidentData count]) {
         [segue.destinationViewController performSelector:@selector(setRetrievedData:)
                                               withObject:self.retrievedResidentData];
     }
