@@ -2133,6 +2133,7 @@ NSString *const kDocName = @"doc_name";
     
     // Pain and Anxiety - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    section.footerTitle = @"If resident selects any of the Extreme options, please refer them for doctor's consult.";
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix rowType:XLFormRowDescriptorTypeInfo title:@"Pain / Discomfort"];
