@@ -29,7 +29,7 @@
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
-    [super viewWillAppear:animated];
+    [super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -58,7 +58,7 @@
     return ^(NSURLSessionDataTask *task, id responseObject){
         NSArray *data = responseObject;      //somehow double brackets... (())
         NSLog(@"%@",data);
-        NSDictionary *dict = [[NSDictionary alloc] init];
+        NSDictionary *dict;
         dict = data[0];
         
         [self.textView setText:[dict description]];

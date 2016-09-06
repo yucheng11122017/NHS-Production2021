@@ -460,11 +460,10 @@
     return [self.form localValidationErrors:self];
 }
 
-// Changed by Nicholas 23.08.2016
 -(void)showFormValidationError:(NSError *)error
 {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED < 80000
-    UIAlertView * alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Invalid entry", nil)
+    UIAlertView * alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"XLFormViewController_ValidationErrorTitle", nil)
                                                          message:error.localizedDescription
                                                         delegate:self
                                                cancelButtonTitle:NSLocalizedString(@"OK", nil)
@@ -472,7 +471,7 @@
     [alertView show];
 #else
     if ([UIAlertController class]){
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Invalid entry", nil)
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"XLFormViewController_ValidationErrorTitle", nil)
                                                                                   message:error.localizedDescription
                                                                            preferredStyle:UIAlertControllerStyleAlert];
         [alertController addAction:[UIAlertAction actionWithTitle:@"OK"
@@ -482,7 +481,7 @@
     }
 #ifndef XL_APP_EXTENSIONS
     else{
-        UIAlertView * alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Invalid entry", nil)
+        UIAlertView * alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"XLFormViewController_ValidationErrorTitle", nil)
                                                              message:error.localizedDescription
                                                             delegate:self
                                                    cancelButtonTitle:NSLocalizedString(@"OK", nil)

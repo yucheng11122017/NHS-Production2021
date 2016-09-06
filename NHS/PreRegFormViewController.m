@@ -103,7 +103,8 @@ typedef enum preRegSection {
 -(void)viewDidLoad
 {
     [self loadDraftIfAny];
-    XLFormDescriptor *form = [self init];       //must init first before [super viewDidLoad]
+    XLFormViewController *form = [self init];       //must init first before [super viewDidLoad]
+    NSLog(@"%@", [form class]);
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitPressed:)];
     self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
@@ -401,7 +402,7 @@ typedef enum preRegSection {
     NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Pre-registration"];
     NSArray *localSavedFilenames = [fileManager contentsOfDirectoryAtPath:folderPath
                                                                error:nil];
-    NSString *filename;
+    NSString *filename = @"";
     for (NSString* item in localSavedFilenames)
     {
         if ([item rangeOfString:nric].location != NSNotFound)
@@ -549,9 +550,9 @@ typedef enum preRegSection {
 - (NSDictionary *) preparePersonalInfoDict {
 
     
-    NSDictionary *personalInfoDict = [[NSDictionary alloc] init];
-    NSDictionary *dict = [[NSDictionary alloc] init];
-    NSString *gender = [[NSString alloc] init];
+    NSDictionary *personalInfoDict;
+    NSDictionary *dict;
+    NSString *gender;
     
     if ([[[self.form formValues] objectForKey:@"gender"] isEqualToString:@"Male"]) {
         gender = @"M";
@@ -580,12 +581,10 @@ typedef enum preRegSection {
 
 - (NSMutableArray *) prepareDictionaryFile {
     int i;
-    NSDictionary *spokenLangDict = [[NSDictionary alloc] init];
-    NSDictionary *contactInfoDict = [[NSDictionary alloc] init];
-    NSDictionary *reqServDict = [[NSDictionary alloc] init];
-    NSDictionary *othersDict = [[NSDictionary alloc] init];
-    NSDictionary *dict = [[NSDictionary alloc] init];
-    NSMutableDictionary *mutaDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *spokenLangDict = @{};
+    NSDictionary *contactInfoDict, *reqServDict, *othersDict;
+    NSDictionary *dict;
+    NSMutableDictionary *mutaDict;
     
     // get current date/time
     NSDate *today = [NSDate date];

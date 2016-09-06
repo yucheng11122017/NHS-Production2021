@@ -119,10 +119,6 @@ typedef enum residentDataSource {
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 
--(void) viewDidAppear:(BOOL)animated {
-    
-}
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -261,7 +257,7 @@ typedef enum residentDataSource {
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSDictionary *selectedResident = [[NSDictionary alloc] init];
+    NSDictionary *selectedResident = Nil;
     if ([self.localSavedFilename count] > 0) {
         if (indexPath.section == 0) {   //part of the drafts...
             selectedResidentID = [NSNumber numberWithInteger:indexPath.row];
@@ -281,11 +277,11 @@ typedef enum residentDataSource {
     hud.label.text = NSLocalizedString(@"Loading...", @"HUD loading title");
     
     if (tableView == self.tableView) {      //not in the searchResult view
-        selectedResident = [self findResidentInfoFromSectionRow:indexPath];
+        selectedResident = [[NSDictionary alloc] initWithDictionary:[self findResidentInfoFromSectionRow:indexPath]];
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
         
     } else {
-        selectedResident = self.resultsTableController.filteredProducts[indexPath.row];  //drafts not included in search!
+        selectedResident = [[NSDictionary alloc] initWithDictionary:self.resultsTableController.filteredProducts[indexPath.row]];  //drafts not included in search!
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
     }
     

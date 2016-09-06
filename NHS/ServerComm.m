@@ -78,8 +78,8 @@
     NSInteger opCode = 52;
     NSDictionary *url = [[NSDictionary alloc]
                           initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dict = [[NSMutableDictionary alloc] init];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dict;
+    NSDictionary *dataDict;
     
     dict = @{@"resident_id" : patientID};
     dataDict = @{@"data": dict};
@@ -101,8 +101,8 @@
     
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dict = [[NSMutableDictionary alloc] init];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dict;
+    NSDictionary *dataDict;
     
     dict = @{@"resident_id" : residentID};
     dataDict = @{@"data": dict};
@@ -142,8 +142,8 @@
     NSInteger opCode = 102;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dict = [[NSMutableDictionary alloc] init];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dict;
+    NSDictionary *dataDict;
     
     dict = @{@"resident_id" : residentID};
     dataDict = @{@"data": dict};
@@ -165,7 +165,7 @@
     NSInteger opCode = 103;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"neighbourhood":dictionary}};
     
@@ -184,7 +184,7 @@
     NSInteger opCode = 104;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"resi_particulars":dictionary}};
     
@@ -205,7 +205,7 @@
     NSInteger opCode = 105;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": dictionary};  //exceptional
     
@@ -224,7 +224,7 @@
     NSInteger opCode = 106;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"risk_factors":dictionary}};
     
@@ -243,7 +243,7 @@
     NSInteger opCode = 107;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"diabetes":dictionary}};
     
@@ -262,7 +262,7 @@
     NSInteger opCode = 108;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"hyperlipid":dictionary}};
     
@@ -281,7 +281,7 @@
     NSInteger opCode = 109;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"hypertension":dictionary}};
     
@@ -300,7 +300,7 @@
     NSInteger opCode = 110;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"cancer":dictionary}};
     
@@ -319,7 +319,7 @@
     NSInteger opCode = 111;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"others":dictionary}};
     
@@ -338,7 +338,7 @@
     NSInteger opCode = 112;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"primary_care":dictionary}};
     
@@ -357,7 +357,7 @@
     NSInteger opCode = 113;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"self_rated":dictionary}};
     
@@ -376,7 +376,7 @@
     NSInteger opCode = 114;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"demographics":dictionary}};
     
@@ -395,7 +395,7 @@
     NSInteger opCode = 115;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"adls":dictionary}};
     
@@ -414,7 +414,7 @@
     NSInteger opCode = 116;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"socioecon":dictionary}};
     
@@ -433,7 +433,7 @@
     NSInteger opCode = 117;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"social_support":dictionary}};
     
@@ -452,7 +452,7 @@
     NSInteger opCode = 118;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"consult_record":dictionary}};
     
@@ -471,7 +471,7 @@
     NSInteger opCode = 119;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"submit_remarks":dictionary}};
     
@@ -493,7 +493,7 @@
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": personalInfoDict};
     
@@ -515,7 +515,7 @@
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": spokenLangDict};
     
@@ -537,7 +537,7 @@
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": contactInfoDict};
     
@@ -559,7 +559,7 @@
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": reqServDict};
     
@@ -581,7 +581,7 @@
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     
-    NSDictionary *dataDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *dataDict;
     
     dataDict = @{@"data": othersDict};
     

@@ -284,7 +284,7 @@ NSString *const kDocName = @"doc_name";
 
 - (void)viewDidLoad {
     
-    XLFormDescriptor *form;
+    XLFormViewController *form;
 //    [self getDictionaryIntoVariables];
     
     switch([self.sectionID integerValue]) {
@@ -321,6 +321,7 @@ NSString *const kDocName = @"doc_name";
         case 15: form = [self initRefForDoctorConsult];
             break;
     }
+    NSLog(@"%@", [form class]);
     
     NSLog(@"Form type: %@", self.formType);
     
@@ -639,7 +640,6 @@ NSString *const kDocName = @"doc_name";
 
 - (id) initClinicalResults {
     
-    typeof(self) __weak weakself = self;    //for alertController
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Clinical Results"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
@@ -3624,7 +3624,6 @@ NSString *const kDocName = @"doc_name";
     NSDictionary *fields = [self.form formValues];
     NSMutableDictionary *resi_particulars = [[self.fullScreeningForm objectForKey:@"resi_particulars"] mutableCopy];
     
-#warning resident_id part is missing...
     if ([fields objectForKey:kGender] != [NSNull null]) {
         if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
             [resi_particulars setObject:@"M" forKey:kGender];

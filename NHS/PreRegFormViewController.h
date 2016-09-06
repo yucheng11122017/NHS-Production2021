@@ -16,7 +16,6 @@
 @property (strong, nonatomic) NSNumber * loadDataFlag;
 
 - (void) setPatientLocalFileIndex:(NSNumber *) patientLocalFileIndex;
-- (void) setAsPatientDataLocal:(NSNumber *) patientDataLocalOrServer;
 - (void) setLoadDataFlag:(NSNumber*) loadDataFlag;
 
 typedef enum patientDataSource {

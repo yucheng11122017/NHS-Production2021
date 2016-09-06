@@ -86,11 +86,6 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
-- (void) postNeighbourhoodWithDict: (NSDictionary *) dictionary
-                     progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
 - (void) postResidentParticularsWithDict: (NSDictionary *) dictionary
                            progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
                             successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock

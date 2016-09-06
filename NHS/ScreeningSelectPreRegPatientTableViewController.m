@@ -228,12 +228,12 @@ typedef enum getDataState {
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSString *selectedPatientName;
-    NSDictionary *selectedPatient = [[NSDictionary alloc] init];
+//    NSString *selectedPatientName;
+    NSDictionary *selectedPatient;
 
     if (tableView == self.tableView) {      //not in the searchResult view
         selectedPatient = [self findPatientNameFromSectionRow:indexPath];
-        selectedPatientName = [selectedPatient objectForKey:@"resident_name"];
+//        selectedPatientName = [selectedPatient objectForKey:@"resident_name"];
         selectedPatientID = [selectedPatient objectForKey:@"resident_id"];
         
     } else {

@@ -33,8 +33,7 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
     }
-    NSDictionary *patientDetails = [[NSDictionary alloc] init];
-    patientDetails = self.filteredProducts[indexPath.row];
+    NSDictionary *patientDetails = [[NSDictionary alloc] initWithDictionary:self.filteredProducts[indexPath.row]];
     [self configureCell:cell forProduct:patientDetails];
     
     return cell;

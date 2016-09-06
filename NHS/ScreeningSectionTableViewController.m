@@ -370,7 +370,7 @@ typedef enum typeOfForm {
     NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Pre-registration"];
     NSArray *localSavedFilenames = [fileManager contentsOfDirectoryAtPath:folderPath
                                                                     error:nil];
-    NSString *filename;
+    NSString *filename = @"";
     for (NSString* item in localSavedFilenames)
     {
         if ([item rangeOfString:nric].location != NSNotFound)
@@ -533,7 +533,7 @@ typedef enum typeOfForm {
     NSArray* keys = [self.retrievedData allKeys];
     NSString *key;
     NSDictionary *retrievedSectionsDict;
-    NSMutableDictionary *currentSectionDict = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *currentSectionDict;
     
     
     for (key in keys) {

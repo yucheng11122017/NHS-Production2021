@@ -7,6 +7,7 @@
 //
 
 #import "PatientPreRegTableViewController.h"
+#import "PreRegDisplayFormViewController.h"
 #import "PreRegPatientDetailsViewController.h"
 #import "ServerComm.h"
 #import "PreRegFormViewController.h"
@@ -278,8 +279,8 @@ typedef enum getDataState {
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSString *selectedResidentName;
-    NSDictionary *selectedResident = [[NSDictionary alloc] init];
+//    NSString *selectedResidentName;
+    NSDictionary *selectedResident;
     if ([self.localSavedFilename count] > 0) {
         if (indexPath.section == 0) {   //part of the drafts...
             selectedResidentID = [NSNumber numberWithInteger:indexPath.row];
@@ -296,7 +297,7 @@ typedef enum getDataState {
     
     if (tableView == self.tableView) {      //not in the searchResult view
         selectedResident = [self findResidentInfoFromSectionRow:indexPath];
-        selectedResidentName = [selectedResident objectForKey:@"resident_name"];
+//        selectedResidentName = [selectedResident objectForKey:@"resident_name"];
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
         
     } else {
@@ -776,6 +777,7 @@ typedef enum getDataState {
     
     [hud hideAnimated:YES];
     if ([segue.identifier isEqualToString:@"preRegPatientListToPatientDataSegue"]) {    //view submitted form
+        
         [segue.destinationViewController performSelector:@selector(setResidentDictionary:)
                                               withObject:self.retrievedResidentDictionary];
     }

@@ -28,7 +28,7 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     self.navigationItem.title = @"Home";
-    [super viewWillAppear:animated];
+    [super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning {

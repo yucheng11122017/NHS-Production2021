@@ -652,7 +652,7 @@
     
     NSMutableArray *bp_records = [[NSMutableArray alloc] initWithArray:[clinical_results objectForKey:@"bp_record"]];
     NSDictionary *innerClinicalDict = [self insertTimestampAndResidentIDToDict:[[clinical_results objectForKey:@"clinical_results"] mutableCopy]];
-    NSMutableDictionary *temp = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *temp;
     
     // get current date/time
     NSDate *today = [NSDate date];

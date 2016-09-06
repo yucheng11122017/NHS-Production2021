@@ -71,7 +71,8 @@ typedef enum preRegSection {
 //            [self getPatientData];
 //        });
 //    });
-    XLFormDescriptor *form = [self init];       //must init first before [super viewDidLoad]
+    XLFormViewController *form = [self init];       //must init first before [super viewDidLoad]
+    NSLog(@"%@", [form class]);
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain
                                                                              target:self
                                                                              action:@selector(editPressed:)];
@@ -490,9 +491,9 @@ typedef enum preRegSection {
 
 - (NSDictionary *) preparePersonalInfoDict {
     
-    NSDictionary *personalInfoDict = [[NSDictionary alloc] init];
-    NSDictionary *dict = [[NSDictionary alloc] init];
-    NSString *gender = [[NSString alloc] init];
+    NSDictionary *personalInfoDict;
+    NSDictionary *dict;
+    NSString *gender;
     
     if ([[[self.form formValues] objectForKey:@"gender"] isEqualToString:@"Male"]) {
         gender = @"M";
@@ -521,12 +522,10 @@ typedef enum preRegSection {
 
 - (NSMutableArray *) prepareDictionaryFile {
     int i;
-    NSDictionary *spokenLangDict = [[NSDictionary alloc] init];
-    NSDictionary *contactInfoDict = [[NSDictionary alloc] init];
-    NSDictionary *reqServDict = [[NSDictionary alloc] init];
-    NSDictionary *othersDict = [[NSDictionary alloc] init];
-    NSDictionary *dict = [[NSDictionary alloc] init];
-    NSMutableDictionary *mutaDict = [[NSMutableDictionary alloc] init];
+    NSDictionary *spokenLangDict = @{};
+    NSDictionary *contactInfoDict, *reqServDict, *othersDict;
+    NSDictionary *dict;
+    NSMutableDictionary *mutaDict;
     
     // get current date/time
     NSDate *today = [NSDate date];

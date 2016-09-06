@@ -5,7 +5,6 @@ install! 'cocoapods', :deterministic_uuids => false
 # platform :ios, '9.0'
 
 abstract_target 'CocoaPods' do
-  pod 'Form'
   pod 'NSDate-HYPString'
   pod 'NSDictionary-HYPImmutable'
   pod 'HYPImagePicker'
@@ -13,6 +12,7 @@ abstract_target 'CocoaPods' do
   pod 'RNCryptor', '~> 2.2'
   pod 'XLForm', :git => 'https://github.com/xmartlabs/XLForm.git'
   pod 'MBProgressHUD', '~> 1.0.0'
+  pod 'SVProgressHUD', '~> 2.0'
 
   target 'NHS' do
     # Uncomment this line if you're using Swift or would like to use dynamic frameworks
