@@ -10,4 +10,8 @@
 
 @interface HomeViewController : UIViewController
 
+@property (strong, nonatomic) NSNumber* isComm;
+
+- (void) setIsComm:(NSNumber *)isComm;
+
 @end

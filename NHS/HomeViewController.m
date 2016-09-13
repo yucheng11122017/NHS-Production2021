@@ -7,8 +7,11 @@
 //
 
 #import "HomeViewController.h"
+#import "LoginViewController.h"
 
 @interface HomeViewController ()
+@property (weak, nonatomic) IBOutlet UIButton *bloodTestBtn;
+@property (weak, nonatomic) IBOutlet UIButton *followUpBtn;
 
 @end
 
@@ -16,6 +19,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    if ([_isComm isEqualToNumber:@0]) {
+        self.bloodTestBtn.hidden = YES;
+        self.followUpBtn.hidden = YES;
+    }
     // Do any additional setup after loading the view.
 }
 
@@ -35,6 +43,7 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 - (IBAction)logoutBtnPressed:(UIButton *)sender {
     NSLog(@"logout pressed");
     [self.navigationController popViewControllerAnimated:YES];

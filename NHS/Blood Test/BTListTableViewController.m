@@ -1,18 +1,18 @@
 //
-//  PatientScreeningListTableViewController.m
+//  BTListTableViewController.m
 //  NHS
 //
-//  Created by Nicholas on 23/7/16.
+//  Created by Nicholas Wong on 9/13/16.
 //  Copyright © 2016 NUS. All rights reserved.
 //
 
-#import "PatientScreeningListTableViewController.h"
+#import "BTListTableViewController.h"
+#import "BTFormViewController.h"
 #import "ServerComm.h"
 #import "SearchResultsTableController.h"
 #import "Reachability.h"
 #import "AppConstants.h"
 #import "MBProgressHUD.h"
-#import "ScreeningSectionTableViewController.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
@@ -28,7 +28,7 @@ typedef enum residentDataSource {
     local
 } residentDataSource;
 
-@interface PatientScreeningListTableViewController ()  <UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating>
+@interface BTListTableViewController ()  <UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating>
 
 @property (strong,nonatomic) UIBarButtonItem *addButton;
 
@@ -51,8 +51,9 @@ typedef enum residentDataSource {
 
 
 
-@implementation PatientScreeningListTableViewController {
+@implementation BTListTableViewController {
     NSNumber *selectedResidentID;
+    NSString *selectedResidentNRIC;
     NSNumber *draftID;
     NSArray *residentSectionTitles;
     NSNumber *residentDataLocalOrServer;
@@ -79,7 +80,6 @@ typedef enum residentDataSource {
                             action:@selector(refreshConnectionAndTable)
                   forControlEvents:UIControlEventValueChanged];
     
-    [self getLocalSavedData];
     Reachability *reachability = [Reachability reachabilityForInternetConnection];
     [reachability startNotifier];
     
@@ -87,13 +87,13 @@ typedef enum residentDataSource {
     [self processConnectionStatus];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(refreshScreeningResidentTable:)
-                                                 name:@"refreshScreeningResidentTable"
+                                             selector:@selector(refreshBTResidentTable:)
+                                                 name:@"refreshBTResidentTable"
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(selectedPreRegResidentToNewScreenForm:)
-                                                 name:@"selectedPreRegResidentToNewScreenForm"
+                                             selector:@selector(selectedScreenedResidentToNewBTForm:)
+                                                 name:@"selectedScreenedResidentToNewBTForm"
                                                object:nil];
     
     _resultsTableController = [[SearchResultsTableController alloc] init];
@@ -108,9 +108,9 @@ typedef enum residentDataSource {
     self.searchController.dimsBackgroundDuringPresentation = YES; // default is YES
     self.searchController.searchBar.delegate = self; // so we can monitor text changes + others
     self.definesPresentationContext = TRUE;     //SUPER IMPORTANT, if not the searchBar won't go away when didSelectRow
-
     
-//    self.navigationItem.rightBarButtonItem = self.addButton;
+    
+    //    self.navigationItem.rightBarButtonItem = self.addButton;
     
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -148,12 +148,12 @@ typedef enum residentDataSource {
     else if (status == ReachableViaWiFi)
     {
         NSLog(@"Wifi");
-        [self getAllScreeningResidents];
+        [self getAllBloodTestResidents];
     }
     else if (status == ReachableViaWWAN)
     {
         NSLog(@"3G");
-        [self getAllScreeningResidents];
+        [self getAllBloodTestResidents];
     }
 }
 
@@ -162,56 +162,24 @@ typedef enum residentDataSource {
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if (fetchDataState == failed) {
-        if ([self.localSavedFilename count] > 0) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
+        return 0;
     } else {
-        if ([self.localSavedFilename count] > 0) {
-            return ([residentSectionTitles count]+1);
-        } else {
-            return [residentSectionTitles count];    //alphabets + locally saved files
-        }
+        return [residentSectionTitles count];    //alphabets
     }
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    if ([self.localSavedFilename count] > 0) {
-        if (section == 0) {
-            return @"Drafts";
-        } else {
-            NSInteger newSection = section-1;
-
-            return [residentSectionTitles objectAtIndex:(newSection)];    //because first section is for drafts.
-        }
-        
-    } else {
-        return [residentSectionTitles objectAtIndex:section];
-    }
-    
+    return [residentSectionTitles objectAtIndex:section];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSString *sectionTitle;
     NSArray *sectionResident;
-    
-    if ([self.localSavedFilename count] > 0) {
-        if(section == 0) {
-            return [self.localSavedFilename count];
-        } else {
-            // Return the number of rows in the section.
-            sectionTitle = [residentSectionTitles objectAtIndex:(section-1)];    //first section reserved for drafts.
-            sectionResident = [self.residentsGroupedInSections objectForKey:sectionTitle];
-            return [sectionResident count];
-        }
-    } else {    //no draft files
-        sectionTitle = [residentSectionTitles objectAtIndex:section];
-        sectionResident = [self.residentsGroupedInSections objectForKey:sectionTitle];
-        return [sectionResident count];
-    }
+
+    sectionTitle = [residentSectionTitles objectAtIndex:section];
+    sectionResident = [self.residentsGroupedInSections objectForKey:sectionTitle];
+    return [sectionResident count];
 }
 
 //Indexing purpose!
@@ -232,20 +200,9 @@ typedef enum residentDataSource {
     
     // Configure the cell...
     NSString *sectionTitle;
+
+    sectionTitle = [residentSectionTitles objectAtIndex:indexPath.section];
     
-    if ([self.localSavedFilename count] > 0) { //if there are local saved data...
-        if (indexPath.section == 0) {   //section for Drafts
-            NSRange range = [[self.localSavedFilename objectAtIndex:indexPath.row] rangeOfString:@"_"];
-            NSString *displayText = [[self.localSavedFilename objectAtIndex:indexPath.row] substringToIndex:(range.location)];
-            cell.textLabel.text = displayText;
-            cell.detailTextLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
-            return cell;
-        } else {
-            sectionTitle = [residentSectionTitles objectAtIndex:(indexPath.section-1)];  //update sectionlist
-        }
-    } else {
-        sectionTitle = [residentSectionTitles objectAtIndex:indexPath.section];
-    }
     NSArray *residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
     NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
     NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"ts"];
@@ -265,22 +222,6 @@ typedef enum residentDataSource {
     hud.label.text = NSLocalizedString(@"Loading...", @"HUD loading title");
     
     if (tableView == self.tableView) {      //not in the searchResult view
-        //check if user clicked on drafts first
-        if ([self.localSavedFilename count] > 0) {
-            if (indexPath.section == 0) {   //part of the drafts...
-                selectedResidentID = [NSNumber numberWithInteger:indexPath.row];
-                //            residentDataLocalOrServer = [NSNumber numberWithInt:local];
-                //            loadDataFlag = YES;
-                draftID = [NSNumber numberWithInteger:indexPath.row];
-                selectedResidentID = @(-2); //indicate load from file
-                [self performSegueWithIdentifier:@"LoadScreeningFormSegue" sender:self];
-                
-                [tableView deselectRowAtIndexPath:indexPath animated:NO];
-                return;
-            }
-        }
-        
-        //not part of draft
         selectedResident = [[NSDictionary alloc] initWithDictionary:[self findResidentInfoFromSectionRow:indexPath]];
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
         
@@ -289,12 +230,10 @@ typedef enum residentDataSource {
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
     }
     
-    [self getAllDataForOneResident];
+    [self getBloodTestResultForOneResident];
     
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    
-    
-    
+
 }
 
 // Override to support conditional editing of the table view.
@@ -307,26 +246,25 @@ typedef enum residentDataSource {
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableVmacproiew commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        if ([self.localSavedFilename count] > 0) {
-            if (indexPath.section == 0) {   //meaning, drafts
-                NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-                NSString *documentsDirectory = [paths objectAtIndex:0];
-                NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Screening"];
-                
-                NSFileManager *fileManager = [[NSFileManager alloc] init];
-                NSString *filePath = [folderPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@", [self.localSavedFilename objectAtIndex:indexPath.row]]];
-                [fileManager removeItemAtPath:filePath error:NULL];
-                UIAlertView *removeSuccessFulAlert=[[UIAlertView alloc]initWithTitle:@"Delete" message:@"Local Draft deleted!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                [removeSuccessFulAlert show];
-                [self getLocalSavedData];   //no need to reload online content
-                [self.tableView reloadData];
-                return;
-            }
-        }
+//        if ([self.localSavedFilename count] > 0) {
+//            if (indexPath.section == 0) {   //meaning, drafts
+//                NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+//                NSString *documentsDirectory = [paths objectAtIndex:0];
+//                NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Screening"];
+//                
+//                NSFileManager *fileManager = [[NSFileManager alloc] init];
+//                NSString *filePath = [folderPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@", [self.localSavedFilename objectAtIndex:indexPath.row]]];
+//                [fileManager removeItemAtPath:filePath error:NULL];
+//                UIAlertView *removeSuccessFulAlert=[[UIAlertView alloc]initWithTitle:@"Delete" message:@"Local Draft deleted!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+//                [removeSuccessFulAlert show];
+//                [self.tableView reloadData];
+//                return;
+//            }
+//        }
         
         // Delete the row from the data source
-        NSDictionary *residentInfo = [self findResidentInfoFromSectionRow:indexPath];
-        [self deleteResident:[residentInfo objectForKey:@"resident_id"]];
+//        NSDictionary *residentInfo = [self findResidentInfoFromSectionRow:indexPath];
+//        [self deleteResident:[residentInfo objectForKey:@"resident_id"]];
         //        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade]; //no need this for now...
         
     }
@@ -335,13 +273,13 @@ typedef enum residentDataSource {
     //    }
 }
 
-- (void)deleteResident: (NSNumber *) residentID {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client deleteResidentWithResidentID: residentID
-                           progressBlock:[self progressBlock]
-                            successBlock:[self deleteSuccessBlock]
-                            andFailBlock:[self errorBlock]];
-}
+//- (void)deleteResident: (NSNumber *) residentID {
+//    ServerComm *client = [ServerComm sharedServerCommInstance];
+//    [client deleteResidentWithResidentID: residentID
+//                           progressBlock:[self progressBlock]
+//                            successBlock:[self deleteSuccessBlock]
+//                            andFailBlock:[self errorBlock]];
+//}
 
 #pragma mark - Patient-sorting Related methods
 
@@ -365,24 +303,10 @@ typedef enum residentDataSource {
 
 
 - (IBAction)addBtnPressed:(UIBarButtonItem *)sender {
-    [self.retrievedResidentData removeAllObjects];  //clear the dictionary
+//    [self.retrievedResidentData removeAllObjects];  //clear the dictionary
     
-    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"New screening form", nil)
-                                                                              message:@"Choose one of the options"
-                                                                       preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"New resident", nil)
-                                                        style:UIAlertActionStyleDefault
-                                                      handler:^(UIAlertAction * action) {
-                                                          selectedResidentID = @(-1);
-                                                          [self performSegueWithIdentifier:@"NewScreeningFormSegue" sender:self];
-                                                      }]];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Pre-registered resident", nil)
-                                                        style:UIAlertActionStyleDefault
-                                                      handler:^(UIAlertAction * action) {
-                                                          [self performSegueWithIdentifier:@"SelectPreRegSegue" sender:self];
-                                                      }]];
-    [self presentViewController:alertController animated:YES completion:nil];
-
+    [self performSegueWithIdentifier:@"SelectScreenedResidentSegue" sender:self];
+    
 }
 
 #pragma mark - UISearchBarDelegate
@@ -426,7 +350,7 @@ typedef enum residentDataSource {
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
     // update the filtered array based on the search text
     NSString *searchText = searchController.searchBar.text;
-    NSMutableArray *searchResults = [self.screeningResidents mutableCopy];
+    NSMutableArray *searchResults = [self.BTResidents mutableCopy];
     
     // strip out all the leading and trailing spaces
     NSString *strippedString = [searchText stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -548,39 +472,23 @@ typedef enum residentDataSource {
     self.searchController.searchBar.text = [coder decodeObjectForKey:SearchBarTextKey];
 }
 
-#pragma mark - Screening Resident API
+#pragma mark - Blood Test API
 
-- (void)getLocalSavedData {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Screening"];
-    
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
-    self.localSavedFilename = [fileManager contentsOfDirectoryAtPath:folderPath
-                                                               error:nil];
-}
-
-- (void)getAllScreeningResidents {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getAllScreeningResidents:[self progressBlock]
-          successBlock:[self successBlock]
-          andFailBlock:[self errorBlock]];
-}
-//
-//- (void)deleteResident: (NSNumber *) residentID {
+- (void)getAllBloodTestResidents {
 //    ServerComm *client = [ServerComm sharedServerCommInstance];
-//    [client deleteResidentWithResidentID: residentID
-//                           progressBlock:[self progressBlock]
-//                            successBlock:[self deleteSuccessBlock]
-//                            andFailBlock:[self errorBlock]];
-//}
+//    [client getAllScreeningResidents:[self progressBlock]
+//                        successBlock:[self successBlock]
+//                        andFailBlock:[self errorBlock]];
+#warning No API yet at the moment
+}
 
-- (void)getAllDataForOneResident {
+
+- (void)getBloodTestResultForOneResident {
     ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getSingleScreeningResidentDataWithResidentID:selectedResidentID
-                          progressBlock:[self progressBlock]
-                           successBlock:[self downloadSingleResidentDataSuccessBlock]
-                           andFailBlock:[self downloadErrorBlock]];
+    [client getBloodTestWithResidentID:selectedResidentID
+                         progressBlock:[self progressBlock]
+                          successBlock:[self downloadBloodTestResultSuccessBlock]
+                          andFailBlock:[self downloadErrorBlock]];
 }
 
 #pragma mark - Blocks
@@ -591,27 +499,27 @@ typedef enum residentDataSource {
     };
 }
 
-- (void (^)(NSURLSessionDataTask *task, id responseObject))deleteSuccessBlock {
-    return ^(NSURLSessionDataTask *task, id responseObject){
-        [self getAllScreeningResidents];
-        
-        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-        
-        // Set the custom view mode to show any view.
-        hud.mode = MBProgressHUDModeCustomView;
-        // Set an image view with a checkmark.
-        UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        hud.customView = [[UIImageView alloc] initWithImage:image];
-        // Looks a bit nicer if we make it square.
-        hud.square = YES;
-        // Optional label text.
-        hud.label.text = NSLocalizedString(@"Done", @"HUD done title");
-        
-        
-        [hud hideAnimated:YES afterDelay:1.f];
-        
-    };
-}
+//- (void (^)(NSURLSessionDataTask *task, id responseObject))deleteSuccessBlock {
+//    return ^(NSURLSessionDataTask *task, id responseObject){
+//        [self getAllScreeningResidents];
+//        
+//        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+//        
+//        // Set the custom view mode to show any view.
+//        hud.mode = MBProgressHUDModeCustomView;
+//        // Set an image view with a checkmark.
+//        UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+//        hud.customView = [[UIImageView alloc] initWithImage:image];
+//        // Looks a bit nicer if we make it square.
+//        hud.square = YES;
+//        // Optional label text.
+//        hud.label.text = NSLocalizedString(@"Done", @"HUD done title");
+//        
+//        
+//        [hud hideAnimated:YES afterDelay:1.f];
+//        
+//    };
+//}
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
@@ -619,16 +527,16 @@ typedef enum residentDataSource {
         [self.residentNames removeAllObjects];   //reset this array first
         [self.residentScreenTimestamp removeAllObjects];   //reset this array first
         NSArray *patients = [responseObject objectForKey:@"0"];      //somehow double brackets... (())
-        self.screeningResidents = [[NSMutableArray alloc] initWithArray:patients];
+        self.BTResidents = [[NSMutableArray alloc] initWithArray:patients];
         
         NSSortDescriptor *sortDescriptor;
         sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"resident_name" ascending:YES];
         NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
-        self.screeningResidents = [[self.screeningResidents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
+        self.BTResidents = [[self.BTResidents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
         
-        for (i=0; i<[self.screeningResidents count]; i++) {
-            [self.residentNames addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:@"resident_name"]];
-            [self.residentScreenTimestamp addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:@"ts"]];
+        for (i=0; i<[self.BTResidents count]; i++) {
+            [self.residentNames addObject:[[self.BTResidents objectAtIndex:i] objectForKey:@"resident_name"]];
+            [self.residentScreenTimestamp addObject:[[self.BTResidents objectAtIndex:i] objectForKey:@"ts"]];
         }
         
         //sort alphabetically
@@ -640,7 +548,7 @@ typedef enum residentDataSource {
     };
 }
 
-- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSingleResidentDataSuccessBlock {
+- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadBloodTestResultSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         
         self.retrievedResidentData = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
@@ -696,7 +604,7 @@ typedef enum residentDataSource {
     for(int i=0;i<26;i++) {
         for (int j=0; j<[self.residentNames count]; j++) {
             if([[[self.residentNames objectAtIndex:j] uppercaseString] hasPrefix:[[letters objectAtIndex:i] uppercaseString]]) {
-                [temp addObject:[self.screeningResidents objectAtIndex:j]];
+                [temp addObject:[self.BTResidents objectAtIndex:j]];
                 found = TRUE;
             }
             if(j==([self.residentNames count]-1)) {  //reached the end
@@ -716,15 +624,15 @@ typedef enum residentDataSource {
 
 #pragma mark - NSNotification Methods
 
-- (void)refreshScreeningResidentTable:(NSNotification *) notification{
+- (void)refreshBTResidentTable:(NSNotification *) notification{
     NSLog(@"refresh screening table");
-    [self getLocalSavedData];
-    [self getAllScreeningResidents];
+    [self getAllBloodTestResidents];
 }
 
-- (void) selectedPreRegResidentToNewScreenForm: (NSNotification *) notification {
+- (void) selectedScreenedResidentToNewBTForm: (NSNotification *) notification {
     selectedResidentID = [notification.userInfo objectForKey:@"resident_id"];
-    [self performSegueWithIdentifier:@"NewScreeningFormSegue" sender:self];
+    selectedResidentNRIC = [notification.userInfo objectForKey:@"nric"];
+    [self performSegueWithIdentifier:@"NewBTFormSegue" sender:self];
 }
 
 #pragma mark - Navigation
@@ -736,16 +644,16 @@ typedef enum residentDataSource {
         [segue.destinationViewController performSelector:@selector(setResidentID:)
                                               withObject:selectedResidentID];
     }
+//    if ([self.retrievedResidentData count]) {
+//        [segue.destinationViewController performSelector:@selector(setRetrievedData:)
+//                                              withObject:self.retrievedResidentData];
+//    }
     
-    if ([self.retrievedResidentData count]) {
-        [segue.destinationViewController performSelector:@selector(setRetrievedData:)
-                                              withObject:self.retrievedResidentData];
+    if ([segue.destinationViewController respondsToSelector:@selector(setResidentNRIC:)]) {
+        [segue.destinationViewController performSelector:@selector(setResidentNRIC:)
+                                              withObject:selectedResidentNRIC];
     }
-    
-    if ([segue.destinationViewController respondsToSelector:@selector(setResidentLocalFileIndex:)]) {    //view submitted form
-        [segue.destinationViewController performSelector:@selector(setResidentLocalFileIndex:)
-                                              withObject:draftID];
-    }
+
 }
 
 

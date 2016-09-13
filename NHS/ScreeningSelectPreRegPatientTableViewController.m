@@ -418,50 +418,6 @@ typedef enum getDataState {
     tableController.filteredProducts = searchResults;
     [tableController.tableView reloadData];
 }
-
-#pragma mark - Util methods
-
-//- (NSMutableArray *)createPatients:(NSArray *)patients {
-//    NSMutableArray *patObjs = [[NSMutableArray alloc] init];
-//    for (id patient in patients) {
-//        [patObjs addObject:[self createPatient:patient]];
-//    }
-//    return patObjs;
-//}
-
-//- (NSArray *) createPatient: (NSDictionary *) patient {
-//    NSNumber *birth_year = [patient objectForKey:@"birth_year"];
-//    NSString *gender = [patient objectForKey:@"gender"];
-//    NSString *nric = [patient objectForKey:@"nric"];
-//    NSNumber *resident_id = [patient objectForKey:@"resident_id"];
-//    NSString *resident_name = [patient objectForKey:@"resident_name"];
-//
-//    return @""; //keep it this way first..
-//}
-//
-//- (Patient *)createPatient:(NSDictionary *)patient {
-//    NSString *name = [patient objectForKey:@"name"];
-//    NSInteger ID = [[patient objectForKey:@"id"] integerValue];
-//    NSString *homeType = [patient objectForKey:@"home"];
-//    NSInteger age = [[patient objectForKey:@"age"] integerValue];
-//    NSInteger height = [[patient objectForKey:@"height"] integerValue];
-//    NSInteger level = [[patient objectForKey:@"level"] integerValue];
-//    BOOL hasCaretaker;
-//    if ([patient objectForKey:@"available"] != [NSNull null]) {
-//        hasCaretaker = [[patient objectForKey:@"available"] boolValue];
-//    } else {
-//        hasCaretaker = NO;
-//    }
-//
-//    return [[Patient alloc] initWithName:name
-//                                     age:(int)age
-//                                      ID:ID
-//                                  height:(int)height
-//                                   level:(int)level
-//                                homeType:homeType
-//                            hasCaretaker:hasCaretaker];
-//}
-
 #pragma  mark - Patient sorting-related methods
 
 - (void)refreshTable:(NSNotification *) notification{

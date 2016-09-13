@@ -7,7 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01871B641D881E0C002194C9 /* FollowUpListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01871B631D881E0C002194C9 /* FollowUpListTableViewController.m */; };
+		019072081D87ABCA00D188D6 /* BTListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 019072071D87ABCA00D188D6 /* BTListTableViewController.m */; };
+		0190720B1D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0190720A1D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.m */; };
+		0190720E1D87DDAD00D188D6 /* BTFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0190720D1D87DDAD00D188D6 /* BTFormViewController.m */; };
 		01C86C761D7725960096379A /* SummaryPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01C86C751D7725960096379A /* SummaryPageViewController.m */; };
+		01FC79F41D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01FC79F31D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m */; };
+		01FC79F71D882BB3003D3AB6 /* SummaryReportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01FC79F61D882BB3003D3AB6 /* SummaryReportViewController.m */; };
 		0365AA69F5F64A154E302724 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8964BE86125ACEAAC6F8C79B /* AVFoundation.framework */; };
 		15939C23012573E7010C5FF7 /* BuddyBuildSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A953ABBE5FC7CBFB590C255 /* BuddyBuildSDK.framework */; };
 		45E30D748D4D9DB15E36E079 /* Pods_CocoaPods_NHS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF146E69B77C3775C935F8C /* Pods_CocoaPods_NHS.framework */; };
@@ -71,8 +77,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		01871B621D881E0C002194C9 /* FollowUpListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FollowUpListTableViewController.h; path = "Follow Up/FollowUpListTableViewController.h"; sourceTree = "<group>"; };
+		01871B631D881E0C002194C9 /* FollowUpListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FollowUpListTableViewController.m; path = "Follow Up/FollowUpListTableViewController.m"; sourceTree = "<group>"; };
+		019072061D87ABCA00D188D6 /* BTListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTListTableViewController.h; path = "Blood Test/BTListTableViewController.h"; sourceTree = "<group>"; };
+		019072071D87ABCA00D188D6 /* BTListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BTListTableViewController.m; path = "Blood Test/BTListTableViewController.m"; sourceTree = "<group>"; };
+		019072091D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTSelectScreenedResidentTableViewController.h; path = "Blood Test/BTSelectScreenedResidentTableViewController.h"; sourceTree = "<group>"; };
+		0190720A1D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BTSelectScreenedResidentTableViewController.m; path = "Blood Test/BTSelectScreenedResidentTableViewController.m"; sourceTree = "<group>"; };
+		0190720C1D87DDAD00D188D6 /* BTFormViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTFormViewController.h; path = "Blood Test/BTFormViewController.h"; sourceTree = "<group>"; };
+		0190720D1D87DDAD00D188D6 /* BTFormViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BTFormViewController.m; path = "Blood Test/BTFormViewController.m"; sourceTree = "<group>"; };
 		01C86C741D7725960096379A /* SummaryPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SummaryPageViewController.h; sourceTree = "<group>"; };
 		01C86C751D7725960096379A /* SummaryPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SummaryPageViewController.m; sourceTree = "<group>"; };
+		01FC79F21D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResidentFollowUpHistoryTableViewController.h; path = "Follow Up/ResidentFollowUpHistoryTableViewController.h"; sourceTree = "<group>"; };
+		01FC79F31D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ResidentFollowUpHistoryTableViewController.m; path = "Follow Up/ResidentFollowUpHistoryTableViewController.m"; sourceTree = "<group>"; };
+		01FC79F51D882BB3003D3AB6 /* SummaryReportViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SummaryReportViewController.h; path = "Follow Up/SummaryReportViewController.h"; sourceTree = "<group>"; };
+		01FC79F61D882BB3003D3AB6 /* SummaryReportViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SummaryReportViewController.m; path = "Follow Up/SummaryReportViewController.m"; sourceTree = "<group>"; };
 		15C05F16B9AA0D95A6AE2EAA /* Pods-CocoaPods-NHS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPods-NHS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPods-NHS/Pods-CocoaPods-NHS.debug.xcconfig"; sourceTree = "<group>"; };
 		209345AB6DD8B9F1E078D209 /* Pods_NHSUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NHSUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		32CF155AD7EB396F62BB8DC1 /* Pods-CocoaPods-NHS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPods-NHS.release.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPods-NHS/Pods-CocoaPods-NHS.release.xcconfig"; sourceTree = "<group>"; };
@@ -183,6 +201,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		01871B611D881DE6002194C9 /* Follow Up */ = {
+			isa = PBXGroup;
+			children = (
+				01871B621D881E0C002194C9 /* FollowUpListTableViewController.h */,
+				01871B631D881E0C002194C9 /* FollowUpListTableViewController.m */,
+				01FC79F21D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.h */,
+				01FC79F31D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m */,
+				01FC79F51D882BB3003D3AB6 /* SummaryReportViewController.h */,
+				01FC79F61D882BB3003D3AB6 /* SummaryReportViewController.m */,
+			);
+			name = "Follow Up";
+			sourceTree = "<group>";
+		};
+		019072051D87A86300D188D6 /* Blood Test */ = {
+			isa = PBXGroup;
+			children = (
+				019072061D87ABCA00D188D6 /* BTListTableViewController.h */,
+				019072071D87ABCA00D188D6 /* BTListTableViewController.m */,
+				019072091D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.h */,
+				0190720A1D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.m */,
+				0190720C1D87DDAD00D188D6 /* BTFormViewController.h */,
+				0190720D1D87DDAD00D188D6 /* BTFormViewController.m */,
+			);
+			name = "Blood Test";
+			sourceTree = "<group>";
+		};
 		8E2527651D57600200ACEE92 /* Pre-Registration */ = {
 			isa = PBXGroup;
 			children = (
@@ -343,6 +387,8 @@
 			children = (
 				8E2527651D57600200ACEE92 /* Pre-Registration */,
 				8E2527661D57600900ACEE92 /* Screening */,
+				019072051D87A86300D188D6 /* Blood Test */,
+				01871B611D881DE6002194C9 /* Follow Up */,
 				8E2527681D5766C400ACEE92 /* HomeViewController.h */,
 				8E2527691D5766C400ACEE92 /* HomeViewController.m */,
 				E1A4F0DD1D66BC5A00EE9BBB /* LoginViewController.h */,
@@ -640,20 +686,26 @@
 				01C86C761D7725960096379A /* SummaryPageViewController.m in Sources */,
 				E120E40B1D431E9B002DBC7E /* AppDelegate.m in Sources */,
 				8EC56F8A1D60CDBB00938C2A /* AppConstants.m in Sources */,
+				01871B641D881E0C002194C9 /* FollowUpListTableViewController.m in Sources */,
 				E120E4081D431E9B002DBC7E /* main.m in Sources */,
 				E1EFB0931D433C3400510532 /* PatientScreeningListTableViewController.m in Sources */,
 				E10412101D4C8EFA0024663B /* PreRegFormViewController.m in Sources */,
 				E13B8F0B1D66F62900C3A81D /* UIScrollViewWithTouchesBegan.m in Sources */,
 				8E25276D1D57891700ACEE92 /* PreRegDisplayFormViewController.m in Sources */,
+				0190720B1D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.m in Sources */,
 				8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */,
+				019072081D87ABCA00D188D6 /* BTListTableViewController.m in Sources */,
+				01FC79F41D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m in Sources */,
 				E1A4F0DF1D66BC5A00EE9BBB /* LoginViewController.m in Sources */,
 				8E23D5541D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m in Sources */,
 				E1FCF9381D45DE2000478F7B /* PreRegPatientDetailsViewController.m in Sources */,
 				8EC56F871D60C16300938C2A /* ScreeningSectionTableViewController.m in Sources */,
+				01FC79F71D882BB3003D3AB6 /* SummaryReportViewController.m in Sources */,
 				E1FCF9321D45B77F00478F7B /* ServerComm.m in Sources */,
 				8EC56F811D60B88D00938C2A /* ScreeningFormViewController.m in Sources */,
 				E1FCF9351D45BBFC00478F7B /* PatientPreRegTableViewController.m in Sources */,
 				E1A4F0DC1D61CB8A00EE9BBB /* Reachability.m in Sources */,
+				0190720E1D87DDAD00D188D6 /* BTFormViewController.m in Sources */,
 				8E25276A1D5766C400ACEE92 /* HomeViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

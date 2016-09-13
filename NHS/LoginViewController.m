@@ -7,6 +7,7 @@
 //
 
 #import "LoginViewController.h"
+#import "HomeViewController.h"
 #import "AFNetworking.h"
 #import <CommonCrypto/CommonDigest.h>
 #import "MBProgressHUD.h"
@@ -19,6 +20,7 @@
 
 @interface LoginViewController () {
     MBProgressHUD *hud;
+    NSNumber *isComm;
 }
 
 @property(strong, nonatomic) IBOutlet UIScrollView *scrollViewBackground;
@@ -188,6 +190,8 @@
               NSLog(@"success: %@", responseObject);
               NSDictionary *responseDict = responseObject;
               
+              isComm = [responseObject valueForKey:@"is_comm"];
+
               // login if auth_result is 1
               if ([[responseDict valueForKey:@"auth_result"] integerValue] == 1) {
                   self.volunteerID =
@@ -238,5 +242,15 @@
     
     return output;
 }
+
+
+ #pragma mark - Navigation
+ 
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+     if ([segue.destinationViewController respondsToSelector:@selector(setIsComm:)]) {
+         [segue.destinationViewController performSelector:@selector(setIsComm:) withObject:isComm];
+     }
+ }
+ 
 @end
 
