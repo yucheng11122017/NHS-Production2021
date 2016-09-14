@@ -478,11 +478,29 @@
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
       progress:progressBlock
-       success:successBlock
+        success:successBlock
        failure:[self checkForBadHTTP:failBlock]];
 }
 
 #pragma mark - Blood Test API
+- (void) getAllBloodTestResidents:(void (^)(NSProgress *downloadProgress))progressBlock
+                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 403;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+//    NSDictionary *dataDict;
+    
+//    dataDict = @{@"data": @{@"resident_id":residentID}};
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:NULL
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
 - (void) getBloodTestWithResidentID: (NSNumber *) residentID
                      progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock

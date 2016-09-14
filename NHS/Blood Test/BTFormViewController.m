@@ -27,6 +27,7 @@ NSString *const kFit = @"fit";
 }
 
 @property (strong, nonatomic) NSMutableArray *bloodTestForm;
+@property (strong, nonatomic) XLFormDescriptor * formDescriptor;
 
 @end
 
@@ -36,9 +37,23 @@ NSString *const kFit = @"fit";
     
     XLFormViewController *form = [self init];       //must init first before [super viewDidLoad]
     NSLog(@"%@", [form class]);
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitPressed:)];
     self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
+    
+    if ([self.downloadedBloodTestResult count] > 0) {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain
+                                                                                 target:self
+                                                                                 action:@selector(editPressed:)];
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Back" style:UIBarButtonItemStylePlain target:self action:@selector(backBtnPressed:)];
+    } else {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone
+                                                                                 target:self
+                                                                                 action:@selector(submitPressed:)];
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
+    }
+        
+        
+    
+    
     self.bloodTestForm = [[NSMutableArray alloc] init];
     
     [super viewDidLoad];
@@ -52,49 +67,52 @@ NSString *const kFit = @"fit";
 
 -(id)init
 {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"New Form"];
+    self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"New Form"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
-    formDescriptor.assignFirstResponderOnShow = YES;
+    if ([self.downloadedBloodTestResult count] > 0) {
+        [self.formDescriptor setDisabled:YES];
+    }
+    
+    self.formDescriptor.assignFirstResponderOnShow = YES;
     
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Blood Test"];
     //    section.footerTitle = @"This is a long text that will appear on section footer";
-    [formDescriptor addFormSection:section];
+    [self.formDescriptor addFormSection:section];
     
     // Name
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC rowType:XLFormRowDescriptorTypeText title:@"NRIC"];
     row.required = YES;
-//    row.value = [self.retrievedPatientDictionary objectForKey:kName]? [self.retrievedPatientDictionary objectForKey:kName]:@"";
+    row.value = [self.downloadedBloodTestResult objectForKey:kNRIC]? [self.downloadedBloodTestResult objectForKey:kNRIC]:_residentNRIC;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    row.value = _residentNRIC;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kGlucose rowType:XLFormRowDescriptorTypeNumber title:@"Glucose (Fasting)"];
     row.required = YES;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-//    row.value = [self.retrievedPatientDictionary objectForKey:kContactNumber]? [self.retrievedPatientDictionary objectForKey:kContactNumber]:@"";
+    row.value = [self.downloadedBloodTestResult objectForKey:kGlucose]? [self.downloadedBloodTestResult objectForKey:kGlucose]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kTrigly rowType:XLFormRowDescriptorTypeNumber title:@"Triglycerides"];
     row.required = YES;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kContactNumber]? [self.retrievedPatientDictionary objectForKey:kContactNumber]:@"";
+        row.value = [self.downloadedBloodTestResult objectForKey:kTrigly]? [self.downloadedBloodTestResult objectForKey:kTrigly]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kLdl rowType:XLFormRowDescriptorTypeNumber title:@"LDL Cholesterol"];
     row.required = YES;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kContactNumber]? [self.retrievedPatientDictionary objectForKey:kContactNumber]:@"";
+        row.value = [self.downloadedBloodTestResult objectForKey:kLdl]? [self.downloadedBloodTestResult objectForKey:kLdl]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFit rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"FIT Positive?"];
     row.required = YES;
-    //    row.value = [self.retrievedPatientDictionary objectForKey:kContactNumber]? [self.retrievedPatientDictionary objectForKey:kContactNumber]:@"";
+        row.value = [self.downloadedBloodTestResult objectForKey:kFit]? [self.downloadedBloodTestResult objectForKey:kFit]:@"";
     [section addFormRow:row];
     
-    return [super initWithForm:formDescriptor];
+    return [super initWithForm:self.formDescriptor];
     
 }
 
@@ -102,19 +120,61 @@ NSString *const kFit = @"fit";
 
 -(void)backBtnPressed:(id)sender
 {
-    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Cancel", nil)
-                                                                              message:@"Do you want to cancel form entry?"
-                                                                       preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil)
-                                                        style:UIAlertActionStyleDefault
-                                                      handler:^(UIAlertAction * deleteDraftAction) {
-                                                          [self.navigationController popViewControllerAnimated:YES];
-                                                      }]];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil)
-                                                        style:UIAlertActionStyleCancel
-                                                      handler:nil]];
-    [self presentViewController:alertController animated:YES completion:nil];
+    if (![self.navigationItem.rightBarButtonItem.title isEqualToString:@"Edit"]) {
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                                                  message:@"Do you want to cancel form entry?"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * deleteDraftAction) {
+                                                              [self.navigationController popViewControllerAnimated:YES];
+                                                          }]];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil)
+                                                            style:UIAlertActionStyleCancel
+                                                          handler:nil]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    } else {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
+
+-(void)editPressed:(UIBarButtonItem * __unused)button
+{
+    if(self.form.isDisabled) {
+        [button setTitle:@"Save"];
+    } else {
+        NSArray * validationErrors = [self formValidationErrors];
+        if (validationErrors.count > 0){
+            [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+                UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+                cell.backgroundColor = [UIColor orangeColor];
+                [UIView animateWithDuration:0.3 animations:^{
+                    cell.backgroundColor = [UIColor whiteColor];
+                }];
+            }];
+            [self showFormValidationError:[validationErrors firstObject]];
+            return;
+        }
+        //    if (validationErrors.count > 0){
+        //        [self showFormValidationError:[validationErrors firstObject]];
+        //        return;
+        //    }
+        [self.tableView endEditing:YES];
+        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+        
+        // Set the label text.
+        hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
+        [self submitBloodTestResult:[self prepareBloodTestDict]];
+        
+        [button setTitle:@"Edit"];
+    }
+    
+    self.form.disabled = !self.form.disabled;
+    [self.tableView endEditing:YES];
+    [self.tableView reloadData];
+}
+
 
 -(void)submitPressed:(UIBarButtonItem * __unused)button
 {
@@ -199,7 +259,7 @@ NSString *const kFit = @"fit";
         [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction * okAction) {
-                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshBTResidentTable"
                                                                                                                   object:nil
                                                                                                                 userInfo:nil];
                                                               [self.navigationController popViewControllerAnimated:YES];

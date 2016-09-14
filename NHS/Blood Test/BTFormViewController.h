@@ -13,9 +13,11 @@
 
 @property (strong, nonatomic) NSString *residentNRIC;
 @property (strong, nonatomic) NSNumber *residentID;
+@property (strong, nonatomic) NSDictionary *downloadedBloodTestResult;
 
 - (void) setResidentNRIC:(NSString *)residentNRIC;
 - (void) setResidentID:(NSNumber *)residentID;
+- (void) setDownloadedBloodTestResult:(NSDictionary *)dictionary;
 
 
 @end

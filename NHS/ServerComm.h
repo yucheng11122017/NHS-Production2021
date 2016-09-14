@@ -168,6 +168,10 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
 
 
 #pragma mark - Blood Test API
+- (void) getAllBloodTestResidents:(void (^)(NSProgress *downloadProgress))progressBlock
+                     successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                     andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
 - (void) getBloodTestWithResidentID: (NSNumber *) residentID
                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock

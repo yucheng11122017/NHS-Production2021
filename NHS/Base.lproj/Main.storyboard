@@ -146,6 +146,7 @@
                     <connections>
                         <segue destination="m5X-8q-vBA" kind="presentation" identifier="SelectScreenedResidentSegue" id="gzY-Sd-PAi"/>
                         <segue destination="FZO-eu-dNd" kind="show" identifier="NewBTFormSegue" id="zBn-OM-x69"/>
+                        <segue destination="FZO-eu-dNd" kind="show" identifier="LoadBloodTestFormSegue" id="EDv-zZ-nX6"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dCB-MG-cR4" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -511,7 +512,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CmE-KV-6uA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="969" y="421"/>
+            <point key="canvasLocation" x="989" y="425"/>
         </scene>
         <!--Screening Form View Controller-->
         <scene sceneID="QKU-57-CiA">
@@ -699,5 +700,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="dVH-QH-3V3"/>
+        <segue reference="EDv-zZ-nX6"/>
     </inferredMetricsTieBreakers>
 </document>

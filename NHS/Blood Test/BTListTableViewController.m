@@ -303,7 +303,6 @@ typedef enum residentDataSource {
 
 
 - (IBAction)addBtnPressed:(UIBarButtonItem *)sender {
-//    [self.retrievedResidentData removeAllObjects];  //clear the dictionary
     
     [self performSegueWithIdentifier:@"SelectScreenedResidentSegue" sender:self];
     
@@ -475,11 +474,10 @@ typedef enum residentDataSource {
 #pragma mark - Blood Test API
 
 - (void)getAllBloodTestResidents {
-//    ServerComm *client = [ServerComm sharedServerCommInstance];
-//    [client getAllScreeningResidents:[self progressBlock]
-//                        successBlock:[self successBlock]
-//                        andFailBlock:[self errorBlock]];
-#warning No API yet at the moment
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    [client getAllBloodTestResidents:[self progressBlock]
+                        successBlock:[self successBlock]
+                        andFailBlock:[self errorBlock]];
 }
 
 
@@ -526,8 +524,8 @@ typedef enum residentDataSource {
         int i;
         [self.residentNames removeAllObjects];   //reset this array first
         [self.residentScreenTimestamp removeAllObjects];   //reset this array first
-        NSArray *patients = [responseObject objectForKey:@"0"];      //somehow double brackets... (())
-        self.BTResidents = [[NSMutableArray alloc] initWithArray:patients];
+        NSArray *residents = responseObject;
+        self.BTResidents = [[NSMutableArray alloc] initWithArray:residents];
         
         NSSortDescriptor *sortDescriptor;
         sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"resident_name" ascending:YES];
@@ -551,15 +549,17 @@ typedef enum residentDataSource {
 - (void (^)(NSURLSessionDataTask *task, id responseObject))downloadBloodTestResultSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         
-        self.retrievedResidentData = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
+        self.retrievedResidentData = [[NSMutableDictionary alloc] initWithDictionary:[responseObject objectAtIndex:0]];
         NSLog(@"%@", self.retrievedResidentData);
-        [self performSegueWithIdentifier:@"LoadScreeningFormSegue" sender:self];
+        [self performSegueWithIdentifier:@"LoadBloodTestFormSegue" sender:self];
     };
 }
 
 - (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
         NSLog(@"Patients data fetch was unsuccessful!");
+        NSDictionary *errorData = [error userInfo];
+        NSLog(@"%@", errorData);
         fetchDataState = failed;
         [self.tableView reloadData];
         [self.refreshControl endRefreshing];
@@ -625,7 +625,7 @@ typedef enum residentDataSource {
 #pragma mark - NSNotification Methods
 
 - (void)refreshBTResidentTable:(NSNotification *) notification{
-    NSLog(@"refresh screening table");
+    NSLog(@"refreshBTResidentTable");
     [self getAllBloodTestResidents];
 }
 
@@ -652,6 +652,13 @@ typedef enum residentDataSource {
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentNRIC:)]) {
         [segue.destinationViewController performSelector:@selector(setResidentNRIC:)
                                               withObject:selectedResidentNRIC];
+    }
+    
+    if ([segue.identifier isEqualToString:@"LoadBloodTestFormSegue"]) {
+        if ([segue.destinationViewController respondsToSelector:@selector(setDownloadedBloodTestResult:)]) {
+            [segue.destinationViewController performSelector:@selector(setDownloadedBloodTestResult:)
+                                                  withObject:self.retrievedResidentData];
+        }
     }
 
 }
