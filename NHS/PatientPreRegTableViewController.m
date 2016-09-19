@@ -106,7 +106,7 @@ typedef enum getDataState {
 }
 
 - (void) viewWillAppear:(BOOL)animated {
-    self.navigationItem.title = @"Pre-Registration";
+    self.navigationItem.title = @"List of Pre-registered Residents";
     
     [super viewWillAppear:animated];
 //    [self getAllPatients];

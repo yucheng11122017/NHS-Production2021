@@ -8,6 +8,7 @@
 
 #import "FollowUpListTableViewController.h"
 #import "ResidentFollowUpHistoryTableViewController.h"
+#import "FollowUpFormViewController.h"
 #import "ServerComm.h"
 #import "SearchResultsTableController.h"
 #import "Reachability.h"
@@ -53,6 +54,7 @@ typedef enum getDataState {
     NetworkStatus status;
     MBProgressHUD *hud;
     int fetchDataState;
+    NSDictionary *residentParticulars;
 }
 
 - (void)viewDidLoad {
@@ -83,6 +85,11 @@ typedef enum getDataState {
                                              selector:@selector(refreshScreeningResidentTable:)
                                                  name:@"refreshScreeningResidentTable"
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(createNewFollowUpForm:)
+                                                 name:@"selectedScreenedResidentToNewForm"
+                                               object:nil];
+    
     
     _resultsTableController = [[SearchResultsTableController alloc] init];
     _searchController = [[UISearchController alloc] initWithSearchResultsController:self.resultsTableController];
@@ -102,6 +109,11 @@ typedef enum getDataState {
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+    self.navigationItem.title = @"List of Followed-up Residents";
+    [super viewWillAppear:animated];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -618,9 +630,9 @@ typedef enum getDataState {
 //    [self getAllScreeningResidents];
 }
 
-- (void) selectedPreRegResidentToNewScreenForm: (NSNotification *) notification {
-    selectedResidentID = [notification.userInfo objectForKey:@"resident_id"];
-    [self performSegueWithIdentifier:@"NewScreeningFormSegue" sender:self];
+- (void) createNewFollowUpForm: (NSNotification *) notification {
+    residentParticulars = [notification userInfo];
+    [self performSegueWithIdentifier:@"NewFollowUpFormSegue" sender:self];
 }
 
 #pragma mark - Navigation
@@ -628,15 +640,20 @@ typedef enum getDataState {
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     [hud hideAnimated:YES];
-    if ([segue.destinationViewController respondsToSelector:@selector(setResidentID:)]) {    //view submitted form
-        [segue.destinationViewController performSelector:@selector(setResidentID:)
-                                              withObject:selectedResidentID];
+    if ([segue.destinationViewController respondsToSelector:@selector(setResidentParticulars:)]) {    //view submitted form
+        [segue.destinationViewController performSelector:@selector(setResidentParticulars:)
+                                              withObject:residentParticulars];
     }
-//
-    if ([self.retrievedResidentData count]) {
-        [segue.destinationViewController performSelector:@selector(setRetrievedData:)
-                                              withObject:self.retrievedResidentData];
-    }
+    
+//    if ([segue.destinationViewController respondsToSelector:@selector(setResidentID:)]) {    //view submitted form
+//        [segue.destinationViewController performSelector:@selector(setResidentID:)
+//                                              withObject:selectedResidentID];
+//    }
+////
+//    if ([self.retrievedResidentData count]) {
+//        [segue.destinationViewController performSelector:@selector(setRetrievedData:)
+//                                              withObject:self.retrievedResidentData];
+//    }
 //
 //    if ([segue.destinationViewController respondsToSelector:@selector(setResidentLocalFileIndex:)]) {    //view submitted form
 //        [segue.destinationViewController performSelector:@selector(setResidentLocalFileIndex:)

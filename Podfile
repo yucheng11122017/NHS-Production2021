@@ -13,6 +13,7 @@ abstract_target 'CocoaPods' do
   pod 'XLForm', :git => 'https://github.com/xmartlabs/XLForm.git'
   pod 'MBProgressHUD', '~> 1.0.0'
   pod 'SVProgressHUD', '~> 2.0'
+  pod 'HTPressableButton', '~> 1.3'
 
   target 'NHS' do
     # Uncomment this line if you're using Swift or would like to use dynamic frameworks
