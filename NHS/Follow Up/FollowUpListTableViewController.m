@@ -24,6 +24,11 @@ typedef enum getDataState {
     successful
 } getDataState;
 
+typedef enum typeOfFollowUp {
+    houseVisit,
+    phoneCall
+} typeOfFollowUp;
+
 @interface FollowUpListTableViewController ()  <UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating>
 
 @property (nonatomic, strong) UISearchController *searchController;
@@ -55,6 +60,7 @@ typedef enum getDataState {
     MBProgressHUD *hud;
     int fetchDataState;
     NSDictionary *residentParticulars;
+    NSNumber *followUpType;
 }
 
 - (void)viewDidLoad {
@@ -304,13 +310,14 @@ typedef enum getDataState {
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Phone Call", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
-                                                          selectedResidentID = @(-1);
-//                                                          [self performSegueWithIdentifier:@"NewScreeningFormSegue" sender:self];
+                                                          followUpType = [NSNumber numberWithInt:phoneCall];
+                                                          [self performSegueWithIdentifier:@"FollowUpListToSelectResidentSegue" sender:self];
                                                       }]];
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"House Visit", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
-//                                                          [self performSegueWithIdentifier:@"SelectPreRegSegue" sender:self];
+                                                          followUpType = [NSNumber numberWithInt:houseVisit];
+                                                          [self performSegueWithIdentifier:@"FollowUpListToSelectResidentSegue" sender:self];
                                                       }]];
     [self presentViewController:alertController animated:YES completion:nil];
     
@@ -627,7 +634,6 @@ typedef enum getDataState {
 
 - (void)refreshScreeningResidentTable:(NSNotification *) notification{
     NSLog(@"refresh screening table");
-//    [self getAllScreeningResidents];
 }
 
 - (void) createNewFollowUpForm: (NSNotification *) notification {
@@ -643,6 +649,11 @@ typedef enum getDataState {
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentParticulars:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setResidentParticulars:)
                                               withObject:residentParticulars];
+    }
+    
+    if ([segue.destinationViewController respondsToSelector:@selector(setTypeOfFollowUp:)]) {    //view submitted form
+        [segue.destinationViewController performSelector:@selector(setTypeOfFollowUp:)
+                                              withObject:followUpType];
     }
     
 //    if ([segue.destinationViewController respondsToSelector:@selector(setResidentID:)]) {    //view submitted form

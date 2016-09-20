@@ -2618,12 +2618,12 @@ NSString *const kDocName = @"doc_name";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Consent to share particulars, personal information, screening results and other necessary information with the following"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_sso" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"SSO @ Taman Jurong / Family Service Centre @ Marine Parade"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_sso_tj" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"SSO @ Taman Jurong"];
     row.required = NO;
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    if ([demographicsDict objectForKey:@"consent_sso"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_sso"])) {
-        if (([[demographicsDict objectForKey:@"consent_sso"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_sso"] isEqualToString:@"1"]))
-            row.value = [demographicsDict objectForKey:@"consent_sso"];
+    if ([demographicsDict objectForKey:@"consent_sso_tj"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_sso_tj"])) {
+        if (([[demographicsDict objectForKey:@"consent_sso_tj"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_sso_tj"] isEqualToString:@"1"]))
+            row.value = [demographicsDict objectForKey:@"consent_sso_tj"];
         else
             row.value = @1;
     } else {
@@ -2631,7 +2631,7 @@ NSString *const kDocName = @"doc_name";
     }
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_ntuc" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"NTUC Health Cluster Support @ Taman Jurong / Goodlife"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_ntuc" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"NTUC Health Cluster Support @ Taman Jurong"];
     row.required = NO;
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     if ([demographicsDict objectForKey:@"consent_ntuc"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_ntuc"])) {
@@ -2644,12 +2644,51 @@ NSString *const kDocName = @"doc_name";
     }
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_fysc" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Fei Yue Family Service Centre / SSO @ Bedok and Geylang Serai"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_fysc" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Fei Yue Family Service Centre"];
     row.required = NO;
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     if ([demographicsDict objectForKey:@"consent_fysc"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_fysc"])) {
         if (([[demographicsDict objectForKey:@"consent_fysc"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_fysc"] isEqualToString:@"1"]))
             row.value = [demographicsDict objectForKey:@"consent_fysc"];
+        else
+            row.value = @1;
+    } else {
+        row.value = @1;
+    }
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_sso_bedok" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"SSO @ Bedok and Geylang Serai"];
+    row.required = NO;
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    if ([demographicsDict objectForKey:@"consent_sso_bedok"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_sso_bedok"])) {
+        if (([[demographicsDict objectForKey:@"consent_sso_bedok"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_sso_bedok"] isEqualToString:@"1"]))
+            row.value = [demographicsDict objectForKey:@"consent_sso_bedok"];
+        else
+            row.value = @1;
+    } else {
+        row.value = @1;
+    }
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_goodlife" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Goodlife"];
+    row.required = NO;
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    if ([demographicsDict objectForKey:@"consent_goodlife"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_goodlife"])) {
+        if (([[demographicsDict objectForKey:@"consent_goodlife"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_goodlife"] isEqualToString:@"1"]))
+            row.value = [demographicsDict objectForKey:@"consent_goodlife"];
+        else
+            row.value = @1;
+    } else {
+        row.value = @1;
+    }
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_fsc" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Family Service Centre @ Marine Parade"];
+    row.required = NO;
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    if ([demographicsDict objectForKey:@"consent_fsc"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_fsc"])) {
+        if (([[demographicsDict objectForKey:@"consent_fsc"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_fsc"] isEqualToString:@"1"]))
+            row.value = [demographicsDict objectForKey:@"consent_fsc"];
         else
             row.value = @1;
     } else {

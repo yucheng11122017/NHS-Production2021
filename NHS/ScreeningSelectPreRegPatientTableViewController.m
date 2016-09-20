@@ -102,7 +102,6 @@ typedef enum getDataState {
     self.navigationItem.title = @"Pre-Registration Patient List";
     
     [super viewWillAppear:animated];
-    //    [self getAllPatients];
     fetchDataState = started;
 }
 

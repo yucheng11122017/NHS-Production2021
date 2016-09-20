@@ -231,9 +231,12 @@
     "ts": ""
   },
   "demographics": {
-    "consent_sso": "",
+    "consent_sso_tj": "",
     "consent_ntuc": "",
     "consent_fysc": "",
+    "consent_sso_bedok": "",
+    "consent_goodlife": "",
+    "consent_fsc": "",
     "resident_id": "",
     "citizenship": "",
     "religion": "",

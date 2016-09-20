@@ -32,21 +32,31 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
+    //----- SETUP DEVICE ORIENTATION CHANGE NOTIFICATION -----
+    UIDevice *device = [UIDevice currentDevice];					//Get the device object
+    [device beginGeneratingDeviceOrientationNotifications];			//Tell it to start monitoring the accelerometer for orientation
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];	//Get the notification centre for the app
+    [nc addObserver:self											//Add yourself as an observer
+           selector:@selector(orientationChanged:)
+               name:UIDeviceOrientationDidChangeNotification
+             object:device];
+    
+    [self createButtons];
+    
     if ([_isComm isEqualToNumber:@0]) {
         self.bloodTestBtn.hidden = YES;
         self.followUpBtn.hidden = YES;
     }
-    
-    [self createButtons];
-    // Do any additional setup after loading the view.
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    
     self.navigationItem.title = @"Home Page";
     [self.navigationController setNavigationBarHidden:NO];
     self.navigationItem.hidesBackButton = YES;
     self.navigationItem.rightBarButtonItem = self.logoutBtn;
+    self.navigationItem.rightBarButtonItem.tintColor = [UIColor redColor];
     [super viewWillAppear:animated];
 }
 
@@ -122,6 +132,21 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+#pragma mark - Notification methods
+//********** ORIENTATION CHANGED **********
+- (void)orientationChanged:(NSNotification *)note
+{
+    NSLog(@"Orientation  has changed: %ld", (long)[[note object] orientation]);
+    [self updateButtonsFrame];
+}
+
+- (void) updateButtonsFrame {
+    int yPos1 = (self.view.frame.size.height - (self.navigationController.navigationBar.frame.size.height + 60 + 40))/4;
+    self.preRegBtn.frame = CGRectMake(30, yPos1, self.view.frame.size.width - 60, 50);
+    self.screeningBtn.frame = CGRectMake(30, yPos1*2, self.view.frame.size.width - 60, 50);
+    self.followUpBtn.frame = CGRectMake(30, yPos1*3, self.view.frame.size.width - 60, 50);
+    self.bloodTestBtn.frame = CGRectMake(30, yPos1*4, self.view.frame.size.width - 60, 50);
+}
 /*
 #pragma mark - Navigation
 

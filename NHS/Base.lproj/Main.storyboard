@@ -19,18 +19,18 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DRx-dF-0Yx" customClass="HTPressableButton">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DRx-dF-0Yx" customClass="HTPressableButton">
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="Wy5-0P-4dJ"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <state key="normal" title="Blood Test"/>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LTf-I5-FXi" customClass="HTPressableButton">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LTf-I5-FXi" customClass="HTPressableButton">
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <state key="normal" title="Follow Up"/>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zVA-7c-ZwZ" customClass="HTPressableButton">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zVA-7c-ZwZ" customClass="HTPressableButton">
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="nPQ-Hh-2Y3"/>
                                     <constraint firstAttribute="width" constant="300" id="vaY-qc-NNb"/>
@@ -38,7 +38,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <state key="normal" title="Pre-Registration"/>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0jN-su-p0U" customClass="HTPressableButton">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0jN-su-p0U" customClass="HTPressableButton">
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="Vy4-N0-ZEE"/>
                                 </constraints>
@@ -88,7 +88,7 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="S0L-aI-EqB">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="92" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="S0L-aI-EqB" id="CBI-9m-fqK">
                                     <frame key="frameInset" width="375" height="43"/>
@@ -136,6 +136,22 @@
             </objects>
             <point key="canvasLocation" x="-1979" y="707"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="ghv-Tl-EhR">
+            <objects>
+                <navigationController id="4hd-Bl-fwT" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="aX3-Fq-m5k">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="wLh-4P-XLU" kind="relationship" relationship="rootViewController" id="AA2-vq-7Eg"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vFo-cL-G8b" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-511" y="-1894"/>
+        </scene>
         <!--Follow Up Select Screening Resident Table View Controller-->
         <scene sceneID="TTA-lu-TrN">
             <objects>
@@ -146,7 +162,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="ybJ-s1-0Jk">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="92" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ybJ-s1-0Jk" id="AD4-wi-PxG">
                                     <frame key="frameInset" width="375" height="43"/>
@@ -159,6 +175,7 @@
                             <outlet property="delegate" destination="wLh-4P-XLU" id="l3T-Jk-qDb"/>
                         </connections>
                     </tableView>
+                    <navigationItem key="navigationItem" id="F4R-lR-YgV"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oHL-fn-nWV" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -211,13 +228,13 @@
                     <navigationItem key="navigationItem" title="Followed-up Residents" id="sMH-ro-Jve">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="3FT-wS-ky2">
                             <connections>
-                                <action selector="addBtnPressed:" destination="1Mk-NL-tr9" id="hC6-a0-ikF"/>
-                                <segue destination="wLh-4P-XLU" kind="presentation" id="B2N-Jl-CyW"/>
+                                <action selector="addBtnPressed:" destination="1Mk-NL-tr9" id="WzP-IZ-qEz"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
                         <segue destination="ngF-rL-mtf" kind="show" identifier="FollowUpListToResidentHistorySegue" id="Atk-Gc-TIr"/>
+                        <segue destination="4hd-Bl-fwT" kind="presentation" identifier="FollowUpListToSelectResidentSegue" id="SnS-OL-IOh"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SUp-v7-lCR" userLabel="First Responder" sceneMemberID="firstResponder"/>

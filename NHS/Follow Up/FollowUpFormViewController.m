@@ -16,6 +16,11 @@
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
+typedef enum typeOfFollowUp {
+    houseVisit,
+    phoneCall
+} typeOfFollowUp;
+
 NSString *const kDateDay = @"date_dd";
 NSString *const kDateMonth = @"date_mm";
 NSString *const kDateYear = @"date_yyyy";
@@ -32,6 +37,8 @@ NSString *const kFUDocName = @"doc_name";
 //NSString *const kAddBlock = @"address_block";
 //NSString *const kAddUnit = @"address_unit";
 
+
+/****** HOUSE VISIT ******/
 //Clinical Results
 NSString *const kFUHeight = @"height";
 NSString *const kFUWeight = @"weight";
@@ -60,6 +67,12 @@ NSString *const kFUDocNotes = @"doc_notes";
 // NSString *const kDocName = @"doc_name";  //same field as the above
 NSString *const kDocSignature = @"doc_sign";
 
+/****** PHONE CALL ******/
+NSString *const kCallTime = @"call_time";
+NSString *const kCallerName = @"caller_name";
+
+NSString *const kNotes = @"notes";
+
 
 @interface FollowUpFormViewController () {
     MBProgressHUD *hud;
@@ -72,9 +85,13 @@ NSString *const kDocSignature = @"doc_sign";
 @implementation FollowUpFormViewController
 
 - (void)viewDidLoad {
-    
-    XLFormViewController *form = [self init];       //must init first before [super viewDidLoad]
-    NSLog(@"%@", [form class]);
+    if ([self.typeOfFollowUp isEqualToNumber:[NSNumber numberWithInt:houseVisit]]) {
+        XLFormViewController *form = [self initHouseVisit];       //must init first before [super viewDidLoad]
+        NSLog(@"%@", [form class]);
+    } else {
+        XLFormViewController *form = [self initPhoneCall];       //must init first before [super viewDidLoad]
+        NSLog(@"%@", [form class]);
+    }
     self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone
@@ -93,7 +110,7 @@ NSString *const kDocSignature = @"doc_sign";
     // Dispose of any resources that can be recreated.
 }
 
--(id)init
+-(id)initHouseVisit
 {
     self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"New Form"];
     XLFormSectionDescriptor * section;
@@ -300,11 +317,65 @@ NSString *const kDocSignature = @"doc_sign";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocSignature rowType:XLFormRowDescriptorTypeText title:@"Doctor's Signature"];
     [section addFormRow:row];
     
-    
-    
-    
     return [super initWithForm:self.formDescriptor];
     
+}
+
+- (id) initPhoneCall {
+    self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"New Form"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    NSDictionary *resiPartiDict = self.residentParticulars;
+    
+    self.formDescriptor.assignFirstResponderOnShow = YES;
+    
+    // Caller's Name - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Call Details"];
+    [self.formDescriptor addFormSection:section];
+    
+    // Name
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCallTime rowType:XLFormRowDescriptorTypeInteger title:@"Time of Call *"];
+    row.required = YES;
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCallerName rowType:XLFormRowDescriptorTypeInteger title:@"Name of Caller *"];
+    row.required = YES;
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [section addFormRow:row];
+    
+    // Subject Particulars - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Subject Particulars"];
+    [self.formDescriptor addFormSection:section];
+    
+    // Name
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeName title:@"Name *"];
+    row.required = YES;
+    row.value = [resiPartiDict objectForKey:@"resident_name"];
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC rowType:XLFormRowDescriptorTypeText title:@"NRIC *"];
+    row.value = [resiPartiDict objectForKey:@"nric"];
+    row.required = YES;
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [section addFormRow:row];
+    
+    // Subject Particulars - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Post Home Visit Management Plan"];
+    [self.formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNotes
+                                                rowType:XLFormRowDescriptorTypeTextView];
+    [row.cellConfigAtConfigure setObject:@"Notes" forKey:@"textView.placeholder"];
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *actionToBeTaken = [XLFormRowDescriptor formRowDescriptorWithTag:kAction rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Action to be taken"];
+    actionToBeTaken.selectorOptions = @[@"Urgent", @"Phone Call", @"Home Visit", @"Discharge"];
+    [section addFormRow:actionToBeTaken];
+    
+    return [super initWithForm:self.formDescriptor];
 }
 
 
