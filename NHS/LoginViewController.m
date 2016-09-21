@@ -11,6 +11,7 @@
 #import "AFNetworking.h"
 #import <CommonCrypto/CommonDigest.h>
 #import "MBProgressHUD.h"
+#import <BuddyBuildSDK/BuddyBuildSDK.h>
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 #define ERROR_MSG_DELAY 5.0f
@@ -46,12 +47,17 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES];
     
     // scale the NHS logo properly
     self.nhsLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
-    self.buildNoLabel.text = [NSString stringWithFormat:@"Version: %@ (%@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
+    if (([BuddyBuildSDK buildNumber] != (id)[NSNull null]) && [BuddyBuildSDK buildNumber]) {
+        self.buildNoLabel.text = [NSString stringWithFormat:@"BuddyBuild Number: %@", [BuddyBuildSDK buildNumber]];
+    } else {
+        self.buildNoLabel.hidden = YES;
+    }
     self.buildNoLabel.numberOfLines = 1;
     [self.buildNoLabel sizeToFit];
 

@@ -649,9 +649,7 @@
                                             <action selector="loginButtonPressed:" destination="BDB-bw-LwV" eventType="touchUpInside" id="cQ4-xl-1hI"/>
                                         </connections>
                                     </button>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Build Number" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f9G-ko-85F">
-                                        <rect key="frame" x="119" y="586" width="105" height="21"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Build Number" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f9G-ko-85F">
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -668,6 +666,7 @@
                                     <constraint firstItem="Ti9-YN-zCm" firstAttribute="top" secondItem="tUX-4K-syl" secondAttribute="bottom" constant="5" id="Qyx-OV-gVy"/>
                                     <constraint firstAttribute="bottom" secondItem="Cie-Kw-7ZC" secondAttribute="bottom" constant="281" id="TlI-y2-8le"/>
                                     <constraint firstItem="Gom-g3-Wjk" firstAttribute="top" relation="greaterThanOrEqual" secondItem="E26-7S-nl5" secondAttribute="top" constant="20" id="UC3-xt-90E"/>
+                                    <constraint firstItem="f9G-ko-85F" firstAttribute="centerX" secondItem="Cie-Kw-7ZC" secondAttribute="centerX" id="W8K-Yg-GjS"/>
                                     <constraint firstItem="Cie-Kw-7ZC" firstAttribute="leading" secondItem="Ti9-YN-zCm" secondAttribute="leading" id="XbP-I9-A3P"/>
                                     <constraint firstItem="tUX-4K-syl" firstAttribute="leading" secondItem="Ti9-YN-zCm" secondAttribute="leading" id="ac2-lA-DTX"/>
                                     <constraint firstItem="Gom-g3-Wjk" firstAttribute="centerX" secondItem="cPC-FP-LhX" secondAttribute="centerX" id="anu-xC-6qm"/>
@@ -675,12 +674,13 @@
                                     <constraint firstItem="Gom-g3-Wjk" firstAttribute="top" secondItem="E26-7S-nl5" secondAttribute="top" constant="20" id="cAP-y2-Ljf"/>
                                     <constraint firstItem="tUX-4K-syl" firstAttribute="trailing" secondItem="Ti9-YN-zCm" secondAttribute="trailing" id="hYw-T2-ZqQ"/>
                                     <constraint firstItem="cPC-FP-LhX" firstAttribute="leading" secondItem="E26-7S-nl5" secondAttribute="leading" constant="20" id="jMG-LJ-1VP"/>
+                                    <constraint firstAttribute="bottom" secondItem="f9G-ko-85F" secondAttribute="bottom" constant="10" id="lvV-rx-ibQ"/>
                                     <constraint firstAttribute="bottom" secondItem="Cie-Kw-7ZC" secondAttribute="bottom" constant="20" id="rlw-ig-ZOe"/>
                                 </constraints>
                                 <variation key="default">
                                     <mask key="constraints">
-                                        <exclude reference="rlw-ig-ZOe"/>
                                         <exclude reference="UC3-xt-90E"/>
+                                        <exclude reference="rlw-ig-ZOe"/>
                                     </mask>
                                 </variation>
                             </scrollView>
