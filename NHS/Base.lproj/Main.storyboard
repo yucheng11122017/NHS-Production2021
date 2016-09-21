@@ -649,6 +649,13 @@
                                             <action selector="loginButtonPressed:" destination="BDB-bw-LwV" eventType="touchUpInside" id="cQ4-xl-1hI"/>
                                         </connections>
                                     </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Build Number" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f9G-ko-85F">
+                                        <rect key="frame" x="119" y="586" width="105" height="21"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="cPC-FP-LhX" secondAttribute="trailing" constant="20" id="9gF-4f-2sR"/>
@@ -709,6 +716,7 @@
                     <navigationItem key="navigationItem" id="S16-9a-pSu"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
+                        <outlet property="buildNoLabel" destination="f9G-ko-85F" id="goU-Kd-sRu"/>
                         <outlet property="errorMsgLabel" destination="Ti9-YN-zCm" id="TnL-Da-WeM"/>
                         <outlet property="loginButton" destination="Cie-Kw-7ZC" id="GL1-FV-gtK"/>
                         <outlet property="nhsLogoImageView" destination="Gom-g3-Wjk" id="YGb-Zh-uLv"/>
