@@ -273,28 +273,28 @@ NSString *const kNotes = @"notes";
     [self.formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *systolic_1;
-    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kSysBP_1 rowType:XLFormRowDescriptorTypeNumber title:@"1st Systolic Reading (mmHg)"];
+    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kSysBP_1 rowType:XLFormRowDescriptorTypeNumber title:@"1st Systolic Reading(mmHg)"];
     [section addFormRow:systolic_1];
     
     XLFormRowDescriptor *diastolic_1;
-    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_1 rowType:XLFormRowDescriptorTypeNumber title:@"1st Diastolic Reading (mmHg)"];
+    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_1 rowType:XLFormRowDescriptorTypeNumber title:@"1st Diastolic Reading(mmHg)"];
     [section addFormRow:diastolic_1];
     
     XLFormRowDescriptor *systolic_2;
-    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kSysBP_2 rowType:XLFormRowDescriptorTypeNumber title:@"2nd Systolic Reading (mmHg)"];
+    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kSysBP_2 rowType:XLFormRowDescriptorTypeNumber title:@"2nd Systolic Reading(mmHg)"];
     [section addFormRow:systolic_2];
     
     XLFormRowDescriptor *diastolic_2;
-    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_2 rowType:XLFormRowDescriptorTypeNumber title:@"1st Diastolic Reading (mmHg)"];
+    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_2 rowType:XLFormRowDescriptorTypeNumber title:@"2nd Diastolic Reading(mmHg)"];
     [section addFormRow:diastolic_2];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical/Social Issues"];
     [self.formDescriptor addFormSection:section];
     
-    row =[XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_2 rowType:XLFormRowDescriptorTypeTextView title:@"1. Medical Issues"];
+    row =[XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_2 rowType:XLFormRowDescriptorTypeTextView title:@"Medical Issues"];
     [section addFormRow:row];
     
-    row =[XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_2 rowType:XLFormRowDescriptorTypeTextView title:@"2. Social Issues"];
+    row =[XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_2 rowType:XLFormRowDescriptorTypeTextView title:@"Social Issues"];
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Post Home Visit Management Plan"];
@@ -314,7 +314,7 @@ NSString *const kNotes = @"notes";
     //    row.value = [self.downloadedBloodTestResult objectForKey:kLdl]? [self.downloadedBloodTestResult objectForKey:kLdl]:@"";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocSignature rowType:XLFormRowDescriptorTypeText title:@"Doctor's Signature"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocSignature rowType:XLFormRowDescriptorTypeText title:@"Doctor's MCR Number"];
     [section addFormRow:row];
     
     return [super initWithForm:self.formDescriptor];
