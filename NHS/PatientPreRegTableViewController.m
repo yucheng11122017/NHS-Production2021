@@ -8,7 +8,6 @@
 
 #import "PatientPreRegTableViewController.h"
 #import "PreRegDisplayFormViewController.h"
-#import "PreRegPatientDetailsViewController.h"
 #import "ServerComm.h"
 #import "PreRegFormViewController.h"
 #import "SearchResultsTableController.h"

@@ -86,7 +86,8 @@ typedef enum getDataState {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
         }
         
-        cell.textLabel.text = [NSString stringWithFormat:@"House Visit %ld", (indexPath.row+1)];
+//        cell.textLabel.text = [NSString stringWithFormat:@"House Visit %ld", (indexPath.row+1)];
+        cell.textLabel.text = @"House Visit";
     }
 //    else {
 //        cell = [tableView dequeueReusableCellWithIdentifier:buttonTableIdentifier];

@@ -30,7 +30,6 @@
 @property(strong, nonatomic) IBOutlet UITextField *usernameField;
 @property(strong, nonatomic) IBOutlet UITextField *passwordField;
 @property(strong, nonatomic) IBOutlet UILabel *errorMsgLabel;
-@property (weak, nonatomic) IBOutlet UILabel *buildNoLabel;
 
 @property(strong, nonatomic) IBOutlet UIButton *loginButton;
 
@@ -53,14 +52,6 @@
     
     // scale the NHS logo properly
     self.nhsLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
-    if (([BuddyBuildSDK buildNumber] != (id)[NSNull null]) && [BuddyBuildSDK buildNumber]) {
-        self.buildNoLabel.text = [NSString stringWithFormat:@"BuddyBuild Number: %@", [BuddyBuildSDK buildNumber]];
-    } else {
-        self.buildNoLabel.hidden = YES;
-    }
-    self.buildNoLabel.numberOfLines = 1;
-    [self.buildNoLabel sizeToFit];
-
     
     // set textfield delegate - for responding to return button presses
     self.usernameField.delegate = self;
