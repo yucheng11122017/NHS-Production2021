@@ -182,4 +182,26 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
                         successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                         andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
+#pragma mark - Follow Up API
+- (void) getAllFollowedUpResidents:(void (^)(NSProgress *downloadProgress))progressBlock
+                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+- (void) getFollowUpDetailsWithResidentID: (NSNumber *) residentID
+                            progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                             successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                             andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+#pragma mark Phone Calls
+- (void) postCallerInfoWithDict: (NSDictionary *) dictionary
+                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+- (void) postCallMgmtPlanWithDict: (NSDictionary *) dictionary
+                    progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                     successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                     andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+
 @end

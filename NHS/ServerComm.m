@@ -117,6 +117,119 @@
     
 }
 
+#pragma mark - Pre-registration methods
+
+- (void)postPersonalInfoWithDict:(NSDictionary *) personalInfoDict
+                   progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                    successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                    andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 53;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": personalInfoDict};
+    
+    NSLog(@"%@", dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void)postSpokenLangWithDict:(NSDictionary *) spokenLangDict
+                 progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                  andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 54;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": spokenLangDict};
+    
+    NSLog(@"%@", dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void)postContactInfoWithDict:(NSDictionary *) contactInfoDict
+                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 55;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": contactInfoDict};
+    
+    NSLog(@"%@", dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void)postReqServWithDict:(NSDictionary *) reqServDict
+              progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+               successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+               andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 56;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": reqServDict};
+    
+    NSLog(@"%@", dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void)postOthersWithDict:(NSDictionary *) othersDict
+             progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+              successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+              andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 57;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": othersDict};
+    
+    NSLog(@"%@", dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+
 
 #pragma mark - Screening API
 - (void)getAllScreeningResidents:(void (^)(NSProgress *downloadProgress))progressBlock
@@ -539,46 +652,33 @@
        failure:[self checkForBadHTTP:failBlock]];
 }
 
+#pragma mark - Follow Up API
+- (void) getAllFollowedUpResidents:(void (^)(NSProgress *downloadProgress))progressBlock
+                     successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                     andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 500;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:NULL
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
 
-
-#pragma mark - Pre-registration methods
-
-- (void)postPersonalInfoWithDict:(NSDictionary *) personalInfoDict
+- (void) getFollowUpDetailsWithResidentID: (NSNumber *) residentID
                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
     
-    NSInteger opCode = 53;
+    NSInteger opCode = 501;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    
     NSDictionary *dataDict;
     
-    dataDict = @{@"data": personalInfoDict};
-    
-    NSLog(@"%@", dataDict);
-    
-    [self POST:[url objectForKey:@"op_code"]
-   parameters:dataDict
-     progress:progressBlock
-      success:successBlock
-      failure:[self checkForBadHTTP:failBlock]];
-}
-
-- (void)postSpokenLangWithDict:(NSDictionary *) spokenLangDict
-                   progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                    successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                    andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
-    
-    NSInteger opCode = 54;
-    NSDictionary *url = [[NSDictionary alloc]
-                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    
-    NSDictionary *dataDict;
-    
-    dataDict = @{@"data": spokenLangDict};
-    
-    NSLog(@"%@", dataDict);
+    dataDict = @{@"data": @{@"resident_id":residentID}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -587,20 +687,18 @@
        failure:[self checkForBadHTTP:failBlock]];
 }
 
-- (void)postContactInfoWithDict:(NSDictionary *) contactInfoDict
-                 progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                  andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+#pragma mark Phone Call
+- (void) postCallerInfoWithDict: (NSDictionary *) dictionary
+                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
     
-    NSInteger opCode = 55;
+    NSInteger opCode = 202;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    
     NSDictionary *dataDict;
     
-    dataDict = @{@"data": contactInfoDict};
-    
-    NSLog(@"%@", dataDict);
+    dataDict = @{@"data": @{@"calls_caller":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -609,20 +707,17 @@
        failure:[self checkForBadHTTP:failBlock]];
 }
 
-- (void)postReqServWithDict:(NSDictionary *) reqServDict
+- (void) postCallMgmtPlanWithDict: (NSDictionary *) dictionary
                   progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
                    successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                    andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
     
-    NSInteger opCode = 56;
+    NSInteger opCode = 203;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    
     NSDictionary *dataDict;
     
-    dataDict = @{@"data": reqServDict};
-    
-    NSLog(@"%@", dataDict);
+    dataDict = @{@"data": @{@"calls_mgmt_plan":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -631,27 +726,6 @@
        failure:[self checkForBadHTTP:failBlock]];
 }
 
-- (void)postOthersWithDict:(NSDictionary *) othersDict
-              progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-               successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-               andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
-    
-    NSInteger opCode = 57;
-    NSDictionary *url = [[NSDictionary alloc]
-                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    
-    NSDictionary *dataDict;
-    
-    dataDict = @{@"data": othersDict};
-    
-    NSLog(@"%@", dataDict);
-    
-    [self POST:[url objectForKey:@"op_code"]
-    parameters:dataDict
-      progress:progressBlock
-       success:successBlock
-       failure:[self checkForBadHTTP:failBlock]];
-}
 
 #pragma mark -
 

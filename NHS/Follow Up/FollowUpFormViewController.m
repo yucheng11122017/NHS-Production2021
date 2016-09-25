@@ -424,8 +424,150 @@ NSString *const kNotes = @"notes";
     
     // Set the label text.
     hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
-//    [self submitBloodTestResult:[self prepareBloodTestDict]];
+    
+    if ([self.typeOfFollowUp isEqualToNumber:[NSNumber numberWithInt:houseVisit]]) {
+        [self submitHouseVisitForm];
+    } else {
+        [self submitPhoneCallForm];
+    }
+
 }
+
+#pragma mark Submission
+- (void) submitHouseVisitForm {
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    //do nothing for now...
+}
+
+- (void) submitPhoneCallForm {
+    NSDictionary *dict = [self prepareCallerInfoDict];
+    
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    [client postCallerInfoWithDict:dict
+                     progressBlock:[self progressBlock]
+                      successBlock:[self successBlock]
+                      andFailBlock:[self errorBlock]];
+    
+    dict = [self prepareCallsMgmtPlanDict];
+    [client postCallMgmtPlanWithDict:dict
+                       progressBlock:[self progressBlock]
+                        successBlock:[self phoneCallSuccessBlock]
+                        andFailBlock:[self errorBlock]];
+}
+
+#pragma mark - Blocks
+
+- (void (^)(NSProgress *downloadProgress))progressBlock {
+    return ^(NSProgress *downloadProgress) {
+        NSLog(@"POST in progress...");
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"caller info submit success");
+    };
+}
+- (void (^)(NSURLSessionDataTask *task, id responseObject))phoneCallSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"%@", responseObject);
+        
+        NSLog(@"SUBMISSION SUCCESSFUL!!");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [hud hideAnimated:YES];
+        });
+        
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
+                                                                                  message:@"Form uploaded successfully!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshFollowUpListTable"
+                                                                                                                  object:nil
+                                                                                                                userInfo:nil];
+                                                              [self.navigationController popViewControllerAnimated:YES];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"******UNSUCCESSFUL SUBMISSION******!!");
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+        
+        [hud hideAnimated:YES];     //stop showing the progressindicator
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
+                                                                                  message:@"Form failed to upload!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              //do nothing for now
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+        
+    };
+}
+
+#pragma mark - Dictionary Methods
+
+- (NSDictionary *) prepareCallerInfoDict {
+    NSString *callerName = [[self.form formValues] objectForKey:kCallerName];
+    NSString *callTime = [[self.form formValues] objectForKey:kCallTime];
+    
+    // get current date/time
+    NSDate *today = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
+    NSString *ts = [[localDateTime description] stringByReplacingOccurrencesOfString:@" +0000" withString:@""];
+    
+    return @{@"resident_id": [self.residentParticulars objectForKey:@"resident_id"],
+             kCallTime: callTime,
+             kCallerName: callerName,
+             @"ts": ts
+             };
+}
+
+- (NSDictionary *) prepareCallsMgmtPlanDict {
+    NSString *notes = [[self.form formValues] objectForKey:kNotes];
+    NSNumber *urgent = @0, *phoneCall = @0, *homeVisit = @0, *discharge = @0;
+    
+    if ([[[self.form formValues] objectForKey:kAction] count]!=0) {
+        NSArray *actions = [[self.form formValues] objectForKey:kAction];
+        for (int i=0; i<[actions count]; i++) {
+            
+            if([[actions objectAtIndex:i] isEqualToString:@"Urgent"]) urgent = @1;
+            else if([[actions objectAtIndex:i] isEqualToString:@"Phone Call"]) phoneCall = @1;
+            else if([[actions objectAtIndex:i] isEqualToString:@"Home Visit"]) homeVisit = @1;
+            else if([[actions objectAtIndex:i] isEqualToString:@"Discharge"]) discharge = @1;
+        }
+    }
+    
+    
+    // get current date/time
+    NSDate *today = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
+    localDateTime = [NSDate dateWithTimeInterval:1.0 sinceDate:localDateTime];      //add a second
+    NSString *ts = [[localDateTime description] stringByReplacingOccurrencesOfString:@" +0000" withString:@""];
+    
+    return @{@"call_id": @"1",
+             kNotes: notes,
+             kUrgent: urgent,
+             kPhoneCall: phoneCall,
+             kHomeVisit: homeVisit,
+             kDischarge: discharge,
+             @"ts": ts
+             };
+}
+
 
 
 

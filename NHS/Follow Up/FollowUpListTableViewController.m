@@ -88,8 +88,8 @@ typedef enum typeOfFollowUp {
     [self processConnectionStatus];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(refreshScreeningResidentTable:)
-                                                 name:@"refreshScreeningResidentTable"
+                                             selector:@selector(refreshFollowUpListTable:)
+                                                 name:@"refreshFollowUpListTable"
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(createNewFollowUpForm:)
@@ -151,12 +151,12 @@ typedef enum typeOfFollowUp {
     else if (status == ReachableViaWiFi)
     {
         NSLog(@"Wifi");
-//        [self getAllScreeningResidents];
+        [self getAllFollowedUpResidents];
     }
     else if (status == ReachableViaWWAN)
     {
         NSLog(@"3G");
-//        [self getAllScreeningResidents];
+        [self getAllFollowedUpResidents];
     }
 }
 
@@ -488,11 +488,11 @@ typedef enum typeOfFollowUp {
 
 #pragma mark - Screening Resident API
 
-- (void)getAllScreeningResidents {
+- (void)getAllFollowedUpResidents {
     ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getAllScreeningResidents:[self progressBlock]
-                        successBlock:[self successBlock]
-                        andFailBlock:[self errorBlock]];
+    [client getAllFollowedUpResidents:[self progressBlock]
+                         successBlock:[self successBlock]
+                         andFailBlock:[self errorBlock]];
 }
 //
 //- (void)deleteResident: (NSNumber *) residentID {
@@ -544,7 +544,7 @@ typedef enum typeOfFollowUp {
         
         for (i=0; i<[self.screenedResidents count]; i++) {
             [self.residentNames addObject:[[self.screenedResidents objectAtIndex:i] objectForKey:@"resident_name"]];
-            [self.residentScreenTimestamp addObject:[[self.screenedResidents objectAtIndex:i] objectForKey:@"ts"]];
+//            [self.residentScreenTimestamp addObject:[[self.screenedResidents objectAtIndex:i] objectForKey:@"ts"]];
         }
         
         //sort alphabetically
@@ -632,8 +632,9 @@ typedef enum typeOfFollowUp {
 
 #pragma mark - NSNotification Methods
 
-- (void)refreshScreeningResidentTable:(NSNotification *) notification{
-    NSLog(@"refresh screening table");
+- (void)refreshFollowUpListTable:(NSNotification *) notification{
+    NSLog(@"refresh follow up table");
+    [self getAllFollowedUpResidents];
 }
 
 - (void) createNewFollowUpForm: (NSNotification *) notification {

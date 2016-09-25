@@ -453,6 +453,7 @@
 					E120E4021D431E9A002DBC7E = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = 84KR86PUS3;
+						LastSwiftMigration = 0800;
 					};
 					E120E41B1D431E9B002DBC7E = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -823,6 +824,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.edu.nus.nhs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -843,6 +845,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.edu.nus.nhs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

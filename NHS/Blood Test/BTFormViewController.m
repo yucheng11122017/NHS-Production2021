@@ -203,7 +203,6 @@ NSString *const kFit = @"fit";
 }
 
 
-
 #pragma mark -
 
 #pragma mark Submission
@@ -213,6 +212,60 @@ NSString *const kFit = @"fit";
                        progressBlock:[self progressBlock]
                         successBlock:[self successBlock]
                         andFailBlock:[self errorBlock]];
+}
+
+#pragma mark - Blocks
+
+- (void (^)(NSProgress *downloadProgress))progressBlock {
+    return ^(NSProgress *downloadProgress) {
+        NSLog(@"POST in progress...");
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"%@", responseObject);
+        
+        NSLog(@"SUBMISSION SUCCESSFUL!!");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [hud hideAnimated:YES];
+        });
+        
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
+                                                                                  message:@"Blood Test Result uploaded successfully!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshResidentTable"
+                                                                                                                  object:nil
+                                                                                                                userInfo:nil];
+                                                              [self.navigationController popViewControllerAnimated:YES];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"******UNSUCCESSFUL SUBMISSION******!!");
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+        
+        [hud hideAnimated:YES];     //stop showing the progressindicator
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
+                                                                                  message:@"Form failed to upload!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              //do nothing for now
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+        
+    };
 }
 
 #pragma mark Prepare Dictionary
@@ -234,61 +287,6 @@ NSString *const kFit = @"fit";
     
     return dict;
 }
-
-#pragma mark - Blocks
-
-- (void (^)(NSProgress *downloadProgress))progressBlock {
-    return ^(NSProgress *downloadProgress) {
-        NSLog(@"POST in progress...");
-    };
-}
-
-- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
-    return ^(NSURLSessionDataTask *task, id responseObject){
-        NSLog(@"%@", responseObject);
-        
-        NSLog(@"SUBMISSION SUCCESSFUL!!");
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [hud hideAnimated:YES];
-        });
-        
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
-                                                                                  message:@"Blood test result uploaded successfully!"
-                                                                           preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * okAction) {
-                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshBTResidentTable"
-                                                                                                                  object:nil
-                                                                                                                userInfo:nil];
-                                                              [self.navigationController popViewControllerAnimated:YES];
-                                                          }]];
-        [self presentViewController:alertController animated:YES completion:nil];
-    };
-}
-
-- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
-    return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"******UNSUCCESSFUL SUBMISSION******!!");
-        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
-        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
-
-        [hud hideAnimated:YES];     //stop showing the progressindicator
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
-                                                                                  message:@"Form failed to upload!"
-                                                                           preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * okAction) {
-                                                              //do nothing for now
-                                                          }]];
-        [self presentViewController:alertController animated:YES completion:nil];
-    
-    };
-}
-
 
 
 @end

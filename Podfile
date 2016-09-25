@@ -14,6 +14,7 @@ abstract_target 'CocoaPods' do
   pod 'MBProgressHUD', '~> 1.0.0'
   pod 'SVProgressHUD', '~> 2.0'
   pod 'HTPressableButton', '~> 1.3'
+  pod 'LiquidFloatingActionButton', '~> 1.2'
 
   target 'NHS' do
     # Uncomment this line if you're using Swift or would like to use dynamic frameworks
