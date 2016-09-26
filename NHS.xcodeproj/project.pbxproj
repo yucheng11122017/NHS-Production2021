@@ -17,7 +17,6 @@
 		01FC79F41D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01FC79F31D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m */; };
 		01FC79F71D882BB3003D3AB6 /* SummaryReportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01FC79F61D882BB3003D3AB6 /* SummaryReportViewController.m */; };
 		0365AA69F5F64A154E302724 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8964BE86125ACEAAC6F8C79B /* AVFoundation.framework */; };
-		15939C23012573E7010C5FF7 /* BuddyBuildSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A953ABBE5FC7CBFB590C255 /* BuddyBuildSDK.framework */; };
 		45E30D748D4D9DB15E36E079 /* Pods_CocoaPods_NHS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF146E69B77C3775C935F8C /* Pods_CocoaPods_NHS.framework */; };
 		4A30721D483BF641740A849C /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F8C126868498248C33D2EA /* CoreMedia.framework */; };
 		4DB160276775517A6B6C0A75 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6D48DA6CEA8B44D498464D0 /* SystemConfiguration.framework */; };
@@ -91,7 +90,6 @@
 		15C05F16B9AA0D95A6AE2EAA /* Pods-CocoaPods-NHS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPods-NHS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPods-NHS/Pods-CocoaPods-NHS.debug.xcconfig"; sourceTree = "<group>"; };
 		209345AB6DD8B9F1E078D209 /* Pods_NHSUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NHSUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		32CF155AD7EB396F62BB8DC1 /* Pods-CocoaPods-NHS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPods-NHS.release.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPods-NHS/Pods-CocoaPods-NHS.release.xcconfig"; sourceTree = "<group>"; };
-		3A953ABBE5FC7CBFB590C255 /* BuddyBuildSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = BuddyBuildSDK.framework; sourceTree = "<group>"; };
 		3D3B5270F7652DCD47BE1008 /* Pods-NHSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NHSTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-NHSTests/Pods-NHSTests.release.xcconfig"; sourceTree = "<group>"; };
 		42F8C126868498248C33D2EA /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		46E041C7C0BB3C7FF9496A21 /* Pods-NHSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NHSTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NHSTests/Pods-NHSTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -157,7 +155,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				45E30D748D4D9DB15E36E079 /* Pods_CocoaPods_NHS.framework in Frameworks */,
-				15939C23012573E7010C5FF7 /* BuddyBuildSDK.framework in Frameworks */,
 				6CFD29C7B37E62DFE01501E8 /* AssetsLibrary.framework in Frameworks */,
 				B932B92D80F966731F0F568C /* CoreText.framework in Frameworks */,
 				B7FF558E02EF2C333752A688 /* CoreTelephony.framework in Frameworks */,
@@ -269,7 +266,6 @@
 				BBF146E69B77C3775C935F8C /* Pods_CocoaPods_NHS.framework */,
 				645A46836680739EAF744E2F /* Pods_NHSTests.framework */,
 				209345AB6DD8B9F1E078D209 /* Pods_NHSUITests.framework */,
-				3A953ABBE5FC7CBFB590C255 /* BuddyBuildSDK.framework */,
 				5770AFF7723755883767FC00 /* AssetsLibrary.framework */,
 				474665EE4826B151279871A1 /* CoreText.framework */,
 				976D2C7502590B08EE5BAFD4 /* CoreTelephony.framework */,

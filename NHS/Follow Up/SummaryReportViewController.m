@@ -176,7 +176,7 @@
     [textStorage appendAttributedString:doctor_referral_header];
     [textStorage appendAttributedString:doctor_referral_contents];
     
-    if ([self.bloodTestResult objectForKey:@"blood_test"] != [NSNull null]) {   //include only if it's not blank
+    if (self.bloodTestResult != (id)[NSNull null]) {   //include only if it's not blank
         NSAttributedString *blood_test_header = [[NSAttributedString alloc] initWithString:@"Blood Test Results\n" attributes:bloodTestHeaderAttrs];
     
         NSAttributedString *blood_test_contents = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [self getBloodTestResultString]] attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]}];
@@ -286,7 +286,7 @@
 }
                                                
 - (NSString *) getBloodTestResultString {
-    NSString *firstString = [NSString stringWithFormat:@"Glucose (Fasting): %@\nTriglycerides: %@\nLDL Cholesterol: %@\nFIT Positive: ", [[self.bloodTestResult objectForKey:@"blood_test"] objectForKey:@"glucose"], [[self.bloodTestResult objectForKey:@"blood_test"] objectForKey:@"trigly"], [[self.bloodTestResult objectForKey:@"blood_test"] objectForKey:@"ldl"]];
+    NSString *firstString = [NSString stringWithFormat:@"Glucose (Fasting): %@\nTriglycerides: %@\nLDL Cholesterol: %@\nFIT Positive: ", [self.bloodTestResult objectForKey:@"glucose"], [self.bloodTestResult objectForKey:@"trigly"], [self.bloodTestResult objectForKey:@"ldl"]];
     
     NSString *secondString = @"No"; //default No
     

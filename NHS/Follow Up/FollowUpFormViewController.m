@@ -40,8 +40,8 @@ NSString *const kFUDocName = @"doc_name";
 
 /****** HOUSE VISIT ******/
 //Clinical Results
-NSString *const kFUHeight = @"height";
-NSString *const kFUWeight = @"weight";
+NSString *const kFUHeight = @"height_cm";
+NSString *const kFUWeight = @"weight_kg";
 NSString *const kFUBMI = @"bmi";      //auto-generated
 
 //Diabetes Mellitus - CBG reading
@@ -50,12 +50,12 @@ NSString *const kFUCBG = @"cbg";
 //Hypertension - BP Reading
 NSString *const kSysBP_1 = @"systolic_bp_1";
 NSString *const kDiaBP_1 = @"diastolic_bp_1";
-NSString *const kSysBP_2 = @"diastolic_bp_2";
+NSString *const kSysBP_2 = @"systolic_bp_2";
 NSString *const kDiaBP_2 = @"diastolic_bp_2";
 
 //Medical/Social Issues
 NSString *const kMedIssues = @"med_issues";
-NSString *const kSocialIssues = @"social_issues";
+NSString *const kSocialIssues = @"soc_issues";
 
 //Post Home Visit Management Plan
 NSString *const kAction = @"action";
@@ -76,6 +76,7 @@ NSString *const kNotes = @"notes";
 
 @interface FollowUpFormViewController () {
     MBProgressHUD *hud;
+    int success_count;
 }
 
 @property (strong, nonatomic) XLFormDescriptor * formDescriptor;
@@ -291,10 +292,10 @@ NSString *const kNotes = @"notes";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical/Social Issues"];
     [self.formDescriptor addFormSection:section];
     
-    row =[XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_2 rowType:XLFormRowDescriptorTypeTextView title:@"Medical Issues"];
+    row =[XLFormRowDescriptor formRowDescriptorWithTag:kMedIssues rowType:XLFormRowDescriptorTypeTextView title:@"Medical Issues"];
     [section addFormRow:row];
     
-    row =[XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_2 rowType:XLFormRowDescriptorTypeTextView title:@"Social Issues"];
+    row =[XLFormRowDescriptor formRowDescriptorWithTag:kSocialIssues rowType:XLFormRowDescriptorTypeTextView title:@"Social Issues"];
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Post Home Visit Management Plan"];
@@ -435,8 +436,13 @@ NSString *const kNotes = @"notes";
 
 #pragma mark Submission
 - (void) submitHouseVisitForm {
+    
+    NSDictionary *dict = [self prepareVolunteerInfoDict];
     ServerComm *client = [ServerComm sharedServerCommInstance];
-    //do nothing for now...
+    [client postVolunteerInfoWithDict:dict
+                        progressBlock:[self progressBlock]
+                         successBlock:[self volunteerInfoSuccessBlock]
+                         andFailBlock:[self errorBlock]];
 }
 
 - (void) submitPhoneCallForm {
@@ -445,14 +451,8 @@ NSString *const kNotes = @"notes";
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client postCallerInfoWithDict:dict
                      progressBlock:[self progressBlock]
-                      successBlock:[self successBlock]
+                      successBlock:[self callerInfoSuccessBlock]
                       andFailBlock:[self errorBlock]];
-    
-    dict = [self prepareCallsMgmtPlanDict];
-    [client postCallMgmtPlanWithDict:dict
-                       progressBlock:[self progressBlock]
-                        successBlock:[self phoneCallSuccessBlock]
-                        andFailBlock:[self errorBlock]];
 }
 
 #pragma mark - Blocks
@@ -463,12 +463,20 @@ NSString *const kNotes = @"notes";
     };
 }
 
-- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
+- (void (^)(NSURLSessionDataTask *task, id responseObject))callerInfoSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
-        NSLog(@"caller info submit success");
+        NSLog(@"%@", responseObject);
+        NSDictionary *dict = [self prepareCallsMgmtPlanDictWithCallID:[responseObject objectForKey:@"call_id"]];
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postCallMgmtPlanWithDict:dict
+                           progressBlock:[self progressBlock]
+                            successBlock:[self callMgmtPlanSuccessBlock]
+                            andFailBlock:[self errorBlock]];
+        
     };
 }
-- (void (^)(NSURLSessionDataTask *task, id responseObject))phoneCallSuccessBlock {
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))callMgmtPlanSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         NSLog(@"%@", responseObject);
         
@@ -490,6 +498,73 @@ NSString *const kNotes = @"notes";
                                                               [self.navigationController popViewControllerAnimated:YES];
                                                           }]];
         [self presentViewController:alertController animated:YES completion:nil];
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject)) volunteerInfoSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"%@", responseObject);
+        success_count = 0; //reset to 0
+        
+        NSDictionary *dict = [self prepareClinicalDictWithVisitID:[responseObject objectForKey:@"visit_id"]];
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postClinicalWithDict:dict
+                       progressBlock:[self progressBlock]
+                        successBlock:[self houseVisitCompleteSuccessBlock]
+                        andFailBlock:[self errorBlock]];
+        
+        dict = [self prepareCbgDictWithVisitID:[responseObject objectForKey:@"visit_id"]];
+        [client postCbgWithDict:dict
+                  progressBlock:[self progressBlock]
+                   successBlock:[self houseVisitCompleteSuccessBlock]
+                   andFailBlock:[self errorBlock]];
+        
+        NSArray *array = [self prepareBpRecordArrayWithVisitID:[responseObject objectForKey:@"visit_id"]];
+        [client postBpRecordWithArray:array
+                        progressBlock:[self progressBlock]
+                         successBlock:[self houseVisitCompleteSuccessBlock]
+                         andFailBlock:[self errorBlock]];
+        
+        dict = [self prepareMedSocIssuesDictWithVisitID:[responseObject objectForKey:@"visit_id"]];
+        [client postMedicalSocialIssuesWithDict:dict
+                                  progressBlock:[self progressBlock]
+                                   successBlock:[self houseVisitCompleteSuccessBlock]
+                                   andFailBlock:[self errorBlock]];
+        
+        dict = [self prepareHouseMgmtPlanDictWithCallID:[responseObject objectForKey:@"visit_id"]];
+        [client postMgmtPlanWithDict:dict
+                       progressBlock:[self progressBlock]
+                        successBlock:[self houseVisitCompleteSuccessBlock]
+                        andFailBlock:[self errorBlock]];
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject)) houseVisitCompleteSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        success_count++;
+        NSLog(@"%@", responseObject);
+        if (success_count==5) {
+            NSLog(@"SUBMISSION SUCCESSFUL!!");
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [hud hideAnimated:YES];
+            });
+            
+            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
+                                                                                      message:@"Form uploaded successfully!"
+                                                                               preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * okAction) {
+                                                                  [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshFollowUpListTable"
+                                                                                                                      object:nil
+                                                                                                                    userInfo:nil];
+                                                                  [self.navigationController popViewControllerAnimated:YES];
+                                                              }]];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
+        
     };
 }
 
@@ -519,22 +594,15 @@ NSString *const kNotes = @"notes";
 - (NSDictionary *) prepareCallerInfoDict {
     NSString *callerName = [[self.form formValues] objectForKey:kCallerName];
     NSString *callTime = [[self.form formValues] objectForKey:kCallTime];
-    
-    // get current date/time
-    NSDate *today = [NSDate date];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
-    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
-    NSString *ts = [[localDateTime description] stringByReplacingOccurrencesOfString:@" +0000" withString:@""];
-    
+
     return @{@"resident_id": [self.residentParticulars objectForKey:@"resident_id"],
              kCallTime: callTime,
              kCallerName: callerName,
-             @"ts": ts
+             @"ts": [self getCurrentTimeWithSecondInterval:0]
              };
 }
 
-- (NSDictionary *) prepareCallsMgmtPlanDict {
+- (NSDictionary *) prepareCallsMgmtPlanDictWithCallID: (NSString *) call_id {
     NSString *notes = [[self.form formValues] objectForKey:kNotes];
     NSNumber *urgent = @0, *phoneCall = @0, *homeVisit = @0, *discharge = @0;
     
@@ -548,26 +616,126 @@ NSString *const kNotes = @"notes";
             else if([[actions objectAtIndex:i] isEqualToString:@"Discharge"]) discharge = @1;
         }
     }
-    
-    
-    // get current date/time
-    NSDate *today = [NSDate date];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
-    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
-    localDateTime = [NSDate dateWithTimeInterval:1.0 sinceDate:localDateTime];      //add a second
-    NSString *ts = [[localDateTime description] stringByReplacingOccurrencesOfString:@" +0000" withString:@""];
-    
-    return @{@"call_id": @"1",
+
+    return @{@"call_id": call_id,
              kNotes: notes,
              kUrgent: urgent,
              kPhoneCall: phoneCall,
              kHomeVisit: homeVisit,
              kDischarge: discharge,
-             @"ts": ts
+             @"ts": [self getCurrentTimeWithSecondInterval:1.0]
              };
 }
 
+- (NSDictionary *) prepareVolunteerInfoDict {
+    NSString *date_dd = [[self.form formValues] objectForKey:kDateDay];
+    NSString *date_mm = [[self.form formValues] objectForKey:kDateMonth];
+    NSString *date_yyyy = [[self.form formValues] objectForKey:kDateYear];
+    NSString *doc_name = [[self.form formValues] objectForKey:kFUDocName];
+    
+    return @{@"resident_id": [self.residentParticulars objectForKey:@"resident_id"],
+             kDateDay: date_dd,
+             kDateMonth: date_mm,
+             kDateYear: date_yyyy,
+             kFUDocName: doc_name,
+             @"ts": [self getCurrentTimeWithSecondInterval:0]
+             };
+}
+
+- (NSDictionary *) prepareClinicalDictWithVisitID: (NSString *) visit_id {
+    NSString *height = [[self.form formValues] objectForKey:kFUHeight];
+    NSString *weight = [[self.form formValues] objectForKey:kFUWeight];
+    NSString *bmi = [[self.form formValues] objectForKey:kFUBMI];
+    
+    return @{@"visit_id": visit_id,
+             kFUHeight: height,
+             kFUWeight: weight,
+             kFUBMI: bmi,
+             @"ts": [self getCurrentTimeWithSecondInterval:1]
+             };
+}
+
+- (NSDictionary *) prepareCbgDictWithVisitID: (NSString *) visit_id {
+    NSString *cbg = [[self.form formValues] objectForKey:kFUCBG];
+    
+    return @{@"visit_id": visit_id,
+             kFUCBG: cbg,
+             @"ts": [self getCurrentTimeWithSecondInterval:2]
+             };
+}
+
+- (NSArray *) prepareBpRecordArrayWithVisitID: (NSString *) visit_id {
+    NSString *systolic_bp1 = [[self.form formValues] objectForKey:kSysBP_1];
+    NSString *diastolic_bp1 = [[self.form formValues] objectForKey:kDiaBP_1];
+    NSString *systolic_bp2 = [[self.form formValues] objectForKey:kSysBP_2];
+    NSString *diastolic_bp2 = [[self.form formValues] objectForKey:kDiaBP_2];
+    
+    return @[@{@"visit_id": visit_id,
+               @"systolic_bp": systolic_bp1,
+               @"diastolic_bp": diastolic_bp1,
+               @"order_num": @"1",
+               @"ts" : [self getCurrentTimeWithSecondInterval:3]},
+             @{@"visit_id": visit_id,
+               @"systolic_bp": systolic_bp2,
+               @"diastolic_bp": diastolic_bp2,
+               @"order_num": @"2",
+               @"ts": [self getCurrentTimeWithSecondInterval:4]
+               }];
+}
+
+- (NSDictionary *) prepareMedSocIssuesDictWithVisitID: (NSString *) visit_id {
+    NSString *med_issues = [[self.form formValues] objectForKey:kMedIssues];
+    NSString *soc_issues = [[self.form formValues] objectForKey:kSocialIssues];
+    
+    return @{@"visit_id": visit_id,
+             kMedIssues: med_issues,
+             kSocialIssues: soc_issues,
+             @"ts": [self getCurrentTimeWithSecondInterval:5]
+             };
+}
+
+- (NSDictionary *) prepareHouseMgmtPlanDictWithCallID: (NSString *) visit_id {
+    NSString *doc_notes = [[self.form formValues] objectForKey:kFUDocNotes];
+    NSString *doc_name = [[self.form formValues] objectForKey:kFUDocName];
+    NSString *doc_sign = [[self.form formValues] objectForKey:kDocSignature];
+    NSNumber *urgent = @0, *phoneCall = @0, *homeVisit = @0, *discharge = @0;
+    
+    if ([[[self.form formValues] objectForKey:kAction] count]!=0) {
+        NSArray *actions = [[self.form formValues] objectForKey:kAction];
+        for (int i=0; i<[actions count]; i++) {
+            
+            if([[actions objectAtIndex:i] isEqualToString:@"Urgent"]) urgent = @1;
+            else if([[actions objectAtIndex:i] isEqualToString:@"Phone Call"]) phoneCall = @1;
+            else if([[actions objectAtIndex:i] isEqualToString:@"Home Visit"]) homeVisit = @1;
+            else if([[actions objectAtIndex:i] isEqualToString:@"Discharge"]) discharge = @1;
+        }
+    }
+
+    return @{@"visit_id": visit_id,
+             kFUDocNotes: doc_notes,
+             kFUDocName: doc_name,
+             kDocSignature: doc_sign,
+             kUrgent: urgent,
+             kPhoneCall: phoneCall,
+             kHomeVisit: homeVisit,
+             kDischarge: discharge,
+             @"ts": [self getCurrentTimeWithSecondInterval:6]
+             };
+}
+
+
+
+- (NSString *) getCurrentTimeWithSecondInterval: (int) timeInSec {
+    // get current date/time
+    NSDate *today = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+    NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
+    localDateTime = [NSDate dateWithTimeInterval:timeInSec sinceDate:localDateTime];      //add a second
+    
+    return [[localDateTime description] stringByReplacingOccurrencesOfString:@" +0000" withString:@""];
+
+}
 
 
 

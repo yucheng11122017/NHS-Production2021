@@ -7,7 +7,6 @@
 //
 
 #import "AppDelegate.h"
-#import <BuddyBuildSDK/BuddyBuildSDK.h>
 
 @interface AppDelegate ()
 
@@ -17,7 +16,6 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [BuddyBuildSDK setup];
 
     return YES;
 }

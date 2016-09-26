@@ -11,7 +11,6 @@
 #import "AFNetworking.h"
 #import <CommonCrypto/CommonDigest.h>
 #import "MBProgressHUD.h"
-#import <BuddyBuildSDK/BuddyBuildSDK.h>
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 #define ERROR_MSG_DELAY 5.0f

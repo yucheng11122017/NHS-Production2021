@@ -26,6 +26,7 @@ typedef enum getDataState {
 }
 
 @property (strong, nonatomic) NSDictionary* retrievedScreeningData;
+@property (strong, nonatomic) NSDictionary* bloodTestResult;
 @end
 
 @implementation ResidentFollowUpHistoryTableViewController
@@ -33,7 +34,8 @@ typedef enum getDataState {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    NSLog(@"Retrieved Blood Test Data: %@", self.retrievedData);
+//    NSLog(@"Retrieved Blood Test Data: %@", self.bloodTestResult);
+    NSLog(@"Retrieved Full Follow Up History: %@", self.completeFollowUpHistory);
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -122,6 +124,7 @@ typedef enum getDataState {
     
     if (indexPath.section == 0) {   //Report Summary
         [self getAllScreeningData];
+        [self getBloodTestResultForOneResident];
         
         [tableView deselectRowAtIndexPath:indexPath animated:NO];
         return;
@@ -141,6 +144,15 @@ typedef enum getDataState {
                                             andFailBlock:[self errorBlock]];
 }
 
+- (void)getBloodTestResultForOneResident {
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    [client getBloodTestWithResidentID:_residentID
+                         progressBlock:[self progressBlock]
+                          successBlock:[self downloadBloodTestResultSuccessBlock]
+                          andFailBlock:[self errorBlock]];
+}
+
+
 #pragma mark - Blocks
 
 - (void (^)(NSProgress *downloadProgress))progressBlock {
@@ -155,7 +167,13 @@ typedef enum getDataState {
     return ^(NSURLSessionDataTask *task, id responseObject){
         
         self.retrievedScreeningData = [[NSDictionary alloc] initWithDictionary:responseObject];
-        NSLog(@"%@", self.retrievedScreeningData);
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadBloodTestResultSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        
+        self.bloodTestResult = [[NSMutableDictionary alloc] initWithDictionary:[responseObject objectAtIndex:0]];
         [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
     };
 }
@@ -231,7 +249,7 @@ typedef enum getDataState {
     
     if ([segue.destinationViewController respondsToSelector:@selector(setBloodTestResult:)]) {
         [segue.destinationViewController performSelector:@selector(setBloodTestResult:)
-                                              withObject:self.retrievedData];
+                                              withObject:self.bloodTestResult];
     }
     
 }

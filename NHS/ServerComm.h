@@ -203,5 +203,37 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
+#pragma mark House Visit
+- (void) postVolunteerInfoWithDict: (NSDictionary *) dictionary
+                     progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+- (void) postClinicalWithDict: (NSDictionary *) dictionary
+                progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                 andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+
+- (void) postCbgWithDict: (NSDictionary *) dictionary
+           progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+             successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+            andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+
+- (void) postBpRecordWithArray: (NSArray *) array
+                progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                 andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+- (void) postMedicalSocialIssuesWithDict: (NSDictionary *) dictionary
+                           progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                             successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                            andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+- (void) postMgmtPlanWithDict: (NSDictionary *) dictionary
+                progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                 andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
 @end

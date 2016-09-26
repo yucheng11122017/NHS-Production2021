@@ -10,9 +10,9 @@
 
 @interface ResidentFollowUpHistoryTableViewController : UITableViewController
 
-@property (strong, nonatomic) NSDictionary *retrievedData;
+@property (strong, nonatomic) NSDictionary *completeFollowUpHistory;
 @property (strong, nonatomic) NSNumber *residentID;
 
-- (void) setRetrievedData: (NSDictionary *) dictionary;
+- (void) setCompleteFollowUpHistory: (NSDictionary *) dictionary;
 - (void) setResidentID: (NSNumber *) residentID;
 @end

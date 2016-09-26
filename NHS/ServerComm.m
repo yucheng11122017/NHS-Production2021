@@ -668,7 +668,7 @@
        failure:[self checkForBadHTTP:failBlock]];
 }
 
-- (void) getFollowUpDetailsWithResidentID: (NSNumber *) residentID
+- (void) getFollowUpDetailsWithResidentID: (NSString *) residentID
                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
@@ -718,6 +718,123 @@
     NSDictionary *dataDict;
     
     dataDict = @{@"data": @{@"calls_mgmt_plan":dictionary}};
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+#pragma mark Home Visit
+- (void) postVolunteerInfoWithDict: (NSDictionary *) dictionary
+                     progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 302;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": @{@"house_volunteer":dictionary}};
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void) postClinicalWithDict: (NSDictionary *) dictionary
+                progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                 andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 303;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": @{@"house_clinical":dictionary}};
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+
+- (void) postCbgWithDict: (NSDictionary *) dictionary
+           progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+             successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+            andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 304;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": @{@"house_cbg":dictionary}};
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+
+- (void) postBpRecordWithArray: (NSArray *) array
+                progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                 andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 305;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": @{@"house_bp_record":array}};
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void) postMedicalSocialIssuesWithDict: (NSDictionary *) dictionary
+                           progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                             successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                            andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 306;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": @{@"house_med_soc":dictionary}};
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void) postMgmtPlanWithDict: (NSDictionary *) dictionary
+                progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                 andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 307;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": @{@"house_mgmt_plan":dictionary}};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict

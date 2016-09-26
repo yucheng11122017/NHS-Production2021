@@ -210,9 +210,9 @@ typedef enum typeOfFollowUp {
     
     NSArray *residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
     NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
-//    NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"ts"];
+    NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"ts"];
     cell.textLabel.text = residentName;
-//    cell.detailTextLabel.text = lastUpdatedTS;
+    cell.detailTextLabel.text = lastUpdatedTS;
     
     return cell;
 }
@@ -235,8 +235,7 @@ typedef enum typeOfFollowUp {
         selectedResident = [[NSDictionary alloc] initWithDictionary:self.resultsTableController.filteredProducts[indexPath.row]];  //drafts not included in search!
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
     }
-    [self getBloodTestResultForOneResident];
-//    [self getAllDataForOneResident];
+    [self getAllFollowUpDataForOneResident];
     
     
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
@@ -494,31 +493,14 @@ typedef enum typeOfFollowUp {
                          successBlock:[self successBlock]
                          andFailBlock:[self errorBlock]];
 }
-//
-//- (void)deleteResident: (NSNumber *) residentID {
-//    ServerComm *client = [ServerComm sharedServerCommInstance];
-//    [client deleteResidentWithResidentID: residentID
-//                           progressBlock:[self progressBlock]
-//                            successBlock:[self deleteSuccessBlock]
-//                            andFailBlock:[self errorBlock]];
-//}
 
-//- (void)getAllDataForOneResident {
-//    ServerComm *client = [ServerComm sharedServerCommInstance];
-//    [client getSingleScreeningResidentDataWithResidentID:selectedResidentID
-//                                           progressBlock:[self progressBlock]
-//                                            successBlock:[self downloadSingleResidentDataSuccessBlock]
-//                                            andFailBlock:[self downloadErrorBlock]];
-//}
-
-- (void)getBloodTestResultForOneResident {
+- (void)getAllFollowUpDataForOneResident {
     ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getBloodTestWithResidentID:selectedResidentID
-                         progressBlock:[self progressBlock]
-                          successBlock:[self downloadSingleResidentDataSuccessBlock]
-                          andFailBlock:[self errorBlock]];
+    [client getFollowUpDetailsWithResidentID:selectedResidentID
+                             progressBlock:[self progressBlock]
+                              successBlock:[self downloadSingleResidentDataSuccessBlock]
+                              andFailBlock:[self errorBlock]];
 }
-
 
 #pragma mark - Blocks
 
@@ -544,7 +526,7 @@ typedef enum typeOfFollowUp {
         
         for (i=0; i<[self.screenedResidents count]; i++) {
             [self.residentNames addObject:[[self.screenedResidents objectAtIndex:i] objectForKey:@"resident_name"]];
-//            [self.residentScreenTimestamp addObject:[[self.screenedResidents objectAtIndex:i] objectForKey:@"ts"]];
+            [self.residentScreenTimestamp addObject:[[self.screenedResidents objectAtIndex:i] objectForKey:@"ts"]];
         }
         
         //sort alphabetically
@@ -558,8 +540,8 @@ typedef enum typeOfFollowUp {
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSingleResidentDataSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
-        
-        self.retrievedResidentData = [[NSMutableDictionary alloc] initWithDictionary:[responseObject objectForKey:@"0"]];
+        [hud hideAnimated:YES];
+        self.retrievedResidentData = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
 //        NSLog(@"%@", self.retrievedResidentData);
         [self performSegueWithIdentifier:@"FollowUpListToResidentHistorySegue" sender:self];
     };
@@ -657,20 +639,17 @@ typedef enum typeOfFollowUp {
                                               withObject:followUpType];
     }
     
-//    if ([segue.destinationViewController respondsToSelector:@selector(setResidentID:)]) {    //view submitted form
-//        [segue.destinationViewController performSelector:@selector(setResidentID:)
-//                                              withObject:selectedResidentID];
-//    }
-////
-//    if ([self.retrievedResidentData count]) {
-//        [segue.destinationViewController performSelector:@selector(setRetrievedData:)
-//                                              withObject:self.retrievedResidentData];
-//    }
-//
-//    if ([segue.destinationViewController respondsToSelector:@selector(setResidentLocalFileIndex:)]) {    //view submitted form
-//        [segue.destinationViewController performSelector:@selector(setResidentLocalFileIndex:)
-//                                              withObject:draftID];
-//    }
+    if ([segue.destinationViewController respondsToSelector:@selector(setResidentID:)]) {    //view submitted form
+        [segue.destinationViewController performSelector:@selector(setResidentID:)
+                                              withObject:selectedResidentID];
+    }
+
+    if ([self.retrievedResidentData count]) {
+        if ([segue.destinationViewController respondsToSelector:@selector(setCompleteFollowUpHistory:)]) {    //view submitted form
+            [segue.destinationViewController performSelector:@selector(setCompleteFollowUpHistory:)
+                                                  withObject:self.retrievedResidentData];
+        }
+    }
 }
 
 
