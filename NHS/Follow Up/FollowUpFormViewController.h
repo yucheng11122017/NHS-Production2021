@@ -15,7 +15,6 @@
 @property (strong, nonatomic) NSNumber *typeOfFollowUp;
 @property (strong, nonatomic) NSDictionary *residentParticulars;
 
-
 - (void) setResidentNRIC:(NSString *)residentNRIC;
 - (void) setTypeOfFollowUp:(NSNumber *)typeOfFollowUp;
 - (void) setResidentParticulars:(NSDictionary *)dictionary;

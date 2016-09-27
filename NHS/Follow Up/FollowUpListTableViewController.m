@@ -52,6 +52,7 @@ typedef enum typeOfFollowUp {
 
 @implementation FollowUpListTableViewController {
     NSNumber *selectedResidentID;
+    NSString *selectedResidentName;
     NSNumber *draftID;
     NSArray *residentSectionTitles;
     NSNumber *residentDataLocalOrServer;
@@ -230,10 +231,12 @@ typedef enum typeOfFollowUp {
         
         selectedResident = [[NSDictionary alloc] initWithDictionary:[self findResidentInfoFromSectionRow:indexPath]];
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
+        selectedResidentName = [selectedResident objectForKey:@"resident_name"];
         
     } else {
         selectedResident = [[NSDictionary alloc] initWithDictionary:self.resultsTableController.filteredProducts[indexPath.row]];  //drafts not included in search!
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
+        selectedResidentName = [selectedResident objectForKey:@"resident_name"];
     }
     [self getAllFollowUpDataForOneResident];
     
@@ -510,7 +513,6 @@ typedef enum typeOfFollowUp {
     };
 }
 
-
 - (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         int i;
@@ -642,6 +644,11 @@ typedef enum typeOfFollowUp {
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentID:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setResidentID:)
                                               withObject:selectedResidentID];
+    }
+    
+    if ([segue.destinationViewController respondsToSelector:@selector(setResidentName:)]) {    //view submitted form
+        [segue.destinationViewController performSelector:@selector(setResidentName:)
+                                              withObject:selectedResidentName];
     }
 
     if ([self.retrievedResidentData count]) {

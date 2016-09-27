@@ -51,7 +51,7 @@
 }
 
 - (void)viewDidLayoutSubviews {
-    [summaryTextView setContentOffset:CGPointZero animated:NO]; //make subview offset from the navigation bar to be 0
+//    [summaryTextView setContentOffset:CGPointZero animated:NO]; //make subview offset from the top of the screen to be 0
 }
 
 - (void)didReceiveMemoryWarning {
@@ -195,7 +195,7 @@
     // Instantiate UITextView object using the text container
     
     
-    summaryTextView = [[UITextView alloc] initWithFrame:CGRectMake(0, 10+self.navigationController.navigationBar.frame.size.height, self.view.bounds.size.width, self.view.bounds.size.height-20) textContainer:textContainer];
+    summaryTextView = [[UITextView alloc] initWithFrame:CGRectMake(0, 10, self.view.bounds.size.width, self.view.bounds.size.height-10) textContainer:textContainer];
     
     summaryTextView.layer.borderWidth = 0.5f;
     summaryTextView.layer.borderColor = [[UIColor grayColor] CGColor];

@@ -12,7 +12,11 @@
 
 @property (strong, nonatomic) NSDictionary *completeFollowUpHistory;
 @property (strong, nonatomic) NSNumber *residentID;
+@property (strong, nonatomic) NSString *residentName;
+
 
 - (void) setCompleteFollowUpHistory: (NSDictionary *) dictionary;
 - (void) setResidentID: (NSNumber *) residentID;
+- (void) setResidentName: (NSString *) residentName;
+
 @end

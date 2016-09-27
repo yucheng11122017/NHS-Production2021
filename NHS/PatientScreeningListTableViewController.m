@@ -60,10 +60,15 @@ typedef enum residentDataSource {
     NetworkStatus status;
     MBProgressHUD *hud;
     int fetchDataState;
+    BOOL appTesting;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    //For hiding credentials from Apple Testers
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    appTesting = [defaults boolForKey:@"AppleTesting"];
     
     self.residentNames = [[NSMutableArray alloc] init];
     self.residentScreenTimestamp = [[NSMutableArray alloc] init];
@@ -567,10 +572,14 @@ typedef enum residentDataSource {
 }
 
 - (void)getAllScreeningResidents {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getAllScreeningResidents:[self progressBlock]
-          successBlock:[self successBlock]
-          andFailBlock:[self errorBlock]];
+    if (!appTesting) {
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client getAllScreeningResidents:[self progressBlock]
+                            successBlock:[self successBlock]
+                            andFailBlock:[self errorBlock]];
+    } else {
+        [self.refreshControl endRefreshing];
+    }
 }
 //
 //- (void)deleteResident: (NSNumber *) residentID {

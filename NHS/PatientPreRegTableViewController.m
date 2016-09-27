@@ -54,10 +54,17 @@ typedef enum getDataState {
     NetworkStatus status;
     MBProgressHUD *hud;
     int fetchDataState;
+    BOOL appTesting;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    //For hiding credentials from Apple Testers
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    appTesting = [defaults boolForKey:@"AppleTesting"];
+    
+    
     fetchDataState = inactive;
     // Initialize the refresh control.
     self.refreshControl = [[UIRefreshControl alloc] init];
@@ -108,7 +115,6 @@ typedef enum getDataState {
     self.navigationItem.title = @"List of Pre-registered Residents";
     
     [super viewWillAppear:animated];
-//    [self getAllPatients];
     fetchDataState = started;
     [self getLocalSavedData];
     
@@ -492,10 +498,14 @@ typedef enum getDataState {
 }
 
 - (void)getAllResidents {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getPatient:[self progressBlock]
-          successBlock:[self successBlock]
-          andFailBlock:[self errorBlock]];
+    if (!appTesting) {
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client getPatient:[self progressBlock]
+              successBlock:[self successBlock]
+              andFailBlock:[self errorBlock]];
+    } else {
+        [self.refreshControl endRefreshing];    //stop refreshing if in Testing mode
+    }
 }
 
 #pragma mark - Downloading Patient Details

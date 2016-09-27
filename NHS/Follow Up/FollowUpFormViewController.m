@@ -145,11 +145,11 @@ NSString *const kNotes = @"notes";
 //    row.value = [self.downloadedBloodTestResult objectForKey:kTrigly]? [self.downloadedBloodTestResult objectForKey:kTrigly]:@"";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFUDocName rowType:XLFormRowDescriptorTypeText title:@"Name of Doctor"];
-    row.required = YES;
-    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    XLFormRowDescriptor *docNameRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFUDocName rowType:XLFormRowDescriptorTypeText title:@"Name of Doctor"];
+    docNameRow.required = YES;
+    [docNameRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
 //    row.value = [self.downloadedBloodTestResult objectForKey:kLdl]? [self.downloadedBloodTestResult objectForKey:kLdl]:@"";
-    [section addFormRow:row];
+    [section addFormRow:docNameRow];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Subject Particulars"];
     [self.formDescriptor addFormSection:section];
@@ -312,9 +312,13 @@ NSString *const kNotes = @"notes";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFUDocName rowType:XLFormRowDescriptorTypeText title:@"Name of Doctor"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    //    row.value = [self.downloadedBloodTestResult objectForKey:kLdl]? [self.downloadedBloodTestResult objectForKey:kLdl]:@"";
-    [section addFormRow:row];
     
+    docNameRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            row.value = newValue;
+        }
+    };
+
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocSignature rowType:XLFormRowDescriptorTypeText title:@"Doctor's MCR Number"];
     [section addFormRow:row];
     
@@ -493,6 +497,9 @@ NSString *const kNotes = @"notes";
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction * okAction) {
                                                               [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshFollowUpListTable"
+                                                                                                                  object:nil
+                                                                                                                userInfo:nil];
+                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshFollowUpHistoryTable"
                                                                                                                   object:nil
                                                                                                                 userInfo:nil];
                                                               [self.navigationController popViewControllerAnimated:YES];

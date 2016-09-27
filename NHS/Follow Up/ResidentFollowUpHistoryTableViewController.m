@@ -8,10 +8,12 @@
 
 #import "ResidentFollowUpHistoryTableViewController.h"
 #import "SummaryReportViewController.h"
+#import "FollowUpFormViewController.h"
 #import "MBProgressHUD.h"
 #import "ServerComm.h"
 #import "Reachability.h"
 #import "AppConstants.h"
+#import "FollowUpCell.h"
 
 typedef enum getDataState {
     inactive,
@@ -20,27 +22,132 @@ typedef enum getDataState {
     successful
 } getDataState;
 
+typedef enum typeOfFollowUp {
+    houseVisit,
+    phoneCall
+} typeOfFollowUp;
 
 @interface ResidentFollowUpHistoryTableViewController () {
     MBProgressHUD *hud;
 }
 
-@property (strong, nonatomic) NSDictionary* retrievedScreeningData;
-@property (strong, nonatomic) NSDictionary* bloodTestResult;
+@property (strong, nonatomic) NSMutableDictionary* retrievedScreeningData;
+@property (strong, nonatomic) NSMutableDictionary* bloodTestResult;
+@property (strong, nonatomic) NSArray* arrayOfCallHistory;
+@property (strong, nonatomic) NSArray* arrayOfHouseVisitHistory;
+@property (nonatomic, strong) NSMutableArray *followUpEntitySections; // 2d array
+@property (nonatomic, copy) NSArray *prototypeEntities;
+
 @end
 
-@implementation ResidentFollowUpHistoryTableViewController
+@implementation ResidentFollowUpHistoryTableViewController {
+    NSNumber *followUpType;
+    NSDictionary *residentParticulars;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
 //    NSLog(@"Retrieved Blood Test Data: %@", self.bloodTestResult);
     NSLog(@"Retrieved Full Follow Up History: %@", self.completeFollowUpHistory);
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
     
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    [self buildFollowUpDataThen:^{
+        self.followUpEntitySections = @[].mutableCopy;
+        [self.followUpEntitySections addObject:self.prototypeEntities.mutableCopy];
+        [self.tableView reloadData];
+    }];
+    
+     self.clearsSelectionOnViewWillAppear = YES;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(refreshFollowUpHistoryTable:)
+                                                 name:@"refreshFollowUpHistoryTable"
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(createNewFollowUpForm:)
+                                                 name:@"selectedScreenedResidentToNewForm"
+                                               object:nil];
+}
+
+- (void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.bloodTestResult removeAllObjects];
+    self.bloodTestResult = nil;
+    [self.retrievedScreeningData removeAllObjects];
+    self.retrievedScreeningData = nil;
+    self.navigationItem.title = _residentName;
+}
+
+- (void) addSummaryReportToSection {
+    [self.followUpEntitySections addObject:
+     [[FollowUpEntity alloc] initWithDictionary:@{
+                                                  @"content": @"",
+                                                  @"imageName": @"Report",
+                                                  @"date": @"",   //best if can show the timestamp from blood test
+                                                  @"title":@"Report Summary",
+                                                  @"username": @"Computer generated"
+                                                  }]];
+}
+
+- (void) buildFollowUpDataThen:(void (^)(void))then {
+    // Simulate an async request
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        self.arrayOfCallHistory = [[NSArray alloc] initWithArray:[self.completeFollowUpHistory objectForKey:@"Calls"]];
+        self.arrayOfHouseVisitHistory = [[NSArray alloc] initWithArray:[self.completeFollowUpHistory objectForKey:@"houseVisits"]];
+        
+        NSMutableArray *combinedArray = [[self.arrayOfCallHistory arrayByAddingObjectsFromArray:self.arrayOfHouseVisitHistory] mutableCopy];
+        NSArray *historyArray = [self prepareArrayForHistoryTable:combinedArray];
+        NSMutableArray *entities = @[].mutableCopy;
+        
+        for (int i=0; i < [historyArray count]; i++) {
+            [entities addObject:[[FollowUpEntity alloc] initWithDictionary:historyArray[i]]];
+        }
+        self.prototypeEntities = entities;
+        
+        // Callback
+        dispatch_async(dispatch_get_main_queue(), ^{
+            !then ?: then();
+        });
+    });
+}
+
+- (NSArray *) prepareArrayForHistoryTable: (NSArray *) combinedArray {
+    NSMutableArray *tempArray = @[].mutableCopy;
+    for (int i=0; i<[combinedArray count]; i++) {
+        if ([combinedArray[i] objectForKey:@"calls_caller"]) {  //phone call
+            
+            NSString *call_notes = @"";
+            if ([combinedArray[i] objectForKey:@"calls_mgmt_plan"]!= (id) [NSNull null]) {
+                call_notes = [combinedArray[i] objectForKey:@"calls_mgmt_plan"]? [[combinedArray[i] objectForKey:@"calls_mgmt_plan"] objectForKey:@"notes"]: @"";
+            }
+            [tempArray addObject:@{
+                                   @"content": call_notes,
+                                   @"imageName": @"Phone",
+                                   @"date": [[combinedArray[i] objectForKey:@"calls_caller"] objectForKey:@"ts"],
+                                   @"title":@"Phone Call",
+                                   @"username": [[combinedArray[i] objectForKey:@"calls_caller"] objectForKey:@"caller_name"]
+                                   }
+            ];
+        } else if ([combinedArray[i] objectForKey:@"house_volunteer"]) {    //house visit
+            
+            NSString *doc_notes = @"";
+            if ([combinedArray[i] objectForKey:@"house_mgmt_plan"]!= (id) [NSNull null]) {
+                doc_notes = [combinedArray[i] objectForKey:@"house_mgmt_plan"]? [[combinedArray[i] objectForKey:@"house_mgmt_plan"] objectForKey:@"doc_notes"]: @"";
+            }
+            [tempArray addObject:@{
+                                   @"content": doc_notes,
+                                   @"imageName": @"House",
+                                   @"date": [[combinedArray[i] objectForKey:@"house_volunteer"] objectForKey:@"ts"],
+                                   @"title":@"House Visit",
+                                   @"username": [[combinedArray[i] objectForKey:@"house_volunteer"] objectForKey:@"doc_name"]
+                                   }
+             ];
+        }
+    }
+    
+    tempArray = [self sortLatestFirst: tempArray];
+    return tempArray;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -66,53 +173,28 @@ typedef enum getDataState {
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (section == 0) return 1;
-    else return 2;
+    else return ([self.arrayOfHouseVisitHistory count] + [self.arrayOfCallHistory count]);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *simpleTableIdentifier = @"SimpleTableItem";
-
-    UITableViewCell *cell;
     
-    if (indexPath.section == 0) {   //for the questionaires
-        cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-        if (cell == nil) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
-        }
-        
-        cell.textLabel.text = @"Report Summary";
-
-    } else {
-        cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-        if (cell == nil) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
-        }
-        
-//        cell.textLabel.text = [NSString stringWithFormat:@"House Visit %ld", (indexPath.row+1)];
-        cell.textLabel.text = @"House Visit";
-    }
-//    else {
-//        cell = [tableView dequeueReusableCellWithIdentifier:buttonTableIdentifier];
-//        if (cell == nil) {
-//            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:buttonTableIdentifier];
-//        }
-//        
-//        cell.textLabel.text = @"Submit";
-//        cell.textLabel.textAlignment = NSTextAlignmentCenter;
-//        cell.textLabel.textColor = [UIColor whiteColor];
-//        cell.textLabel.font = [UIFont boldSystemFontOfSize:20];
-//        
-//        if (readyToSubmit) {    //if enabled
-//            cell.backgroundColor = [UIColor colorWithRed:0 green:51/255.0 blue:102/255.0 alpha:1];  //dark blue
-//            cell.userInteractionEnabled = YES;
-//        }
-//        else {  //if disabled
-//            cell.userInteractionEnabled = NO;
-//            cell.backgroundColor = [UIColor colorWithRed:184/255.0 green:184/255.0 blue:184/255.0 alpha:1];  //grayed out
-//        }
-//    }
-    
+    FollowUpCell *cell = [tableView dequeueReusableCellWithIdentifier:@"FollowUpCell"];
+    [self configureCell:cell atIndexPath:indexPath];
     return cell;
+}
+
+- (void)configureCell:(FollowUpCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section==0) {
+       cell.entity = [[FollowUpEntity alloc] initWithDictionary:@{
+                                                     @"content": @"Computer-generated Report",
+                                                     @"imageName": @"Report",
+                                                     @"date": @"",   //best if can show the timestamp from blood test
+                                                     @"title":@"Report Summary",
+                                                     @"username": @"---"
+                                                     }];
+    } else {
+        cell.entity = self.followUpEntitySections[indexPath.section-1][indexPath.row];
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -131,10 +213,9 @@ typedef enum getDataState {
     }
     
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    
-    
-    
 }
+
+#pragma mark - Server API
 
 - (void)getAllScreeningData {
     ServerComm *client = [ServerComm sharedServerCommInstance];
@@ -152,6 +233,14 @@ typedef enum getDataState {
                           andFailBlock:[self errorBlock]];
 }
 
+- (void)getAllFollowUpDataForOneResident {
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    [client getFollowUpDetailsWithResidentID:_residentID
+                               progressBlock:[self progressBlock]
+                                successBlock:[self downloadFollowUpDataSuccessBlock]
+                                andFailBlock:[self errorBlock]];
+}
+
 
 #pragma mark - Blocks
 
@@ -161,12 +250,13 @@ typedef enum getDataState {
     };
 }
 
-
-
 - (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSingleResidentDataSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         
-        self.retrievedScreeningData = [[NSDictionary alloc] initWithDictionary:responseObject];
+        self.retrievedScreeningData = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
+        if ([self.bloodTestResult allKeys] != 0) {  //depending on which one successfully retrieve data from server first
+            [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
+        }
     };
 }
 
@@ -174,9 +264,19 @@ typedef enum getDataState {
     return ^(NSURLSessionDataTask *task, id responseObject){
         
         self.bloodTestResult = [[NSMutableDictionary alloc] initWithDictionary:[responseObject objectAtIndex:0]];
-        [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
+        if ([self.retrievedScreeningData allKeys] != 0) {   //depending on which one successfully retrieve data from server first
+            [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
+        }
     };
 }
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject)) downloadFollowUpDataSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        [hud hideAnimated:YES];
+        self.completeFollowUpHistory = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
+    };
+}
+
 
 - (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
@@ -196,7 +296,52 @@ typedef enum getDataState {
     };
 }
 
+- (NSMutableArray *) sortLatestFirst: (NSArray *) array {
+    
+    NSMutableArray *mutArray = [array mutableCopy];
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:FALSE];
+    [mutArray sortUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+    
+    return mutArray;
+}
 
+#pragma mark - NSNotification Methods
+- (void)refreshFollowUpHistoryTable:(NSNotification *) notification{
+    NSLog(@"refresh follow up history table");
+    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    
+    // Set the label text.
+    hud.label.text = NSLocalizedString(@"Loading...", @"HUD loading title");
+    [self getAllFollowUpDataForOneResident];
+}
+
+- (void) createNewFollowUpForm: (NSNotification *) notification {
+    residentParticulars = [notification userInfo];
+    [self performSegueWithIdentifier:@"NewFollowUpFormSegue" sender:self];
+}
+
+#pragma mark - Button methods
+
+- (IBAction)addBtnPressed:(UIBarButtonItem *)sender {
+    
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"New follow-up form", nil)
+                                                                              message:@"Choose one of the options"
+                                                                       preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Phone Call", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * action) {
+                                                          followUpType = [NSNumber numberWithInt:phoneCall];
+                                                          [self performSegueWithIdentifier:@"FollowUpHistoryToSelectResidentSegue" sender:self];
+                                                      }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"House Visit", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * action) {
+                                                          followUpType = [NSNumber numberWithInt:houseVisit];
+                                                          [self performSegueWithIdentifier:@"FollowUpHistoryToSelectResidentSegue" sender:self];
+                                                      }]];
+    [self presentViewController:alertController animated:YES completion:nil];
+    
+}
 
 /*
 // Override to support conditional editing of the table view.
@@ -237,10 +382,16 @@ typedef enum getDataState {
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     [hud hideAnimated:YES];
-//    if ([segue.destinationViewController respondsToSelector:@selector(setResidentID:)]) {    //view submitted form
-//        [segue.destinationViewController performSelector:@selector(setResidentID:)
-//                                              withObject:selectedResidentID];
-//    }
+    
+    if ([segue.destinationViewController respondsToSelector:@selector(setResidentParticulars:)]) {    //view submitted form
+        [segue.destinationViewController performSelector:@selector(setResidentParticulars:)
+                                              withObject:residentParticulars];
+    }
+    
+    if ([segue.destinationViewController respondsToSelector:@selector(setTypeOfFollowUp:)]) {    //view submitted form
+        [segue.destinationViewController performSelector:@selector(setTypeOfFollowUp:)
+                                              withObject:followUpType];
+    }
     
     if ([segue.destinationViewController respondsToSelector:@selector(setFullScreeningForm:)]) {
         [segue.destinationViewController performSelector:@selector(setFullScreeningForm:)

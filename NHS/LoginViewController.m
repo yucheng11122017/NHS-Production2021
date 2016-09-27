@@ -160,8 +160,8 @@
     // Set the label text.
 //    hud.label.text = NSLocalizedString(@"", @"HUD loading title");
     
-    NSString *username = self.usernameField.text; // @"nhs16user2";
-    NSString *password = self.passwordField.text; // @"2016user2"
+    NSString *username = self.usernameField.text; //
+    NSString *password = self.passwordField.text; //
     
     // prepare password for submission: hash 5 times
     NSString *passkey = [self createSHA512:password];
@@ -195,6 +195,16 @@
 
               // login if auth_result is 1
               if ([[responseDict valueForKey:@"auth_result"] integerValue] == 1) {
+                  if ([username isEqualToString:@"apple"]) {
+                      NSLog(@"Apple testing");
+                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                      [defaults setBool:TRUE forKey:@"AppleTesting"];
+                      [defaults synchronize];
+                  } else {
+                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                      [defaults setBool:FALSE forKey:@"AppleTesting"];
+                      [defaults synchronize];
+                  }
                   self.volunteerID =
                   [[responseDict valueForKey:@"user_id"] integerValue];
                   [self performSegueWithIdentifier:@"login segue" sender:self];
