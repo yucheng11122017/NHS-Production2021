@@ -4056,9 +4056,12 @@ NSString *const kDocName = @"doc_name";
     NSDictionary *fields = [self.form formValues];
     NSMutableDictionary *demographics_dict = [[self.fullScreeningForm objectForKey:@"demographics"] mutableCopy];
     
-    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_sso"] forKey:@"consent_sso"];
-    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_ntuc"] forKey:@"consent_ntuc"];
+    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_sso_tj"] forKey:@"consent_sso_tj"];
+    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_fsc_mp"] forKey:@"consent_fsc_mp"];
+    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_ntuc_tj"] forKey:@"consent_ntuc_tj"];
+    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_gl"] forKey:@"consent_gl"];
     [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_fysc"] forKey:@"consent_fysc"];
+    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_sso_bgs"] forKey:@"consent_sso_bgs"];
     
     
     [demographics_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kCitizenship] forKey:kCitizenship];

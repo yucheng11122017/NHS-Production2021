@@ -538,8 +538,10 @@ typedef enum residentDataSource {
         self.BTResidents = [[self.BTResidents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
         
         for (i=0; i<[self.BTResidents count]; i++) {
-            [self.residentNames addObject:[[self.BTResidents objectAtIndex:i] objectForKey:@"resident_name"]];
-            [self.residentScreenTimestamp addObject:[[self.BTResidents objectAtIndex:i] objectForKey:@"ts"]];
+            if ([[self.BTResidents objectAtIndex:i] objectForKey:@"resident_name"] != (id)[NSNull null]) {
+                [self.residentNames addObject:[[self.BTResidents objectAtIndex:i] objectForKey:@"resident_name"]];
+                [self.residentScreenTimestamp addObject:[[self.BTResidents objectAtIndex:i] objectForKey:@"ts"]];
+            }
         }
         
         //sort alphabetically

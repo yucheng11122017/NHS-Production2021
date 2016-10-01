@@ -212,7 +212,9 @@ typedef enum typeOfFollowUp {
     NSArray *residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
     NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
     NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"ts"];
-    cell.textLabel.text = residentName;
+    if (residentName != (id)[NSNull null]) {
+        cell.textLabel.text = residentName;
+    }
     cell.detailTextLabel.text = lastUpdatedTS;
     
     return cell;
@@ -527,8 +529,10 @@ typedef enum typeOfFollowUp {
         self.screenedResidents = [[self.screenedResidents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
         
         for (i=0; i<[self.screenedResidents count]; i++) {
-            [self.residentNames addObject:[[self.screenedResidents objectAtIndex:i] objectForKey:@"resident_name"]];
-            [self.residentScreenTimestamp addObject:[[self.screenedResidents objectAtIndex:i] objectForKey:@"ts"]];
+            if ([[self.screenedResidents objectAtIndex:i] objectForKey:@"resident_name"] != (id)[NSNull null]) {
+                [self.residentNames addObject:[[self.screenedResidents objectAtIndex:i] objectForKey:@"resident_name"]];
+                [self.residentScreenTimestamp addObject:[[self.screenedResidents objectAtIndex:i] objectForKey:@"ts"]];
+            }
         }
         
         //sort alphabetically
