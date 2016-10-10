@@ -43,14 +43,18 @@
              object:device];
     
     [self createButtons];
-    
-    if ([_isComm isEqualToNumber:@0]) {
-        self.bloodTestBtn.hidden = YES;
-        self.followUpBtn.hidden = YES;
-    }
+
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    BOOL isComm = [defaults boolForKey:@"isComm"];
+    
+    if (!isComm) {
+        self.bloodTestBtn.hidden = YES;
+        self.followUpBtn.hidden = YES;
+    }
     
     self.navigationItem.title = @"Home Page";
     [self.navigationController setNavigationBarHidden:NO];

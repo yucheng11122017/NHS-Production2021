@@ -539,7 +539,7 @@ typedef enum residentDataSource {
 
 - (void)decodeRestorableStateWithCoder:(NSCoder *)coder {
     [super decodeRestorableStateWithCoder:coder];
-    
+
     // restore the title
     self.title = [coder decodeObjectForKey:ViewControllerTitleKey];
     

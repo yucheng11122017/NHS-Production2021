@@ -11,12 +11,14 @@
 
 @interface FollowUpFormViewController : XLFormViewController
 
-@property (strong, nonatomic) NSString *residentNRIC;
 @property (strong, nonatomic) NSNumber *typeOfFollowUp;
 @property (strong, nonatomic) NSDictionary *residentParticulars;
+@property (strong, nonatomic) NSDictionary *downloadedForm;
+@property (strong, nonatomic) NSNumber *viewForm;
 
-- (void) setResidentNRIC:(NSString *)residentNRIC;
 - (void) setTypeOfFollowUp:(NSNumber *)typeOfFollowUp;
 - (void) setResidentParticulars:(NSDictionary *)dictionary;
+- (void) setViewForm: (NSNumber *) viewForm;
+- (void) setDownloadedForm: (NSDictionary *) dictionary;
 
 @end

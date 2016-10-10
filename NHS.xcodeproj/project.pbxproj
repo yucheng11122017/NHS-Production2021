@@ -198,10 +198,10 @@
 				01871B631D881E0C002194C9 /* FollowUpListTableViewController.m */,
 				01EAFF241D8E617900F4EAD2 /* FollowUpSelectScreeningResidentTableViewController.h */,
 				01EAFF251D8E617900F4EAD2 /* FollowUpSelectScreeningResidentTableViewController.m */,
-				01EAFF271D8E64B800F4EAD2 /* FollowUpFormViewController.h */,
-				01EAFF281D8E64B800F4EAD2 /* FollowUpFormViewController.m */,
 				01FC79F21D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.h */,
 				01FC79F31D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m */,
+				01EAFF271D8E64B800F4EAD2 /* FollowUpFormViewController.h */,
+				01EAFF281D8E64B800F4EAD2 /* FollowUpFormViewController.m */,
 				01FC79F51D882BB3003D3AB6 /* SummaryReportViewController.h */,
 				01FC79F61D882BB3003D3AB6 /* SummaryReportViewController.m */,
 			);

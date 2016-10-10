@@ -86,6 +86,9 @@ NSString *const kNotes = @"notes";
 @implementation FollowUpFormViewController
 
 - (void)viewDidLoad {
+    
+    
+    
     if ([self.typeOfFollowUp isEqualToNumber:[NSNumber numberWithInt:houseVisit]]) {
         XLFormViewController *form = [self initHouseVisit];       //must init first before [super viewDidLoad]
         NSLog(@"%@", [form class]);
@@ -93,14 +96,20 @@ NSString *const kNotes = @"notes";
         XLFormViewController *form = [self initPhoneCall];       //must init first before [super viewDidLoad]
         NSLog(@"%@", [form class]);
     }
-    self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
-    
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone
-                                                                             target:self
-                                                                             action:@selector(submitPressed:)];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
+    if ([_viewForm isEqualToNumber:@1]) {
+        [self.form setDisabled:YES];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone
+                                                                                 target:self
+                                                                                 action:@selector(editPressed:)];
+    } else {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone
+                                                                                 target:self
+                                                                                 action:@selector(submitPressed:)];
 
-    
+    }
+    self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
+
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -123,7 +132,6 @@ NSString *const kNotes = @"notes";
     
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Details of Home Visit"];
-    //    section.footerTitle = @"This is a long text that will appear on section footer";
     [self.formDescriptor addFormSection:section];
     
     // Name
@@ -340,13 +348,24 @@ NSString *const kNotes = @"notes";
     [self.formDescriptor addFormSection:section];
     
     // Name
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCallTime rowType:XLFormRowDescriptorTypeInteger title:@"Time of Call *"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCallTime rowType:XLFormRowDescriptorTypeDateTime title:@"Time of Call *"];
     row.required = YES;
-    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    row.value = [NSDate dateWithTimeIntervalSinceNow:0];
+    if ([_viewForm isEqualToNumber:@1]) {
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        
+        dateFormatter.dateFormat = @"yyyy-MM-dd hh:mm:ss";
+        NSDate *oneDayBehind = [dateFormatter dateFromString:[[self.downloadedForm objectForKey:@"calls_caller"] objectForKey:@"call_time"]];
+        NSDate *correctDate = [NSDate dateWithTimeInterval:60*60*8 sinceDate:oneDayBehind];
+        if ([self.downloadedForm objectForKey:@"calls_caller"]!= (id)[NSNull null]) {
+            row.value = correctDate;
+        }
+    }
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCallerName rowType:XLFormRowDescriptorTypeText title:@"Name of Caller *"];
     row.required = YES;
+    row.value = [self.downloadedForm objectForKey:@"calls_caller"]? [[self.downloadedForm objectForKey:@"calls_caller"] objectForKey:kCallerName] : @"";
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
@@ -373,36 +392,63 @@ NSString *const kNotes = @"notes";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNotes
                                                 rowType:XLFormRowDescriptorTypeTextView];
+    row.value = [self.downloadedForm objectForKey:@"calls_mgmt_plan"]? [[self.downloadedForm objectForKey:@"calls_mgmt_plan"] objectForKey:kNotes] : @"";
     [row.cellConfigAtConfigure setObject:@"Notes" forKey:@"textView.placeholder"];
     [section addFormRow:row];
     
     XLFormRowDescriptor *actionToBeTaken = [XLFormRowDescriptor formRowDescriptorWithTag:kAction rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Action to be taken"];
     actionToBeTaken.selectorOptions = @[@"Urgent", @"Phone Call", @"Home Visit", @"Discharge"];
+    actionToBeTaken.value = [self getActionToBeTaken];
     [section addFormRow:actionToBeTaken];
     
     return [super initWithForm:self.formDescriptor];
 }
 
+- (NSArray *) getActionToBeTaken {
+    if ([self.downloadedForm objectForKey:@"calls_mgmt_plan"] != (id)[NSNull null] && [self.downloadedForm objectForKey:@"calls_mgmt_plan"] != nil) {
+        NSDictionary *calls_mgmt_plan = [self.downloadedForm objectForKey:@"calls_mgmt_plan"];
+        NSMutableArray *mutArray = [[NSMutableArray alloc] init];
+        if ([[calls_mgmt_plan objectForKey:@"discharge"] isEqualToString:@"1"]) {
+            [mutArray addObject:@"Discharge"];
+        }
+        if ([[calls_mgmt_plan objectForKey:@"urgent"] isEqualToString:@"1"]) {
+            [mutArray addObject:@"Urgent"];
+        }
+        if ([[calls_mgmt_plan objectForKey:@"phone_call"] isEqualToString:@"1"]) {
+            [mutArray addObject:@"Phone Call"];
+        }
+        if ([[calls_mgmt_plan objectForKey:@"home_visit"] isEqualToString:@"1"]) {
+            [mutArray addObject:@"Home Visit"];
+        }
+        return mutArray;
+    } else {
+        return @[];
+    }
+}
 
 #pragma mark - Buttons
 
 -(void)backBtnPressed:(id)sender
 {
-    if (![self.navigationItem.rightBarButtonItem.title isEqualToString:@"Edit"]) {
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Cancel", nil)
-                                                                                  message:@"Do you want to cancel form entry?"
-                                                                           preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * deleteDraftAction) {
-                                                              [self.navigationController popViewControllerAnimated:YES];
-                                                          }]];
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil)
-                                                            style:UIAlertActionStyleCancel
-                                                          handler:nil]];
-        [self presentViewController:alertController animated:YES completion:nil];
-    } else {
+    if ([_viewForm isEqualToNumber:@1]) {   //for form viewing
         [self.navigationController popViewControllerAnimated:YES];
+    } else {
+        if (![self.navigationItem.rightBarButtonItem.title isEqualToString:@"Edit"]) {
+            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                                                      message:@"Do you want to cancel form entry?"
+                                                                               preferredStyle:UIAlertControllerStyleAlert];
+            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil)
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * deleteDraftAction) {
+                                                                  [self.navigationController popViewControllerAnimated:YES];
+                                                              }]];
+            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"No", nil)
+                                                                style:UIAlertActionStyleCancel
+                                                              handler:nil]];
+            [self presentViewController:alertController animated:YES completion:nil];
+        } else {
+            [self.navigationController popViewControllerAnimated:YES];
+        }
     }
 }
 
@@ -437,6 +483,17 @@ NSString *const kNotes = @"notes";
     }
 
 }
+
+-(void) editPressed:(UIBarButtonItem * __unused)button {
+    [self.form setDisabled:NO];
+    [self.tableView reloadData];
+    
+    //change button to submit
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone
+                                                                             target:self
+                                                                             action:@selector(submitPressed:)];
+}
+
 
 #pragma mark Submission
 - (void) submitHouseVisitForm {
@@ -603,7 +660,7 @@ NSString *const kNotes = @"notes";
     NSString *callTime = [[self.form formValues] objectForKey:kCallTime];
 
     return @{@"resident_id": [self.residentParticulars objectForKey:@"resident_id"],
-             kCallTime: callTime,
+             kCallTime: [callTime description], //to get the NSString
              kCallerName: callerName,
              @"ts": [self getCurrentTimeWithSecondInterval:0]
              };

@@ -20,6 +20,8 @@
         _username = dictionary[@"username"];
         _date = dictionary[@"date"];
         _imageName = dictionary[@"imageName"];
+        _id = dictionary[@"id"];
+        _index = dictionary[@"index"];
     }
     return self;
 }

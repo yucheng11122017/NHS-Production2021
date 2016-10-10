@@ -29,6 +29,10 @@ typedef enum typeOfFollowUp {
 
 @interface ResidentFollowUpHistoryTableViewController () {
     MBProgressHUD *hud;
+    NSNumber *viewForm;
+    NSNumber *newForm;
+    NSArray *followUpArray;
+    NSDictionary *formToView;
 }
 
 @property (strong, nonatomic) NSMutableDictionary* retrievedScreeningData;
@@ -48,6 +52,7 @@ typedef enum typeOfFollowUp {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    newForm = @0;
 //    NSLog(@"Retrieved Blood Test Data: %@", self.bloodTestResult);
     NSLog(@"Retrieved Full Follow Up History: %@", self.completeFollowUpHistory);
     
@@ -96,8 +101,8 @@ typedef enum typeOfFollowUp {
         self.arrayOfCallHistory = [[NSArray alloc] initWithArray:[self.completeFollowUpHistory objectForKey:@"Calls"]];
         self.arrayOfHouseVisitHistory = [[NSArray alloc] initWithArray:[self.completeFollowUpHistory objectForKey:@"houseVisits"]];
         
-        NSMutableArray *combinedArray = [[self.arrayOfCallHistory arrayByAddingObjectsFromArray:self.arrayOfHouseVisitHistory] mutableCopy];
-        NSArray *historyArray = [self prepareArrayForHistoryTable:combinedArray];
+        followUpArray = [[self.arrayOfCallHistory arrayByAddingObjectsFromArray:self.arrayOfHouseVisitHistory] mutableCopy];
+        NSArray *historyArray = [self prepareArrayForHistoryTable:followUpArray];
         NSMutableArray *entities = @[].mutableCopy;
         
         for (int i=0; i < [historyArray count]; i++) {
@@ -126,7 +131,9 @@ typedef enum typeOfFollowUp {
                                    @"imageName": @"Phone",
                                    @"date": [[combinedArray[i] objectForKey:@"calls_caller"] objectForKey:@"ts"],
                                    @"title":@"Phone Call",
-                                   @"username": [[combinedArray[i] objectForKey:@"calls_caller"] objectForKey:@"caller_name"]
+                                   @"username": [[combinedArray[i] objectForKey:@"calls_caller"] objectForKey:@"caller_name"],
+                                   @"id":[[combinedArray[i] objectForKey:@"calls_caller"] objectForKey:@"call_id"],
+                                   @"index":[NSString stringWithFormat:@"%d", i]
                                    }
             ];
         } else if ([combinedArray[i] objectForKey:@"house_volunteer"]) {    //house visit
@@ -140,7 +147,9 @@ typedef enum typeOfFollowUp {
                                    @"imageName": @"House",
                                    @"date": [[combinedArray[i] objectForKey:@"house_volunteer"] objectForKey:@"ts"],
                                    @"title":@"House Visit",
-                                   @"username": [[combinedArray[i] objectForKey:@"house_volunteer"] objectForKey:@"doc_name"]
+                                   @"username": [[combinedArray[i] objectForKey:@"house_volunteer"] objectForKey:@"doc_name"],
+                                   @"id":[[combinedArray[i] objectForKey:@"house_volunteer"] objectForKey:@"visit_id"],
+                                   @"index":[NSString stringWithFormat:@"%d", i]
                                    }
              ];
         }
@@ -205,14 +214,27 @@ typedef enum typeOfFollowUp {
     hud.label.text = NSLocalizedString(@"Loading...", @"HUD loading title");
     
     if (indexPath.section == 0) {   //Report Summary
+        viewForm = @0;
         [self getAllScreeningData];
         [self getBloodTestResultForOneResident];
         
         [tableView deselectRowAtIndexPath:indexPath animated:NO];
         return;
+
+    } else {
+        viewForm = @1;
+        [self getAllScreeningData];
+        FollowUpEntity *entity = self.followUpEntitySections[indexPath.section-1][indexPath.row];
+        NSLog(@"%@", [followUpArray objectAtIndex:[entity.index intValue]]);
+        formToView = [followUpArray objectAtIndex:[entity.index intValue]];
+        if ([entity.title isEqualToString:@"Phone Call"]) {
+            followUpType = [NSNumber numberWithInt:phoneCall];
+        } else {
+            followUpType = [NSNumber numberWithInt:houseVisit];
+        }
+        [tableView deselectRowAtIndexPath:indexPath animated:NO];
     }
     
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 
 #pragma mark - Server API
@@ -254,8 +276,17 @@ typedef enum typeOfFollowUp {
     return ^(NSURLSessionDataTask *task, id responseObject){
         
         self.retrievedScreeningData = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
-        if ([self.bloodTestResult allKeys] != 0) {  //depending on which one successfully retrieve data from server first
-            [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
+        if ([viewForm isEqualToNumber:@1]) {
+            residentParticulars = [self.retrievedScreeningData objectForKey:@"resi_particulars"];
+            [self performSegueWithIdentifier:@"ViewFollowUpFormSegue" sender:self];
+        } else if ([newForm isEqualToNumber:@1]) {
+            residentParticulars = [self.retrievedScreeningData objectForKey:@"resi_particulars"];
+            [self performSegueWithIdentifier:@"NewFollowUpFormSegue" sender:self];
+        }
+        else {    //for view summary
+            if ([self.bloodTestResult allKeys] != 0) {  //depending on which one successfully retrieve data from server first
+                [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
+            }
         }
     };
 }
@@ -316,6 +347,7 @@ typedef enum typeOfFollowUp {
 }
 
 - (void) createNewFollowUpForm: (NSNotification *) notification {
+    viewForm = @0;  //not viewing, but creating new one
     residentParticulars = [notification userInfo];
     [self performSegueWithIdentifier:@"NewFollowUpFormSegue" sender:self];
 }
@@ -323,7 +355,8 @@ typedef enum typeOfFollowUp {
 #pragma mark - Button methods
 
 - (IBAction)addBtnPressed:(UIBarButtonItem *)sender {
-    
+    viewForm = @0;
+    newForm = @1;
     UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"New follow-up form", nil)
                                                                               message:@"Choose one of the options"
                                                                        preferredStyle:UIAlertControllerStyleAlert];
@@ -331,13 +364,15 @@ typedef enum typeOfFollowUp {
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
                                                           followUpType = [NSNumber numberWithInt:phoneCall];
-                                                          [self performSegueWithIdentifier:@"FollowUpHistoryToSelectResidentSegue" sender:self];
+                                                          [self getAllScreeningData];
+                                                          
                                                       }]];
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"House Visit", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
                                                           followUpType = [NSNumber numberWithInt:houseVisit];
-                                                          [self performSegueWithIdentifier:@"FollowUpHistoryToSelectResidentSegue" sender:self];
+                                                          [self getAllScreeningData];
+                                                          [self performSegueWithIdentifier:@"NewFollowUpFormSegue" sender:self];
                                                       }]];
     [self presentViewController:alertController animated:YES completion:nil];
     
@@ -401,6 +436,16 @@ typedef enum typeOfFollowUp {
     if ([segue.destinationViewController respondsToSelector:@selector(setBloodTestResult:)]) {
         [segue.destinationViewController performSelector:@selector(setBloodTestResult:)
                                               withObject:self.bloodTestResult];
+    }
+    
+    if ([segue.destinationViewController respondsToSelector:@selector(setViewForm:)]) {
+        [segue.destinationViewController performSelector:@selector(setViewForm:)
+                                              withObject:viewForm];
+    }
+    
+    if ([segue.destinationViewController respondsToSelector:@selector(setDownloadedForm:)]) {
+        [segue.destinationViewController performSelector:@selector(setDownloadedForm:)
+                                              withObject:formToView];
     }
     
 }

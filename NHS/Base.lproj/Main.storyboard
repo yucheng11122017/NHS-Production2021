@@ -197,7 +197,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nVN-KF-LCZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1580" y="-1878"/>
+            <point key="canvasLocation" x="1834" y="-1886"/>
         </scene>
         <!--Followed-up Residents-->
         <scene sceneID="Jyu-F6-qRC">
@@ -328,13 +328,13 @@
                     </navigationItem>
                     <connections>
                         <segue destination="ZyZ-QM-Nup" kind="show" identifier="LoadReportSummarySegue" id="bQG-Oo-9qc"/>
-                        <segue destination="4hd-Bl-fwT" kind="presentation" identifier="FollowUpHistoryToSelectResidentSegue" id="dRP-qQ-d1G"/>
                         <segue destination="X22-sE-rEh" kind="show" identifier="NewFollowUpFormSegue" id="dqs-tI-c0S"/>
+                        <segue destination="X22-sE-rEh" kind="show" identifier="ViewFollowUpFormSegue" id="uj3-UQ-1eo"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="I0y-1y-Rwf" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1014" y="-1180"/>
+            <point key="canvasLocation" x="988" y="-1181"/>
         </scene>
         <!--Summary Report View Controller-->
         <scene sceneID="eh5-Us-qS0">
@@ -691,6 +691,14 @@
                                             <constraint firstAttribute="width" constant="150" id="rUd-bT-XJX"/>
                                         </constraints>
                                     </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qdQ-zG-Xfi">
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="230" id="eP8-YI-XBT"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="tUX-4K-syl" firstAttribute="trailing" secondItem="Ti9-YN-zCm" secondAttribute="trailing" id="3fM-Ka-dSK"/>
@@ -701,10 +709,12 @@
                                     <constraint firstItem="Gom-g3-Wjk" firstAttribute="top" secondItem="E26-7S-nl5" secondAttribute="top" constant="20" id="Sur-2j-tlL"/>
                                     <constraint firstItem="Gom-g3-Wjk" firstAttribute="centerX" secondItem="cPC-FP-LhX" secondAttribute="centerX" id="Wlk-Mq-Hto"/>
                                     <constraint firstItem="cPC-FP-LhX" firstAttribute="trailing" secondItem="tUX-4K-syl" secondAttribute="trailing" id="XGD-3N-EXy"/>
+                                    <constraint firstItem="qdQ-zG-Xfi" firstAttribute="centerX" secondItem="Cie-Kw-7ZC" secondAttribute="centerX" constant="5.5" id="XzN-xI-oTL"/>
                                     <constraint firstItem="cPC-FP-LhX" firstAttribute="leading" secondItem="tUX-4K-syl" secondAttribute="leading" id="YJy-cT-oqU"/>
                                     <constraint firstItem="Cie-Kw-7ZC" firstAttribute="top" secondItem="Ti9-YN-zCm" secondAttribute="bottom" constant="7" id="aVz-NS-DZ4"/>
                                     <constraint firstItem="cPC-FP-LhX" firstAttribute="top" secondItem="Gom-g3-Wjk" secondAttribute="bottom" constant="17" id="d9U-GJ-fBf"/>
                                     <constraint firstItem="Ti9-YN-zCm" firstAttribute="trailing" secondItem="Cie-Kw-7ZC" secondAttribute="trailing" id="dML-QG-p5H"/>
+                                    <constraint firstItem="qdQ-zG-Xfi" firstAttribute="top" secondItem="E26-7S-nl5" secondAttribute="top" constant="385" id="ela-Ui-m0e"/>
                                     <constraint firstItem="Ti9-YN-zCm" firstAttribute="top" secondItem="tUX-4K-syl" secondAttribute="bottom" constant="8" symbolic="YES" id="hDM-8k-seZ"/>
                                     <constraint firstItem="tUX-4K-syl" firstAttribute="top" secondItem="cPC-FP-LhX" secondAttribute="bottom" constant="20" id="juq-Qw-lze"/>
                                     <constraint firstItem="cPC-FP-LhX" firstAttribute="leading" secondItem="E26-7S-nl5" secondAttribute="leading" constant="36" id="l1S-sd-s9n"/>
@@ -749,6 +759,7 @@
                         <outlet property="passwordField" destination="tUX-4K-syl" id="v3e-FM-IQu"/>
                         <outlet property="scrollViewBackground" destination="E26-7S-nl5" id="TPp-2B-pSM"/>
                         <outlet property="usernameField" destination="cPC-FP-LhX" id="9uf-VJ-aQY"/>
+                        <outlet property="versionLabel" destination="qdQ-zG-Xfi" id="Ubm-hO-2Hm"/>
                         <segue destination="rpZ-vG-ijl" kind="show" identifier="login segue" id="icZ-Ke-3Xr"/>
                     </connections>
                 </viewController>
@@ -762,7 +773,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="dVH-QH-3V3"/>
-        <segue reference="dRP-qQ-d1G"/>
         <segue reference="dqs-tI-c0S"/>
         <segue reference="EDv-zZ-nX6"/>
     </inferredMetricsTieBreakers>

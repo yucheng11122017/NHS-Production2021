@@ -323,8 +323,17 @@ typedef enum typeOfFollowUp {
                                                           followUpType = [NSNumber numberWithInt:houseVisit];
                                                           [self performSegueWithIdentifier:@"FollowUpListToSelectResidentSegue" sender:self];
                                                       }]];
-    [self presentViewController:alertController animated:YES completion:nil];
+    [self presentViewController:alertController animated:YES completion:^{
+        UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
+        alertController.view.superview.userInteractionEnabled = YES;
+        [alertController.view.superview addGestureRecognizer:singleTap];    //tap elsewhere to close the alertView
+    }];
     
+    
+}
+
+-(void)handleSingleTap:(UITapGestureRecognizer *)sender{
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - UISearchBarDelegate

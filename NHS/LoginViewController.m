@@ -29,6 +29,7 @@
 @property(strong, nonatomic) IBOutlet UITextField *usernameField;
 @property(strong, nonatomic) IBOutlet UITextField *passwordField;
 @property(strong, nonatomic) IBOutlet UILabel *errorMsgLabel;
+@property (weak, nonatomic) IBOutlet UILabel *versionLabel;
 
 @property(strong, nonatomic) IBOutlet UIButton *loginButton;
 
@@ -59,6 +60,11 @@
     // set tags for identifying textfields
     self.usernameField.tag = USERNAME_TEXTFIELD_TAG;
     self.passwordField.tag = PASSWORD_TEXTFIELD_TAG;
+    
+    NSString * version = [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"];
+    NSString * build = [[NSBundle mainBundle] objectForInfoDictionaryKey: (NSString *)kCFBundleVersionKey];
+    
+    [self.versionLabel setText:[NSString stringWithFormat:@"Version: %@.%@", version, build]];
     
     // prepare scrollview if screen is too small to display all elements
     CGFloat height = [[UIScreen mainScreen] bounds].size.height;
@@ -188,7 +194,7 @@
           success:^(NSURLSessionDataTask *_Nonnull task,
                     id _Nullable responseObject) {
               
-              NSLog(@"success: %@", responseObject);
+//              NSLog(@"success: %@", responseObject);
               NSDictionary *responseDict = responseObject;
               
               isComm = [responseObject valueForKey:@"is_comm"];
@@ -205,6 +211,19 @@
                       [defaults setBool:FALSE forKey:@"AppleTesting"];
                       [defaults synchronize];
                   }
+                  
+                  if ([isComm isEqualToNumber:@1]) {
+                      NSLog(@"Committee Login");
+                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                      [defaults setBool:TRUE forKey:@"isComm"];
+                      [defaults synchronize];
+                  } else {
+                      NSLog(@"Volunteer Login");
+                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                      [defaults setBool:FALSE forKey:@"isComm"];
+                      [defaults synchronize];
+                  }
+                  
                   self.volunteerID =
                   [[responseDict valueForKey:@"user_id"] integerValue];
                   [self performSegueWithIdentifier:@"login segue" sender:self];
@@ -258,9 +277,6 @@
  #pragma mark - Navigation
  
  - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-     if ([segue.destinationViewController respondsToSelector:@selector(setIsComm:)]) {
-         [segue.destinationViewController performSelector:@selector(setIsComm:) withObject:isComm];
-     }
  }
  
 @end

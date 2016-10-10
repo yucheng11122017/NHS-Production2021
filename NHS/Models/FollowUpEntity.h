@@ -18,5 +18,7 @@
 @property (nonatomic, copy, readonly) NSString *username;
 @property (nonatomic, copy, readonly) NSString *date;
 @property (nonatomic, copy, readonly) NSString *imageName;
+@property (nonatomic, copy, readonly) NSString *id;
+@property (nonatomic, copy, readonly) NSString *index;
 
 @end
