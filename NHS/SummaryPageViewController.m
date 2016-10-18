@@ -9,7 +9,7 @@
 #import "SummaryPageViewController.h"
 #import "PatientScreeningListTableViewController.h"
 #import "ServerComm.h"
-#import "MBProgressHUD.h"
+#import "SVProgressHUD.h"
 #import "AppConstants.h"
 
 //XLForms stuffs
@@ -25,7 +25,6 @@
 
     UITextView *summaryTextView;
     UILabel *remarksLabel;
-    MBProgressHUD *hud;
     int successCounter;
     float timestampSecond;
     BOOL errorMsgFlag;
@@ -335,12 +334,10 @@
 #pragma mark Submit Button
 
 -(void)submitScreeningPressed:(UIBarButtonItem * __unused)button {
-    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    
+//    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    [SVProgressHUD showWithStatus:@"Uploaing..."];
     [self saveRemarksToDict];
-    
-    // Set the label text.
-    hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
+
     errorMsgFlag = NO;
     [self submitResidentParticulars];
     
@@ -492,7 +489,7 @@
             NSLog(@"SUBMISSION SUCCESSFUL!!");
             [self deleteAutoSavedFile];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [hud hideAnimated:YES];
+                [SVProgressHUD dismiss];
             });
 //            if (self.loadDataFlag == [NSNumber numberWithBool:YES]) {       //if this draft is loaded and submitted,now delete!
 //                [self removeDraftAfterSubmission];
@@ -529,7 +526,7 @@
         self.resident_id = [responseObject objectForKey:@"resident_id"];
         NSLog(@"I'm resident %@", self.resident_id);
         
-        [hud hideAnimated:YES];
+        [SVProgressHUD dismiss];
         
         [self submitAllOtherSections];
         
@@ -544,7 +541,7 @@
         NSString *errorString = [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
         NSLog(@"Error: %@", errorString);
 
-        [hud hideAnimated:YES];     //stop showing the progressindicator
+        [SVProgressHUD dismiss];
         if (!errorMsgFlag) {
             errorMsgFlag = YES;
             UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Ooops!", nil)

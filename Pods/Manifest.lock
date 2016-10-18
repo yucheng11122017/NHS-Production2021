@@ -35,14 +35,20 @@ DEPENDENCIES:
   - NSDate-HYPString
   - NSDictionary-HYPImmutable
   - RNCryptor (~> 2.2)
-  - SVProgressHUD (~> 2.0)
+  - SVProgressHUD (from `https://github.com/SVProgressHUD/SVProgressHUD.git`, commit `1871e8e12740f5fc672cb03f314737ab4ff319bc`)
   - XLForm (from `https://github.com/xmartlabs/XLForm.git`)
 
 EXTERNAL SOURCES:
+  SVProgressHUD:
+    :commit: 1871e8e12740f5fc672cb03f314737ab4ff319bc
+    :git: https://github.com/SVProgressHUD/SVProgressHUD.git
   XLForm:
     :git: https://github.com/xmartlabs/XLForm.git
 
 CHECKOUT OPTIONS:
+  SVProgressHUD:
+    :commit: 1871e8e12740f5fc672cb03f314737ab4ff319bc
+    :git: https://github.com/SVProgressHUD/SVProgressHUD.git
   XLForm:
     :commit: 6879f01230e02e0c14da1f6eda263ce1b3eda215
     :git: https://github.com/xmartlabs/XLForm.git
@@ -59,6 +65,6 @@ SPEC CHECKSUMS:
   SVProgressHUD: b0830714205bea1317ea1a2ebc71e5633af334d4
   XLForm: 2250b4e96ab8ffa5f3355838c79edd90de451782
 
-PODFILE CHECKSUM: b06f227438a0e25353e5d45347b12978172db3b1
+PODFILE CHECKSUM: 4023876c29cf8404318da1be759e6e78113f2e13
 
 COCOAPODS: 1.0.1

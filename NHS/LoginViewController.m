@@ -10,7 +10,7 @@
 #import "HomeViewController.h"
 #import "AFNetworking.h"
 #import <CommonCrypto/CommonDigest.h>
-#import "MBProgressHUD.h"
+#import "SVProgressHUD.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 #define ERROR_MSG_DELAY 5.0f
@@ -19,7 +19,6 @@
 #define PASSWORD_TEXTFIELD_TAG 2
 
 @interface LoginViewController () {
-    MBProgressHUD *hud;
     NSNumber *isComm;
 }
 
@@ -158,13 +157,7 @@
 }
 
 - (IBAction)loginButtonPressed:(id)sender {
-    // fetch user entered values
-    
-    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    hud.backgroundView.style = MBProgressHUDBackgroundStyleSolidColor;
-    hud.backgroundView.color = [UIColor colorWithWhite:0.f alpha:0.1f];
-    // Set the label text.
-//    hud.label.text = NSLocalizedString(@"", @"HUD loading title");
+    [SVProgressHUD showWithStatus:@"Logging in..."];
     
     NSString *username = self.usernameField.text; //
     NSString *password = self.passwordField.text; //
@@ -236,7 +229,7 @@
                              withObject:nil
                              afterDelay:ERROR_MSG_DELAY];
               }
-              [hud hideAnimated:YES];   //hide progress indicator
+              [SVProgressHUD dismiss];
           }
      // print error msg if HTTP failure
           failure:^(NSURLSessionDataTask *_Nullable task, NSError *_Nonnull error) {
@@ -245,7 +238,7 @@
               [[NSString alloc] initWithData:errorData
                                     encoding:NSUTF8StringEncoding];
               NSLog(@"error: %@", errorString);
-              [hud hideAnimated:YES];   //hide progress indicator
+              [SVProgressHUD dismiss];
           }];
 }
 

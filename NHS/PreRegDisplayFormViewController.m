@@ -9,7 +9,7 @@
 #import "PreRegDisplayFormViewController.h"
 #import "ServerComm.h"
 #import "XLForm.h"
-#import "MBProgressHUD.h"
+#import "SVProgressHUD.h"
 
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
@@ -48,7 +48,6 @@ typedef enum preRegSection {
 
 @interface PreRegDisplayFormViewController () {
     bool flag;
-    MBProgressHUD *hud;
     int successCounter;
 }
 
@@ -338,10 +337,11 @@ typedef enum preRegSection {
         //        return;
         //    }
         [self.tableView endEditing:YES];
-        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-        
-        // Set the label text.
-        hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
+//        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+//        
+//        // Set the label text.
+//        hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
+        [SVProgressHUD showWithStatus:@"Uploading..."];
         [self submitPersonalInfo:[self preparePersonalInfoDict]];
         
         [button setTitle:@"Edit"];
@@ -406,7 +406,8 @@ typedef enum preRegSection {
         if(successCounter == 4) {
             NSLog(@"SUBMISSION SUCCESSFUL!!");
             dispatch_async(dispatch_get_main_queue(), ^{
-                [hud hideAnimated:YES];
+//                [hud hideAnimated:YES];
+                [SVProgressHUD dismiss];
             });
             UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
                                                                                       message:@"Pre-registration successful!"
@@ -431,7 +432,8 @@ typedef enum preRegSection {
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
         NSLog(@"error: %@", errorString);
-        [hud hideAnimated:YES];     //stop showing the progressindicator
+//        [hud hideAnimated:YES];     //stop showing the progressindicator
+        [SVProgressHUD dismiss];
         UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
                                                                                   message:@"Update form failed!"
                                                                            preferredStyle:UIAlertControllerStyleAlert];

@@ -8,7 +8,7 @@
 
 #import "PreRegFormViewController.h"
 #import "ServerComm.h"
-#import "MBProgressHUD.h"
+#import "SVProgressHUD.h"
 
 //XLForms stuffs
 #import "XLForm.h"
@@ -87,7 +87,6 @@ typedef enum preRegSection {
 
 @interface PreRegFormViewController () {
     int successCounter, failCounter;
-    MBProgressHUD *hud;
 }
 
 @property (strong, nonatomic) NSNumber *resident_id;
@@ -356,10 +355,11 @@ typedef enum preRegSection {
 //        return;
 //    }
     [self.tableView endEditing:YES];
-    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    
-    // Set the label text.
-    hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
+//    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+//    
+//    // Set the label text.
+//    hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
+    [SVProgressHUD showWithStatus:@"Uploading..."];
     [self submitPersonalInfo:[self preparePersonalInfoDict]];
 }
 
@@ -486,7 +486,8 @@ typedef enum preRegSection {
         if(successCounter == 4) {
             NSLog(@"SUBMISSION SUCCESSFUL!!");
             dispatch_async(dispatch_get_main_queue(), ^{
-                [hud hideAnimated:YES];
+//                [hud hideAnimated:YES];
+                [SVProgressHUD dismiss];
             });
             if (self.loadDataFlag == [NSNumber numberWithBool:YES]) {       //if this draft is loaded and submitted,now delete!
                 [self removeDraftAfterSubmission];
@@ -504,6 +505,11 @@ typedef enum preRegSection {
                     [self.navigationController popViewControllerAnimated:YES];
                 }]];
             [self presentViewController:alertController animated:YES completion:nil];
+//            [SVProgressHUD showSuccessWithStatus:@"Pre-registraion successful!"];
+//            [SVProgressHUD dismissWithDelay:5.0f completion:^{
+//                [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable" object:nil userInfo:nil];
+//                [self.navigationController popViewControllerAnimated:YES];
+//            }];
         }
 
 
@@ -529,7 +535,8 @@ typedef enum preRegSection {
         NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
         failCounter++;
         if (failCounter==1) {
-            [hud hideAnimated:YES];     //stop showing the progressindicator
+//            [hud hideAnimated:YES];     //stop showing the progressindicator
+            [SVProgressHUD dismiss];
             UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
                                                                                       message:@"Form failed to upload!"
                                                                                preferredStyle:UIAlertControllerStyleAlert];

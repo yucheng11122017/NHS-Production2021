@@ -9,7 +9,7 @@
 #import "ResidentFollowUpHistoryTableViewController.h"
 #import "SummaryReportViewController.h"
 #import "FollowUpFormViewController.h"
-#import "MBProgressHUD.h"
+#import "SVProgressHUD.h"
 #import "ServerComm.h"
 #import "Reachability.h"
 #import "AppConstants.h"
@@ -28,11 +28,10 @@ typedef enum typeOfFollowUp {
 } typeOfFollowUp;
 
 @interface ResidentFollowUpHistoryTableViewController () {
-    MBProgressHUD *hud;
     NSNumber *viewForm;
     NSNumber *newForm;
     NSArray *followUpArray;
-    NSDictionary *formToView;
+    NSMutableDictionary *formToView;
 }
 
 @property (strong, nonatomic) NSMutableDictionary* retrievedScreeningData;
@@ -152,6 +151,21 @@ typedef enum typeOfFollowUp {
                                    @"index":[NSString stringWithFormat:@"%d", i]
                                    }
              ];
+        } else if ([combinedArray[i] objectForKey:@"social_wk_followup"]) {    //social work
+            NSString *case_status = @"";
+            if ([combinedArray[i] objectForKey:@"social_wk_followup"]!= (id) [NSNull null]) {
+                case_status = [[combinedArray[i] objectForKey:@"social_wk_followup"] objectForKey:@"case_status_info"];
+            }
+            [tempArray addObject:@{
+                                   @"content": case_status,
+                                   @"imageName": @"Social Work",
+                                   @"date": [[combinedArray[i] objectForKey:@"social_wk_followup"] objectForKey:@"ts"],
+                                   @"title":@"Social Work",
+                                   @"username": [[combinedArray[i] objectForKey:@"social_wk_followup"] objectForKey:@"done_by"],
+                                   @"id":[[combinedArray[i] objectForKey:@"social_wk_followup"] objectForKey:@"social_wk_followup_id"],
+                                   @"index":[NSString stringWithFormat:@"%d", i]
+                                   }
+             ];
         }
     }
     
@@ -207,14 +221,11 @@ typedef enum typeOfFollowUp {
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    
-    // Set the label text.
-    hud.label.text = NSLocalizedString(@"Loading...", @"HUD loading title");
+    [SVProgressHUD showWithStatus:@"Loading..."];
     
     if (indexPath.section == 0) {   //Report Summary
         viewForm = @0;
+        newForm = @0;
         [self getAllScreeningData];
         [self getBloodTestResultForOneResident];
         
@@ -226,7 +237,7 @@ typedef enum typeOfFollowUp {
         [self getAllScreeningData];
         FollowUpEntity *entity = self.followUpEntitySections[indexPath.section-1][indexPath.row];
         NSLog(@"%@", [followUpArray objectAtIndex:[entity.index intValue]]);
-        formToView = [followUpArray objectAtIndex:[entity.index intValue]];
+        formToView = [[NSMutableDictionary alloc] initWithDictionary:[followUpArray objectAtIndex:[entity.index intValue]]];
         if ([entity.title isEqualToString:@"Phone Call"]) {
             followUpType = [NSNumber numberWithInt:phoneCall];
         } else {
@@ -286,6 +297,10 @@ typedef enum typeOfFollowUp {
         else {    //for view summary
             if ([self.bloodTestResult allKeys] != 0) {  //depending on which one successfully retrieve data from server first
                 [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
+            } else {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"waitForScreeningSummary"
+                                                                    object:nil
+                                                                  userInfo:nil];
             }
         }
     };
@@ -293,18 +308,33 @@ typedef enum typeOfFollowUp {
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))downloadBloodTestResultSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
-        
-        self.bloodTestResult = [[NSMutableDictionary alloc] initWithDictionary:[responseObject objectAtIndex:0]];
-        if ([self.retrievedScreeningData allKeys] != 0) {   //depending on which one successfully retrieve data from server first
-            [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
+        if (self.bloodTestResult) { //only if bloodtestresult is not nil
+            self.bloodTestResult = [[NSMutableDictionary alloc] initWithDictionary:[responseObject objectAtIndex:0]];
+            if ([self.retrievedScreeningData allKeys] != 0) {   //depending on which one successfully retrieve data from server first
+                [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
+            }
+        } else {
+            if ([self.retrievedScreeningData allKeys] != 0) {   //depending on which one successfully retrieve data from server first
+                [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
+            } else {
+                [[NSNotificationCenter defaultCenter] addObserver:self
+                                                         selector:@selector(loadReportSummary:)
+                                                             name:@"waitForScreeningSummary"
+                                                           object:nil];
+            }
         }
     };
 }
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject)) downloadFollowUpDataSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
-        [hud hideAnimated:YES];
+        [SVProgressHUD dismiss];
         self.completeFollowUpHistory = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
+        [self buildFollowUpDataThen:^{
+            self.followUpEntitySections = @[].mutableCopy;
+            [self.followUpEntitySections addObject:self.prototypeEntities.mutableCopy];
+            [self.tableView reloadData];
+        }];
     };
 }
 
@@ -339,10 +369,7 @@ typedef enum typeOfFollowUp {
 #pragma mark - NSNotification Methods
 - (void)refreshFollowUpHistoryTable:(NSNotification *) notification{
     NSLog(@"refresh follow up history table");
-    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    
-    // Set the label text.
-    hud.label.text = NSLocalizedString(@"Loading...", @"HUD loading title");
+
     [self getAllFollowUpDataForOneResident];
 }
 
@@ -352,11 +379,20 @@ typedef enum typeOfFollowUp {
     [self performSegueWithIdentifier:@"NewFollowUpFormSegue" sender:self];
 }
 
+- (void) loadReportSummary: (NSNotification *) notification {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"waitForScreeningSummary" object:nil];
+    [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
+}
+
 #pragma mark - Button methods
 
 - (IBAction)addBtnPressed:(UIBarButtonItem *)sender {
     viewForm = @0;
     newForm = @1;
+    if (formToView) {
+        [formToView removeAllObjects];
+    }
+    
     UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"New follow-up form", nil)
                                                                               message:@"Choose one of the options"
                                                                        preferredStyle:UIAlertControllerStyleAlert];
@@ -416,7 +452,7 @@ typedef enum typeOfFollowUp {
 
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    [hud hideAnimated:YES];
+    [SVProgressHUD dismiss];
     
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentParticulars:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setResidentParticulars:)

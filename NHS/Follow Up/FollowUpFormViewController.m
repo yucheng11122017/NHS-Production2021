@@ -8,7 +8,7 @@
 
 #import "FollowUpFormViewController.h"
 #import "ServerComm.h"
-#import "MBProgressHUD.h"
+#import "SVProgressHUD.h"
 
 //XLForms stuffs
 #import "XLForm.h"
@@ -70,12 +70,20 @@ NSString *const kDocSignature = @"doc_sign";
 /****** PHONE CALL ******/
 NSString *const kCallTime = @"call_time";
 NSString *const kCallerName = @"caller_name";
-
 NSString *const kNotes = @"notes";
+
+/****** SOCIAL WORK ******/
+NSString *const kCaseRanking = @"case_ranking";
+NSString *const kDoneBy = @"done_by";
+NSString *const kFollowUpDate = @"follow_up_date";
+NSString *const kFollowUpType = @"follow_up_type";
+NSString *const kFollowUpTypeOrg = @"follow_up_type_org";
+NSString *const kIssues = @"issues";
+NSString *const kCaseStatusInfo = @"case_status_info";
+NSString *const kFollowUpInfo = @"follow_up_info";
 
 
 @interface FollowUpFormViewController () {
-    MBProgressHUD *hud;
     int success_count;
 }
 
@@ -87,13 +95,14 @@ NSString *const kNotes = @"notes";
 
 - (void)viewDidLoad {
     
-    
-    
     if ([self.typeOfFollowUp isEqualToNumber:[NSNumber numberWithInt:houseVisit]]) {
         XLFormViewController *form = [self initHouseVisit];       //must init first before [super viewDidLoad]
         NSLog(@"%@", [form class]);
-    } else {
+    } else if ([self.typeOfFollowUp isEqualToNumber:[NSNumber numberWithInt:phoneCall]]){
         XLFormViewController *form = [self initPhoneCall];       //must init first before [super viewDidLoad]
+        NSLog(@"%@", [form class]);
+    } else {
+        XLFormViewController *form = [self initSocialWork];       //must init first before [super viewDidLoad]
         NSLog(@"%@", [form class]);
     }
     if ([_viewForm isEqualToNumber:@1]) {
@@ -109,7 +118,9 @@ NSString *const kNotes = @"notes";
     }
     self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
 
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Back" style:UIBarButtonItemStylePlain
+                                                                            target:self
+                                                                            action:@selector(backBtnPressed:)];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -130,35 +141,42 @@ NSString *const kNotes = @"notes";
     
     self.formDescriptor.assignFirstResponderOnShow = YES;
     
+    NSDictionary *house_volunteer, *house_mgmt_plan, *house_med_soc, *house_clinical, *house_cbg;
+    NSArray *house_bp_record;
+    house_bp_record = [self.downloadedForm objectForKey:@"house_bp_record"];
+    house_cbg = [self.downloadedForm objectForKey:@"house_cbg"];
+    house_clinical = [self.downloadedForm objectForKey:@"house_clinical"];
+    house_med_soc = [self.downloadedForm objectForKey:@"house_med_soc"];
+    house_mgmt_plan = [self.downloadedForm objectForKey:@"house_mgmt_plan"];
+    house_volunteer = [self.downloadedForm objectForKey:@"house_volunteer"];
+    
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Details of Home Visit"];
     [self.formDescriptor addFormSection:section];
     
-    // Name
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDateDay rowType:XLFormRowDescriptorTypeInteger title:@"Date of Home Visit (dd)"];
     row.required = YES;
-//    row.value = [self.downloadedBloodTestResult objectForKey:kNRIC]? [self.downloadedBloodTestResult objectForKey:kNRIC]:_residentNRIC;
+    row.value = [house_volunteer objectForKey:kDateDay]? [house_volunteer objectForKey:kDateDay]:@"";
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDateMonth rowType:XLFormRowDescriptorTypeInteger title:@"Date of Home Visit (mm)"];
     row.required = YES;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-//    row.value = [self.downloadedBloodTestResult objectForKey:kGlucose]? [self.downloadedBloodTestResult objectForKey:kGlucose]:@"";
+  row.value = [house_volunteer objectForKey:kDateMonth]? [house_volunteer objectForKey:kDateMonth]:@"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDateYear rowType:XLFormRowDescriptorTypeInteger title:@"Date of Home Visit (yyyy)"];
     row.required = YES;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-//    row.value = [self.downloadedBloodTestResult objectForKey:kTrigly]? [self.downloadedBloodTestResult objectForKey:kTrigly]:@"";
+    row.value = [house_volunteer objectForKey:kDateYear]? [house_volunteer objectForKey:kDateYear]:@"";
     [section addFormRow:row];
     
-    XLFormRowDescriptor *docNameRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFUDocName rowType:XLFormRowDescriptorTypeText title:@"Name of Doctor"];
+    XLFormRowDescriptor *docNameRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFUDocName rowType:XLFormRowDescriptorTypeName title:@"Name of Doctor"];
     docNameRow.required = YES;
+    docNameRow.value = [house_volunteer objectForKey:kFUDocName]? [house_volunteer objectForKey:kFUDocName]:@"";
     [docNameRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-//    row.value = [self.downloadedBloodTestResult objectForKey:kLdl]? [self.downloadedBloodTestResult objectForKey:kLdl]:@"";
     [section addFormRow:docNameRow];
-    
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Subject Particulars"];
     [self.formDescriptor addFormSection:section];
     
@@ -229,16 +247,18 @@ NSString *const kNotes = @"notes";
     
     XLFormRowDescriptor *height;
     height = [XLFormRowDescriptor formRowDescriptorWithTag:kFUHeight rowType:XLFormRowDescriptorTypeNumber title:@"Height (cm)"];
-//    height.value = [clinicalResultsDict objectForKey:@"height_cm"];
+    height.value = [house_clinical objectForKey:kFUHeight]? [house_clinical objectForKey:kFUHeight]:@"";
+    
     [section addFormRow:height];
     
     XLFormRowDescriptor *weight;
     weight = [XLFormRowDescriptor formRowDescriptorWithTag:kFUWeight rowType:XLFormRowDescriptorTypeNumber title:@"Weight (kg)"];
-//    weight.value = [clinicalResultsDict objectForKey:@"weight_kg"];
+    weight.value = [house_clinical objectForKey:kFUWeight]? [house_clinical objectForKey:kFUWeight]:@"";
     [section addFormRow:weight];
     
     XLFormRowDescriptor *bmi;
     bmi = [XLFormRowDescriptor formRowDescriptorWithTag:kFUBMI rowType:XLFormRowDescriptorTypeText title:@"BMI"];
+    bmi.value = [house_clinical objectForKey:kFUBMI]? [house_clinical objectForKey:kFUBMI]:@"";
     //    bmi.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kHeight, kWeight]];
     //Initial value only
 //    if ([clinicalResultsDict objectForKey:@"bmi"] != [NSNull null]) {
@@ -273,37 +293,45 @@ NSString *const kNotes = @"notes";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Diabetes Mellitus - CBG Reading"];
     [self.formDescriptor addFormSection:section];
     
+    
     XLFormRowDescriptor *cbg;
     cbg = [XLFormRowDescriptor formRowDescriptorWithTag:kFUCBG rowType:XLFormRowDescriptorTypeNumber title:@"CBG Reading (mmol/L)"];
-    //    height.value = [clinicalResultsDict objectForKey:@"height_cm"];
+    cbg.value = [house_cbg objectForKey:kFUCBG]? [house_cbg objectForKey:kFUCBG]:@"";
     [section addFormRow:cbg];
+    
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Hypertension - BP Readings"];
     [self.formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *systolic_1;
     systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kSysBP_1 rowType:XLFormRowDescriptorTypeNumber title:@"1st Systolic Reading(mmHg)"];
+    systolic_1.value = [house_bp_record objectAtIndex:0]? [[house_bp_record objectAtIndex:0] objectForKey:@"systolic_bp"]:@"";
     [section addFormRow:systolic_1];
     
     XLFormRowDescriptor *diastolic_1;
     diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_1 rowType:XLFormRowDescriptorTypeNumber title:@"1st Diastolic Reading(mmHg)"];
+    diastolic_1.value = [house_bp_record objectAtIndex:0]? [[house_bp_record objectAtIndex:0] objectForKey:@"diastolic_bp"]:@"";
     [section addFormRow:diastolic_1];
     
     XLFormRowDescriptor *systolic_2;
     systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kSysBP_2 rowType:XLFormRowDescriptorTypeNumber title:@"2nd Systolic Reading(mmHg)"];
+    systolic_2.value = [house_bp_record objectAtIndex:1]? [[house_bp_record objectAtIndex:1] objectForKey:@"systolic_bp"]:@"";
     [section addFormRow:systolic_2];
     
     XLFormRowDescriptor *diastolic_2;
     diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_2 rowType:XLFormRowDescriptorTypeNumber title:@"2nd Diastolic Reading(mmHg)"];
     [section addFormRow:diastolic_2];
+    diastolic_2.value = [house_bp_record objectAtIndex:1]? [[house_bp_record objectAtIndex:1] objectForKey:@"diastolic_bp"]:@"";
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical/Social Issues"];
     [self.formDescriptor addFormSection:section];
     
     row =[XLFormRowDescriptor formRowDescriptorWithTag:kMedIssues rowType:XLFormRowDescriptorTypeTextView title:@"Medical Issues"];
+    row.value = [house_med_soc objectForKey:kMedIssues]? [house_med_soc objectForKey:kMedIssues]:@"";
     [section addFormRow:row];
     
     row =[XLFormRowDescriptor formRowDescriptorWithTag:kSocialIssues rowType:XLFormRowDescriptorTypeTextView title:@"Social Issues"];
+    row.value = [house_med_soc objectForKey:kSocialIssues]? [house_med_soc objectForKey:kSocialIssues]:@"";
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Post Home Visit Management Plan"];
@@ -311,14 +339,16 @@ NSString *const kNotes = @"notes";
     
     XLFormRowDescriptor *actionToBeTaken = [XLFormRowDescriptor formRowDescriptorWithTag:kAction rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Action to be taken"];
     actionToBeTaken.selectorOptions = @[@"Urgent", @"Phone Call", @"Home Visit", @"Discharge"];
+    actionToBeTaken.value = [self getActionToBeTakenForKey:@"house_mgmt_plan"];
     [section addFormRow:actionToBeTaken];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFUDocNotes
                                                 rowType:XLFormRowDescriptorTypeTextView];
     [row.cellConfigAtConfigure setObject:@"Doctor's notes" forKey:@"textView.placeholder"];
+    row.value = [house_mgmt_plan objectForKey:kFUDocNotes]? [house_mgmt_plan objectForKey:kFUDocNotes]:@"";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFUDocName rowType:XLFormRowDescriptorTypeText title:@"Name of Doctor"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFUDocName rowType:XLFormRowDescriptorTypeName title:@"Name of Doctor"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     
     docNameRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -328,6 +358,7 @@ NSString *const kNotes = @"notes";
     };
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocSignature rowType:XLFormRowDescriptorTypeText title:@"Doctor's MCR Number"];
+    row.value = [house_mgmt_plan objectForKey:kDocSignature]? [house_mgmt_plan objectForKey:kDocSignature]:@"";
     [section addFormRow:row];
     
     return [super initWithForm:self.formDescriptor];
@@ -363,7 +394,7 @@ NSString *const kNotes = @"notes";
     }
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCallerName rowType:XLFormRowDescriptorTypeText title:@"Name of Caller *"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCallerName rowType:XLFormRowDescriptorTypeName title:@"Name of Caller *"];
     row.required = YES;
     row.value = [self.downloadedForm objectForKey:@"calls_caller"]? [[self.downloadedForm objectForKey:@"calls_caller"] objectForKey:kCallerName] : @"";
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
@@ -392,21 +423,106 @@ NSString *const kNotes = @"notes";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNotes
                                                 rowType:XLFormRowDescriptorTypeTextView];
-    row.value = [self.downloadedForm objectForKey:@"calls_mgmt_plan"]? [[self.downloadedForm objectForKey:@"calls_mgmt_plan"] objectForKey:kNotes] : @"";
+    if ([self.downloadedForm objectForKey:@"calls_mgmt_plan"] != (id) [NSNull null]) {
+        row.value = [self.downloadedForm objectForKey:@"calls_mgmt_plan"]? [[self.downloadedForm objectForKey:@"calls_mgmt_plan"] objectForKey:kNotes] : @"";
+    }
     [row.cellConfigAtConfigure setObject:@"Notes" forKey:@"textView.placeholder"];
     [section addFormRow:row];
     
     XLFormRowDescriptor *actionToBeTaken = [XLFormRowDescriptor formRowDescriptorWithTag:kAction rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Action to be taken"];
     actionToBeTaken.selectorOptions = @[@"Urgent", @"Phone Call", @"Home Visit", @"Discharge"];
-    actionToBeTaken.value = [self getActionToBeTaken];
+    actionToBeTaken.value = [self getActionToBeTakenForKey:@"calls_mgmt_plan"];
     [section addFormRow:actionToBeTaken];
     
     return [super initWithForm:self.formDescriptor];
 }
 
-- (NSArray *) getActionToBeTaken {
-    if ([self.downloadedForm objectForKey:@"calls_mgmt_plan"] != (id)[NSNull null] && [self.downloadedForm objectForKey:@"calls_mgmt_plan"] != nil) {
-        NSDictionary *calls_mgmt_plan = [self.downloadedForm objectForKey:@"calls_mgmt_plan"];
+- (id) initSocialWork {
+    self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"New Form"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    self.formDescriptor.assignFirstResponderOnShow = YES;
+    
+    // Social Work - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Social Work"];
+    [self.formDescriptor addFormSection:section];
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaseRanking rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Case Ranking"];
+    row.noValueDisplayText = @"Tap here";
+    row.selectorOptions = @[@"Immediate", @"R1", @"R1.5", @"R2", @"R3"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDoneBy rowType:XLFormRowDescriptorTypeName title:@"Done by"];
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpDate rowType:XLFormRowDescriptorTypeDate title:@"Follow up date"];
+    row.required = YES;
+    row.value = [NSDate dateWithTimeIntervalSinceNow:0];
+//        if ([_viewForm isEqualToNumber:@1]) {
+//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//    
+//            dateFormatter.dateFormat = @"yyyy-MM-dd hh:mm:ss";
+//            NSDate *oneDayBehind = [dateFormatter dateFromString:[[self.downloadedForm objectForKey:@"calls_caller"] objectForKey:@"call_time"]];
+//            NSDate *correctDate = [NSDate dateWithTimeInterval:60*60*8 sinceDate:oneDayBehind];
+//            if ([self.downloadedForm objectForKey:@"calls_caller"]!= (id)[NSNull null]) {
+//                row.value = correctDate;
+//            }
+//        }
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *followUpTypeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpType rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Type of follow up"];
+    followUpTypeRow.noValueDisplayText = @"Tap here";
+    followUpTypeRow.selectorOptions = @[@"Phone Call", @"Home Visit", @"Organisation"];
+    [section addFormRow:followUpTypeRow];
+    
+    XLFormRowDescriptor *nameOfOrgRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpTypeOrg rowType:XLFormRowDescriptorTypeName title:@"Name of Organisation"];
+    nameOfOrgRow.value = @"";
+    [nameOfOrgRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    nameOfOrgRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Organisation'", followUpTypeRow];
+    [section addFormRow:nameOfOrgRow];
+    
+//    followUpTypeRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+//        if (oldValue != newValue) {
+//            if (newValue != (id)[NSNull null]) {
+//                if ([newValue isEqualToString:@"Organisation"]) {
+//                    nameOfOrgRow.hidden = @(0);
+//                } else {
+//                    nameOfOrgRow.hidden = @(1);
+//                }
+//            }
+//        }
+//    };
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kIssues rowType:XLFormRowDescriptorTypeText title:@"Presenting issues"];
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [self.formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"Q1" rowType:XLFormRowDescriptorTypeInfo title:@"Case status & information discussed"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaseStatusInfo rowType:XLFormRowDescriptorTypeTextView title:@""];
+    [row.cellConfigAtConfigure setObject:@"Type here" forKey:@"textView.placeholder"];
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [self.formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpInfo rowType:XLFormRowDescriptorTypeText title:@"Follow up to be done"];
+    [section addFormRow:row];
+    
+    return [super initWithForm:self.formDescriptor];
+}
+
+- (NSArray *) getActionToBeTakenForKey: (NSString *) firstKey {
+    if ([self.downloadedForm objectForKey:firstKey] != (id)[NSNull null] && [self.downloadedForm objectForKey:firstKey] != nil) {
+        NSDictionary *calls_mgmt_plan = [self.downloadedForm objectForKey:firstKey];
         NSMutableArray *mutArray = [[NSMutableArray alloc] init];
         if ([[calls_mgmt_plan objectForKey:@"discharge"] isEqualToString:@"1"]) {
             [mutArray addObject:@"Discharge"];
@@ -471,15 +587,13 @@ NSString *const kNotes = @"notes";
     }
     
     [self.tableView endEditing:YES];
-    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    
-    // Set the label text.
-    hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
-    
+    [SVProgressHUD showWithStatus:@"Uploading..."];
     if ([self.typeOfFollowUp isEqualToNumber:[NSNumber numberWithInt:houseVisit]]) {
         [self submitHouseVisitForm];
-    } else {
+    } else if ([self.typeOfFollowUp isEqualToNumber:[NSNumber numberWithInt:phoneCall]]) {
         [self submitPhoneCallForm];
+    } else {
+        [self submitSocialWorkForm];
     }
 
 }
@@ -516,6 +630,16 @@ NSString *const kNotes = @"notes";
                       andFailBlock:[self errorBlock]];
 }
 
+- (void) submitSocialWorkForm {
+    NSDictionary *dict = [self prepareSocialWorkDict];
+    
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    [client postSocialWorkFollowUpWithDict:dict
+                             progressBlock:[self progressBlock]
+                              successBlock:[self callerInfoSuccessBlock]
+                              andFailBlock:[self errorBlock]];
+}
+
 #pragma mark - Blocks
 
 - (void (^)(NSProgress *downloadProgress))progressBlock {
@@ -543,7 +667,7 @@ NSString *const kNotes = @"notes";
         
         NSLog(@"SUBMISSION SUCCESSFUL!!");
         dispatch_async(dispatch_get_main_queue(), ^{
-            [hud hideAnimated:YES];
+            [SVProgressHUD dismiss];
         });
         
         UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
@@ -611,7 +735,7 @@ NSString *const kNotes = @"notes";
             NSLog(@"SUBMISSION SUCCESSFUL!!");
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [hud hideAnimated:YES];
+                [SVProgressHUD dismiss];
             });
             
             UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
@@ -638,7 +762,7 @@ NSString *const kNotes = @"notes";
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
         
-        [hud hideAnimated:YES];     //stop showing the progressindicator
+        [SVProgressHUD dismiss];
         UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
                                                                                   message:@"Form failed to upload!"
                                                                            preferredStyle:UIAlertControllerStyleAlert];
@@ -785,6 +909,48 @@ NSString *const kNotes = @"notes";
              kDischarge: discharge,
              @"ts": [self getCurrentTimeWithSecondInterval:6]
              };
+}
+
+- (NSDictionary *) prepareSocialWorkDict {
+    
+    // CASE RANKING
+    NSString *caseRankingString = [[self.form formValues] objectForKey:kCaseRanking];
+    NSString *caseRankingIndex = @"";
+    if ([caseRankingString isEqualToString:@"Immedidate"]) caseRankingIndex = @"1";
+    else if ([caseRankingString isEqualToString:@"R1"]) caseRankingIndex = @"2";
+    else if ([caseRankingString isEqualToString:@"R1.5"]) caseRankingIndex = @"3";
+    else if ([caseRankingString isEqualToString:@"R2"]) caseRankingIndex = @"4";
+    else if ([caseRankingString isEqualToString:@"R3"]) caseRankingIndex = @"5";
+    
+    // FOLLOW UP TYPE
+    NSString *followUpTypeIndex = @"";
+    NSString *followUpTypeString = [[self.form formValues] objectForKey:kFollowUpType];
+    
+    if ([followUpTypeString isEqualToString:@"Phone Call"]) followUpTypeIndex = @"1";
+    else if([followUpTypeString isEqualToString:@"Home Visit"]) followUpTypeIndex = @"2";
+    else if([followUpTypeString isEqualToString:@"Organisation"]) followUpTypeIndex = @"3";
+    
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"yyyy-MM-dd"];
+    
+    NSDate *longDate = [[self.form formValues] objectForKey:kFollowUpDate];
+    NSString *shortDate = [dateFormat stringFromDate:longDate];
+//    NSString *shortDate = [longDate stringByReplacingCharactersInRange:NSMakeRange(11, 14) withString:@""];
+    
+    //make sure no nil value inserted to dictionary
+    NSString *followUpTypeOrg = ([[self.form formValues] objectForKey:kFollowUpTypeOrg])? [[self.form formValues] objectForKey:kFollowUpTypeOrg]:@"";
+    
+    return @{ @"resident_id":[self.residentParticulars objectForKey:@"resident_id"],
+             kCaseRanking:caseRankingIndex,
+             kDoneBy:[[self.form formValues]objectForKey:kDoneBy],
+             kFollowUpDate:shortDate,
+             kFollowUpType:followUpTypeIndex,
+             kFollowUpTypeOrg:followUpTypeOrg,
+             kIssues:[[self.form formValues] objectForKey:kIssues],
+             kCaseStatusInfo:[[self.form formValues] objectForKey:kCaseStatusInfo],
+             kFollowUpInfo:[[self.form formValues] objectForKey:kFollowUpInfo],
+             @"ts":[self getCurrentTimeWithSecondInterval:0]
+          };
 }
 
 

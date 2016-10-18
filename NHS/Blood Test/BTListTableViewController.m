@@ -12,7 +12,8 @@
 #import "SearchResultsTableController.h"
 #import "Reachability.h"
 #import "AppConstants.h"
-#import "MBProgressHUD.h"
+#import "SVProgressHUD.h"
+#import "GenericTableViewCell.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
@@ -59,7 +60,6 @@ typedef enum residentDataSource {
     NSNumber *residentDataLocalOrServer;
     BOOL loadDataFlag;
     NetworkStatus status;
-    MBProgressHUD *hud;
     int fetchDataState;
 }
 
@@ -196,11 +196,11 @@ typedef enum residentDataSource {
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    static NSString *simpleTableIdentifier = @"SimpleTableItem";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
+    GenericTableViewCell *cell = (GenericTableViewCell *)[tableView dequeueReusableCellWithIdentifier:@"GenericTableCell"];
+    if (cell == nil)
+    {
+        NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"GenericTableViewCell" owner:self options:nil];
+        cell = [nib objectAtIndex:0];
     }
     
     // Configure the cell...
@@ -210,21 +210,25 @@ typedef enum residentDataSource {
     
     NSArray *residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
     NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
+    NSString *residentNric = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"nric"];
     NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"ts"];
-    cell.textLabel.text = residentName;
-    cell.detailTextLabel.text = lastUpdatedTS;
+    cell.nameLabel.text = residentName;
+    cell.NRICLabel.text = residentNric;
+    cell.dateLabel.text = lastUpdatedTS;
     
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 60;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     NSDictionary *selectedResident = Nil;
 
-    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    
-    // Set the label text.
-    hud.label.text = NSLocalizedString(@"Loading...", @"HUD loading title");
+    [SVProgressHUD showWithStatus:@"Loading..."];
     
     if (tableView == self.tableView) {      //not in the searchResult view
         selectedResident = [[NSDictionary alloc] initWithDictionary:[self findResidentInfoFromSectionRow:indexPath]];
@@ -589,7 +593,7 @@ typedef enum residentDataSource {
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
         NSLog(@"error: %@", errorString);
-        [hud hideAnimated:YES];     //stop showing the progressindicator
+        [SVProgressHUD dismiss];
         UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Download Fail", nil)
                                                                                   message:@"Download form failed!"
                                                                            preferredStyle:UIAlertControllerStyleAlert];
@@ -646,7 +650,7 @@ typedef enum residentDataSource {
 
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    [hud hideAnimated:YES];
+    [SVProgressHUD dismiss];
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentID:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setResidentID:)
                                               withObject:selectedResidentID];

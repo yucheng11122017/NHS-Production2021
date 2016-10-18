@@ -843,6 +843,26 @@
        failure:[self checkForBadHTTP:failBlock]];
 }
 
+#pragma mark Social Work
+
+- (void) postSocialWorkFollowUpWithDict: (NSDictionary *) dictionary
+                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 600;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": @{@"social_wk_followup":dictionary}};
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
 
 #pragma mark -
 

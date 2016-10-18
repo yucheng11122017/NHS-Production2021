@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		015831401DB4D2F80049F16C /* GenericTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0158313E1DB4D2F80049F16C /* GenericTableViewCell.m */; };
+		015831411DB4D2F80049F16C /* GenericTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0158313F1DB4D2F80049F16C /* GenericTableViewCell.xib */; };
 		01871B641D881E0C002194C9 /* FollowUpListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01871B631D881E0C002194C9 /* FollowUpListTableViewController.m */; };
 		019072081D87ABCA00D188D6 /* BTListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 019072071D87ABCA00D188D6 /* BTListTableViewController.m */; };
 		0190720B1D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0190720A1D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.m */; };
@@ -71,6 +73,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0158313D1DB4D2F80049F16C /* GenericTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTableViewCell.h; path = Models/GenericTableViewCell.h; sourceTree = "<group>"; };
+		0158313E1DB4D2F80049F16C /* GenericTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTableViewCell.m; path = Models/GenericTableViewCell.m; sourceTree = "<group>"; };
+		0158313F1DB4D2F80049F16C /* GenericTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GenericTableViewCell.xib; path = Models/GenericTableViewCell.xib; sourceTree = "<group>"; };
 		01871B621D881E0C002194C9 /* FollowUpListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FollowUpListTableViewController.h; path = "Follow Up/FollowUpListTableViewController.h"; sourceTree = "<group>"; };
 		01871B631D881E0C002194C9 /* FollowUpListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FollowUpListTableViewController.m; path = "Follow Up/FollowUpListTableViewController.m"; sourceTree = "<group>"; };
 		019072061D87ABCA00D188D6 /* BTListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BTListTableViewController.h; path = "Blood Test/BTListTableViewController.h"; sourceTree = "<group>"; };
@@ -373,6 +378,9 @@
 				E1A4F0DB1D61CB8A00EE9BBB /* Reachability.m */,
 				E1FCF9301D45B77F00478F7B /* ServerComm.h */,
 				E1FCF9311D45B77F00478F7B /* ServerComm.m */,
+				0158313D1DB4D2F80049F16C /* GenericTableViewCell.h */,
+				0158313E1DB4D2F80049F16C /* GenericTableViewCell.m */,
+				0158313F1DB4D2F80049F16C /* GenericTableViewCell.xib */,
 				01F1543D1D9A480D00D4B7D1 /* FollowUpCell.h */,
 				01F1543E1D9A480D00D4B7D1 /* FollowUpCell.m */,
 				01F154401D9A48D700D4B7D1 /* FollowUpEntity.h */,
@@ -497,6 +505,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E120E4161D431E9B002DBC7E /* LaunchScreen.storyboard in Resources */,
+				015831411DB4D2F80049F16C /* GenericTableViewCell.xib in Resources */,
 				8E0852581D6DCCD7006E68FE /* blankScreeningForm.json in Resources */,
 				E120E4111D431E9B002DBC7E /* Main.storyboard in Resources */,
 				E1A4F0E11D66BE2000EE9BBB /* Assets.xcassets in Resources */,
@@ -664,6 +673,7 @@
 				01FC79F41D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m in Sources */,
 				E1A4F0DF1D66BC5A00EE9BBB /* LoginViewController.m in Sources */,
 				8E23D5541D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m in Sources */,
+				015831401DB4D2F80049F16C /* GenericTableViewCell.m in Sources */,
 				8EC56F871D60C16300938C2A /* ScreeningSectionTableViewController.m in Sources */,
 				01FC79F71D882BB3003D3AB6 /* SummaryReportViewController.m in Sources */,
 				01F154421D9A48D700D4B7D1 /* FollowUpEntity.m in Sources */,

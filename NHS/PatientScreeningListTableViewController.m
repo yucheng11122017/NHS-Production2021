@@ -11,8 +11,9 @@
 #import "SearchResultsTableController.h"
 #import "Reachability.h"
 #import "AppConstants.h"
-#import "MBProgressHUD.h"
+#import "SVProgressHUD.h"
 #import "ScreeningSectionTableViewController.h"
+#import "GenericTableViewCell.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
@@ -58,7 +59,6 @@ typedef enum residentDataSource {
     NSNumber *residentDataLocalOrServer;
     BOOL loadDataFlag;
     NetworkStatus status;
-    MBProgressHUD *hud;
     int fetchDataState;
     BOOL appTesting;
 }
@@ -234,11 +234,11 @@ typedef enum residentDataSource {
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    static NSString *simpleTableIdentifier = @"SimpleTableItem";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
+    GenericTableViewCell *cell = (GenericTableViewCell *)[tableView dequeueReusableCellWithIdentifier:@"GenericTableCell"];
+    if (cell == nil)
+    {
+        NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"GenericTableViewCell" owner:self options:nil];
+        cell = [nib objectAtIndex:0];
     }
     
     // Configure the cell...
@@ -248,8 +248,10 @@ typedef enum residentDataSource {
         if (indexPath.section == 0) {   //section for Drafts
             NSRange range = [[self.localSavedFilename objectAtIndex:indexPath.row] rangeOfString:@"_"];
             NSString *displayText = [[self.localSavedFilename objectAtIndex:indexPath.row] substringToIndex:(range.location)];
-            cell.textLabel.text = displayText;
-            cell.detailTextLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
+            cell.nameLabel.text = @"Draft";
+            cell.NRICLabel.text = displayText;
+            cell.dateLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
+//            cell.detailTextLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
             return cell;
         } else {
             sectionTitle = [residentSectionTitles objectAtIndex:(indexPath.section-1)];  //update sectionlist
@@ -259,21 +261,26 @@ typedef enum residentDataSource {
     }
     NSArray *residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
     NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
+    NSString *residentNric = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"nric"];
     NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"ts"];
-    cell.textLabel.text = residentName;
-    cell.detailTextLabel.text = lastUpdatedTS;
+    
+    cell.nameLabel.text = residentName;
+    cell.NRICLabel.text = residentNric;
+    cell.dateLabel.text = lastUpdatedTS;
     
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 60;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     NSDictionary *selectedResident = Nil;
 
-    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    
-    // Set the label text.
-    hud.label.text = NSLocalizedString(@"Loading...", @"HUD loading title");
+    [SVProgressHUD showWithStatus:@"Loading..."];
     
     if (tableView == self.tableView) {      //not in the searchResult view
         //check if user clicked on drafts first
@@ -392,8 +399,16 @@ typedef enum residentDataSource {
                                                       handler:^(UIAlertAction * action) {
                                                           [self performSegueWithIdentifier:@"SelectPreRegSegue" sender:self];
                                                       }]];
-    [self presentViewController:alertController animated:YES completion:nil];
+    [self presentViewController:alertController animated:YES completion:^{
+        UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
+        alertController.view.superview.userInteractionEnabled = YES;
+        [alertController.view.superview addGestureRecognizer:singleTap];    //tap elsewhere to close the alertView
+    }];
 
+}
+
+-(void)handleSingleTap:(UITapGestureRecognizer *)sender{
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - UISearchBarDelegate
@@ -609,21 +624,8 @@ typedef enum residentDataSource {
 - (void (^)(NSURLSessionDataTask *task, id responseObject))deleteSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         [self getAllScreeningResidents];
-        
-        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-        
-        // Set the custom view mode to show any view.
-        hud.mode = MBProgressHUDModeCustomView;
-        // Set an image view with a checkmark.
-        UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        hud.customView = [[UIImageView alloc] initWithImage:image];
-        // Looks a bit nicer if we make it square.
-        hud.square = YES;
-        // Optional label text.
-        hud.label.text = NSLocalizedString(@"Done", @"HUD done title");
-        
-        
-        [hud hideAnimated:YES afterDelay:1.f];
+
+        [SVProgressHUD showSuccessWithStatus:@"Entry Deleted!"];
         
     };
 }
@@ -689,7 +691,7 @@ typedef enum residentDataSource {
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
         NSLog(@"error: %@", errorString);
-        [hud hideAnimated:YES];     //stop showing the progressindicator
+        [SVProgressHUD dismiss];
         UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Download Fail", nil)
                                                                                   message:@"Download form failed!"
                                                                            preferredStyle:UIAlertControllerStyleAlert];
@@ -746,7 +748,7 @@ typedef enum residentDataSource {
 
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    [hud hideAnimated:YES];
+    [SVProgressHUD dismiss];
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentID:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setResidentID:)
                                               withObject:selectedResidentID];

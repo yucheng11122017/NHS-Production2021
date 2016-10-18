@@ -9,7 +9,7 @@
 #import "ScreeningFormViewController.h"
 #import "PreRegFormViewController.h"
 #import "ServerComm.h"
-#import "MBProgressHUD.h"
+#import "SVProgressHUD.h"
 #import "AppConstants.h"
 #import "ScreeningSectionTableViewController.h"
 #import "math.h"
@@ -3581,20 +3581,23 @@ NSString *const kDocName = @"doc_name";
             //        [alertController addAction:okAction];
             //        [alertController setModalPresentationStyle:UIModalPresentationPopover];
             //        [self presentViewController:alertController animated:YES completion:nil];
-            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+//            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+//            
+//            // Set the custom view mode to show any view.
+//            hud.mode = MBProgressHUDModeCustomView;
+//            // Set an image view with a checkmark.
+//            UIImage *image = [[UIImage imageNamed:@"ThumbsUp"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+//            hud.customView = [[UIImageView alloc] initWithImage:image];
+//            // Looks a bit nicer if we make it square.
+//            hud.square = YES;
+//            
+//            hud.backgroundColor = [UIColor clearColor];
+//            // Optional label text.
+//            hud.label.text = NSLocalizedString(@"Good!", @"HUD done title");
+//            [hud hideAnimated:YES afterDelay:1.f];
+            [SVProgressHUD setMinimumDismissTimeInterval:1.0f];
+            [SVProgressHUD showImage:[[UIImage imageNamed:@"ThumbsUp"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] status:@"Good!"];
             
-            // Set the custom view mode to show any view.
-            hud.mode = MBProgressHUDModeCustomView;
-            // Set an image view with a checkmark.
-            UIImage *image = [[UIImage imageNamed:@"ThumbsUp"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-            hud.customView = [[UIImageView alloc] initWithImage:image];
-            // Looks a bit nicer if we make it square.
-            hud.square = YES;
-            
-            hud.backgroundColor = [UIColor clearColor];
-            // Optional label text.
-            hud.label.text = NSLocalizedString(@"Good!", @"HUD done title");
-            [hud hideAnimated:YES afterDelay:1.f];
             
         }
         //    [self.tableView endEditing:YES];

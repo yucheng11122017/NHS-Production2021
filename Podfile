@@ -12,7 +12,7 @@ abstract_target 'CocoaPods' do
   pod 'RNCryptor', '~> 2.2'
   pod 'XLForm', :git => 'https://github.com/xmartlabs/XLForm.git'
   pod 'MBProgressHUD', '~> 1.0.0'
-  pod 'SVProgressHUD', '~> 2.0'
+  pod 'SVProgressHUD', :git => 'https://github.com/SVProgressHUD/SVProgressHUD.git', :commit => '1871e8e12740f5fc672cb03f314737ab4ff319bc'
   pod 'HTPressableButton', '~> 1.3'
   pod 'LiquidFloatingActionButton', '~> 1.2'
 

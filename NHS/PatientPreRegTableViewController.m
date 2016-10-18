@@ -13,8 +13,8 @@
 #import "SearchResultsTableController.h"
 #import "Reachability.h"
 #import "AppConstants.h"
-#import "MBProgressHUD.h"
-
+#import "SVProgressHUD.h"
+#import "GenericTableViewCell.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
@@ -52,7 +52,6 @@ typedef enum getDataState {
     NSNumber *residentDataLocalOrServer;
     BOOL loadDataFlag;
     NetworkStatus status;
-    MBProgressHUD *hud;
     int fetchDataState;
     BOOL appTesting;
 }
@@ -249,13 +248,15 @@ typedef enum getDataState {
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    static NSString *simpleTableIdentifier = @"SimpleTableItem";
 
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
+    GenericTableViewCell *cell = (GenericTableViewCell *)[tableView dequeueReusableCellWithIdentifier:@"GenericTableCell"];
+    if (cell == nil)
+    {
+        NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"GenericTableViewCell" owner:self options:nil];
+        cell = [nib objectAtIndex:0];
     }
+    
+
     
     // Configure the cell...
     NSString *sectionTitle;
@@ -264,8 +265,12 @@ typedef enum getDataState {
         if (indexPath.section == 0) {   //section for Drafts
             NSRange range = [[self.localSavedFilename objectAtIndex:indexPath.row] rangeOfString:@"_"];
             NSString *displayText = [[self.localSavedFilename objectAtIndex:indexPath.row] substringToIndex:(range.location)];
-            cell.textLabel.text = displayText;
-            cell.detailTextLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
+            
+            cell.nameLabel.text = @"Draft";
+            cell.dateLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
+            cell.NRICLabel.text = displayText;
+//            cell.textLabel.text = displayText;
+//            cell.detailTextLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
             return cell;
         } else {
             sectionTitle = [residentSectionTitles objectAtIndex:(indexPath.section-1)];  //update sectionlist
@@ -275,15 +280,25 @@ typedef enum getDataState {
     }
     NSArray *residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
     NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
+    NSString *residentNric =  [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"nric"];
     NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"last_updated_ts"];
-    cell.textLabel.text = residentName;
-    cell.detailTextLabel.text = lastUpdatedTS;
     
+    cell.nameLabel.text = residentName;
+    cell.dateLabel.text = lastUpdatedTS;
+    cell.NRICLabel.text = residentNric;
+
     return cell;
+
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 60;
+}
+
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
+    [SVProgressHUD dismiss];
 //    NSString *selectedResidentName;
     NSDictionary *selectedResident;
     
@@ -312,9 +327,7 @@ typedef enum getDataState {
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
     }
     //Show Progress Indicator
-    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    hud.backgroundView.style = MBProgressHUDBackgroundStyleSolidColor;
-    hud.backgroundView.color = [UIColor colorWithWhite:0.f alpha:0.1f];
+    [SVProgressHUD show];
     
     
     [self getAllDataForOneResident];
@@ -380,6 +393,7 @@ typedef enum getDataState {
 #pragma mark - Buttons
 
 - (IBAction)addBtnPressed:(id)sender {
+    [SVProgressHUD dismiss];
     [self.refreshControl endRefreshing];    //stop refreshing
     loadDataFlag = NO;
     [self performSegueWithIdentifier:@"preRegPatientListToPatientFormSegue" sender:self];
@@ -398,21 +412,23 @@ typedef enum getDataState {
     return ^(NSURLSessionDataTask *task, id responseObject){
         [self getAllResidents];
         
-        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-        
-        // Set the custom view mode to show any view.
-        hud.mode = MBProgressHUDModeCustomView;
-        // Set an image view with a checkmark.
-        UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        hud.customView = [[UIImageView alloc] initWithImage:image];
-        // Looks a bit nicer if we make it square.
-        hud.square = YES;
-        // Optional label text.
-        hud.label.text = NSLocalizedString(@"Done", @"HUD done title");
-        
-        
-        [hud hideAnimated:YES afterDelay:1.f];
-        
+//        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+//        
+//        // Set the custom view mode to show any view.
+//        hud.mode = MBProgressHUDModeCustomView;
+//        // Set an image view with a checkmark.
+//        UIImage *image = [[UIImage imageNamed:@"Checkmark"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+//        hud.customView = [[UIImageView alloc] initWithImage:image];
+//        // Looks a bit nicer if we make it square.
+//        hud.square = YES;
+//        // Optional label text.
+//        hud.label.text = NSLocalizedString(@"Done", @"HUD done title");
+//        
+//        
+//        [hud hideAnimated:YES afterDelay:1.f];
+        [SVProgressHUD setMinimumDismissTimeInterval:2.0f];
+        [SVProgressHUD showSuccessWithStatus:@"Entry deleted!"];
+//        
     };
 }
 
@@ -446,6 +462,7 @@ typedef enum getDataState {
 - (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
         NSLog(@"Patients data fetch was unsuccessful!");
+        [SVProgressHUD showErrorWithStatus:@"Fetch unsuccessful!"];
         fetchDataState = failed;
         [self.tableView reloadData];
     };
@@ -469,7 +486,7 @@ typedef enum getDataState {
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
         NSLog(@"error: %@", errorString);
-        [hud hideAnimated:YES];     //stop showing the progressindicator
+        [SVProgressHUD dismiss];
         UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Download Fail", nil)
                                                                                   message:@"Download form failed!"
                                                                            preferredStyle:UIAlertControllerStyleAlert];
@@ -631,49 +648,6 @@ typedef enum getDataState {
     [tableController.tableView reloadData];
 }
 
-//#pragma mark - Util methods
-
-//- (NSMutableArray *)createPatients:(NSArray *)patients {
-//    NSMutableArray *patObjs = [[NSMutableArray alloc] init];
-//    for (id patient in patients) {
-//        [patObjs addObject:[self createPatient:patient]];
-//    }
-//    return patObjs;
-//}
-
-//- (NSArray *) createPatient: (NSDictionary *) patient {
-//    NSNumber *birth_year = [patient objectForKey:@"birth_year"];
-//    NSString *gender = [patient objectForKey:@"gender"];
-//    NSString *nric = [patient objectForKey:@"nric"];
-//    NSNumber *resident_id = [patient objectForKey:@"resident_id"];
-//    NSString *resident_name = [patient objectForKey:@"resident_name"];
-//
-//    return @""; //keep it this way first..
-//}
-//
-//- (Patient *)createPatient:(NSDictionary *)patient {
-//    NSString *name = [patient objectForKey:@"name"];
-//    NSInteger ID = [[patient objectForKey:@"id"] integerValue];
-//    NSString *homeType = [patient objectForKey:@"home"];
-//    NSInteger age = [[patient objectForKey:@"age"] integerValue];
-//    NSInteger height = [[patient objectForKey:@"height"] integerValue];
-//    NSInteger level = [[patient objectForKey:@"level"] integerValue];
-//    BOOL hasCaretaker;
-//    if ([patient objectForKey:@"available"] != [NSNull null]) {
-//        hasCaretaker = [[patient objectForKey:@"available"] boolValue];
-//    } else {
-//        hasCaretaker = NO;
-//    }
-//    
-//    return [[Patient alloc] initWithName:name
-//                                     age:(int)age
-//                                      ID:ID
-//                                  height:(int)height
-//                                   level:(int)level
-//                                homeType:hfomeType
-//                            hasCaretaker:hasCaretaker];
-//}
-
 #pragma  mark - Patient sorting-related methods
 
 - (void)refreshTable:(NSNotification *) notification{
@@ -786,7 +760,8 @@ typedef enum getDataState {
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     
-    [hud hideAnimated:YES];
+//    [hud hideAnimated:YES];
+    [SVProgressHUD dismiss];
     if ([segue.identifier isEqualToString:@"preRegPatientListToPatientDataSegue"]) {    //view submitted form
         
         [segue.destinationViewController performSelector:@selector(setResidentDictionary:)

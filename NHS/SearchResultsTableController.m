@@ -7,6 +7,7 @@
 //
 
 #import "SearchResultsTableController.h"
+#import "GenericTableViewCell.h"
 
 @interface SearchResultsTableController ()
 
@@ -26,12 +27,12 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *simpleTableIdentifier = @"SimpleTableItem";
     
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
+    GenericTableViewCell *cell = (GenericTableViewCell *)[tableView dequeueReusableCellWithIdentifier:@"GenericTableCell"];
+    if (cell == nil)
+    {
+        NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"GenericTableViewCell" owner:self options:nil];
+        cell = [nib objectAtIndex:0];
     }
     NSDictionary *patientDetails = [[NSDictionary alloc] initWithDictionary:self.filteredProducts[indexPath.row]];
     [self configureCell:cell forProduct:patientDetails];
@@ -39,9 +40,10 @@
     return cell;
 }
 
-- (void)configureCell:(UITableViewCell *)cell forProduct:(NSDictionary *)patientDetails {
-    cell.textLabel.text = [patientDetails objectForKey:@"resident_name"];
-    cell.detailTextLabel.text = [patientDetails objectForKey:@"nric"];
+- (void)configureCell:(GenericTableViewCell *)cell forProduct:(NSDictionary *)patientDetails {
+    cell.nameLabel.text = [patientDetails objectForKey:@"resident_name"];
+    cell.NRICLabel.text = [patientDetails objectForKey:@"nric"];
+    cell.dateLabel.text = [patientDetails objectForKey:@"last_updated_ts"];
     
     // build the price and year string
     // use NSNumberFormatter to get the currency format out of this NSNumber (product.introPrice)

@@ -236,4 +236,10 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                  andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
+#pragma mark Social Work
+- (void) postSocialWorkFollowUpWithDict: (NSDictionary *) dictionary
+                          progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                           successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                           andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
 @end

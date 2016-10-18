@@ -13,7 +13,8 @@
 #import "SearchResultsTableController.h"
 #import "Reachability.h"
 #import "AppConstants.h"
-#import "MBProgressHUD.h"
+#import "SVProgressHUD.h"
+#import "GenericTableViewCell.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
@@ -26,7 +27,8 @@ typedef enum getDataState {
 
 typedef enum typeOfFollowUp {
     houseVisit,
-    phoneCall
+    phoneCall,
+    socialWork
 } typeOfFollowUp;
 
 @interface FollowUpListTableViewController ()  <UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating>
@@ -58,7 +60,6 @@ typedef enum typeOfFollowUp {
     NSNumber *residentDataLocalOrServer;
     BOOL loadDataFlag;
     NetworkStatus status;
-    MBProgressHUD *hud;
     int fetchDataState;
     NSDictionary *residentParticulars;
     NSNumber *followUpType;
@@ -197,11 +198,11 @@ typedef enum typeOfFollowUp {
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    static NSString *simpleTableIdentifier = @"SimpleTableItem";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
+    GenericTableViewCell *cell = (GenericTableViewCell *)[tableView dequeueReusableCellWithIdentifier:@"GenericTableCell"];
+    if (cell == nil)
+    {
+        NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"GenericTableViewCell" owner:self options:nil];
+        cell = [nib objectAtIndex:0];
     }
     
     // Configure the cell...
@@ -211,23 +212,27 @@ typedef enum typeOfFollowUp {
     
     NSArray *residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
     NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
+    NSString *residentNric = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"nric"];
     NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"ts"];
     if (residentName != (id)[NSNull null]) {
-        cell.textLabel.text = residentName;
+        cell.nameLabel.text = residentName;
+        cell.NRICLabel.text = residentNric;
     }
-    cell.detailTextLabel.text = lastUpdatedTS;
+    cell.dateLabel.text = lastUpdatedTS;
     
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 60;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     NSDictionary *selectedResident = Nil;
     
-    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    
-    // Set the label text.
-    hud.label.text = NSLocalizedString(@"Loading...", @"HUD loading title");
+    [SVProgressHUD showWithStatus:@"Loading..."];
     
     if (tableView == self.tableView) {      //not in the searchResult view
         
@@ -323,6 +328,14 @@ typedef enum typeOfFollowUp {
                                                           followUpType = [NSNumber numberWithInt:houseVisit];
                                                           [self performSegueWithIdentifier:@"FollowUpListToSelectResidentSegue" sender:self];
                                                       }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Social Work", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * action) {
+                                                          followUpType = [NSNumber numberWithInt:socialWork];
+                                                          [self performSegueWithIdentifier:@"FollowUpListToSelectResidentSegue" sender:self];
+                                                      }]];
+    
+    
     [self presentViewController:alertController animated:YES completion:^{
         UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
         alertController.view.superview.userInteractionEnabled = YES;
@@ -555,7 +568,7 @@ typedef enum typeOfFollowUp {
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSingleResidentDataSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
-        [hud hideAnimated:YES];
+        [SVProgressHUD dismiss];
         self.retrievedResidentData = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
 //        NSLog(@"%@", self.retrievedResidentData);
         [self performSegueWithIdentifier:@"FollowUpListToResidentHistorySegue" sender:self];
@@ -587,7 +600,7 @@ typedef enum typeOfFollowUp {
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
         NSLog(@"error: %@", errorString);
-        [hud hideAnimated:YES];     //stop showing the progressindicator
+        [SVProgressHUD dismiss];
         UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Download Fail", nil)
                                                                                   message:@"Download form failed!"
                                                                            preferredStyle:UIAlertControllerStyleAlert];
@@ -643,7 +656,8 @@ typedef enum typeOfFollowUp {
 
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    [hud hideAnimated:YES];
+    
+    [SVProgressHUD dismiss];
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentParticulars:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setResidentParticulars:)
                                               withObject:residentParticulars];

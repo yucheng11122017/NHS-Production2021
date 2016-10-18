@@ -8,7 +8,7 @@
 
 #import "BTFormViewController.h"
 #import "ServerComm.h"
-#import "MBProgressHUD.h"
+#import "SVProgressHUD.h"
 
 //XLForms stuffs
 #import "XLForm.h"
@@ -23,7 +23,7 @@ NSString *const kFit = @"fit";
 
 
 @interface BTFormViewController () {
-    MBProgressHUD *hud;
+
 }
 
 @property (strong, nonatomic) NSMutableArray *bloodTestForm;
@@ -161,11 +161,7 @@ NSString *const kFit = @"fit";
         //        return;
         //    }
         [self.tableView endEditing:YES];
-        hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-        
-        // Set the label text.
-        hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
-        [self submitBloodTestResult:[self prepareBloodTestDict]];
+        [SVProgressHUD showWithStatus:@"Uploading..."];
         
         [button setTitle:@"Edit"];
     }
@@ -195,10 +191,7 @@ NSString *const kFit = @"fit";
     }
 
     [self.tableView endEditing:YES];
-    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    
-    // Set the label text.
-    hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
+    [SVProgressHUD showWithStatus:@"Uploading..."];
     [self submitBloodTestResult:[self prepareBloodTestDict]];
 }
 
@@ -228,7 +221,7 @@ NSString *const kFit = @"fit";
         
         NSLog(@"SUBMISSION SUCCESSFUL!!");
         dispatch_async(dispatch_get_main_queue(), ^{
-            [hud hideAnimated:YES];
+            [SVProgressHUD dismiss];
         });
         
         UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
@@ -253,7 +246,7 @@ NSString *const kFit = @"fit";
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
         
-        [hud hideAnimated:YES];     //stop showing the progressindicator
+        [SVProgressHUD dismiss];
         UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
                                                                                   message:@"Form failed to upload!"
                                                                            preferredStyle:UIAlertControllerStyleAlert];
