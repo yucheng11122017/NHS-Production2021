@@ -38,6 +38,7 @@ typedef enum typeOfFollowUp {
 @property (strong, nonatomic) NSMutableDictionary* bloodTestResult;
 @property (strong, nonatomic) NSArray* arrayOfCallHistory;
 @property (strong, nonatomic) NSArray* arrayOfHouseVisitHistory;
+@property (strong, nonatomic) NSArray* arrayOfSocialWorkHistory;
 @property (nonatomic, strong) NSMutableArray *followUpEntitySections; // 2d array
 @property (nonatomic, copy) NSArray *prototypeEntities;
 
@@ -99,8 +100,9 @@ typedef enum typeOfFollowUp {
         
         self.arrayOfCallHistory = [[NSArray alloc] initWithArray:[self.completeFollowUpHistory objectForKey:@"Calls"]];
         self.arrayOfHouseVisitHistory = [[NSArray alloc] initWithArray:[self.completeFollowUpHistory objectForKey:@"houseVisits"]];
+        self.arrayOfSocialWorkHistory = [[NSArray alloc] initWithArray:[self.completeFollowUpHistory objectForKey:@"socialWorkFollowUp"]];
         
-        followUpArray = [[self.arrayOfCallHistory arrayByAddingObjectsFromArray:self.arrayOfHouseVisitHistory] mutableCopy];
+        followUpArray = [[[self.arrayOfCallHistory arrayByAddingObjectsFromArray:self.arrayOfHouseVisitHistory] arrayByAddingObjectsFromArray:self.arrayOfSocialWorkHistory] mutableCopy];  //merge all the arrays together
         NSArray *historyArray = [self prepareArrayForHistoryTable:followUpArray];
         NSMutableArray *entities = @[].mutableCopy;
         

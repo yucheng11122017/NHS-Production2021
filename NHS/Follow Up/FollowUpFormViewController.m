@@ -636,7 +636,7 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client postSocialWorkFollowUpWithDict:dict
                              progressBlock:[self progressBlock]
-                              successBlock:[self callerInfoSuccessBlock]
+                              successBlock:[self socialWorkSuccessBlock]
                               andFailBlock:[self errorBlock]];
 }
 
@@ -657,6 +657,37 @@ NSString *const kFollowUpInfo = @"follow_up_info";
                            progressBlock:[self progressBlock]
                             successBlock:[self callMgmtPlanSuccessBlock]
                             andFailBlock:[self errorBlock]];
+        
+    };
+}
+
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject)) socialWorkSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"%@", responseObject);
+        
+        NSLog(@"SUBMISSION SUCCESSFUL!!");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD dismiss];
+        });
+        
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
+                                                                                  message:@"Form uploaded successfully!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshFollowUpListTable"
+                                                                                                                  object:nil
+                                                                                                                userInfo:nil];
+                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshFollowUpHistoryTable"
+                                                                                                                  object:nil
+                                                                                                                userInfo:nil];
+                                                              [self.navigationController popViewControllerAnimated:YES];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+
         
     };
 }
