@@ -257,6 +257,14 @@ typedef enum getDataState {
     
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (tableView != self.tableView) {  //part of the search
+        return 60;
+    }
+    return 44;
+}
+
 
 
 /*
