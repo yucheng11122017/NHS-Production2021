@@ -451,53 +451,65 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaseRanking rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Case Ranking"];
     row.noValueDisplayText = @"Tap here";
+    int caseRankingIndex = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kCaseRanking] intValue] : 0;
+    
+    if (caseRankingIndex > 0) {
+        switch (caseRankingIndex) {
+            case 1: row.value = @"Immediate"; break;
+            case 2: row.value = @"R1"; break;
+            case 3: row.value = @"R1.5"; break;
+            case 4: row.value = @"R2"; break;
+            case 5: row.value = @"R3"; break;
+        }
+    }
     row.selectorOptions = @[@"Immediate", @"R1", @"R1.5", @"R2", @"R3"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDoneBy rowType:XLFormRowDescriptorTypeName title:@"Done by"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    row.value = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kDoneBy] : @"";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpDate rowType:XLFormRowDescriptorTypeDate title:@"Follow up date"];
     row.required = YES;
     row.value = [NSDate dateWithTimeIntervalSinceNow:0];
-//        if ([_viewForm isEqualToNumber:@1]) {
-//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-//    
-//            dateFormatter.dateFormat = @"yyyy-MM-dd hh:mm:ss";
-//            NSDate *oneDayBehind = [dateFormatter dateFromString:[[self.downloadedForm objectForKey:@"calls_caller"] objectForKey:@"call_time"]];
-//            NSDate *correctDate = [NSDate dateWithTimeInterval:60*60*8 sinceDate:oneDayBehind];
-//            if ([self.downloadedForm objectForKey:@"calls_caller"]!= (id)[NSNull null]) {
-//                row.value = correctDate;
-//            }
-//        }
+        if ([_viewForm isEqualToNumber:@1]) {
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    
+            dateFormatter.dateFormat = @"yyyy-MM-dd";
+            NSDate *oneDayBehind = [dateFormatter dateFromString:[[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kFollowUpDate]];
+            NSDate *correctDate = [NSDate dateWithTimeInterval:60*60*8 sinceDate:oneDayBehind];
+            if ([self.downloadedForm objectForKey:@"social_wk_followup"]!= (id)[NSNull null]) {
+                row.value = correctDate;
+            }
+        }
     [section addFormRow:row];
     
     XLFormRowDescriptor *followUpTypeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpType rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Type of follow up"];
     followUpTypeRow.noValueDisplayText = @"Tap here";
     followUpTypeRow.selectorOptions = @[@"Phone Call", @"Home Visit", @"Organisation"];
+    
+    int followUpTypeIndex = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kFollowUpType] intValue] : 0;
+    
+    if (followUpTypeIndex > 0) {
+        switch (followUpTypeIndex) {
+            case 1: followUpTypeRow.value = @"Phone Call"; break;
+            case 2: followUpTypeRow.value = @"Home Visit"; break;
+            case 3: followUpTypeRow.value = @"Organisation"; break;
+        }
+    }
+    
     [section addFormRow:followUpTypeRow];
     
     XLFormRowDescriptor *nameOfOrgRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpTypeOrg rowType:XLFormRowDescriptorTypeName title:@"Name of Organisation"];
-    nameOfOrgRow.value = @"";
+    nameOfOrgRow.value = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kFollowUpTypeOrg] : @"";
     [nameOfOrgRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     nameOfOrgRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Organisation'", followUpTypeRow];
     [section addFormRow:nameOfOrgRow];
     
-//    followUpTypeRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if (oldValue != newValue) {
-//            if (newValue != (id)[NSNull null]) {
-//                if ([newValue isEqualToString:@"Organisation"]) {
-//                    nameOfOrgRow.hidden = @(0);
-//                } else {
-//                    nameOfOrgRow.hidden = @(1);
-//                }
-//            }
-//        }
-//    };
-    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kIssues rowType:XLFormRowDescriptorTypeText title:@"Presenting issues"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    row.value = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kIssues] : @"";
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -509,12 +521,14 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaseStatusInfo rowType:XLFormRowDescriptorTypeTextView title:@""];
     [row.cellConfigAtConfigure setObject:@"Type here" forKey:@"textView.placeholder"];
+    row.value = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kCaseStatusInfo] : @"";
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [self.formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpInfo rowType:XLFormRowDescriptorTypeText title:@"Follow up to be done"];
+    row.value = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kFollowUpInfo] : @"";
     [section addFormRow:row];
     
     return [super initWithForm:self.formDescriptor];

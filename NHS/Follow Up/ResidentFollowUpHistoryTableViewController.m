@@ -24,7 +24,8 @@ typedef enum getDataState {
 
 typedef enum typeOfFollowUp {
     houseVisit,
-    phoneCall
+    phoneCall,
+    socialWork
 } typeOfFollowUp;
 
 @interface ResidentFollowUpHistoryTableViewController () {
@@ -242,8 +243,10 @@ typedef enum typeOfFollowUp {
         formToView = [[NSMutableDictionary alloc] initWithDictionary:[followUpArray objectAtIndex:[entity.index intValue]]];
         if ([entity.title isEqualToString:@"Phone Call"]) {
             followUpType = [NSNumber numberWithInt:phoneCall];
-        } else {
+        } else if ([entity.title isEqualToString:@"House Visit"]) {
             followUpType = [NSNumber numberWithInt:houseVisit];
+        } else {
+            followUpType = [NSNumber numberWithInt:socialWork];
         }
         [tableView deselectRowAtIndexPath:indexPath animated:NO];
     }
@@ -410,7 +413,13 @@ typedef enum typeOfFollowUp {
                                                       handler:^(UIAlertAction * action) {
                                                           followUpType = [NSNumber numberWithInt:houseVisit];
                                                           [self getAllScreeningData];
-                                                          [self performSegueWithIdentifier:@"NewFollowUpFormSegue" sender:self];
+                                                      }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Social Work", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * action) {
+                                                          followUpType = [NSNumber numberWithInt:socialWork];
+                                                          [self getAllScreeningData];
+//                                                          [self performSegueWithIdentifier:@"NewFollowUpFormSegue" sender:self];
                                                       }]];
     [self presentViewController:alertController animated:YES completion:nil];
     
