@@ -162,6 +162,7 @@ NSString *const kFit = @"fit";
         //    }
         [self.tableView endEditing:YES];
         [SVProgressHUD showWithStatus:@"Uploading..."];
+        [self submitBloodTestResult:[self prepareBloodTestDict]];
         
         [button setTitle:@"Edit"];
     }

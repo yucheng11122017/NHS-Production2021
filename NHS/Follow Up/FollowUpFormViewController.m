@@ -85,6 +85,7 @@ NSString *const kFollowUpInfo = @"follow_up_info";
 
 @interface FollowUpFormViewController () {
     int success_count;
+    NSNumber *form_id;
 }
 
 @property (strong, nonatomic) XLFormDescriptor * formDescriptor;
@@ -106,6 +107,15 @@ NSString *const kFollowUpInfo = @"follow_up_info";
         NSLog(@"%@", [form class]);
     }
     if ([_viewForm isEqualToNumber:@1]) {
+        
+        if ([self.typeOfFollowUp isEqualToNumber:[NSNumber numberWithInt:houseVisit]]) {
+            form_id = [[self.downloadedForm objectForKey:@"house_cbg"] objectForKey:@"visit_id"];
+        } else if ([self.typeOfFollowUp isEqualToNumber:[NSNumber numberWithInt:phoneCall]]){
+            form_id = [[self.downloadedForm objectForKey:@"calls_caller"] objectForKey:@"call_id"];
+        } else {
+            form_id = [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:@"social_wk_followup_id"];
+        }
+        
         [self.form setDisabled:YES];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone
                                                                                  target:self
@@ -328,10 +338,12 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     
     row =[XLFormRowDescriptor formRowDescriptorWithTag:kMedIssues rowType:XLFormRowDescriptorTypeTextView title:@"Medical Issues"];
     row.value = [house_med_soc objectForKey:kMedIssues]? [house_med_soc objectForKey:kMedIssues]:@"";
+    row.height = 200;
     [section addFormRow:row];
     
     row =[XLFormRowDescriptor formRowDescriptorWithTag:kSocialIssues rowType:XLFormRowDescriptorTypeTextView title:@"Social Issues"];
     row.value = [house_med_soc objectForKey:kSocialIssues]? [house_med_soc objectForKey:kSocialIssues]:@"";
+    row.height = 200;
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Post Home Visit Management Plan"];
@@ -345,7 +357,8 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFUDocNotes
                                                 rowType:XLFormRowDescriptorTypeTextView];
     [row.cellConfigAtConfigure setObject:@"Doctor's notes" forKey:@"textView.placeholder"];
-    row.value = [house_mgmt_plan objectForKey:kFUDocNotes]? [house_mgmt_plan objectForKey:kFUDocNotes]:@"";
+    row.value = [self getValueFromDictionary:house_mgmt_plan withKey:kFUDocNotes];
+    row.height = 200;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFUDocName rowType:XLFormRowDescriptorTypeName title:@"Name of Doctor"];
@@ -396,7 +409,7 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCallerName rowType:XLFormRowDescriptorTypeName title:@"Name of Caller *"];
     row.required = YES;
-    row.value = [self.downloadedForm objectForKey:@"calls_caller"]? [[self.downloadedForm objectForKey:@"calls_caller"] objectForKey:kCallerName] : @"";
+    row.value = [self getValueFromDictionary:self.downloadedForm withFirstKey:@"calls_caller" andSecondKey:kCallerName];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
@@ -424,8 +437,9 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNotes
                                                 rowType:XLFormRowDescriptorTypeTextView];
     if ([self.downloadedForm objectForKey:@"calls_mgmt_plan"] != (id) [NSNull null]) {
-        row.value = [self.downloadedForm objectForKey:@"calls_mgmt_plan"]? [[self.downloadedForm objectForKey:@"calls_mgmt_plan"] objectForKey:kNotes] : @"";
+        row.value = [self getValueFromDictionary:self.downloadedForm withFirstKey:@"calls_mgmt_plan" andSecondKey:kNotes];
     }
+    row.height = 200;
     [row.cellConfigAtConfigure setObject:@"Notes" forKey:@"textView.placeholder"];
     [section addFormRow:row];
     
@@ -467,7 +481,7 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDoneBy rowType:XLFormRowDescriptorTypeName title:@"Done by"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    row.value = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kDoneBy] : @"";
+    row.value = [self getValueFromDictionary:self.downloadedForm withFirstKey:@"social_wk_followup" andSecondKey:kDoneBy];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpDate rowType:XLFormRowDescriptorTypeDate title:@"Follow up date"];
@@ -502,33 +516,34 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     [section addFormRow:followUpTypeRow];
     
     XLFormRowDescriptor *nameOfOrgRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpTypeOrg rowType:XLFormRowDescriptorTypeName title:@"Name of Organisation"];
-    nameOfOrgRow.value = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kFollowUpTypeOrg] : @"";
+    nameOfOrgRow.value = [self getValueFromDictionary:self.downloadedForm withFirstKey:@"social_wk_followup" andSecondKey:kFollowUpTypeOrg];
     [nameOfOrgRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     nameOfOrgRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Organisation'", followUpTypeRow];
     [section addFormRow:nameOfOrgRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kIssues rowType:XLFormRowDescriptorTypeText title:@"Presenting issues"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    row.value = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kIssues] : @"";
+    row.value = [self getValueFromDictionary:self.downloadedForm withFirstKey:@"social_wk_followup" andSecondKey:kIssues];
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [self.formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"Q1" rowType:XLFormRowDescriptorTypeInfo title:@"Case status & information discussed"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"Q1" rowType:XLFormRowDescriptorTypeInfo title:@"Case status & information discussed:"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaseStatusInfo rowType:XLFormRowDescriptorTypeTextView title:@""];
     [row.cellConfigAtConfigure setObject:@"Type here" forKey:@"textView.placeholder"];
-    row.value = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kCaseStatusInfo] : @"";
+    row.height = 200;
+    row.value = [self getValueFromDictionary:self.downloadedForm withFirstKey:@"social_wk_followup" andSecondKey:kCaseStatusInfo];
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [self.formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpInfo rowType:XLFormRowDescriptorTypeText title:@"Follow up to be done"];
-    row.value = [self.downloadedForm objectForKey:@"social_wk_followup"]? [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:kFollowUpInfo] : @"";
+    row.value = [self getValueFromDictionary:self.downloadedForm withFirstKey:@"social_wk_followup" andSecondKey:kFollowUpInfo];
     [section addFormRow:row];
     
     return [super initWithForm:self.formDescriptor];
@@ -627,6 +642,14 @@ NSString *const kFollowUpInfo = @"follow_up_info";
 - (void) submitHouseVisitForm {
     
     NSDictionary *dict = [self prepareVolunteerInfoDict];
+    if ([_viewForm isEqualToNumber:@1]) {
+        NSMutableDictionary *mutDict = [dict mutableCopy];
+        [mutDict setObject:form_id forKey:@"visit_id"];
+        dict = mutDict; //add visit_id into the form
+        NSLog(@"Attempt to update entry!\n%@",dict);
+    }
+    
+    
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client postVolunteerInfoWithDict:dict
                         progressBlock:[self progressBlock]
@@ -637,6 +660,13 @@ NSString *const kFollowUpInfo = @"follow_up_info";
 - (void) submitPhoneCallForm {
     NSDictionary *dict = [self prepareCallerInfoDict];
     
+    if ([_viewForm isEqualToNumber:@1]) {
+        NSMutableDictionary *mutDict = [dict mutableCopy];
+        [mutDict setObject:form_id forKey:@"call_id"];
+        dict = mutDict; //add visit_id into the form
+        NSLog(@"Attempt to update entry!\n%@",dict);
+    }
+    
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client postCallerInfoWithDict:dict
                      progressBlock:[self progressBlock]
@@ -646,6 +676,13 @@ NSString *const kFollowUpInfo = @"follow_up_info";
 
 - (void) submitSocialWorkForm {
     NSDictionary *dict = [self prepareSocialWorkDict];
+    
+    if ([_viewForm isEqualToNumber:@1]) {
+        NSMutableDictionary *mutDict = [dict mutableCopy];
+        [mutDict setObject:form_id forKey:@"social_wk_followup_id"];
+        dict = mutDict; //add visit_id into the form
+        NSLog(@"Attempt to update entry!\n%@",dict);
+    }
     
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client postSocialWorkFollowUpWithDict:dict
@@ -791,6 +828,9 @@ NSString *const kFollowUpInfo = @"follow_up_info";
                                                                 style:UIAlertActionStyleDefault
                                                               handler:^(UIAlertAction * okAction) {
                                                                   [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshFollowUpListTable"
+                                                                                                                      object:nil
+                                                                                                                    userInfo:nil];
+                                                                  [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshFollowUpHistoryTable"
                                                                                                                       object:nil
                                                                                                                     userInfo:nil];
                                                                   [self.navigationController popViewControllerAnimated:YES];
@@ -1010,6 +1050,25 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     
     return [[localDateTime description] stringByReplacingOccurrencesOfString:@" +0000" withString:@""];
 
+}
+
+- (NSString *) getValueFromDictionary: (NSDictionary *) dict withKey: (NSString *) Key{
+    
+    if ([dict objectForKey:Key] != (id) [NSNull null]) {
+        return [dict objectForKey:Key];
+    }
+    return @"";
+}
+
+- (NSString *) getValueFromDictionary: (NSDictionary *) dict withFirstKey: (NSString *) firstKey andSecondKey: (NSString *) secondKey {
+    
+    if ([dict objectForKey:firstKey] != (id) [NSNull null]) {
+        if ([[dict objectForKey:firstKey] objectForKey:secondKey] != (id) [NSNull null]) {
+            return [[dict objectForKey:firstKey] objectForKey:secondKey];
+            
+        }
+    }
+    return @"";
 }
 
 

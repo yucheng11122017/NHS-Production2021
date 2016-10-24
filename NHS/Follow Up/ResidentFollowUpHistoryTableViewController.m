@@ -140,10 +140,8 @@ typedef enum typeOfFollowUp {
             ];
         } else if ([combinedArray[i] objectForKey:@"house_volunteer"]) {    //house visit
             
-            NSString *doc_notes = @"";
-            if ([combinedArray[i] objectForKey:@"house_mgmt_plan"]!= (id) [NSNull null]) {
-                doc_notes = [combinedArray[i] objectForKey:@"house_mgmt_plan"]? [[combinedArray[i] objectForKey:@"house_mgmt_plan"] objectForKey:@"doc_notes"]: @"";
-            }
+            NSString *doc_notes = [self getValueFromDictionary:combinedArray[i] withFirstKey:@"house_mgmt_plan" andSecondKey:@"doc_notes"];
+
             [tempArray addObject:@{
                                    @"content": doc_notes,
                                    @"imageName": @"House",
@@ -421,8 +419,29 @@ typedef enum typeOfFollowUp {
                                                           [self getAllScreeningData];
 //                                                          [self performSegueWithIdentifier:@"NewFollowUpFormSegue" sender:self];
                                                       }]];
-    [self presentViewController:alertController animated:YES completion:nil];
     
+    [self presentViewController:alertController animated:YES completion:^{
+        UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
+        alertController.view.superview.userInteractionEnabled = YES;
+        [alertController.view.superview addGestureRecognizer:singleTap];    //tap elsewhere to close the alertView
+    }];
+    
+}
+
+-(void)handleSingleTap:(UITapGestureRecognizer *)sender{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+#pragma mark - Methods
+- (NSString *) getValueFromDictionary: (NSDictionary *) dict withFirstKey: (NSString *) firstKey andSecondKey: (NSString *) secondKey {
+    
+    if ([dict objectForKey:firstKey] != (id) [NSNull null]) {
+        if ([[dict objectForKey:firstKey] objectForKey:secondKey] != (id) [NSNull null]) {
+            return [[dict objectForKey:firstKey] objectForKey:secondKey];
+            
+        }
+    }
+    return @"";
 }
 
 /*
