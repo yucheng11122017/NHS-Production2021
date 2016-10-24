@@ -311,7 +311,9 @@ typedef enum typeOfFollowUp {
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))downloadBloodTestResultSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
-        if (self.bloodTestResult) { //only if bloodtestresult is not nil
+        NSLog(@"%@", responseObject);
+        
+        if ([responseObject count] > 0) { //only if bloodtestresult is not nil
             self.bloodTestResult = [[NSMutableDictionary alloc] initWithDictionary:[responseObject objectAtIndex:0]];
             if ([self.retrievedScreeningData allKeys] != 0) {   //depending on which one successfully retrieve data from server first
                 [self performSegueWithIdentifier:@"LoadReportSummarySegue" sender:self];
@@ -345,6 +347,7 @@ typedef enum typeOfFollowUp {
 - (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
         NSLog(@"Patients data fetch was unsuccessful!");
+        [SVProgressHUD dismiss];
         [self.tableView reloadData];
         [self.refreshControl endRefreshing];
         UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error", nil)
