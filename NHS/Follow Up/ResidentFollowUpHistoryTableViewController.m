@@ -125,8 +125,13 @@ typedef enum typeOfFollowUp {
         if ([combinedArray[i] objectForKey:@"calls_caller"]) {  //phone call
             
             NSString *call_notes = @"";
-            if ([combinedArray[i] objectForKey:@"calls_mgmt_plan"]!= (id) [NSNull null]) {
-                call_notes = [combinedArray[i] objectForKey:@"calls_mgmt_plan"]? [[combinedArray[i] objectForKey:@"calls_mgmt_plan"] objectForKey:@"notes"]: @"";
+            if ([combinedArray[i] objectForKey:@"calls_mgmt_plan"]!= (id) [NSNull null] && [combinedArray[i] objectForKey:@"calls_mgmt_plan"]) {
+                if ([[combinedArray[i] objectForKey:@"calls_mgmt_plan"] objectForKey:@"notes"] != (id) [NSNull null
+                                                                                                        ]) {
+                    call_notes = [[combinedArray[i] objectForKey:@"calls_mgmt_plan"] objectForKey:@"notes"];
+                } else {
+                    call_notes = @"";
+                }
             }
             [tempArray addObject:@{
                                    @"content": call_notes,

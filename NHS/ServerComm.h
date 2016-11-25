@@ -13,6 +13,8 @@
 // singleton
 + (ServerComm *)sharedServerCommInstance;
 
+
+
 //#pragma mark Therapist Info methods
 //- (void)loginWithUserName:(NSString *)userName
 //                  passkey:(NSString *)passkey
