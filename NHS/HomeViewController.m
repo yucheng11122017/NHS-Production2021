@@ -24,6 +24,7 @@
 @property (strong, nonatomic) HTPressableButton *screeningBtn;
 @property (strong, nonatomic) HTPressableButton *followUpBtn;
 @property (strong, nonatomic) HTPressableButton *bloodTestBtn;
+@property (strong, nonatomic) HTPressableButton *drawingBtn;
 @property (strong, nonatomic) UIBarButtonItem *logoutBtn;
 
 @end
@@ -76,7 +77,7 @@
 
 - (void) createButtons {
     // Rounded rectangular default color button
-    int yPos1 = (self.view.frame.size.height - (self.navigationController.navigationBar.frame.size.height + 60 + 40))/4;
+    int yPos1 = (self.view.frame.size.height - (self.navigationController.navigationBar.frame.size.height + 60 + 40))/5;
     CGRect frame1 = CGRectMake(30, yPos1, self.view.frame.size.width - 60, 50);
     self.preRegBtn = [[HTPressableButton alloc] initWithFrame:frame1 buttonStyle:HTPressableButtonStyleRounded];
     [self.preRegBtn setTitle:@"Pre-Registration" forState:UIControlStateNormal];
@@ -111,6 +112,15 @@
     [self.bloodTestBtn addTarget:self action:@selector(bloodTestBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.bloodTestBtn];
     
+    int yPos5 = yPos1*5;
+    CGRect frame5 = CGRectMake(30, yPos5, self.view.frame.size.width - 60, 50);
+    self.drawingBtn = [[HTPressableButton alloc] initWithFrame:frame5 buttonStyle:HTPressableButtonStyleRounded];
+    [self.drawingBtn setButtonColor:[UIColor ht_amethystColor]];
+    [self.drawingBtn setShadowColor:[UIColor ht_wisteriaColor]];
+    [self.drawingBtn setTitle:@"Drawing" forState:UIControlStateNormal];
+    [self.drawingBtn addTarget:self action:@selector(drawingBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.drawingBtn];
+    
     self.logoutBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Logout"] style:UIBarButtonItemStylePlain target:self action:@selector(logoutBtnPressed:)];
 }
 
@@ -130,6 +140,10 @@
 
 - (IBAction) bloodTestBtnPressed: (HTPressableButton *) sender {
     [self performSegueWithIdentifier:@"HomeToBloodTestListSegue" sender:self];
+}
+
+- (IBAction) drawingBtnPressed: (HTPressableButton *) sender {
+    [self performSegueWithIdentifier:@"HomeToDrawingSegue" sender:self];
 }
 
 - (IBAction) logoutBtnPressed: (UIBarButtonItem *) sender {

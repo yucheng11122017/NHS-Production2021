@@ -12,9 +12,11 @@ abstract_target 'CocoaPods' do
   pod 'RNCryptor', '~> 2.2'
   pod 'XLForm', :git => 'https://github.com/xmartlabs/XLForm.git'
   pod 'MBProgressHUD', '~> 1.0.0'
-  pod 'SVProgressHUD', :git => 'https://github.com/SVProgressHUD/SVProgressHUD.git', :commit => '1871e8e12740f5fc672cb03f314737ab4ff319bc'
+  pod 'SVProgressHUD', '~> 2.1'
   pod 'HTPressableButton', '~> 1.3'
-  pod 'LiquidFloatingActionButton', '~> 1.2'
+  pod 'ACEDrawingView'
+  pod 'FontAwesomeKit', '~> 2.2'
+#  pod 'LiquidFloatingActionButton', '~> 1.2'
 
   target 'NHS' do
     # Uncomment this line if you're using Swift or would like to use dynamic frameworks

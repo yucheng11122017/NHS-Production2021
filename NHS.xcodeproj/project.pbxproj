@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0154D0671EED6AF7000348B9 /* DrawingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0154D0661EED6AF7000348B9 /* DrawingViewController.m */; };
 		015831401DB4D2F80049F16C /* GenericTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0158313E1DB4D2F80049F16C /* GenericTableViewCell.m */; };
 		015831411DB4D2F80049F16C /* GenericTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0158313F1DB4D2F80049F16C /* GenericTableViewCell.xib */; };
 		01871B641D881E0C002194C9 /* FollowUpListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01871B631D881E0C002194C9 /* FollowUpListTableViewController.m */; };
@@ -73,6 +74,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0154D0651EED6AF7000348B9 /* DrawingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawingViewController.h; sourceTree = "<group>"; };
+		0154D0661EED6AF7000348B9 /* DrawingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawingViewController.m; sourceTree = "<group>"; };
 		0158313D1DB4D2F80049F16C /* GenericTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTableViewCell.h; path = Models/GenericTableViewCell.h; sourceTree = "<group>"; };
 		0158313E1DB4D2F80049F16C /* GenericTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTableViewCell.m; path = Models/GenericTableViewCell.m; sourceTree = "<group>"; };
 		0158313F1DB4D2F80049F16C /* GenericTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GenericTableViewCell.xib; path = Models/GenericTableViewCell.xib; sourceTree = "<group>"; };
@@ -363,6 +366,8 @@
 				01871B611D881DE6002194C9 /* Follow Up */,
 				8E2527681D5766C400ACEE92 /* HomeViewController.h */,
 				8E2527691D5766C400ACEE92 /* HomeViewController.m */,
+				0154D0651EED6AF7000348B9 /* DrawingViewController.h */,
+				0154D0661EED6AF7000348B9 /* DrawingViewController.m */,
 				E1A4F0DD1D66BC5A00EE9BBB /* LoginViewController.h */,
 				E1A4F0DE1D66BC5A00EE9BBB /* LoginViewController.m */,
 			);
@@ -444,6 +449,7 @@
 				E120E4241D431E9B002DBC7E /* Frameworks */,
 				E120E4251D431E9B002DBC7E /* Resources */,
 				BADE51B934F98F53819FD555 /* [CP] Copy Pods Resources */,
+				167C99464A31CD14EC6CFB47 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -529,6 +535,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		167C99464A31CD14EC6CFB47 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-NHSUITests/Pods-NHSUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		19372F93748DFE5AE03EF15E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -541,7 +562,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		34FB291B9709B014537CA544 /* [CP] Embed Pods Frameworks */ = {
@@ -616,7 +637,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		E19509DE9462D1D8BF1BCD00 /* [CP] Copy Pods Resources */ = {
@@ -646,7 +667,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -680,6 +701,7 @@
 				E1FCF9321D45B77F00478F7B /* ServerComm.m in Sources */,
 				01EAFF291D8E64B800F4EAD2 /* FollowUpFormViewController.m in Sources */,
 				8EC56F811D60B88D00938C2A /* ScreeningFormViewController.m in Sources */,
+				0154D0671EED6AF7000348B9 /* DrawingViewController.m in Sources */,
 				E1FCF9351D45BBFC00478F7B /* PatientPreRegTableViewController.m in Sources */,
 				E1A4F0DC1D61CB8A00EE9BBB /* Reachability.m in Sources */,
 				0190720E1D87DDAD00D188D6 /* BTFormViewController.m in Sources */,

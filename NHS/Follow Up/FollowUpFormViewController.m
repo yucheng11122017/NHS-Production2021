@@ -109,11 +109,14 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     if ([_viewForm isEqualToNumber:@1]) {
         
         if ([self.typeOfFollowUp isEqualToNumber:[NSNumber numberWithInt:houseVisit]]) {
-            form_id = [[self.downloadedForm objectForKey:@"house_cbg"] objectForKey:@"visit_id"];
+            if ([self.downloadedForm objectForKey:@"house_cbg"] != (id)[NSNull null])
+                form_id = [[self.downloadedForm objectForKey:@"house_cbg"] objectForKey:@"visit_id"];
         } else if ([self.typeOfFollowUp isEqualToNumber:[NSNumber numberWithInt:phoneCall]]){
-            form_id = [[self.downloadedForm objectForKey:@"calls_caller"] objectForKey:@"call_id"];
+            if ([self.downloadedForm objectForKey:@"calls_caller"] != (id)[NSNull null])
+                form_id = [[self.downloadedForm objectForKey:@"calls_caller"] objectForKey:@"call_id"];
         } else {
-            form_id = [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:@"social_wk_followup_id"];
+            if ([self.downloadedForm objectForKey:@"social_wk_followup"] != (id)[NSNull null])
+                form_id = [[self.downloadedForm objectForKey:@"social_wk_followup"] objectForKey:@"social_wk_followup_id"];
         }
         
         [self.form setDisabled:YES];
@@ -143,7 +146,7 @@ NSString *const kFollowUpInfo = @"follow_up_info";
 
 -(id)initHouseVisit
 {
-    self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"New Form"];
+    self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"House Visit Form"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
@@ -257,18 +260,24 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     
     XLFormRowDescriptor *height;
     height = [XLFormRowDescriptor formRowDescriptorWithTag:kFUHeight rowType:XLFormRowDescriptorTypeNumber title:@"Height (cm)"];
-    height.value = [house_clinical objectForKey:kFUHeight]? [house_clinical objectForKey:kFUHeight]:@"";
+    if (house_clinical != (id) [NSNull null]) {
+        height.value = [house_clinical objectForKey:kFUHeight]? [house_clinical objectForKey:kFUHeight]:@"";
+    }
     
     [section addFormRow:height];
     
     XLFormRowDescriptor *weight;
     weight = [XLFormRowDescriptor formRowDescriptorWithTag:kFUWeight rowType:XLFormRowDescriptorTypeNumber title:@"Weight (kg)"];
-    weight.value = [house_clinical objectForKey:kFUWeight]? [house_clinical objectForKey:kFUWeight]:@"";
+    if (house_clinical != (id) [NSNull null]) {
+        weight.value = [house_clinical objectForKey:kFUWeight]? [house_clinical objectForKey:kFUWeight]:@"";
+    }
     [section addFormRow:weight];
     
     XLFormRowDescriptor *bmi;
     bmi = [XLFormRowDescriptor formRowDescriptorWithTag:kFUBMI rowType:XLFormRowDescriptorTypeText title:@"BMI"];
-    bmi.value = [house_clinical objectForKey:kFUBMI]? [house_clinical objectForKey:kFUBMI]:@"";
+    if (house_clinical != (id) [NSNull null]) {
+        bmi.value = [house_clinical objectForKey:kFUBMI]? [house_clinical objectForKey:kFUBMI]:@"";
+    }
     //    bmi.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kHeight, kWeight]];
     //Initial value only
 //    if ([clinicalResultsDict objectForKey:@"bmi"] != [NSNull null]) {
@@ -306,7 +315,9 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     
     XLFormRowDescriptor *cbg;
     cbg = [XLFormRowDescriptor formRowDescriptorWithTag:kFUCBG rowType:XLFormRowDescriptorTypeNumber title:@"CBG Reading (mmol/L)"];
-    cbg.value = [house_cbg objectForKey:kFUCBG]? [house_cbg objectForKey:kFUCBG]:@"";
+    if (house_cbg != (id) [NSNull null]) {
+        cbg.value = [house_cbg objectForKey:kFUCBG]? [house_cbg objectForKey:kFUCBG]:@"";
+    }
     [section addFormRow:cbg];
     
     
@@ -315,34 +326,46 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     
     XLFormRowDescriptor *systolic_1;
     systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kSysBP_1 rowType:XLFormRowDescriptorTypeNumber title:@"1st Systolic Reading(mmHg)"];
-    systolic_1.value = [house_bp_record objectAtIndex:0]? [[house_bp_record objectAtIndex:0] objectForKey:@"systolic_bp"]:@"";
+    if ([house_bp_record count] != 0) {
+        systolic_1.value = [house_bp_record objectAtIndex:0]? [[house_bp_record objectAtIndex:0] objectForKey:@"systolic_bp"]:@"";
+    }
     [section addFormRow:systolic_1];
     
     XLFormRowDescriptor *diastolic_1;
     diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_1 rowType:XLFormRowDescriptorTypeNumber title:@"1st Diastolic Reading(mmHg)"];
-    diastolic_1.value = [house_bp_record objectAtIndex:0]? [[house_bp_record objectAtIndex:0] objectForKey:@"diastolic_bp"]:@"";
+    if ([house_bp_record count] != 0) {
+        diastolic_1.value = [house_bp_record objectAtIndex:0]? [[house_bp_record objectAtIndex:0] objectForKey:@"diastolic_bp"]:@"";
+    }
     [section addFormRow:diastolic_1];
     
     XLFormRowDescriptor *systolic_2;
     systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kSysBP_2 rowType:XLFormRowDescriptorTypeNumber title:@"2nd Systolic Reading(mmHg)"];
-    systolic_2.value = [house_bp_record objectAtIndex:1]? [[house_bp_record objectAtIndex:1] objectForKey:@"systolic_bp"]:@"";
+    if ([house_bp_record count] != 0) {
+        systolic_2.value = [house_bp_record objectAtIndex:1]? [[house_bp_record objectAtIndex:1] objectForKey:@"systolic_bp"]:@"";
+    }
     [section addFormRow:systolic_2];
     
     XLFormRowDescriptor *diastolic_2;
     diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kDiaBP_2 rowType:XLFormRowDescriptorTypeNumber title:@"2nd Diastolic Reading(mmHg)"];
     [section addFormRow:diastolic_2];
-    diastolic_2.value = [house_bp_record objectAtIndex:1]? [[house_bp_record objectAtIndex:1] objectForKey:@"diastolic_bp"]:@"";
+    if ([house_bp_record count] != 0) {
+        diastolic_2.value = [house_bp_record objectAtIndex:1]? [[house_bp_record objectAtIndex:1] objectForKey:@"diastolic_bp"]:@"";
+    }
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical/Social Issues"];
     [self.formDescriptor addFormSection:section];
     
     row =[XLFormRowDescriptor formRowDescriptorWithTag:kMedIssues rowType:XLFormRowDescriptorTypeTextView title:@"Medical Issues"];
-    row.value = [house_med_soc objectForKey:kMedIssues]? [house_med_soc objectForKey:kMedIssues]:@"";
+    if (house_med_soc != (id) [NSNull null]) {
+        row.value = [house_med_soc objectForKey:kMedIssues]? [house_med_soc objectForKey:kMedIssues]:@"";
+    }
     row.height = 200;
     [section addFormRow:row];
     
     row =[XLFormRowDescriptor formRowDescriptorWithTag:kSocialIssues rowType:XLFormRowDescriptorTypeTextView title:@"Social Issues"];
-    row.value = [house_med_soc objectForKey:kSocialIssues]? [house_med_soc objectForKey:kSocialIssues]:@"";
+    if (house_med_soc != (id) [NSNull null]) {
+        row.value = [house_med_soc objectForKey:kSocialIssues]? [house_med_soc objectForKey:kSocialIssues]:@"";
+    }
     row.height = 200;
     [section addFormRow:row];
     
@@ -371,7 +394,9 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     };
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocSignature rowType:XLFormRowDescriptorTypeText title:@"Doctor's MCR Number"];
-    row.value = [house_mgmt_plan objectForKey:kDocSignature]? [house_mgmt_plan objectForKey:kDocSignature]:@"";
+    if (house_mgmt_plan != (id) [NSNull null]) {
+        row.value = [house_mgmt_plan objectForKey:kDocSignature]? [house_mgmt_plan objectForKey:kDocSignature]:@"";
+    }
     [section addFormRow:row];
     
     return [super initWithForm:self.formDescriptor];
@@ -379,7 +404,7 @@ NSString *const kFollowUpInfo = @"follow_up_info";
 }
 
 - (id) initPhoneCall {
-    self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"New Form"];
+    self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Phone Call Form"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
@@ -452,7 +477,7 @@ NSString *const kFollowUpInfo = @"follow_up_info";
 }
 
 - (id) initSocialWork {
-    self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"New Form"];
+    self.formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Social Work Form"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
@@ -1054,8 +1079,10 @@ NSString *const kFollowUpInfo = @"follow_up_info";
 
 - (NSString *) getValueFromDictionary: (NSDictionary *) dict withKey: (NSString *) Key{
     
-    if ([dict objectForKey:Key] != (id) [NSNull null]) {
-        return [dict objectForKey:Key];
+    if (dict != (id) [NSNull null]) {   //check if dictionary itself is null first
+        if ([dict objectForKey:Key] != (id) [NSNull null]) {
+            return [dict objectForKey:Key];
+        }
     }
     return @"";
 }
