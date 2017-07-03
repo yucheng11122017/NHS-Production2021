@@ -84,7 +84,6 @@
     [self.preRegBtn addTarget:self action:@selector(preRegBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.preRegBtn];
     
-    
     int yPos2 = yPos1*2;
     CGRect frame2 = CGRectMake(30, yPos2, self.view.frame.size.width - 60, 50);
     self.screeningBtn = [[HTPressableButton alloc] initWithFrame:frame2 buttonStyle:HTPressableButtonStyleRounded];
@@ -159,11 +158,12 @@
 }
 
 - (void) updateButtonsFrame {
-    int yPos1 = (self.view.frame.size.height - (self.navigationController.navigationBar.frame.size.height + 60 + 40))/4;
+    int yPos1 = (self.view.frame.size.height - (self.navigationController.navigationBar.frame.size.height + 60 + 40))/5;
     self.preRegBtn.frame = CGRectMake(30, yPos1, self.view.frame.size.width - 60, 50);
     self.screeningBtn.frame = CGRectMake(30, yPos1*2, self.view.frame.size.width - 60, 50);
     self.followUpBtn.frame = CGRectMake(30, yPos1*3, self.view.frame.size.width - 60, 50);
     self.bloodTestBtn.frame = CGRectMake(30, yPos1*4, self.view.frame.size.width - 60, 50);
+    self.drawingBtn.frame = CGRectMake(30, yPos1*5, self.view.frame.size.width - 60, 50);
 }
 /*
 #pragma mark - Navigation

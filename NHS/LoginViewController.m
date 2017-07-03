@@ -159,12 +159,12 @@
 - (IBAction)loginButtonPressed:(id)sender {
     [SVProgressHUD showWithStatus:@"Logging in..."];
     
-//    NSString *username = self.usernameField.text;
-//    NSString *password = self.passwordField.text;
+    NSString *username = self.usernameField.text;
+    NSString *password = self.passwordField.text;
     
     //bypassing for now
-    NSString *username = @"nhs16comm1";
-    NSString *password =  @"2016comm1";
+//    NSString *username = 
+//    NSString *password =
     
     // prepare password for submission: hash 5 times
     NSString *passkey = [self createSHA512:password];
