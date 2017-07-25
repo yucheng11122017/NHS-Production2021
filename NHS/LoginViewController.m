@@ -44,6 +44,8 @@
     // Do any additional setup after loading the view, typically from a nib.
 }
 
+
+
 - (void)viewWillAppear:(BOOL)animated {
     
     [super viewWillAppear:animated];
@@ -163,8 +165,8 @@
     NSString *password = self.passwordField.text;
     
     //bypassing for now
-//    NSString *username = 
-//    NSString *password =
+//    NSString *username = ;
+//    NSString *password = ;
     
     // prepare password for submission: hash 5 times
     NSString *passkey = [self createSHA512:password];

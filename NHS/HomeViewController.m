@@ -145,6 +145,16 @@
     [self performSegueWithIdentifier:@"HomeToDrawingSegue" sender:self];
 }
 
+- (void)openScheme:(NSString *)scheme {
+    UIApplication *application = [UIApplication sharedApplication];
+    NSURL *URL = [NSURL URLWithString:scheme];
+    [application openURL:URL options:@{} completionHandler:^(BOOL success) {
+        if (success) {
+            NSLog(@"Opened %@",scheme);
+        }
+    }];
+}
+
 - (IBAction) logoutBtnPressed: (UIBarButtonItem *) sender {
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -153,7 +163,7 @@
 //********** ORIENTATION CHANGED **********
 - (void)orientationChanged:(NSNotification *)note
 {
-    NSLog(@"Orientation  has changed: %ld", (long)[[note object] orientation]);
+//    NSLog(@"Orientation  has changed: %ld", (long)[[note object] orientation]);
     [self updateButtonsFrame];
 }
 
