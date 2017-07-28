@@ -169,7 +169,16 @@
     [application openURL:URL options:@{} completionHandler:^(BOOL success) {
         if (success) {
             NSLog(@"Opened %@",scheme);
+        } else {
+            [self downloadCamScanner];
         }
+    }];
+}
+
+- (void) downloadCamScanner {
+    NSString *iTunesLink = @"itms://itunes.apple.com/sg/app/camscanner-lite-pdf-document-scanner-and-ocr/id388627783?mt=8";
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:iTunesLink] options:@{} completionHandler:^(BOOL success) {
+        NSLog(@"Open iTunes Link successful!");
     }];
 }
 

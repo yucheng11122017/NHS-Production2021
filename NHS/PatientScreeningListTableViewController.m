@@ -17,6 +17,9 @@
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
+//disable this if fetch data from server
+#define DISABLE_SERVER_DATA_FETCH
+
 typedef enum getDataState {
     inactive,
     started,
@@ -113,7 +116,12 @@ typedef enum residentDataSource {
     self.searchController.dimsBackgroundDuringPresentation = YES; // default is YES
     self.searchController.searchBar.delegate = self; // so we can monitor text changes + others
     self.definesPresentationContext = TRUE;     //SUPER IMPORTANT, if not the searchBar won't go away when didSelectRow
-
+    
+    
+    #ifdef DISABLE_SERVER_DATA_FETCH
+    [self generateFakePatient];
+    #endif
+    
     
 //    self.navigationItem.rightBarButtonItem = self.addButton;
     
@@ -159,7 +167,9 @@ typedef enum residentDataSource {
     else if (status == ReachableViaWiFi)
     {
         NSLog(@"Wifi");
+        #ifndef DISABLE_SERVER_DATA_FETCH
         [self getAllScreeningResidents];
+        #endif
     }
     else if (status == ReachableViaWWAN)
     {
@@ -307,11 +317,15 @@ typedef enum residentDataSource {
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
     }
     
-    [self getAllDataForOneResident];
-    
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     
+#ifndef DISABLE_SERVER_DATA_FETCH
+    [self getAllDataForOneResident];
+#endif
     
+#ifdef DISABLE_SERVER_DATA_FETCH
+    [self performSegueWithIdentifier:@"LoadScreeningFormSegue" sender:self];
+#endif
     
 }
 
@@ -744,8 +758,43 @@ typedef enum residentDataSource {
     [self performSegueWithIdentifier:@"NewScreeningFormSegue" sender:self];
 }
 
-#pragma mark - Navigation
 
+#pragma mark - For Dev Testing
+- (void) generateFakePatient {
+    int i;
+    [self.residentNames removeAllObjects];   //reset this array first
+    [self.residentScreenTimestamp removeAllObjects];   //reset this array first
+    NSArray *patients = @[@{@"resident_id":@"1",
+                            @"resident_name":@"Nicholas Wong",
+                            @"ts":@"2017-07-01 14:24:24",
+                            @"nric":@"S1231234A"
+                            },
+                          @{@"resident_id":@"2",
+                            @"resident_name":@"Yoga Kumar",
+                            @"ts":@"2017-07-02 12:42:42",
+                            @"nric":@"S3214321B"
+                            }];
+    self.screeningResidents = [[NSMutableArray alloc] initWithArray:patients];
+    
+    NSSortDescriptor *sortDescriptor;
+    sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"resident_name" ascending:YES];
+    NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
+    self.screeningResidents = [[self.screeningResidents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
+    
+    for (i=0; i<[self.screeningResidents count]; i++) {
+        [self.residentNames addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:@"resident_name"]];
+        [self.residentScreenTimestamp addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:@"ts"]];
+    }
+    
+    //sort alphabetically
+    self.residentNames = [[self.residentNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] mutableCopy];
+    
+    [self putNamesIntoSections];
+    [self.tableView reloadData];
+    [self.refreshControl endRefreshing];
+}
+
+#pragma mark - Navigation
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     [SVProgressHUD dismiss];

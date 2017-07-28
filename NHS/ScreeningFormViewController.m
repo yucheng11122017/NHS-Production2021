@@ -285,11 +285,9 @@ NSString *const kDocName = @"doc_name";
 - (void)viewDidLoad {
     
     XLFormViewController *form;
-//    [self getDictionaryIntoVariables];
     
+    //must init first before [super viewDidLoad]
     switch([self.sectionID integerValue]) {
-        case 0: form = [self initNeighbourhood];       //must init first before [super viewDidLoad]
-            break;
         case 1: form = [self initResidentParticulars];
             break;
         case 2: form = [self initClinicalResults];
@@ -308,8 +306,8 @@ NSString *const kDocName = @"doc_name";
             break;
         case 9: form = [self initPrimaryCareSource];
             break;
-        case 10: form = [self initMyHealthAndMyNeighbourhood];
-            break;
+//        case 10: form = [self initMyHealthAndMyNeighbourhood];
+//            break;
         case 11: form = [self initDemographics];
             break;
         case 12: form = [self initCurrentPhysicalIssues];
@@ -372,64 +370,6 @@ NSString *const kDocName = @"doc_name";
 }
 
 #pragma mark - Forms methods
-
--(id)initNeighbourhood
-{
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Neighbourhood"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    
-    
-    NSDictionary *neighbourhoodDict = [self.fullScreeningForm objectForKey:@"neighbourhood"];
-    
-    formDescriptor.assignFirstResponderOnShow = YES;
-    
-    // Basic Information - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Introduction"];
-    section.footerTitle = @"Dear Volunteer: \n\nThank you for being a part of NHS. For your convenience, this form contains the questionnaire. \nAll fields marked with an asterisk are mandatory. \nComplete all sections (tick) to submit. \nForm is auto-saved.";
-    [formDescriptor addFormSection:section];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Neighbourhood"];
-    [formDescriptor addFormSection:section];
-    
-    
-    // RowNavigationShowAccessoryView
-    XLFormRowDescriptor *neighbourhoodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourhoodLoc rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Screening Neighbourhood *"];
-    neighbourhoodRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Bukit Merah"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Eunos Crescent"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Marine Terrace"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Taman Jurong"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Volunteer Training"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Others"]
-                            ];
-    neighbourhoodRow.required = YES;
-    neighbourhoodRow.noValueDisplayText = @"Tap here";
-    NSArray *options = neighbourhoodRow.selectorOptions;
-    if (![[neighbourhoodDict objectForKey:kNeighbourhoodLoc]isEqualToString:@""]) {
-        neighbourhoodRow.value = [options objectAtIndex:[[neighbourhoodDict objectForKey:kNeighbourhoodLoc] integerValue]];
-    }
-    [section addFormRow:neighbourhoodRow];
-    
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourhoodOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
-    row.value = [neighbourhoodDict objectForKey:kNeighbourhoodOthers];
-    if ([row.value length] <= 0) {
-        row.hidden = @(YES);
-    }
-    [section addFormRow:row];
-    
-    neighbourhoodRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([[newValue formValue] isEqual:@5]) {
-                row.hidden = @(NO);
-            } else {
-                row.hidden = @(YES);
-            }
-        }
-    };
-    
-    return [super initWithForm:formDescriptor];
-}
 
 -(id)initResidentParticulars
 {
@@ -2383,228 +2323,228 @@ NSString *const kDocName = @"doc_name";
     return [super initWithForm:formDescriptor];
 }
 
--(id) initMyHealthAndMyNeighbourhood {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"My Health & My Neighbourhood"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    NSDictionary *healthNeighbourhoodDict = [self.fullScreeningForm objectForKey:@"self_rated"];
-    
-    formDescriptor.assignFirstResponderOnShow = YES;
-
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne rowType:XLFormRowDescriptorTypeInfo title:@"Mobility"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    
-    XLFormRowDescriptor *mobilityRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMobility
-                                                         rowType:XLFormRowDescriptorTypeSelectorActionSheet
-                                                           title:@""];
-    mobilityRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no problem in walking about"],
-                                     [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight problems in walking about"],
-                                     [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate problems in walking about"],
-                                     [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I have severe problems in walking about"],
-                                     [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I am unable to walk about"]];
-    //value
-    NSArray *options = mobilityRow.selectorOptions;
-    if (![[healthNeighbourhoodDict objectForKey:kMobility]isEqualToString:@""]) {
-        mobilityRow.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kMobility] integerValue]];
-    }
-    mobilityRow.noValueDisplayText = @"Tap here for options";
-    [section addFormRow:mobilityRow];
-    
-    XLFormRowDescriptor *mobilityAidQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"If you have difficulty walking, what mobility aid are you using?"];
-    mobilityAidQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:mobilityAidQRow];
-    XLFormRowDescriptor *mobilityAidRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMobilityAid
-                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
-                                                  title:@""];
-    mobilityRow.noValueDisplayText = @"Tap here for options";
-    mobilityAidRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Walking stick/frame"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Wheelchair-bound"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Bedridden"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Have problems walking but do not use aids"]];
-    
-    //value
-    options = mobilityAidRow.selectorOptions;
-    if (![[healthNeighbourhoodDict objectForKey:kMobilityAid]isEqualToString:@""]) {
-        mobilityAidRow.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kMobilityAid] integerValue]];
-    }
-    
-    [section addFormRow:mobilityAidRow];
-    
-    mobilityRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([[newValue formValue] isEqual:@(0)]) {
-                mobilityAidQRow.hidden = @(1);  //hide
-                mobilityAidRow.hidden = @(1);  //hide
-            } else {
-                mobilityAidQRow.hidden = @(0);  //hide
-                mobilityAidRow.hidden = @(0);  //hide
-            }
-        }
-    };
-    
-    
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree rowType:XLFormRowDescriptorTypeInfo title:@"Self-care"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSelfCare
-                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
-                                                  title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no problem washing or dressing myself"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight problems washing or dressing myself"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate problems washing or dressing myself"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I have severe problems washing or dressing myself"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"I am unable to wash or dress myself"]];
-    row.noValueDisplayText = @"Tap here for options";
-    //value
-    options = row.selectorOptions;
-    if (![[healthNeighbourhoodDict objectForKey:kSelfCare]isEqualToString:@""]) {
-        row.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kSelfCare] integerValue]];
-    }
-    
-    [section addFormRow:row];
-
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive rowType:XLFormRowDescriptorTypeInfo title:@"Usual Activities (e.g. work, study, housework, family or leisure activities)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUsualActivities
-                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
-                                                  title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no problem doing my usual activities"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight problems doing my usual activities"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate problems doing my usual activities"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I have severe problems doing my usual activities"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"I am unable to do my usual activities"]];
-    //value
-    options = row.selectorOptions;
-    if (![[healthNeighbourhoodDict objectForKey:kUsualActivities]isEqualToString:@""]) {
-        row.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kUsualActivities] integerValue]];
-    }
-    row.noValueDisplayText = @"Tap here for options";
-    [section addFormRow:row];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Your health today"];
-    section.footerTitle = @"100 means the BEST health you can imagine.\n0 means the WORST health you can imagine.";
-    [formDescriptor addFormSection:section];
-
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSeven
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"We would like to know how good or bad your health is TODAY. The scale is numbered from 0 to 100. *"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHealthToday rowType:XLFormRowDescriptorTypeNumber title:@""];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between 0 and 100" regex:@"^(0|[0-9][0-9]|100|[0-9])$"]];
-    row.required = YES;
-    row.value = [healthNeighbourhoodDict objectForKey:kHealthToday];
-    [section addFormRow:row];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Park"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"How long does it take (mins) for you to reach to a park or rest areas where you like to walk and enjoy yourself, playing sports or games, from your house? *"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kParkTime rowType:XLFormRowDescriptorTypeNumber title:@""];
-    row.required = YES;
-    row.value = [healthNeighbourhoodDict objectForKey:kParkTime];
-    [section addFormRow:row];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Tick all that applies"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelSafe rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel safe when I walk around my neighbourhood by myself at night."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kFeelSafe];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCrimeLow rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel that crime rate (i.e. damage or stealing) is low in my neighbourhood."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kCrimeLow];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDrunkenPpl rowType:XLFormRowDescriptorTypeBooleanCheck title:@"In the morning, or later in the day, I can see drunken people on the street in my neighbourhood."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kDrunkenPpl];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBrokenBottles rowType:XLFormRowDescriptorTypeBooleanCheck title:@"In my neighbourhood, there are broken bottles or trash lying around."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kBrokenBottles];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUnclearSigns rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I and my visitors have been lost because of no or unclear signs of directions."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kUnclearSigns];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHomelessPpl rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I see destitute or homeless people walking or sitting around in my neighbourhood."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kHomelessPpl];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPublicTrans rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to take public transportations in my neighbourhood (i.e. bus stops, MRT)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kPublicTrans];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSeeDoc rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to see a doctor in my neighbourhood."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kSeeDoc];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBuyMedi rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to buy medication in my neighbourhood."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kBuyMedi];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kGrocery rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to do grocery shopping in my neighbourhood."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kGrocery];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCommCentre rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit community centres in my neighbourhood."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kCommCentre];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSSCentres rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit social service centres (i.e. Senior Activity Centres, Family Service Centres) in my neighbourhood."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kSSCentres];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBankingPost rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit banking and post services (banks, post offices, etc.)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kBankingPost];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReligiousPlaces rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit religious places (i.e., temples, churches, synagogue, etc.)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kReligiousPlaces];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kInteract rowType:XLFormRowDescriptorTypeBooleanCheck title:@"The people in my neighbourhood actively interact with each other (i.e., playing sports together, having meals together, etc.)."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kInteract];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSafePlaces rowType:XLFormRowDescriptorTypeBooleanCheck title:@"There are plenty of safe places to walk or play outdoors in my neighbourhood."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.value = [healthNeighbourhoodDict objectForKey:kSafePlaces];
-    [section addFormRow:row];
-    
-    return [super initWithForm:formDescriptor];
-}
+//-(id) initMyHealthAndMyNeighbourhood {
+//    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"My Health & My Neighbourhood"];
+//    XLFormSectionDescriptor * section;
+//    XLFormRowDescriptor * row;
+//    NSDictionary *healthNeighbourhoodDict = [self.fullScreeningForm objectForKey:@"self_rated"];
+//    
+//    formDescriptor.assignFirstResponderOnShow = YES;
+//
+//    
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+//    [formDescriptor addFormSection:section];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne rowType:XLFormRowDescriptorTypeInfo title:@"Mobility"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [section addFormRow:row];
+//    
+//    XLFormRowDescriptor *mobilityRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMobility
+//                                                         rowType:XLFormRowDescriptorTypeSelectorActionSheet
+//                                                           title:@""];
+//    mobilityRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no problem in walking about"],
+//                                     [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight problems in walking about"],
+//                                     [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate problems in walking about"],
+//                                     [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I have severe problems in walking about"],
+//                                     [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I am unable to walk about"]];
+//    //value
+//    NSArray *options = mobilityRow.selectorOptions;
+//    if (![[healthNeighbourhoodDict objectForKey:kMobility]isEqualToString:@""]) {
+//        mobilityRow.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kMobility] integerValue]];
+//    }
+//    mobilityRow.noValueDisplayText = @"Tap here for options";
+//    [section addFormRow:mobilityRow];
+//    
+//    XLFormRowDescriptor *mobilityAidQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"If you have difficulty walking, what mobility aid are you using?"];
+//    mobilityAidQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [section addFormRow:mobilityAidQRow];
+//    XLFormRowDescriptor *mobilityAidRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMobilityAid
+//                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+//                                                  title:@""];
+//    mobilityRow.noValueDisplayText = @"Tap here for options";
+//    mobilityAidRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Walking stick/frame"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Wheelchair-bound"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Bedridden"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Have problems walking but do not use aids"]];
+//    
+//    //value
+//    options = mobilityAidRow.selectorOptions;
+//    if (![[healthNeighbourhoodDict objectForKey:kMobilityAid]isEqualToString:@""]) {
+//        mobilityAidRow.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kMobilityAid] integerValue]];
+//    }
+//    
+//    [section addFormRow:mobilityAidRow];
+//    
+//    mobilityRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+//        if (oldValue != newValue) {
+//            if ([[newValue formValue] isEqual:@(0)]) {
+//                mobilityAidQRow.hidden = @(1);  //hide
+//                mobilityAidRow.hidden = @(1);  //hide
+//            } else {
+//                mobilityAidQRow.hidden = @(0);  //hide
+//                mobilityAidRow.hidden = @(0);  //hide
+//            }
+//        }
+//    };
+//    
+//    
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree rowType:XLFormRowDescriptorTypeInfo title:@"Self-care"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSelfCare
+//                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+//                                                  title:@""];
+//    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no problem washing or dressing myself"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight problems washing or dressing myself"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate problems washing or dressing myself"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I have severe problems washing or dressing myself"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"I am unable to wash or dress myself"]];
+//    row.noValueDisplayText = @"Tap here for options";
+//    //value
+//    options = row.selectorOptions;
+//    if (![[healthNeighbourhoodDict objectForKey:kSelfCare]isEqualToString:@""]) {
+//        row.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kSelfCare] integerValue]];
+//    }
+//    
+//    [section addFormRow:row];
+//
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive rowType:XLFormRowDescriptorTypeInfo title:@"Usual Activities (e.g. work, study, housework, family or leisure activities)"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUsualActivities
+//                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+//                                                  title:@""];
+//    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no problem doing my usual activities"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight problems doing my usual activities"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate problems doing my usual activities"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I have severe problems doing my usual activities"],
+//                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"I am unable to do my usual activities"]];
+//    //value
+//    options = row.selectorOptions;
+//    if (![[healthNeighbourhoodDict objectForKey:kUsualActivities]isEqualToString:@""]) {
+//        row.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kUsualActivities] integerValue]];
+//    }
+//    row.noValueDisplayText = @"Tap here for options";
+//    [section addFormRow:row];
+//    
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@"Your health today"];
+//    section.footerTitle = @"100 means the BEST health you can imagine.\n0 means the WORST health you can imagine.";
+//    [formDescriptor addFormSection:section];
+//
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSeven
+//                                                rowType:XLFormRowDescriptorTypeInfo
+//                                                  title:@"We would like to know how good or bad your health is TODAY. The scale is numbered from 0 to 100. *"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHealthToday rowType:XLFormRowDescriptorTypeNumber title:@""];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between 0 and 100" regex:@"^(0|[0-9][0-9]|100|[0-9])$"]];
+//    row.required = YES;
+//    row.value = [healthNeighbourhoodDict objectForKey:kHealthToday];
+//    [section addFormRow:row];
+//    
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+//    [formDescriptor addFormSection:section];
+//    
+//    
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@"Park"];
+//    [formDescriptor addFormSection:section];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight
+//                                                rowType:XLFormRowDescriptorTypeInfo
+//                                                  title:@"How long does it take (mins) for you to reach to a park or rest areas where you like to walk and enjoy yourself, playing sports or games, from your house? *"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kParkTime rowType:XLFormRowDescriptorTypeNumber title:@""];
+//    row.required = YES;
+//    row.value = [healthNeighbourhoodDict objectForKey:kParkTime];
+//    [section addFormRow:row];
+//    
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@"Tick all that applies"];
+//    [formDescriptor addFormSection:section];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelSafe rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel safe when I walk around my neighbourhood by myself at night."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kFeelSafe];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCrimeLow rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel that crime rate (i.e. damage or stealing) is low in my neighbourhood."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kCrimeLow];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDrunkenPpl rowType:XLFormRowDescriptorTypeBooleanCheck title:@"In the morning, or later in the day, I can see drunken people on the street in my neighbourhood."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kDrunkenPpl];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBrokenBottles rowType:XLFormRowDescriptorTypeBooleanCheck title:@"In my neighbourhood, there are broken bottles or trash lying around."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kBrokenBottles];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUnclearSigns rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I and my visitors have been lost because of no or unclear signs of directions."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kUnclearSigns];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHomelessPpl rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I see destitute or homeless people walking or sitting around in my neighbourhood."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kHomelessPpl];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPublicTrans rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to take public transportations in my neighbourhood (i.e. bus stops, MRT)"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kPublicTrans];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSeeDoc rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to see a doctor in my neighbourhood."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kSeeDoc];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBuyMedi rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to buy medication in my neighbourhood."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kBuyMedi];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kGrocery rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to do grocery shopping in my neighbourhood."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kGrocery];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCommCentre rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit community centres in my neighbourhood."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kCommCentre];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSSCentres rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit social service centres (i.e. Senior Activity Centres, Family Service Centres) in my neighbourhood."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kSSCentres];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBankingPost rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit banking and post services (banks, post offices, etc.)"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kBankingPost];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReligiousPlaces rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit religious places (i.e., temples, churches, synagogue, etc.)"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kReligiousPlaces];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kInteract rowType:XLFormRowDescriptorTypeBooleanCheck title:@"The people in my neighbourhood actively interact with each other (i.e., playing sports together, having meals together, etc.)."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kInteract];
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSafePlaces rowType:XLFormRowDescriptorTypeBooleanCheck title:@"There are plenty of safe places to walk or play outdoors in my neighbourhood."];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.value = [healthNeighbourhoodDict objectForKey:kSafePlaces];
+//    [section addFormRow:row];
+//    
+//    return [super initWithForm:formDescriptor];
+//}
 
 -(id) initDemographics {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Demographics"];

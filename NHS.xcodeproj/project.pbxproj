@@ -414,6 +414,7 @@
 				FF8776DD202AC1025F115A16 /* [CP] Check Pods Manifest.lock */,
 				E120E3FF1D431E9A002DBC7E /* Sources */,
 				E120E4001D431E9A002DBC7E /* Frameworks */,
+				0130D1861F2AFDC10073901D /* Auto Build Number */,
 				E120E4011D431E9A002DBC7E /* Resources */,
 				34FB291B9709B014537CA544 /* [CP] Embed Pods Frameworks */,
 				69A14B7E4C7E0E5BE0060ACD /* [CP] Copy Pods Resources */,
@@ -544,6 +545,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		0130D1861F2AFDC10073901D /* Auto Build Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Auto Build Number";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/sh\n# Auto Increment Version Script\n# set CFBundleVersion to 1.0.1 first!!!\n# the perl regex splits out the last part of a build number (ie: 1.1.1) and increments it by one\n# if you have a build number that is more than 3 components, add a '\\.\\d+' into the first part of the regex.\nbuildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"";
+		};
 		167C99464A31CD14EC6CFB47 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

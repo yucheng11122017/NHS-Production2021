@@ -13,7 +13,7 @@
 #import "AppConstants.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
-
+#define DISABLE_SERVER_DATA_FETCH
 typedef enum typeOfForm {
     NewScreeningForm,
     PreRegisteredScreeningForm,
@@ -50,9 +50,10 @@ typedef enum typeOfForm {
     self.preRegDictionary = [[NSMutableDictionary alloc] init];
     
     //positive number -> Pre-reg Resident/Uploaded Screening Form
-    // (-1) New Screeing Form
+    // (-1) New Screening Form
     // (-2) Draft
     
+#ifndef DISABLE_SERVER_DATA_FETCH
     if ([self.residentID intValue]>= 0) {
         if (self.retrievedData) {
             [self insertRequestDataToScreeningForm];
@@ -65,8 +66,9 @@ typedef enum typeOfForm {
         formType = LoadedDraftScreeningForm;
         [self loadDraftIfAny];
     }
+#endif
     
-    self.rowTitles = @[@"Neighbourhood",@"Resident Particulars", @"Clinical Results",@"Screening of Risk Factors", @"Diabetes Mellitus", @"Hyperlipidemia", @"Hypertension", @"Cancer Screening", @"Other Medical Issues", @"Primary Care Source", @"My Health and My Neighbourhood", @"Demographics", @"Current Physical Issues", @"Current Socioeconomics Situation", @"Social Support Assessment", @"Referral for Doctor Consultation"];
+    self.rowTitles = @[@"Resident Particulars", @"Clinical Results",@"Screening of Risk Factors", @"Diabetes Mellitus", @"Hyperlipidemia", @"Hypertension", @"Cancer Screening", @"Other Medical Issues", @"Primary Care Source", @"My Health and My Neighbourhood", @"Demographics", @"Current Physical Issues", @"Current Socioeconomics Situation", @"Social Support Assessment", @"Referral for Doctor Consultation"];
     
      self.clearsSelectionOnViewWillAppear = YES;
     
@@ -99,7 +101,7 @@ typedef enum typeOfForm {
     }
     //if initialised previously, won't do it again
     if (!self.completionCheck) {
-        self.completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,nil];
+        self.completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,nil];
     }
     int count = 0;
     for (int i=0;i<[self.completionCheck count];i++) {
@@ -126,7 +128,7 @@ typedef enum typeOfForm {
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if(section == 0) return 16;
+    if(section == 0) return [self.rowTitles count];
     else return 1;
 }
 
