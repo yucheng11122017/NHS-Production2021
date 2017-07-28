@@ -199,6 +199,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0130D1851F2AEAD00073901D /* UNUSED */ = {
+			isa = PBXGroup;
+			children = (
+				0154D0651EED6AF7000348B9 /* DrawingViewController.h */,
+				0154D0661EED6AF7000348B9 /* DrawingViewController.m */,
+			);
+			name = UNUSED;
+			sourceTree = "<group>";
+		};
 		01871B611D881DE6002194C9 /* Follow Up */ = {
 			isa = PBXGroup;
 			children = (
@@ -319,9 +328,10 @@
 			children = (
 				8E0852571D6DCCD7006E68FE /* blankScreeningForm.json */,
 				E1FCF92F1D45B76100478F7B /* Models */,
+				0130D1851F2AEAD00073901D /* UNUSED */,
+				E1FCF92E1D45B75200478F7B /* ViewControllers */,
 				E120E4091D431E9B002DBC7E /* AppDelegate.h */,
 				E120E40A1D431E9B002DBC7E /* AppDelegate.m */,
-				E1FCF92E1D45B75200478F7B /* ViewControllers */,
 				E120E40F1D431E9B002DBC7E /* Main.storyboard */,
 				E120E4141D431E9B002DBC7E /* LaunchScreen.storyboard */,
 				E1A4F0E01D66BE2000EE9BBB /* Assets.xcassets */,
@@ -364,12 +374,10 @@
 				8E2527661D57600900ACEE92 /* Screening */,
 				019072051D87A86300D188D6 /* Blood Test */,
 				01871B611D881DE6002194C9 /* Follow Up */,
-				8E2527681D5766C400ACEE92 /* HomeViewController.h */,
-				8E2527691D5766C400ACEE92 /* HomeViewController.m */,
-				0154D0651EED6AF7000348B9 /* DrawingViewController.h */,
-				0154D0661EED6AF7000348B9 /* DrawingViewController.m */,
 				E1A4F0DD1D66BC5A00EE9BBB /* LoginViewController.h */,
 				E1A4F0DE1D66BC5A00EE9BBB /* LoginViewController.m */,
+				8E2527681D5766C400ACEE92 /* HomeViewController.h */,
+				8E2527691D5766C400ACEE92 /* HomeViewController.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -864,7 +872,7 @@
 				INFOPLIST_FILE = NHS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.edu.nus.nhs;
+				PRODUCT_BUNDLE_IDENTIFIER = com.edu.nus.nhs2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 2.3;
@@ -887,7 +895,7 @@
 				INFOPLIST_FILE = NHS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.edu.nus.nhs;
+				PRODUCT_BUNDLE_IDENTIFIER = com.edu.nus.nhs2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 2.3;

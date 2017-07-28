@@ -15,8 +15,9 @@
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 #define ERROR_MSG_DELAY 5.0f
 
-#define USERNAME_TEXTFIELD_TAG 1
-#define PASSWORD_TEXTFIELD_TAG 2
+#define FULLNAME_TEXTFIELD_TAG 1
+#define USERNAME_TEXTFIELD_TAG 2
+#define PASSWORD_TEXTFIELD_TAG 3
 
 @interface LoginViewController () {
     NSNumber *isComm;
@@ -25,6 +26,7 @@
 @property(strong, nonatomic) IBOutlet UIScrollView *scrollViewBackground;
 
 @property(strong, nonatomic) IBOutlet UIImageView *nhsLogoImageView;
+@property (weak, nonatomic) IBOutlet UITextField *fullNameField;
 @property(strong, nonatomic) IBOutlet UITextField *usernameField;
 @property(strong, nonatomic) IBOutlet UITextField *passwordField;
 @property(strong, nonatomic) IBOutlet UILabel *errorMsgLabel;
@@ -55,10 +57,12 @@
     self.nhsLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
     
     // set textfield delegate - for responding to return button presses
+    self.fullNameField.delegate = self;
     self.usernameField.delegate = self;
     self.passwordField.delegate = self;
     
     // set tags for identifying textfields
+    self.fullNameField.tag = FULLNAME_TEXTFIELD_TAG;
     self.usernameField.tag = USERNAME_TEXTFIELD_TAG;
     self.passwordField.tag = PASSWORD_TEXTFIELD_TAG;
     
@@ -147,7 +151,9 @@
     
     // if 'return' is pressed at the name text field,
     // go on to the passowrd text field
-    if (theTextField.tag == USERNAME_TEXTFIELD_TAG)
+    if(theTextField.tag == FULLNAME_TEXTFIELD_TAG)
+        [self.usernameField becomeFirstResponder];
+    else if (theTextField.tag == USERNAME_TEXTFIELD_TAG)
         [self.passwordField becomeFirstResponder];
     else if (theTextField.tag == PASSWORD_TEXTFIELD_TAG) {
         // if 'return' is pressed at the password text field,
@@ -179,73 +185,79 @@
     
     // submit credentials
 //    NSString *url = @"https://nus-nhs.ml/volunteerLogin"; //for DEV
-    NSString *url = @"https://nhs-som.nus.edu.sg/volunteerLogin";
-    NSDictionary *dict = @{ @"username" : username, @"passkey" : passkey };
-    NSDictionary *dataDict = @{ @"data" : dict };
+//    NSString *url = @"https://nhs-som.nus.edu.sg/volunteerLogin";
+//    NSDictionary *dict = @{ @"username" : username, @"passkey" : passkey };
+//    NSDictionary *dataDict = @{ @"data" : dict };
+//    
+//    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+//    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+//    manager.requestSerializer = [AFJSONRequestSerializer serializer];
+//    
+//    [manager POST:url
+//       parameters:dataDict
+//         progress:nil
+//          success:^(NSURLSessionDataTask *_Nonnull task,
+//                    id _Nullable responseObject) {
+//              
+////              NSLog(@"success: %@", responseObject);
+//              NSDictionary *responseDict = responseObject;
+//              
+//              isComm = [responseObject valueForKey:@"is_comm"];
+//
+//              // login if auth_result is 1
+//              if ([[responseDict valueForKey:@"auth_result"] integerValue] == 1) {
+//                  if ([username isEqualToString:@"apple"]) {
+//                      NSLog(@"Apple testing");
+//                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+//                      [defaults setBool:TRUE forKey:@"AppleTesting"];
+//                      [defaults synchronize];
+//                  } else {
+//                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+//                      [defaults setBool:FALSE forKey:@"AppleTesting"];
+//                      [defaults synchronize];
+//                  }
+//                  
+//                  if ([isComm isEqualToNumber:@1]) {
+//                      NSLog(@"Committee Login");
+//                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+//                      [defaults setBool:TRUE forKey:@"isComm"];
+//                      [defaults synchronize];
+//                  } else {
+//                      NSLog(@"Volunteer Login");
+//                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+//                      [defaults setBool:FALSE forKey:@"isComm"];
+//                      [defaults synchronize];
+//                  }
+//                  
+//                  self.volunteerID =
+//                  [[responseDict valueForKey:@"user_id"] integerValue];
+//                  [self performSegueWithIdentifier:@"login segue" sender:self];
+//              }
+//              
+//              // show error msg for some time
+//              else {
+//                  [self.errorMsgLabel setHidden:NO];
+//                  [self performSelector:@selector(hideErrorMsg)
+//                             withObject:nil
+//                             afterDelay:ERROR_MSG_DELAY];
+//              }
+//              [SVProgressHUD dismiss];
+//          }
+//     // print error msg if HTTP failure
+//          failure:^(NSURLSessionDataTask *_Nullable task, NSError *_Nonnull error) {
+//              NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+//              NSString *errorString =
+//              [[NSString alloc] initWithData:errorData
+//                                    encoding:NSUTF8StringEncoding];
+//              NSLog(@"error: %@", errorString);
+//              [SVProgressHUD dismiss];
+//          }];
     
-    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];
-    manager.requestSerializer = [AFJSONRequestSerializer serializer];
-    
-    [manager POST:url
-       parameters:dataDict
-         progress:nil
-          success:^(NSURLSessionDataTask *_Nonnull task,
-                    id _Nullable responseObject) {
-              
-//              NSLog(@"success: %@", responseObject);
-              NSDictionary *responseDict = responseObject;
-              
-              isComm = [responseObject valueForKey:@"is_comm"];
-
-              // login if auth_result is 1
-              if ([[responseDict valueForKey:@"auth_result"] integerValue] == 1) {
-                  if ([username isEqualToString:@"apple"]) {
-                      NSLog(@"Apple testing");
-                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                      [defaults setBool:TRUE forKey:@"AppleTesting"];
-                      [defaults synchronize];
-                  } else {
-                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                      [defaults setBool:FALSE forKey:@"AppleTesting"];
-                      [defaults synchronize];
-                  }
-                  
-                  if ([isComm isEqualToNumber:@1]) {
-                      NSLog(@"Committee Login");
-                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                      [defaults setBool:TRUE forKey:@"isComm"];
-                      [defaults synchronize];
-                  } else {
-                      NSLog(@"Volunteer Login");
-                      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                      [defaults setBool:FALSE forKey:@"isComm"];
-                      [defaults synchronize];
-                  }
-                  
-                  self.volunteerID =
-                  [[responseDict valueForKey:@"user_id"] integerValue];
-                  [self performSegueWithIdentifier:@"login segue" sender:self];
-              }
-              
-              // show error msg for some time
-              else {
-                  [self.errorMsgLabel setHidden:NO];
-                  [self performSelector:@selector(hideErrorMsg)
-                             withObject:nil
-                             afterDelay:ERROR_MSG_DELAY];
-              }
-              [SVProgressHUD dismiss];
-          }
-     // print error msg if HTTP failure
-          failure:^(NSURLSessionDataTask *_Nullable task, NSError *_Nonnull error) {
-              NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
-              NSString *errorString =
-              [[NSString alloc] initWithData:errorData
-                                    encoding:NSUTF8StringEncoding];
-              NSLog(@"error: %@", errorString);
-              [SVProgressHUD dismiss];
-          }];
+    //Force it to committee login always!
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:TRUE forKey:@"isComm"];
+    [SVProgressHUD dismiss];
+    [self performSegueWithIdentifier:@"login segue" sender:self];
 }
 
 - (void)hideErrorMsg {
