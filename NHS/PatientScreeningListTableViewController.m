@@ -324,7 +324,9 @@ typedef enum residentDataSource {
 #endif
     
 #ifdef DISABLE_SERVER_DATA_FETCH
-    [self performSegueWithIdentifier:@"LoadScreeningFormSegue" sender:self];
+//    [self performSegueWithIdentifier:@"LoadScreeningFormSegue" sender:self];
+    [self performSegueWithIdentifier:@"showSelectProfileTableVC" sender:self];
+
 #endif
     
 }

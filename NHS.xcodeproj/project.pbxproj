@@ -15,6 +15,8 @@
 		0190720B1D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0190720A1D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.m */; };
 		0190720E1D87DDAD00D188D6 /* BTFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0190720D1D87DDAD00D188D6 /* BTFormViewController.m */; };
 		01C86C761D7725960096379A /* SummaryPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01C86C751D7725960096379A /* SummaryPageViewController.m */; };
+		01D48EC11F3327B5002C3928 /* ScreeningSelectProfileTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D48EC01F3327B5002C3928 /* ScreeningSelectProfileTableVC.m */; };
+		01D48EC41F346C36002C3928 /* ResidentParticularsVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D48EC31F346C36002C3928 /* ResidentParticularsVC.m */; };
 		01EAFF261D8E617900F4EAD2 /* FollowUpSelectScreeningResidentTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01EAFF251D8E617900F4EAD2 /* FollowUpSelectScreeningResidentTableViewController.m */; };
 		01EAFF291D8E64B800F4EAD2 /* FollowUpFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01EAFF281D8E64B800F4EAD2 /* FollowUpFormViewController.m */; };
 		01F1543F1D9A480D00D4B7D1 /* FollowUpCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 01F1543E1D9A480D00D4B7D1 /* FollowUpCell.m */; };
@@ -89,6 +91,10 @@
 		0190720D1D87DDAD00D188D6 /* BTFormViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BTFormViewController.m; path = "Blood Test/BTFormViewController.m"; sourceTree = "<group>"; };
 		01C86C741D7725960096379A /* SummaryPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SummaryPageViewController.h; sourceTree = "<group>"; };
 		01C86C751D7725960096379A /* SummaryPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SummaryPageViewController.m; sourceTree = "<group>"; };
+		01D48EBF1F3327B5002C3928 /* ScreeningSelectProfileTableVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreeningSelectProfileTableVC.h; sourceTree = "<group>"; };
+		01D48EC01F3327B5002C3928 /* ScreeningSelectProfileTableVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreeningSelectProfileTableVC.m; sourceTree = "<group>"; };
+		01D48EC21F346C36002C3928 /* ResidentParticularsVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResidentParticularsVC.h; sourceTree = "<group>"; };
+		01D48EC31F346C36002C3928 /* ResidentParticularsVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResidentParticularsVC.m; sourceTree = "<group>"; };
 		01EAFF241D8E617900F4EAD2 /* FollowUpSelectScreeningResidentTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FollowUpSelectScreeningResidentTableViewController.h; path = "Follow Up/FollowUpSelectScreeningResidentTableViewController.h"; sourceTree = "<group>"; };
 		01EAFF251D8E617900F4EAD2 /* FollowUpSelectScreeningResidentTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FollowUpSelectScreeningResidentTableViewController.m; path = "Follow Up/FollowUpSelectScreeningResidentTableViewController.m"; sourceTree = "<group>"; };
 		01EAFF271D8E64B800F4EAD2 /* FollowUpFormViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FollowUpFormViewController.h; path = "Follow Up/FollowUpFormViewController.h"; sourceTree = "<group>"; };
@@ -258,6 +264,10 @@
 			children = (
 				E1EFB0911D433C3400510532 /* PatientScreeningListTableViewController.h */,
 				E1EFB0921D433C3400510532 /* PatientScreeningListTableViewController.m */,
+				01D48EBF1F3327B5002C3928 /* ScreeningSelectProfileTableVC.h */,
+				01D48EC01F3327B5002C3928 /* ScreeningSelectProfileTableVC.m */,
+				01D48EC21F346C36002C3928 /* ResidentParticularsVC.h */,
+				01D48EC31F346C36002C3928 /* ResidentParticularsVC.m */,
 				8E23D5521D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.h */,
 				8E23D5531D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m */,
 				8EC56F851D60C16300938C2A /* ScreeningSectionTableViewController.h */,
@@ -702,6 +712,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				01C86C761D7725960096379A /* SummaryPageViewController.m in Sources */,
+				01D48EC41F346C36002C3928 /* ResidentParticularsVC.m in Sources */,
 				E120E40B1D431E9B002DBC7E /* AppDelegate.m in Sources */,
 				8EC56F8A1D60CDBB00938C2A /* AppConstants.m in Sources */,
 				01F1543F1D9A480D00D4B7D1 /* FollowUpCell.m in Sources */,
@@ -726,6 +737,7 @@
 				01EAFF291D8E64B800F4EAD2 /* FollowUpFormViewController.m in Sources */,
 				8EC56F811D60B88D00938C2A /* ScreeningFormViewController.m in Sources */,
 				0154D0671EED6AF7000348B9 /* DrawingViewController.m in Sources */,
+				01D48EC11F3327B5002C3928 /* ScreeningSelectProfileTableVC.m in Sources */,
 				E1FCF9351D45BBFC00478F7B /* PatientPreRegTableViewController.m in Sources */,
 				E1A4F0DC1D61CB8A00EE9BBB /* Reachability.m in Sources */,
 				0190720E1D87DDAD00D188D6 /* BTFormViewController.m in Sources */,

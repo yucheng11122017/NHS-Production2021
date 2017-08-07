@@ -441,12 +441,44 @@
                     <connections>
                         <segue destination="nRG-LZ-Hpk" kind="show" identifier="NewScreeningFormSegue" id="Lod-au-JK3"/>
                         <segue destination="6lt-nE-hrg" kind="presentation" identifier="SelectPreRegSegue" id="dvx-gg-8NF"/>
-                        <segue destination="nRG-LZ-Hpk" kind="show" identifier="LoadScreeningFormSegue" id="dVH-QH-3V3"/>
+                        <segue destination="Rmh-CE-vE7" kind="show" identifier="showSelectProfileTableVC" id="gep-8f-DgT"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lh5-MQ-aOL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-112" y="1145"/>
+            <point key="canvasLocation" x="-479" y="1096"/>
+        </scene>
+        <!--Screening Select Profile TableVC-->
+        <scene sceneID="zh3-dW-59f">
+            <objects>
+                <tableViewController id="Rmh-CE-vE7" customClass="ScreeningSelectProfileTableVC" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="que-zK-BE4">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="R2e-JH-Uq8">
+                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="R2e-JH-Uq8" id="Hhp-0g-GXX">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="Rmh-CE-vE7" id="GGe-xx-uwy"/>
+                            <outlet property="delegate" destination="Rmh-CE-vE7" id="6UR-bF-b2L"/>
+                        </connections>
+                    </tableView>
+                    <connections>
+                        <segue destination="nRG-LZ-Hpk" kind="show" identifier="LoadScreeningFormSegue" id="tZl-fx-nf1"/>
+                        <segue destination="MP5-cc-QXX" kind="show" identifier="showResiPartiSegue" id="lyp-3O-0f2"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="fbu-A9-JEn" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="524" y="1140"/>
         </scene>
         <!--Screening Select Pre Reg Patient Table View Controller-->
         <scene sceneID="Uhk-qS-4a0">
@@ -476,6 +508,24 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="d03-8D-2yB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="625" y="1879"/>
+        </scene>
+        <!--Resident ParticularsVC-->
+        <scene sceneID="uIC-ye-Bpg">
+            <objects>
+                <viewController id="MP5-cc-QXX" customClass="ResidentParticularsVC" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="CSB-qq-XK3"/>
+                        <viewControllerLayoutGuide type="bottom" id="EH2-zO-N6N"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="9x3-1n-NP8">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ELK-2o-tyC" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1393" y="1227"/>
         </scene>
         <!--Screening Section Table View Controller-->
         <scene sceneID="xRV-Vc-3S8">
@@ -509,7 +559,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="p9q-dF-195" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="625" y="1116"/>
+            <point key="canvasLocation" x="2153" y="1192"/>
         </scene>
         <!--Root View Controller-->
         <scene sceneID="me8-8y-DzS">
@@ -590,7 +640,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2xD-9v-bZp" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1445" y="1202"/>
+            <point key="canvasLocation" x="3026" y="1418"/>
         </scene>
         <!--Summary Page View Controller-->
         <scene sceneID="RWr-69-agU">
@@ -729,8 +779,8 @@
         <image name="NHS logo" width="471" height="299"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="dVH-QH-3V3"/>
-        <segue reference="dqs-tI-c0S"/>
         <segue reference="EDv-zZ-nX6"/>
+        <segue reference="dqs-tI-c0S"/>
+        <segue reference="tZl-fx-nf1"/>
     </inferredMetricsTieBreakers>
 </document>
