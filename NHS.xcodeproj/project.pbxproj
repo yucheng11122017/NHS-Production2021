@@ -17,6 +17,9 @@
 		01C86C761D7725960096379A /* SummaryPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01C86C751D7725960096379A /* SummaryPageViewController.m */; };
 		01D48EC11F3327B5002C3928 /* ScreeningSelectProfileTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D48EC01F3327B5002C3928 /* ScreeningSelectProfileTableVC.m */; };
 		01D48EC41F346C36002C3928 /* ResidentParticularsVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D48EC31F346C36002C3928 /* ResidentParticularsVC.m */; };
+		01D48EC71F39C8C0002C3928 /* HealthAssessAndRiskFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D48EC61F39C8C0002C3928 /* HealthAssessAndRiskFormVC.m */; };
+		01D48ECB1F39CB67002C3928 /* HealthAssessAndRiskTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D48ECA1F39CB67002C3928 /* HealthAssessAndRiskTableVC.m */; };
+		01D48ECE1F39CD2C002C3928 /* MedicalHistoryTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D48ECD1F39CD2C002C3928 /* MedicalHistoryTableVC.m */; };
 		01EAFF261D8E617900F4EAD2 /* FollowUpSelectScreeningResidentTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01EAFF251D8E617900F4EAD2 /* FollowUpSelectScreeningResidentTableViewController.m */; };
 		01EAFF291D8E64B800F4EAD2 /* FollowUpFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01EAFF281D8E64B800F4EAD2 /* FollowUpFormViewController.m */; };
 		01F1543F1D9A480D00D4B7D1 /* FollowUpCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 01F1543E1D9A480D00D4B7D1 /* FollowUpCell.m */; };
@@ -95,6 +98,12 @@
 		01D48EC01F3327B5002C3928 /* ScreeningSelectProfileTableVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreeningSelectProfileTableVC.m; sourceTree = "<group>"; };
 		01D48EC21F346C36002C3928 /* ResidentParticularsVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResidentParticularsVC.h; sourceTree = "<group>"; };
 		01D48EC31F346C36002C3928 /* ResidentParticularsVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResidentParticularsVC.m; sourceTree = "<group>"; };
+		01D48EC51F39C8C0002C3928 /* HealthAssessAndRiskFormVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HealthAssessAndRiskFormVC.h; sourceTree = "<group>"; };
+		01D48EC61F39C8C0002C3928 /* HealthAssessAndRiskFormVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HealthAssessAndRiskFormVC.m; sourceTree = "<group>"; };
+		01D48EC91F39CB67002C3928 /* HealthAssessAndRiskTableVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HealthAssessAndRiskTableVC.h; sourceTree = "<group>"; };
+		01D48ECA1F39CB67002C3928 /* HealthAssessAndRiskTableVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HealthAssessAndRiskTableVC.m; sourceTree = "<group>"; };
+		01D48ECC1F39CD2C002C3928 /* MedicalHistoryTableVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MedicalHistoryTableVC.h; sourceTree = "<group>"; };
+		01D48ECD1F39CD2C002C3928 /* MedicalHistoryTableVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MedicalHistoryTableVC.m; sourceTree = "<group>"; };
 		01EAFF241D8E617900F4EAD2 /* FollowUpSelectScreeningResidentTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FollowUpSelectScreeningResidentTableViewController.h; path = "Follow Up/FollowUpSelectScreeningResidentTableViewController.h"; sourceTree = "<group>"; };
 		01EAFF251D8E617900F4EAD2 /* FollowUpSelectScreeningResidentTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FollowUpSelectScreeningResidentTableViewController.m; path = "Follow Up/FollowUpSelectScreeningResidentTableViewController.m"; sourceTree = "<group>"; };
 		01EAFF271D8E64B800F4EAD2 /* FollowUpFormViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FollowUpFormViewController.h; path = "Follow Up/FollowUpFormViewController.h"; sourceTree = "<group>"; };
@@ -244,6 +253,19 @@
 			name = "Blood Test";
 			sourceTree = "<group>";
 		};
+		01D48EC81F39CB37002C3928 /* Health Assessment & Risk Stratification */ = {
+			isa = PBXGroup;
+			children = (
+				01D48EC91F39CB67002C3928 /* HealthAssessAndRiskTableVC.h */,
+				01D48ECA1F39CB67002C3928 /* HealthAssessAndRiskTableVC.m */,
+				01D48ECC1F39CD2C002C3928 /* MedicalHistoryTableVC.h */,
+				01D48ECD1F39CD2C002C3928 /* MedicalHistoryTableVC.m */,
+				01D48EC51F39C8C0002C3928 /* HealthAssessAndRiskFormVC.h */,
+				01D48EC61F39C8C0002C3928 /* HealthAssessAndRiskFormVC.m */,
+			);
+			name = "Health Assessment & Risk Stratification";
+			sourceTree = "<group>";
+		};
 		8E2527651D57600200ACEE92 /* Pre-Registration */ = {
 			isa = PBXGroup;
 			children = (
@@ -274,6 +296,7 @@
 				8EC56F861D60C16300938C2A /* ScreeningSectionTableViewController.m */,
 				8EC56F7F1D60B88D00938C2A /* ScreeningFormViewController.h */,
 				8EC56F801D60B88D00938C2A /* ScreeningFormViewController.m */,
+				01D48EC81F39CB37002C3928 /* Health Assessment & Risk Stratification */,
 				01C86C741D7725960096379A /* SummaryPageViewController.h */,
 				01C86C751D7725960096379A /* SummaryPageViewController.m */,
 			);
@@ -721,6 +744,7 @@
 				E1EFB0931D433C3400510532 /* PatientScreeningListTableViewController.m in Sources */,
 				E10412101D4C8EFA0024663B /* PreRegFormViewController.m in Sources */,
 				E13B8F0B1D66F62900C3A81D /* UIScrollViewWithTouchesBegan.m in Sources */,
+				01D48ECB1F39CB67002C3928 /* HealthAssessAndRiskTableVC.m in Sources */,
 				8E25276D1D57891700ACEE92 /* PreRegDisplayFormViewController.m in Sources */,
 				0190720B1D87DA9F00D188D6 /* BTSelectScreenedResidentTableViewController.m in Sources */,
 				8E28D5531D54C9F8006BDF8F /* SearchResultsTableController.m in Sources */,
@@ -730,6 +754,7 @@
 				E1A4F0DF1D66BC5A00EE9BBB /* LoginViewController.m in Sources */,
 				8E23D5541D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m in Sources */,
 				015831401DB4D2F80049F16C /* GenericTableViewCell.m in Sources */,
+				01D48ECE1F39CD2C002C3928 /* MedicalHistoryTableVC.m in Sources */,
 				8EC56F871D60C16300938C2A /* ScreeningSectionTableViewController.m in Sources */,
 				01FC79F71D882BB3003D3AB6 /* SummaryReportViewController.m in Sources */,
 				01F154421D9A48D700D4B7D1 /* FollowUpEntity.m in Sources */,
@@ -742,6 +767,7 @@
 				E1A4F0DC1D61CB8A00EE9BBB /* Reachability.m in Sources */,
 				0190720E1D87DDAD00D188D6 /* BTFormViewController.m in Sources */,
 				8E25276A1D5766C400ACEE92 /* HomeViewController.m in Sources */,
+				01D48EC71F39C8C0002C3928 /* HealthAssessAndRiskFormVC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

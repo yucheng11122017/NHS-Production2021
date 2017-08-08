@@ -155,7 +155,7 @@ typedef enum typeOfForm {
             cell.accessoryType = UITableViewCellAccessoryNone;
         }
         
-        if (indexPath.row > 2) {
+        if (indexPath.row > 3) {
             cell.userInteractionEnabled = NO;
             [cell.textLabel setTextColor:[UIColor grayColor]];
         }
@@ -203,6 +203,12 @@ typedef enum typeOfForm {
 {
     if (indexPath.section == 0) {
         selectedRow = [NSNumber numberWithInteger:indexPath.row];
+        
+        if (indexPath.row == 3) {
+            NSLog(@"Segue to HA and RS!");
+            [self performSegueWithIdentifier:@"sectionToHARSSegue" sender:self];
+            return;
+        }
         
         [self performSegueWithIdentifier:@"screeningSectionToFormSegue" sender:self];
         NSLog(@"Form segue performed!");
