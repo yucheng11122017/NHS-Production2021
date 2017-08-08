@@ -17,6 +17,9 @@
 #import "XLForm.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
+#define DEFAULT_FONT_SIZE 15
+
+//[row.cellConfigAtConfigure setObject:[NSNumber numberWithFloat:0.7] forKey:XLFormTextFieldLengthPercentage];      //for changing the answer's fontSize
 
 
 NSString *const kContactNumber2 = @"contactnumber2";
@@ -92,14 +95,25 @@ NSString *const kHighestEduLvl = @"highest_level_education";
     [formDescriptor addFormSection:section];
     
     // Name
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeName title:@"Patient Name *"];
-    row.required = YES;
-//    row.value = [resiPartiDict objectForKey:@"resident_name"];
-    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [section addFormRow:row];
+    XLFormRowDescriptor *nameRow = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeName title:@"Patient Name *"];
+    nameRow.required = YES;
+    [nameRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [nameRow.cellConfig setObject:[UIFont fontWithName:@"Helvetica" size:14] forKey:@"textField.font"];
+    [nameRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+//    [nameRow.cellConfigAtConfigure setObject:[NSNumber numberWithFloat:0.7] forKey:XLFormTextFieldLengthPercentage];      //for changing the length of the left side TextLabel
+    [section addFormRow:nameRow];
+    
+    nameRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        
+        if (![oldValue isEqual:newValue]) { //otherwise this segment will crash
+            NSString *CAPSed = [rowDescriptor.editTextValue uppercaseString];
+            rowDescriptor.value = CAPSed;
+        }
+    };
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Gender *"];
     row.selectorOptions = @[@"Male", @"Female"];
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
 //    NSString *genderMF = [resiPartiDict objectForKey:@"gender"];
 //    if ([genderMF isEqualToString:@"M"]) {
 //        row.value = @"Male";
@@ -109,14 +123,23 @@ NSString *const kHighestEduLvl = @"highest_level_education";
     row.required = YES;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC rowType:XLFormRowDescriptorTypeText title:@"NRIC *"];
-//    row.value = [resiPartiDict objectForKey:@"nric"];
-    row.required = YES;
-    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [section addFormRow:row];
+    XLFormRowDescriptor *nricRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC rowType:XLFormRowDescriptorTypeName title:@"NRIC *"];
+    nricRow.required = YES;
+    [nricRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [nricRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:nricRow];
+    
+    nricRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        
+        if (![oldValue isEqual:newValue]) { //otherwise this segment will crash
+            NSString *CAPSed = [rowDescriptor.editTextValue uppercaseString];
+            rowDescriptor.value = CAPSed;
+        }
+    };
     
     dobRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDOB rowType:XLFormRowDescriptorTypeDateInline title:@"DOB *"];
     dobRow.required = YES;
+    [dobRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
 #warning need to save the YOB here for calculating age!
     [section addFormRow:dobRow];
     
@@ -127,12 +150,14 @@ NSString *const kHighestEduLvl = @"highest_level_education";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"citizenship" rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"Citizenship status *"];
     row.required = YES;
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
     row.selectorOptions = @[@"Singaporean", @"PR", @"Foreigner", @"Stateless"];
     [section addFormRow:row];
     
     XLFormRowDescriptor *religionRow;
     religionRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"religion" rowType:XLFormRowDescriptorTypeSelectorPush title:@"Religion *"];
     religionRow.selectorOptions = @[@"Buddhism", @"Taoism", @"Islam", @"Christianity", @"Hinduism", @"No Religion", @"Others"];
+    [religionRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
     religionRow.required = YES;
     [section addFormRow:religionRow];
     
@@ -140,6 +165,7 @@ NSString *const kHighestEduLvl = @"highest_level_education";
     row.required = NO;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", religionRow];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"hp_number" rowType:XLFormRowDescriptorTypePhone title:@"HP Number *"];
@@ -147,13 +173,15 @@ NSString *const kHighestEduLvl = @"highest_level_education";
 //    row.value = [resiPartiDict objectForKey:@"contact_no"];
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"house_number" rowType:XLFormRowDescriptorTypePhone title:@"House Phone Number "];
-    row.required = NO;
+    row.required = YES;
 //    row.value = [resiPartiDict objectForKey:@"contact_no2"];
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number(2) must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEthnicity rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Ethnicity"];
@@ -164,6 +192,7 @@ NSString *const kHighestEduLvl = @"highest_level_education";
                             ];
     row.required = NO;
     row.noValueDisplayText = @"Tap here for options";
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
 //    if ([[resiPartiDict objectForKey:@"ethnicity_id"] isEqualToString:@""]) {
 //        
 //    } else {
@@ -174,6 +203,7 @@ NSString *const kHighestEduLvl = @"highest_level_education";
     XLFormRowDescriptor * spokenLangRow;
     spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLanguage rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language *"];
     spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
+    [spokenLangRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
     row.required = YES;
 
 //    spokenLangRow.value = [self getSpokenLangArray:resiPartiDict];
@@ -184,6 +214,7 @@ NSString *const kHighestEduLvl = @"highest_level_education";
     row.required = NO;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", spokenLangRow];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
 //    row.value = [resiPartiDict objectForKey:@"lang_others_text"];
     [section addFormRow:row];
     
@@ -199,13 +230,15 @@ NSString *const kHighestEduLvl = @"highest_level_education";
 //    } else {
 //        row.value = [row.selectorOptions objectAtIndex:[[resiPartiDict objectForKey:@"marital_status"] integerValue]] ;
 //    }
-    
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    row.noValueDisplayText = @"Tap here";
     row.required = NO;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHousingType rowType:XLFormRowDescriptorTypeSelectorPush title:@"Housing Type *"];
     row.selectorOptions = @[@"Owned, 1-room", @"Owned, 2-room", @"Owned, 3-room", @"Owned, 4-room", @"Owned, 5-room", @"Rental, 1-room", @"Rental, 2-room", @"Rental, 3-room", @"Rental, 4-room"];
     row.required = YES;
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
 //    if (![[resiPartiDict objectForKey:@"housing_owned_rented"] isEqualToString:@""]) { //if got value
 //        if([[resiPartiDict objectForKey:@"housing_owned_rented"] isEqualToString:@"0"]) {   //owned
 //            NSArray *options = row.selectorOptions;
@@ -230,19 +263,47 @@ NSString *const kHighestEduLvl = @"highest_level_education";
 //    } else {
 //        row.value = [row.selectorOptions objectAtIndex:[[resiPartiDict objectForKey:@"highest_edu_lvl"] integerValue]] ;
 //    }
-    
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
     row.required = NO;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"address" rowType:XLFormRowDescriptorTypeSelectorPush title:@"Address *"];
+    XLFormRowDescriptor *addressRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"address" rowType:XLFormRowDescriptorTypeSelectorPush title:@"Address *"];
     if ([neighbourhood isEqualToString:@"KGL"])
-        row.selectorOptions = @[@"Blk 4,5,6 Beach Rd", @"Blk 7,8,9,10 North Bridge Rd", @"Blk 18,19 Jln Sultan"];
+        addressRow.selectorOptions = @[@"Blk 4 Beach Rd",@"Blk 5 Beach Rd",@"Blk 6 Beach Rd", @"Blk 7 North Bridge Rd", @"Blk 8 North Bridge Rd", @"Blk 9 North Bridge Rd", @"Blk 10 North Bridge Rd", @"Blk 18 Jln Sultan", @"Blk 19 Jln Sultan", @"Others"];
     else
-        row.selectorOptions = @[@"1,2,12 Eunos Crescent", @"2,3,4,5 Upper Aljunied Lane"];
-    row.required = YES;
-    [section addFormRow:row];
+        addressRow.selectorOptions = @[@"1 Eunos Crescent", @"2 Eunos Crescent", @"12 Eunos Crescent", @"2 Upper Aljunied Lane", @"3 Upper Aljunied Lane", @"4 Upper Aljunied Lane", @"5 Upper Aljunied Lane"];
+    addressRow.required = YES;
+    [addressRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:addressRow];
     
-#warning Supposed to have one address (others) here...
+    XLFormRowDescriptor *addrOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"address_others" rowType:XLFormRowDescriptorTypeText title:@"Others: "];
+    addrOthersRow.required = NO;
+    addrOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", addressRow];
+    [addrOthersRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [addrOthersRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:addrOthersRow];
+    
+    addrOthersRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor) {
+        
+        if (![oldValue isEqual:newValue]) { //otherwise this segment will crash
+            NSString *CAPSed = [rowDescriptor.editTextValue uppercaseString];
+            rowDescriptor.value = CAPSed;
+        }
+    };
+    
+    XLFormRowDescriptor *unitRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"address_unit" rowType:XLFormRowDescriptorTypeText title:@"Unit No: "];
+    [unitRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    unitRow.required = YES;
+    [section addFormRow:unitRow];
+    
+    unitRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        
+        if (![oldValue isEqual:newValue]) { //otherwise this segment will crash
+            NSString *CAPSed = [rowDescriptor.editTextValue uppercaseString];
+            rowDescriptor.value = CAPSed;
+        }
+    };
+    
     
     return [super initWithForm:formDescriptor];
 }
@@ -286,9 +347,8 @@ NSString *const kHighestEduLvl = @"highest_level_education";
 
     NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
     
-    NSLog(@"Age: %ld", age);
     
-    [SVProgressHUD showInfoWithStatus:[NSString stringWithFormat:@"You are %ld years old", age]];
+    [SVProgressHUD showInfoWithStatus:[NSString stringWithFormat:@"You are %ld years old", (long)age]];
     
     [self deselectFormRow:sender];
 }

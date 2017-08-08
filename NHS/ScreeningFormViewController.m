@@ -263,7 +263,7 @@ NSString *const kHelpHelpful = @"help_helpful";
 
 
 @interface ScreeningFormViewController () {
-    NSString *gender, *nric, *resident_name, *birth_year, *address_block, *address_postcode, *address_street, *address_unit, *contact_no;
+    NSString *gender;
     NSArray *spoken_lang_value;
     XLFormRowDescriptor *relativesContactRow, *relativesEaseRow, *relativesCloseRow, *friendsContactRow, *friendsEaseRow, *friendsCloseRow, *socialScoreRow;
     NSString *neighbourhood, *citizenship;
@@ -282,6 +282,7 @@ NSString *const kHelpHelpful = @"help_helpful";
     neighbourhood = @"KGL";
     citizenship = @"Singaporean";
     age = [NSNumber numberWithInt:70];
+    gender = @"M";
     
     
 //    form = [self initModeOfScreening];
@@ -383,11 +384,12 @@ NSString *const kHelpHelpful = @"help_helpful";
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kScreenMode rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Centralised / Door-to-door *"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kScreenMode rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Pick one *"];
+    row.selectorOptions = @[@"Centralised", @"Door-to-door"];
     row.required = YES;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"apt_date_time" rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Appointment Date & Time"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kApptDate rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Appointment Date"];
     row.noValueDisplayText = @"Tap here";
     
     if ([neighbourhood isEqualToString:@"EC"]) {
@@ -395,7 +397,12 @@ NSString *const kHelpHelpful = @"help_helpful";
     } else {
         row.selectorOptions = @[@"30 Sept", @"1 Oct"];
     }
+    row.required = NO;
+    [section addFormRow:row];
     
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kApptTime rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Appointment Time"];
+    row.noValueDisplayText = @"Tap here";
+    row.selectorOptions= @[@"8am", @"10am", @"12pm", @"2pm"];
     row.required = NO;
     [section addFormRow:row];
     
@@ -454,7 +461,7 @@ NSString *const kHelpHelpful = @"help_helpful";
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kProfilingConsent rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Consent"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kProfilingConsent rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Consent to disclosure of information"];
     row.required = YES;
     [section addFormRow:row];
     
@@ -480,88 +487,132 @@ NSString *const kHelpHelpful = @"help_helpful";
     [otherEmployRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:otherEmployRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiscloseIncome rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Resident does not want to disclose income"];
-    row.selectorOptions = @[@"Yes", @"No"];
-    [row.cellConfig setObject:[UIFont systemFontOfSize:14] forKey:@"textLabel.font"];   //the description too long. Default fontsize is 16
-    row.required = NO;
-    [section addFormRow:row];
+    XLFormRowDescriptor *noDiscloseIncomeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiscloseIncome rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Resident does not want to disclose income"];
+    noDiscloseIncomeRow.selectorOptions = @[@"Yes", @"No"];
+    noDiscloseIncomeRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    noDiscloseIncomeRow.required = NO;
+    [section addFormRow:noDiscloseIncomeRow];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne rowType:XLFormRowDescriptorTypeInfo title:@"Average monthly household income"];
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgMthHouseIncome rowType:XLFormRowDescriptorTypeDecimal title:@""];
-    [row.cellConfigAtConfigure setObject:@"Enter here" forKey:@"textField.placeholder"];
-    row.required = NO;
-    [section addFormRow:row];
+    XLFormRowDescriptor *mthHouseIncome = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgMthHouseIncome rowType:XLFormRowDescriptorTypeDecimal title:@"Average monthly household income"];
+    [mthHouseIncome.cellConfigAtConfigure setObject:@"Enter here" forKey:@"textField.placeholder"];
+    mthHouseIncome.cellConfig[@"textLabel.numberOfLines"] = @0;
+    mthHouseIncome.required = NO;
+    [section addFormRow:mthHouseIncome];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPplInHouse rowType:XLFormRowDescriptorTypeNumber title:@"No. of people in the household"];
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15] forKey:@"textLabel.font"];   //the description too long. Default fontsize is 16
-    row.required = NO;
-    [section addFormRow:row];
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+
+    XLFormRowDescriptor *noOfPplInHouse = [XLFormRowDescriptor formRowDescriptorWithTag:kPplInHouse rowType:XLFormRowDescriptorTypeNumber title:@"No. of people in the household"];
+    [noOfPplInHouse.cellConfig setObject:[UIFont systemFontOfSize:15] forKey:@"textLabel.font"];   //the description too long. Default fontsize is 16
+    [noOfPplInHouse.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    noOfPplInHouse.required = NO;
+    [section addFormRow:noOfPplInHouse];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgIncomePerHead rowType:XLFormRowDescriptorTypeDecimal title:@"Average income per head"];   //auto-calculate
-    row.required = NO;
-    [section addFormRow:row];
+    XLFormRowDescriptor *avgIncomePerHead = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgIncomePerHead rowType:XLFormRowDescriptorTypeDecimal title:@"Average income per head"];   //auto-calculate
+    [avgIncomePerHead.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    avgIncomePerHead.required = NO;
+    
+    if (!isnan([mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue])) {  //check for not nan first!
+        avgIncomePerHead.value = [NSString stringWithFormat:@"$ %.2f", [mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue]];
+    }
+    
+    avgIncomePerHead.disabled = @(1);
+    [section addFormRow:avgIncomePerHead];
+        //Initial value only
+//        if ([clinicalResultsDict objectForKey:@"bmi"] != [NSNull null]) {
+//            if (![[clinicalResultsDict objectForKey:@"bmi"] isEqualToString:@""]) {
+//                bmi.value = [clinicalResultsDict objectForKey:@"bmi"];
+//            } else {
+    
+//            }
+//        }
+    
+    mthHouseIncome.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([mthHouseIncome.value integerValue] != 0 && [noOfPplInHouse.value integerValue] != 0) {
+                avgIncomePerHead.value = [NSString stringWithFormat:@"$ %.2f", ([mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue])];
+                [self updateFormRow:avgIncomePerHead];
+            }
+        }
+    };
+    noOfPplInHouse.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([mthHouseIncome.value integerValue] != 0 && [noOfPplInHouse.value integerValue] != 0) {
+                avgIncomePerHead.value = [NSString stringWithFormat:@"$ %.2f", ([mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue])];
+                [self updateFormRow:avgIncomePerHead];
+            }
+        }
+    };
     
     // CHAS Preliminary Eligibiliy Assessment - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"CHAS Preliminary Eligibility Assessment"];
     [formDescriptor addFormSection:section];
+
+    XLFormRowDescriptor *chasNoChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDoesntOwnChasPioneer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does not currently own a CHAS card (blue/orange/NA) or pioneer generation card"];
+    chasNoChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    chasNoChasRow.required = NO;
+    [section addFormRow:chasNoChasRow];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Does not currently own a CHAS card (blue/orange/NA) or pioneer generation card"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
+    XLFormRowDescriptor *lowHouseIncomeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLowHouseIncome rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"For households with income: Household monthly income per person is $1800 and below \nOR\nFor households with no income: Annual Value (AV) of home is $21,000 and below"];
+    lowHouseIncomeRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    lowHouseIncomeRow.required = NO;
+    [section addFormRow:lowHouseIncomeRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDoesntOwnChasPioneer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
-    row.required = NO;
-    [section addFormRow:row];
+    XLFormRowDescriptor *wantChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want to apply for CHAS?"];
+    wantChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    wantChasRow.required = NO;
+    [section addFormRow:wantChasRow];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"For households with income: Household monthly income per person is $1800 and below OR …"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
+    XLFormRowDescriptor *chasColorRow = [XLFormRowDescriptor formRowDescriptorWithTag:kChasColor rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If resident owns CHAS card, what colour?"];
+    chasColorRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    chasColorRow.required = NO;
+    chasColorRow.selectorOptions = @[@"Blue", @"Orange"];
+    [section addFormRow:chasColorRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLowHouseIncome rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
-    row.required = NO;
-    [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"For households with no income: Annual Value (AV) of home is $21,000 and below"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLowHomeValue rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
-    row.required = NO;
-    [section addFormRow:row];
-    
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Does resident want to apply for CHAS?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
-    row.required = NO;
-    [section addFormRow:row];
-    
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"If resident owns CHAS card, what colour?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kChasColor rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
-    row.selectorOptions = @[@"Blue", @"Orange", @"NA"];
-    row.noValueDisplayText = @"Tap for options";
-    row.required = NO;
-    [section addFormRow:row];
-    
+    // Disable all income related questions if not willing to disclose income
+    noDiscloseIncomeRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([newValue isEqual:@"Yes"]) {
+                mthHouseIncome.disabled = @(1);
+                noOfPplInHouse.disabled = @(1);
+                avgIncomePerHead.disabled = @(1);
+                chasColorRow.disabled = @(1);
+                chasNoChasRow.disabled = @(1);
+                wantChasRow.disabled = @(1);
+                lowHouseIncomeRow.disabled = @(1);
+
+            } else {
+                mthHouseIncome.disabled = @(0);
+                noOfPplInHouse.disabled = @(0);
+                avgIncomePerHead.disabled = @(0);
+                chasColorRow.disabled = @(0);
+                chasNoChasRow.disabled = @(0);
+                wantChasRow.disabled = @(0);
+                lowHouseIncomeRow.disabled = @(0);
+            }
+            
+            [self reloadFormRow:mthHouseIncome];
+            [self reloadFormRow:noOfPplInHouse];
+            [self reloadFormRow:avgIncomePerHead];
+            [self reloadFormRow:chasColorRow];
+            [self reloadFormRow:chasNoChasRow];
+            [self reloadFormRow:wantChasRow];
+            [self reloadFormRow:lowHouseIncomeRow];
+        }
+    };
+
     // Eligibility Assessment for Colonoscopy - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Colonoscopy"];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
     row.required = NO;
-    if ([citizenship isEqualToString:@"Singaporean"])
+    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"])
         row.value = @1;
     else
         row.value = @0;
@@ -575,29 +626,19 @@ NSString *const kHelpHelpful = @"help_helpful";
         row.value = @0;
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"First degree relative with colorectal cancer?"];
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRelWColorectCancer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@""];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRelWColorectCancer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"First degree relative with colorectal cancer?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree rowType:XLFormRowDescriptorTypeInfo title:@"Has not done colonoscopy in the past 3 years?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy3yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy3yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 3 years?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Does resident want a referral for free colonoscopy?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantColonoscopyRef rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantColonoscopyRef rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a referral for free colonoscopy?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
     
@@ -607,7 +648,7 @@ NSString *const kHelpHelpful = @"help_helpful";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
     row.required = NO;
-    if ([citizenship isEqualToString:@"Singaporean"])
+    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"])
         row.value = @1;
     else
         row.value = @0;
@@ -621,42 +662,36 @@ NSString *const kHelpHelpful = @"help_helpful";
         row.value = @0;
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Has not done FIT in the last 12 months?"];
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFitLast2Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done FIT in the last 12 months?"];
+    row.required = NO;
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFitLast2Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy10Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 10 years?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Has not done colonoscopy in the past 10 years?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy10Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantFitKit rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free FIT kit?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Does resident want a free FIT kit?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantFitKit rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"" ];
-    row.required = NO;
-    [section addFormRow:row];
+    BOOL isMale;
+    if ([gender isEqualToString:@"M"]) isMale=true;
+    else isMale = false;
     
     // Eligibility Assessment for Mammogram - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Mammogram (Female only)"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean"];
     row.required = NO;
     if ([citizenship isEqualToString:@"Singaporean"])
         row.value = @1;
     else
         row.value = @0;
+    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
 #warning need to change age name for 50 to 69
@@ -667,33 +702,25 @@ NSString *const kHelpHelpful = @"help_helpful";
         row.value = @1;
     else
         row.value = @0;
+    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Has not done mammogram in the last 2 years?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMammo2Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMammo2Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done mammogram in the last 2 years?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
+    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Has a valid CHAS card (blue/orange)"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHasChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHasChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has a valid CHAS card (blue/orange)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
+    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Does resident want a free mammogram referral?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantMammo rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantMammo rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free mammogram referral?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
+    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
     // Eligibility Assessment for pap smear - Section
@@ -702,10 +729,11 @@ NSString *const kHelpHelpful = @"help_helpful";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
     row.required = NO;
-    if ([citizenship isEqualToString:@"Singaporean"])
+    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"])
         row.value = @1;
     else
         row.value = @0;
+    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
 #warning need to change the age name
@@ -716,45 +744,31 @@ NSString *const kHelpHelpful = @"help_helpful";
         row.value = @1;
     else
         row.value = @0;
+    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Has not done pap smear in the last 3 years?"];
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPap3Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@""];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPap3Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done pap smear in the last 3 years?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
+    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Has engaged in sexual intercourse before"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEngagedSex rowType:XLFormRowDescriptorTypeBooleanSwitch title:@""];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEngagedSex rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has engaged in sexual intercourse before"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
+    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Does resident want a free pap smear referral?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPapSmear rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPapSmear rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free pap smear referral?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
+    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
+
     
     // Eligibility Assessment for fall risk - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Fall Risk"];
     [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
-    row.required = NO;
-    if ([citizenship isEqualToString:@"Singaporean"])
-        row.value = @1;
-    else
-        row.value = @0;
-    [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove50 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 65 and above?"];
     row.required = NO;
@@ -764,30 +778,18 @@ NSString *const kHelpHelpful = @"help_helpful";
         row.value = @0;
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Have you fallen in the past 12 months?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFallen12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFallen12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Have you fallen in the past 12 months?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Do you avoid going out because you are scared of falling?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kScaredFall rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kScaredFall rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Do you avoid going out because you are scared of falling?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Do you feel like you are going to fall when getting up or walking?"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelFall rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelFall rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Do you feel like you are going to fall when getting up or walking?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
     
@@ -803,12 +805,8 @@ NSString *const kHelpHelpful = @"help_helpful";
         row.value = @0;
     [section addFormRow:row];
     
-    rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Resident shows signs of cognitive impairment(e.g. forgetfulness, carelessness, lack of awareness)"];
-    rowInfo.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    rowInfo.required = NO;
-    [section addFormRow:rowInfo];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@" "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident shows signs of cognitive impairment(e.g. forgetfulness, carelessness, lack of awareness)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
 
