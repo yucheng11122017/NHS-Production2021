@@ -20,7 +20,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    [self.tableView setTableFooterView:[[UIView alloc] initWithFrame:CGRectZero]];
+
     
     self.navigationItem.title = @"Medical History";
     _rowLabelsText= [[NSArray alloc] initWithObjects:@"Diabetes Mellitus",@"Hyperlipidemia",@"Hypertension", nil];
@@ -29,7 +30,8 @@
     self.tableView.dataSource = self;
     
     [self.tableView reloadData];
-    // Uncomment the following line to preserve selection between presentations.
+    
+        // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
@@ -45,7 +47,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     
-    return 2;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

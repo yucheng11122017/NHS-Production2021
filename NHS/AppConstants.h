@@ -142,7 +142,7 @@ extern NSString *const kHasCpfPayouts;
 extern NSString *const kCpfAmt;
 extern NSString *const kReceivingFinAssist;
 extern NSString *const kFinAssistName;
-extern NSString *const kFinAssistORg;
+extern NSString *const kFinAssistOrg;
 extern NSString *const kFinAssistAmt;
 extern NSString *const kFinAssistPeriod;
 extern NSString *const kFinAssistEnuf;
