@@ -10,4 +10,12 @@
 
 @interface ScreeningSelectProfileTableVC : UITableViewController <UITableViewDelegate, UITableViewDataSource>
 
+
+
+@property (strong, nonatomic) NSDictionary* residentDetails;
+
+// Public Methods
+- (void) setResidentDetails:(NSDictionary *)residentDetails;
+
+
 @end

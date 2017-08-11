@@ -145,9 +145,9 @@ typedef enum preRegSection {
     row.value = [self.retrievedPatientDictionary objectForKey:kGender]? [self.retrievedPatientDictionary objectForKey:kGender]:@"Male";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDOB rowType:XLFormRowDescriptorTypeInteger title:@"DOB Year"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBirthDate rowType:XLFormRowDescriptorTypeInteger title:@"DOB Year"];
     row.required = YES;
-    row.value = [self.retrievedPatientDictionary objectForKey:kDOB]? [self.retrievedPatientDictionary objectForKey:kDOB]:@"";
+    row.value = [self.retrievedPatientDictionary objectForKey:kBirthDate]? [self.retrievedPatientDictionary objectForKey:kBirthDate]:@"";
     [section addFormRow:row];
     
     
@@ -156,15 +156,15 @@ typedef enum preRegSection {
     [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor * spokenLangRow;
-    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLanguage rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language"];
+    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language"];
     spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
     row.required = YES;
-    spokenLangRow.value = [self.retrievedPatientDictionary objectForKey:kSpokenLanguage]? [self.retrievedPatientDictionary objectForKey:kSpokenLanguage]:@[] ;
+    spokenLangRow.value = [self.retrievedPatientDictionary objectForKey:kSpokenLang]? [self.retrievedPatientDictionary objectForKey:kSpokenLang]:@[] ;
     [section addFormRow:spokenLangRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLangOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLangOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
     row.required = NO;
-    row.value = [self.retrievedPatientDictionary objectForKey:kSpokenLangOthers]? [self.retrievedPatientDictionary objectForKey:kSpokenLangOthers]:@"" ;
+    row.value = [self.retrievedPatientDictionary objectForKey:kLangOthers]? [self.retrievedPatientDictionary objectForKey:kLangOthers]:@"" ;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", spokenLangRow];
     [section addFormRow:row];
     
@@ -172,30 +172,30 @@ typedef enum preRegSection {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Contact Info"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kContactNumber rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHpNumber rowType:XLFormRowDescriptorTypePhone title:@"HP Number"];
     row.required = YES;
-    row.value = [self.retrievedPatientDictionary objectForKey:kContactNumber]? [self.retrievedPatientDictionary objectForKey:kContactNumber]:@"";
+    row.value = [self.retrievedPatientDictionary objectForKey:kHpNumber]? [self.retrievedPatientDictionary objectForKey:kHpNumber]:@"";
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddStreet rowType:XLFormRowDescriptorTypeText title:@"Address Street"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressStreet rowType:XLFormRowDescriptorTypeText title:@"Address Street"];
     row.required = YES;
-    row.value = [self.retrievedPatientDictionary objectForKey:kAddStreet]? [self.retrievedPatientDictionary objectForKey:kAddStreet]:@"";
+    row.value = [self.retrievedPatientDictionary objectForKey:kAddressStreet]? [self.retrievedPatientDictionary objectForKey:kAddressStreet]:@"";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddBlock rowType:XLFormRowDescriptorTypeText title:@"Address Block"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressBlock rowType:XLFormRowDescriptorTypeText title:@"Address Block"];
     row.required = YES;
-    row.value = [self.retrievedPatientDictionary objectForKey:kAddUnit]? [self.retrievedPatientDictionary objectForKey:kAddUnit]:@"";
+    row.value = [self.retrievedPatientDictionary objectForKey:kAddressUnitNum]? [self.retrievedPatientDictionary objectForKey:kAddressUnitNum]:@"";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddUnit rowType:XLFormRowDescriptorTypeText title:@"Address Unit"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressUnitNum rowType:XLFormRowDescriptorTypeText title:@"Address Unit"];
     row.required = YES;
-    row.value = [self.retrievedPatientDictionary objectForKey:kAddBlock]? [self.retrievedPatientDictionary objectForKey:kAddBlock]:@"";
+    row.value = [self.retrievedPatientDictionary objectForKey:kAddressBlock]? [self.retrievedPatientDictionary objectForKey:kAddressBlock]:@"";
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddPostCode rowType:XLFormRowDescriptorTypeInteger title:@"Address Post Code"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressPostCode rowType:XLFormRowDescriptorTypeInteger title:@"Address Post Code"];
     row.required = YES;
-    row.value = [self.retrievedPatientDictionary objectForKey:kAddPostCode]? [self.retrievedPatientDictionary objectForKey:kAddPostCode]:@"";
+    row.value = [self.retrievedPatientDictionary objectForKey:kAddressPostCode]? [self.retrievedPatientDictionary objectForKey:kAddressPostCode]:@"";
     [section addFormRow:row];
     
     // Required Services - Section
@@ -206,26 +206,26 @@ typedef enum preRegSection {
     [formDescriptor addFormSection:section];
 
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhleb rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Phleb"];
-    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:0]:@(NO);
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFOBT rowType:XLFormRowDescriptorTypeBooleanCheck title:@"FOBT"];
-    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:1]:@(NO);
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDental rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental"];
-    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:2]:@(NO);
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEye rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Eye"];
-    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:3]:@(NO);
-    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhleb rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Phleb"];
+//    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:0]:@(NO);
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFOBT rowType:XLFormRowDescriptorTypeBooleanCheck title:@"FOBT"];
+//    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:1]:@(NO);
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDental rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental"];
+//    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:2]:@(NO);
+//    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEye rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Eye"];
+//    row.value = [self.retrievedPatientDictionary objectForKey:@"otherservices"]? [[self.retrievedPatientDictionary objectForKey:@"otherservices"] objectAtIndex:3]:@(NO);
+//    [section addFormRow:row];
     
 //    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqServOthers rowType:XLFormRowDescriptorTypeTextView title:@"Others: -"];
 //    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqServOthers rowType:XLFormRowDescriptorTypeText];
-    [[row cellConfig] setObject:@"Add other services" forKey:@"textField.placeholder"];
-    section.multivaluedTag = @"otherservices";
-    section.multivaluedRowTemplate = row;
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqServOthers rowType:XLFormRowDescriptorTypeText];
+//    [[row cellConfig] setObject:@"Add other services" forKey:@"textField.placeholder"];
+//    section.multivaluedTag = @"otherservices";
+//    section.multivaluedRowTemplate = row;
     
     // Others - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Others"];
@@ -233,19 +233,19 @@ typedef enum preRegSection {
     
     
     // Date
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPrefDate rowType:XLFormRowDescriptorTypeDateInline title:@"Preferred Date"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kApptDate rowType:XLFormRowDescriptorTypeDateInline title:@"Preferred Date"];
     [row.cellConfigAtConfigure setObject:[NSDate new] forKey:@"minimumDate"];
     row.required = YES;
-    NSDate *date = [self.retrievedPatientDictionary objectForKey:kPrefDate]? [self.retrievedPatientDictionary objectForKey:kPrefDate]: [NSDate new];
+    NSDate *date = [self.retrievedPatientDictionary objectForKey:kApptTime]? [self.retrievedPatientDictionary objectForKey:kApptDate]: [NSDate new];
     row.value = date;
     [section addFormRow:row];
     
 //    // Preferred Time
     XLFormRowDescriptor *preferredTimeRow;
-    preferredTimeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPrefTime rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Preferred Time"];
+    preferredTimeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kApptTime rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Preferred Time"];
     preferredTimeRow.selectorOptions = @[@"9-11", @"11-1", @"1-3"];
     preferredTimeRow.required = YES;
-    preferredTimeRow.value = [self.retrievedPatientDictionary objectForKey:kPrefTime]? [self.retrievedPatientDictionary objectForKey:kPrefTime]:@[];
+    preferredTimeRow.value = [self.retrievedPatientDictionary objectForKey:kApptTime]? [self.retrievedPatientDictionary objectForKey:kApptTime]:@[];
     [section addFormRow:preferredTimeRow];
     
 //    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPrefTime rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Preferred Time"];
@@ -370,8 +370,8 @@ typedef enum preRegSection {
     NSMutableDictionary *formValuesDict = [[self.form formValues] mutableCopy];
     if ([formValuesDict objectForKey:kName] == [NSNull null])        //if NULL, cannot store in local directory
         [formValuesDict removeObjectForKey:kName];
-    if ([formValuesDict objectForKey:kSpokenLanguage] == [NSNull null]) {
-        [formValuesDict removeObjectForKey:kSpokenLanguage];
+    if ([formValuesDict objectForKey:kSpokenLang] == [NSNull null]) {
+        [formValuesDict removeObjectForKey:kSpokenLang];
     }
     // get current date/time
     NSDate *today = [NSDate date];

@@ -31,7 +31,7 @@ NSString *const kQ15 = @"q15";
 
 
 
-@interface HealthAssessAndRiskFormVC ()
+@interface HealthAssessAndRiskFormVC () 
 
 
 
@@ -42,6 +42,8 @@ NSString *const kQ15 = @"q15";
 - (void)viewDidLoad {
     
     XLFormViewController *form;
+    
+
     
     //must init first before [super viewDidLoad]
     int formNumber = [_formID intValue];
@@ -462,33 +464,58 @@ NSString *const kQ15 = @"q15";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Geriatric Depression Assessment"];
     [formDescriptor addFormSection:section];
     
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ1
+    XLFormRowDescriptor* phqQ1Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ1
                                                 rowType:XLFormRowDescriptorTypeStepCounter
                                                   title:@"Score for PHQ-2 question 1"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
-    [row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
-    [row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
-    [row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
-    [section addFormRow:row];
+    phqQ1Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [phqQ1Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
+    [phqQ1Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
+    [phqQ1Row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
+    [phqQ1Row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
+    [section addFormRow:phqQ1Row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ2
+    XLFormRowDescriptor* phqQ2Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ2
                                                 rowType:XLFormRowDescriptorTypeStepCounter
                                                   title:@"Score for PHQ-2 question 2"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
-    [row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
-    [row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
-    [row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhq9Score
+    phqQ2Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [phqQ2Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
+    [phqQ2Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
+    [phqQ2Row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
+    [phqQ2Row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
+    [section addFormRow:phqQ2Row];
+
+    XLFormRowDescriptor* phq9ScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhq9Score
                                                 rowType:XLFormRowDescriptorTypeNumber
-                                                  title:@"Total score for PHQ-9 field"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
+                                                  title:@"Total score for PHQ-9"];
+    phq9ScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    phq9ScoreRow.disabled = @(1);
+    [section addFormRow:phq9ScoreRow];
     
+    phqQ1Row.onChangeBlock= ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue intValue] > 1) phq9ScoreRow.disabled = @(0);
+            else {
+                if ([phqQ2Row.value intValue] < 2) {
+                    phq9ScoreRow.disabled = @(1);
+                }
+            }
+            [self reloadFormRow:phq9ScoreRow];
+        }
+    };
+    
+    phqQ2Row.onChangeBlock= ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue intValue] > 1) phq9ScoreRow.disabled = @(0);
+            else {
+                if ([phqQ1Row.value intValue] < 2) {
+                    phq9ScoreRow.disabled = @(1);
+                }
+            }
+            [self reloadFormRow:phq9ScoreRow];
+        }
+    };
+    
+
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpReq
                                                 rowType:XLFormRowDescriptorTypeBooleanSwitch
                                                   title:@"Does resident require further follow up?"];

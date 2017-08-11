@@ -10,6 +10,7 @@
 #import "HealthAssessAndRiskFormVC.h"
 @interface MedicalHistoryTableVC () {
     NSNumber *selectedRow;
+    
 }
 
 @property (strong, nonatomic) NSArray *rowLabelsText;
@@ -70,6 +71,7 @@
     [cell.textLabel setText:text];
     // Configure the cell...
     
+
     return cell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

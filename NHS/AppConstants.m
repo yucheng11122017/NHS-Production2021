@@ -12,26 +12,45 @@
 
 /*
 
- * Form Constants
+ * Resident Particulars
  ********************************************/
-NSString *const kName = @"name";
+NSString *const kName = @"resident_name";
 NSString *const kNRIC = @"nric";
 NSString *const kGender = @"gender";
-NSString *const kDOB = @"dob";
-NSString *const kSpokenLanguage = @"spokenlanguage";
-NSString *const kSpokenLangOthers = @"spokenlangothers";
-NSString *const kContactNumber = @"contactnumber";
-NSString *const kAddStreet = @"addressstreet";
-NSString *const kAddBlock = @"addressblock";
-NSString *const kAddUnit = @"addressunit";
-NSString *const kAddPostCode = @"addresspostcode";
-NSString *const kPhleb = @"phleb";
-NSString *const kFOBT = @"fobt";
-NSString *const kDental = @"dental";
-NSString *const kEye = @"eye";
-NSString *const kReqServOthers = @"reqservothers";
-NSString *const kPrefDate = @"preferreddate";
-NSString *const kPrefTime = @"preferredtime";
+NSString *const kBirthDate = @"birthdate";
+NSString *const kCitizenship = @"citizenship_status";
+NSString *const kReligion = @"religion";
+NSString *const kReligionOthers = @"religion_others";
+NSString *const kHpNumber = @"hp_number";
+NSString *const kHouseNumber = @"house_number";
+NSString *const kEthnicity = @"ethnicity";
+
+NSString *const kSpokenLang = @"spoken_lang";
+NSString *const kLangCanto = @"lang_canto";
+NSString *const kLangEng = @"lang_english";
+NSString *const kLangHindi = @"lang_hindi";
+NSString *const kLangHokkien = @"lang_hokkien";
+NSString *const kLangMalay = @"lang_malay";
+NSString *const kLangMandarin = @"lang_mandarin";
+NSString *const kLangTamil = @"lang_tamil";
+NSString *const kLangTeoChew = @"lang_teochew";
+NSString *const kLangOthers = @"lang_others";
+NSString *const kLangOthersText  = @"lang_others_text";
+
+NSString *const kMaritalStatus = @"marital_status";
+NSString *const kHousingOwnedRented = @"housing_owned_rented";
+NSString *const kHousingNumRooms = @"housing_num_rooms";
+NSString *const kHighestEduLevel = @"highest_edu_level";
+
+NSString *const kAddressStreet = @"address_street";
+NSString *const kAddressBlock = @"address_block";
+NSString *const kAddressOthers = @"address_others";
+NSString *const kAddressUnitNum = @"address_unit_num";
+NSString *const kAddressDuration = @"address_duration";
+NSString *const kAddressPostCode = @"address_postcode";
+
+NSString *const kIsFinal = @"is_final";
+
 NSString *const kNeighbourhood = @"neighbourhood";
 NSString *const kRemarks = @"remarks";
 

@@ -92,14 +92,14 @@
 //    [self.screeningBtn addTarget:self action:@selector(screeningBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
 //    [self.view addSubview:self.screeningBtn];
     
-    int yPos2 = yPos1*2;
-    CGRect frame2 = CGRectMake(30, yPos2, self.view.frame.size.width - 60, 50);
-    self.followUpBtn = [[HTPressableButton alloc] initWithFrame:frame2 buttonStyle:HTPressableButtonStyleRounded];
-    [self.followUpBtn setButtonColor:[UIColor ht_sunflowerColor]];
-    [self.followUpBtn setShadowColor:[UIColor ht_citrusColor]];
-    [self.followUpBtn setTitle:@"Follow Up" forState:UIControlStateNormal];
-    [self.followUpBtn addTarget:self action:@selector(followUpBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:self.followUpBtn];
+//    int yPos2 = yPos1*2;
+//    CGRect frame2 = CGRectMake(30, yPos2, self.view.frame.size.width - 60, 50);
+//    self.followUpBtn = [[HTPressableButton alloc] initWithFrame:frame2 buttonStyle:HTPressableButtonStyleRounded];
+//    [self.followUpBtn setButtonColor:[UIColor ht_sunflowerColor]];
+//    [self.followUpBtn setShadowColor:[UIColor ht_citrusColor]];
+//    [self.followUpBtn setTitle:@"Follow Up" forState:UIControlStateNormal];
+//    [self.followUpBtn addTarget:self action:@selector(followUpBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
+//    [self.view addSubview:self.followUpBtn];
 
     int yPos3 = yPos1*3;
     CGRect frame3 = CGRectMake(30, yPos3, self.view.frame.size.width - 60, 50);

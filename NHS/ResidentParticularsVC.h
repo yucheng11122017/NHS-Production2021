@@ -11,4 +11,9 @@
 
 @interface ResidentParticularsVC : XLFormViewController
 
+@property (strong, nonatomic) NSDictionary* residentParticularsDict;
+
+// Public Methods
+- (void) setResidentParticularsDict:(NSDictionary *)residentParticularsDict;
+
 @end

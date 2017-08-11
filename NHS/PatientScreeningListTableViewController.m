@@ -14,6 +14,7 @@
 #import "SVProgressHUD.h"
 #import "ScreeningSectionTableViewController.h"
 #import "GenericTableViewCell.h"
+#import "ScreeningSelectProfileTableVC.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
@@ -49,6 +50,8 @@ typedef enum residentDataSource {
 @property (strong, nonatomic) NSMutableDictionary *residentsGroupedInSections;
 @property (strong, nonatomic) NSMutableDictionary *retrievedResidentData;
 @property (strong, nonatomic) NSArray *localSavedFilename;
+
+@property (strong, nonatomic) NSDictionary *sampleResidentDict;
 
 
 @end
@@ -174,7 +177,9 @@ typedef enum residentDataSource {
     else if (status == ReachableViaWWAN)
     {
         NSLog(@"3G");
+        #ifndef DISABLE_SERVER_DATA_FETCH
         [self getAllScreeningResidents];
+        #endif
     }
 }
 
@@ -292,6 +297,8 @@ typedef enum residentDataSource {
 
     [SVProgressHUD showWithStatus:@"Loading..."];
     
+    
+    
     if (tableView == self.tableView) {      //not in the searchResult view
         //check if user clicked on drafts first
         if ([self.localSavedFilename count] > 0) {
@@ -308,9 +315,13 @@ typedef enum residentDataSource {
             }
         }
         
+        
+        
         //not part of draft
-        selectedResident = [[NSDictionary alloc] initWithDictionary:[self findResidentInfoFromSectionRow:indexPath]];
+        _sampleResidentDict = [[NSDictionary alloc] initWithDictionary:[self findResidentInfoFromSectionRow:indexPath]];
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
+        
+        [self saveAgeGenderAndCitizenship];
         
     } else {
         selectedResident = [[NSDictionary alloc] initWithDictionary:self.resultsTableController.filteredProducts[indexPath.row]];  //drafts not included in search!
@@ -409,11 +420,6 @@ typedef enum residentDataSource {
                                                       handler:^(UIAlertAction * action) {
                                                           selectedResidentID = @(-1);
                                                           [self performSegueWithIdentifier:@"NewScreeningFormSegue" sender:self];
-                                                      }]];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Pre-registered resident", nil)
-                                                        style:UIAlertActionStyleDefault
-                                                      handler:^(UIAlertAction * action) {
-                                                          [self performSegueWithIdentifier:@"SelectPreRegSegue" sender:self];
                                                       }]];
     [self presentViewController:alertController animated:YES completion:^{
         UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
@@ -751,8 +757,11 @@ typedef enum residentDataSource {
 
 - (void)refreshScreeningResidentTable:(NSNotification *) notification{
     NSLog(@"refresh screening table");
+    
     [self getLocalSavedData];
+#ifndef DISABLE_SERVER_DATA_FETCH
     [self getAllScreeningResidents];
+#endif
 }
 
 - (void) selectedPreRegResidentToNewScreenForm: (NSNotification *) notification {
@@ -766,16 +775,31 @@ typedef enum residentDataSource {
     int i;
     [self.residentNames removeAllObjects];   //reset this array first
     [self.residentScreenTimestamp removeAllObjects];   //reset this array first
-    NSArray *patients = @[@{@"resident_id":@"1",
-                            @"resident_name":@"Nicholas Wong",
+    NSArray *patients = @[@{@"resident_id":@1,
+                            @"resident_name":@"NICHOLAS WONG",
+                            kGender:@"M",
+                            kBirthDate:@"1990-06-12",
+                            kCitizenship:@"PR",
                             @"ts":@"2017-07-01 14:24:24",
                             @"nric":@"S1231234A"
                             },
-                          @{@"resident_id":@"2",
-                            @"resident_name":@"Yoga Kumar",
+                          @{@"resident_id":@2,
+                            @"resident_name":@"YOGA KUMAR",
+                            kBirthDate:@"1962-05-05",
+                            kGender:@"M",
+                            kCitizenship:@"Singaporean",
                             @"ts":@"2017-07-02 12:42:42",
                             @"nric":@"S3214321B"
+                            },
+                          @{@"resident_id":@3,
+                            @"resident_name":@"FOREIGNER MICHELLE",
+                            kGender:@"F",
+                            kBirthDate:@"1947-01-01",
+                            kCitizenship:@"Foreigner",
+                            @"ts":@"2017-07-03 08:41:44",
+                            @"nric":@"G1342231K"
                             }];
+;
     self.screeningResidents = [[NSMutableArray alloc] initWithArray:patients];
     
     NSSortDescriptor *sortDescriptor;
@@ -796,6 +820,23 @@ typedef enum residentDataSource {
     [self.refreshControl endRefreshing];
 }
 
+- (void) saveAgeGenderAndCitizenship {
+    NSMutableString *str = [_sampleResidentDict[kBirthDate] mutableCopy];
+    NSString *yearOfBirth = [str substringWithRange:NSMakeRange(0, 4)];
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy"];
+    
+    NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
+    
+    NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
+
+    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kCitizenship] forKey:@"ResidentCitizenship"];
+    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kGender] forKey:@"ResidentGender"];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:age] forKey:@"ResidentAge"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 #pragma mark - Navigation
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -813,6 +854,11 @@ typedef enum residentDataSource {
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentLocalFileIndex:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setResidentLocalFileIndex:)
                                               withObject:draftID];
+    }
+    
+    if ([segue.destinationViewController respondsToSelector:@selector(setResidentDetails:)]) {
+        [segue.destinationViewController performSelector:@selector(setResidentDetails:)
+                                              withObject:_sampleResidentDict];
     }
 }
 

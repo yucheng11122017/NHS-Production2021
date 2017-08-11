@@ -13,25 +13,43 @@
 /*
  * Form Constants
  ********************************************/
-extern NSString* const baseURL;
 extern NSString *const kName;
 extern NSString *const kNRIC;
 extern NSString *const kGender;
-extern NSString *const kDOB;
-extern NSString *const kSpokenLanguage;
-extern NSString *const kSpokenLangOthers;
-extern NSString *const kContactNumber;
-extern NSString *const kAddStreet;
-extern NSString *const kAddBlock;
-extern NSString *const kAddUnit;
-extern NSString *const kAddPostCode;
-extern NSString *const kPhleb;
-extern NSString *const kFOBT;
-extern NSString *const kDental;
-extern NSString *const kEye;
-extern NSString *const kReqServOthers;
-extern NSString *const kPrefDate;
-extern NSString *const kPrefTime;
+extern NSString *const kBirthDate;
+extern NSString *const kCitizenship;
+extern NSString *const kReligion;
+extern NSString *const kReligionOthers;
+extern NSString *const kHpNumber;
+extern NSString *const kHouseNumber;
+extern NSString *const kEthnicity;
+
+extern NSString *const kSpokenLang;
+extern NSString *const kLangCanto;
+extern NSString *const kLangEng;
+extern NSString *const kLangHindi;
+extern NSString *const kLangHokkien;
+extern NSString *const kLangMalay;
+extern NSString *const kLangMandarin;
+extern NSString *const kLangTamil;
+extern NSString *const kLangTeoChew;
+extern NSString *const kLangOthers;
+extern NSString *const kLangOthersText;
+
+extern NSString *const kMaritalStatus;
+extern NSString *const kHousingOwnedRented;
+extern NSString *const kHousingNumRooms;
+extern NSString *const kHighestEduLevel;
+
+extern NSString *const kAddressStreet;
+extern NSString *const kAddressBlock;
+extern NSString *const kAddressOthers;
+extern NSString *const kAddressUnitNum;
+extern NSString *const kAddressDuration;
+extern NSString *const kAddressPostCode;
+
+extern NSString *const kIsFinal;
+
 extern NSString *const kNeighbourhood;
 extern NSString *const kRemarks;
 

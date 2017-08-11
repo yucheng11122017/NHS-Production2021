@@ -186,9 +186,6 @@ NSString *const kInteract = @"interact";
 NSString *const kSafePlaces = @"safe_places";
 
 //Demographics
-NSString *const kCitizenship = @"citizenship";
-NSString *const kReligion = @"religion";
-NSString *const kReligionOthers = @"religion_others";
 
 //Current Physical Issues
 NSString *const kMultiADL = @"multi_adl";
@@ -268,6 +265,7 @@ NSString *const kHelpHelpful = @"help_helpful";
     XLFormRowDescriptor *relativesContactRow, *relativesEaseRow, *relativesCloseRow, *friendsContactRow, *friendsEaseRow, *friendsCloseRow, *socialScoreRow;
     NSString *neighbourhood, *citizenship;
     NSNumber *age;
+    BOOL sporean, age50, relColorectCancer, colon3Yrs, wantColRef, disableFIT;
 }
 
 @end
@@ -280,9 +278,15 @@ NSString *const kHelpHelpful = @"help_helpful";
     
     //fixed for now
     neighbourhood = @"KGL";
-    citizenship = @"Singaporean";
-    age = [NSNumber numberWithInt:70];
-    gender = @"M";
+//    citizenship = @"Singaporean";
+//    age = [NSNumber numberWithInt:70];
+    
+    citizenship = [[NSUserDefaults standardUserDefaults]
+                            stringForKey:@"ResidentCitizenship"];
+    age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
+                             stringForKey:@"ResidentAge"];
+    gender = [[NSUserDefaults standardUserDefaults]
+              stringForKey:@"ResidentGender"];
     
     
 //    form = [self initModeOfScreening];
@@ -335,7 +339,7 @@ NSString *const kHelpHelpful = @"help_helpful";
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
-    [self saveEntriesIntoDictionary];
+//    [self saveEntriesIntoDictionary];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"updateFullScreeningForm"
                                                         object:nil
                                                       userInfo:self.fullScreeningForm];
@@ -449,6 +453,9 @@ NSString *const kHelpHelpful = @"help_helpful";
     XLFormRowDescriptor * row;
     XLFormRowDescriptor *rowInfo;
     
+    sporean = age50 = relColorectCancer = colon3Yrs = wantColRef = disableFIT = false;
+    
+    
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
@@ -479,8 +486,8 @@ NSString *const kHelpHelpful = @"help_helpful";
     [otherEmployRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:otherEmployRow];
     
-    XLFormRowDescriptor *noDiscloseIncomeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiscloseIncome rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Resident does not want to disclose income"];
-    noDiscloseIncomeRow.selectorOptions = @[@"Yes", @"No"];
+    XLFormRowDescriptor *noDiscloseIncomeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiscloseIncome rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident does not want to disclose income"];
+//    noDiscloseIncomeRow.selectorOptions = @[@"Yes", @"No"];
     noDiscloseIncomeRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     noDiscloseIncomeRow.required = NO;
     [section addFormRow:noDiscloseIncomeRow];
@@ -543,7 +550,7 @@ NSString *const kHelpHelpful = @"help_helpful";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"CHAS Preliminary Eligibility Assessment"];
     [formDescriptor addFormSection:section];
 
-    XLFormRowDescriptor *chasNoChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDoesntOwnChasPioneer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does not currently own a CHAS card (blue/orange/NA) or pioneer generation card"];
+    XLFormRowDescriptor *chasNoChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDoesntOwnChasPioneer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does not currently own a CHAS card (blue/orange) or pioneer generation card"];
     chasNoChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     chasNoChasRow.required = NO;
     [section addFormRow:chasNoChasRow];
@@ -569,7 +576,7 @@ NSString *const kHelpHelpful = @"help_helpful";
     // Disable all income related questions if not willing to disclose income
     noDiscloseIncomeRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if (oldValue != newValue) {
-            if ([newValue isEqual:@"Yes"]) {
+            if ([newValue isEqual:@(1)]) {
                 mthHouseIncome.disabled = @(1);
                 noOfPplInHouse.disabled = @(1);
                 avgIncomePerHead.disabled = @(1);
@@ -602,37 +609,47 @@ NSString *const kHelpHelpful = @"help_helpful";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Colonoscopy"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
-    row.required = NO;
-    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"])
-        row.value = @1;
-    else
-        row.value = @0;
-    [section addFormRow:row];
+    XLFormRowDescriptor *sporeanPrRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
+    sporeanPrRow.required = NO;
+    sporeanPrRow.disabled = @(1);
+    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"]) {
+        sporeanPrRow.value = @1;
+        sporean = YES;
+    }
+    else {
+        sporeanPrRow.value = @0;
+        sporean = NO;
+    }
+    [section addFormRow:sporeanPrRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove50 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Age 50 and above"];
-    row.required = NO;
-    if ([age integerValue] >= 50)
-        row.value = @1;
-    else
-        row.value = @0;
-    [section addFormRow:row];
+    XLFormRowDescriptor *age50Row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove50 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Age 50 and above"];
+    age50Row.required = NO;
+    age50Row.disabled = @(1);
+    if ([age integerValue] >= 50) {
+        age50Row.value = @1;
+        age50 = YES;
+    }
+    else {
+        age50Row.value = @0;
+        age50 = NO;
+    }
+    [section addFormRow:age50Row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRelWColorectCancer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"First degree relative with colorectal cancer?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    [section addFormRow:row];
+    XLFormRowDescriptor *relColCancerRow = [XLFormRowDescriptor formRowDescriptorWithTag:kRelWColorectCancer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"First degree relative with colorectal cancer?"];
+    relColCancerRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    relColCancerRow.required = NO;
+    [section addFormRow:relColCancerRow];
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy3yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 3 years?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    [section addFormRow:row];
+    XLFormRowDescriptor *colon3yrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy3yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 3 years?"];
+    colon3yrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    colon3yrsRow.required = NO;
+    [section addFormRow:colon3yrsRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantColonoscopyRef rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a referral for free colonoscopy?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    [section addFormRow:row];
+    XLFormRowDescriptor *wantColonRefRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantColonoscopyRef rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a referral for free colonoscopy?"];
+    wantColonRefRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    wantColonRefRow.required = NO;
+    [section addFormRow:wantColonRefRow];
     
     // Eligibility Assessment for FIT - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for FIT"];
@@ -640,6 +657,7 @@ NSString *const kHelpHelpful = @"help_helpful";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
     row.required = NO;
+    row.disabled = @(1);
     if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"])
         row.value = @1;
     else
@@ -648,53 +666,109 @@ NSString *const kHelpHelpful = @"help_helpful";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove50 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Age 50 and above"];
     row.required = NO;
+    row.disabled = @(1);
     if ([age integerValue] >= 50)
         row.value = @1;
     else
         row.value = @0;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFitLast12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done FIT in the last 12 months?"];
-    row.required = NO;
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    [section addFormRow:row];
+    XLFormRowDescriptor *fitLast12MthsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFitLast12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done FIT in the last 12 months?"];
+    fitLast12MthsRow.required = NO;
+    fitLast12MthsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    [section addFormRow:fitLast12MthsRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy10Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 10 years?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    [section addFormRow:row];
+    XLFormRowDescriptor *colonoscopy10YrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy10Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 10 years?"];
+    colonoscopy10YrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    colonoscopy10YrsRow.required = NO;
+    [section addFormRow:colonoscopy10YrsRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantFitKit rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free FIT kit?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    [section addFormRow:row];
+    XLFormRowDescriptor *wantFitKitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantFitKit rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free FIT kit?"];
+    wantFitKitRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    wantFitKitRow.required = NO;
+    [section addFormRow:wantFitKitRow];
+    
+    relColCancerRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([newValue isEqual:@(1)])  relColorectCancer = true;
+            else relColorectCancer = false;
+        }
+        
+        if (sporean && age50 && relColorectCancer && colon3Yrs && wantColRef) disableFIT = true;
+        else disableFIT = false;
+        fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
+        colonoscopy10YrsRow.disabled = [NSNumber numberWithBool:disableFIT];
+        wantFitKitRow.disabled = [NSNumber numberWithBool:disableFIT];
+        [self reloadFormRow:fitLast12MthsRow];
+        [self reloadFormRow:colonoscopy10YrsRow];
+        [self reloadFormRow:wantFitKitRow];
+        
+    };
+    
+    colon3yrsRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([newValue isEqual:@(1)]) colon3Yrs  = true;
+            else colon3Yrs = false;
+        }
+        
+        if (sporean && age50 && relColorectCancer && colon3Yrs && wantColRef) disableFIT = true;
+        else disableFIT = false;
+        
+        fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
+        colonoscopy10YrsRow.disabled = [NSNumber numberWithBool:disableFIT];
+        wantFitKitRow.disabled = [NSNumber numberWithBool:disableFIT];
+        [self reloadFormRow:fitLast12MthsRow];
+        [self reloadFormRow:colonoscopy10YrsRow];
+        [self reloadFormRow:wantFitKitRow];
+
+    };
+    
+    wantColonRefRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([newValue isEqual:@(1)]) wantColRef  = true;
+            else wantColRef = false;
+        }
+        
+        if (sporean && age50 && relColorectCancer && colon3Yrs && wantColRef) disableFIT = true;
+        else disableFIT = false;
+        fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
+        colonoscopy10YrsRow.disabled = [NSNumber numberWithBool:disableFIT];
+        wantFitKitRow.disabled = [NSNumber numberWithBool:disableFIT];
+        [self reloadFormRow:fitLast12MthsRow];
+        [self reloadFormRow:colonoscopy10YrsRow];
+        [self reloadFormRow:wantFitKitRow];
+
+    };
+    
+    
+    
     
     BOOL isMale;
     if ([gender isEqualToString:@"M"]) isMale=true;
     else isMale = false;
     
     // Eligibility Assessment for Mammogram - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Mammogram (Female only)"];
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Mammogram"];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean"];
     row.required = NO;
+    row.disabled = @(1);
     if ([citizenship isEqualToString:@"Singaporean"])
         row.value = @1;
     else
         row.value = @0;
-    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+//    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
-    
-#warning need to change age name for 50 to 69
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeCheck rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 50 to 69"];
     row.required = NO;
+    row.disabled = @(1);
     if (([age integerValue] >= 50) && ([age integerValue] < 70))
         row.value = @1;
     else
         row.value = @0;
-    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+//    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kMammo2Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done mammogram in the last 2 years?"];
@@ -716,27 +790,29 @@ NSString *const kHelpHelpful = @"help_helpful";
     [section addFormRow:row];
     
     // Eligibility Assessment for pap smear - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Pap Smear (Female only)"];
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Pap Smear"];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
     row.required = NO;
+    row.disabled = @(1);
     if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"])
         row.value = @1;
     else
         row.value = @0;
-    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+//    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
 #warning need to change the age name
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeCheck2 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 25 to 69"];
     row.required = NO;
+    row.disabled = @(1);
     if (([age integerValue] >= 25) && ([age integerValue] < 70))
         row.value = @1;
     else
         row.value = @0;
-    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+//    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kPap3Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done pap smear in the last 3 years?"];
@@ -758,12 +834,13 @@ NSString *const kHelpHelpful = @"help_helpful";
     [section addFormRow:row];
 
     
-    // Eligibility Assessment for fall risk - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Fall Risk"];
+    // Eligibility for Fall Risk Assessment - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility for Fall Risk Assessment"];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove50 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 65 and above?"];
     row.required = NO;
+    row.disabled = @(1);
     if ([age integerValue] >= 65)
         row.value = @1;
     else
@@ -785,12 +862,13 @@ NSString *const kHelpHelpful = @"help_helpful";
     row.required = NO;
     [section addFormRow:row];
     
-    // Eligibility Assessment for mental health - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for geriatric dementia"];
+    // Eligibility for Geriatric dementia assessment - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility for Geriatric dementia assessment"];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove65 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 65 and above?"];
     row.required = NO;
+    row.disabled = @(1);
     if ([age integerValue] >= 65)
         row.value = @1;
     else

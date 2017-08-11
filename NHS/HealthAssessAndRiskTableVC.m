@@ -10,6 +10,7 @@
 
 @interface HealthAssessAndRiskTableVC () {
     NSNumber *destinationFormID;
+    NSNumber *age;
 }
 
 @property (strong, nonatomic) NSArray *rowLabelsText;
@@ -21,6 +22,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
+                        stringForKey:@"ResidentAge"];
     
     self.navigationItem.title = @"Health Assessment and Risk Stratisfaction";
     _rowLabelsText= [[NSArray alloc] initWithObjects:@"Medical History",@"Geriatric Depression Assessment",@"Risk Stratification", nil];
@@ -66,7 +69,13 @@
     NSString *text = [_rowLabelsText objectAtIndex:indexPath.row];
     
     [cell.textLabel setText:text];
-    // Configure the cell...
+    
+    if (indexPath.row == 1) {   //Geriatric Depression Assessment
+        if ([age intValue] <65) {
+            [cell.textLabel setTextColor:[UIColor grayColor]];
+        }
+    }
+    
     
     return cell;
 }
@@ -77,6 +86,13 @@
     if (indexPath.row == 0)
         [self performSegueWithIdentifier:@"HARSToMedHistSegue" sender:self];
     else {
+        if (indexPath.row == 1) {   //Geriatric Depression Assessment
+            if ([age intValue] <65) {
+                [tableView deselectRowAtIndexPath:indexPath animated:YES];
+                return; //do nothing
+            }
+        }
+        
         NSInteger targetRow = indexPath.row + 2;
         destinationFormID = [NSNumber numberWithInteger:targetRow];
         [self performSegueWithIdentifier:@"HARSToFormSegue" sender:self];

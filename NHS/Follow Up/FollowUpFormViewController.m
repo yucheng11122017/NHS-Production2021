@@ -217,38 +217,38 @@ NSString *const kFollowUpInfo = @"follow_up_info";
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDOB rowType:XLFormRowDescriptorTypeInteger title:@"Year of Birth *"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBirthDate rowType:XLFormRowDescriptorTypeInteger title:@"Year of Birth *"];
     row.required = YES;
     row.value = [resiPartiDict objectForKey:@"birth_year"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kContactNumber rowType:XLFormRowDescriptorTypePhone title:@"Contact No *"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHpNumber rowType:XLFormRowDescriptorTypePhone title:@"Contact No *"];
     row.required = YES;
     row.value = [resiPartiDict objectForKey:@"contact_no"];
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddPostCode rowType:XLFormRowDescriptorTypeInteger title:@"Address (Post Code) *"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressPostCode rowType:XLFormRowDescriptorTypeInteger title:@"Address (Post Code) *"];
     row.required = YES;
     row.value = [resiPartiDict objectForKey:@"address_postcode"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddStreet rowType:XLFormRowDescriptorTypeName title:@"Address (Street) *"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressStreet rowType:XLFormRowDescriptorTypeName title:@"Address (Street) *"];
     row.required = YES;
     row.value = [resiPartiDict objectForKey:@"address_street"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddBlock rowType:XLFormRowDescriptorTypeText title:@"Address (Block) *"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressBlock rowType:XLFormRowDescriptorTypeText title:@"Address (Block) *"];
     row.required = YES;
     row.value = [resiPartiDict objectForKey:@"address_block"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddUnit rowType:XLFormRowDescriptorTypeText title:@"Address (Unit)* - {With #}"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressUnitNum rowType:XLFormRowDescriptorTypeText title:@"Address (Unit)* - {With #}"];
     row.required = YES;
     row.value = [resiPartiDict objectForKey:@"address_unit"];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
