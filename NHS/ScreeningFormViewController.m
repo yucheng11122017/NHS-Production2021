@@ -277,7 +277,7 @@ NSString *const kHelpHelpful = @"help_helpful";
     XLFormViewController *form;
     
     //fixed for now
-    neighbourhood = @"KGL";
+//    neighbourhood = @"KGL";
 //    citizenship = @"Singaporean";
 //    age = [NSNumber numberWithInt:70];
     
@@ -287,6 +287,8 @@ NSString *const kHelpHelpful = @"help_helpful";
                              stringForKey:@"ResidentAge"];
     gender = [[NSUserDefaults standardUserDefaults]
               stringForKey:@"ResidentGender"];
+    neighbourhood = [[NSUserDefaults standardUserDefaults]
+              stringForKey:@"Neighbourhood"];
     
     
 //    form = [self initModeOfScreening];

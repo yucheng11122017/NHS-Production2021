@@ -11,5 +11,9 @@
 @interface PatientScreeningListTableViewController : UITableViewController
 
 @property NSMutableArray *screeningResidents;
+@property NSString *neighbourhood;
+
+- (void) setNeighbourhood:(NSString *)neighbourhood;
+
 
 @end

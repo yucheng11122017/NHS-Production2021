@@ -775,30 +775,66 @@ typedef enum residentDataSource {
     int i;
     [self.residentNames removeAllObjects];   //reset this array first
     [self.residentScreenTimestamp removeAllObjects];   //reset this array first
-    NSArray *patients = @[@{@"resident_id":@1,
-                            @"resident_name":@"NICHOLAS WONG",
-                            kGender:@"M",
-                            kBirthDate:@"1990-06-12",
-                            kCitizenship:@"PR",
-                            @"ts":@"2017-07-01 14:24:24",
-                            @"nric":@"S1231234A"
-                            },
-                          @{@"resident_id":@2,
-                            @"resident_name":@"YOGA KUMAR",
-                            kBirthDate:@"1962-05-05",
-                            kGender:@"M",
-                            kCitizenship:@"Singaporean",
-                            @"ts":@"2017-07-02 12:42:42",
-                            @"nric":@"S3214321B"
-                            },
-                          @{@"resident_id":@3,
-                            @"resident_name":@"FOREIGNER MICHELLE",
-                            kGender:@"F",
-                            kBirthDate:@"1947-01-01",
-                            kCitizenship:@"Foreigner",
-                            @"ts":@"2017-07-03 08:41:44",
-                            @"nric":@"G1342231K"
-                            }];
+    NSArray *patients;
+  
+    if ([_neighbourhood isEqualToString:@"EC"]) {   //kampung glam
+        patients =@[@{@"resident_id":@1,
+                      @"resident_name":@"NICHOLAS WONG",
+                      kNeighbourhood:@"EC",
+                      kGender:@"M",
+                      kBirthDate:@"1990-06-12",
+                      kCitizenship:@"PR",
+                      @"ts":@"2017-07-01 14:24:24",
+                      @"nric":@"S1231234A"
+                      },
+                    @{@"resident_id":@2,
+                      @"resident_name":@"YOGA KUMAR",
+                      kNeighbourhood:@"EC",
+                      kBirthDate:@"1962-05-05",
+                      kGender:@"M",
+                      kCitizenship:@"Singaporean",
+                      @"ts":@"2017-07-02 12:42:42",
+                      @"nric":@"S3214321B"
+                      },
+                    @{@"resident_id":@3,
+                      @"resident_name":@"FOREIGNER MICHELLE",
+                      kNeighbourhood:@"EC",
+                      kGender:@"F",
+                      kBirthDate:@"1947-01-01",
+                      kCitizenship:@"Foreigner",
+                      @"ts":@"2017-07-03 08:41:44",
+                      @"nric":@"G1342231K"
+                      }];
+    } else {
+        patients =@[@{@"resident_id":@1,
+                      @"resident_name":@"MOHAMMAD YUSOF",
+                      kNeighbourhood:@"KGL",
+                      kGender:@"M",
+                      kBirthDate:@"1989-07-13",
+                      kCitizenship:@"PR",
+                      @"ts":@"2017-07-01 14:24:24",
+                      @"nric":@"S1231234A"
+                      },
+                    @{@"resident_id":@2,
+                      @"resident_name":@"JOSEPH SCHOOLING",
+                      kNeighbourhood:@"KGL",
+                      kBirthDate:@"1960-05-05",
+                      kGender:@"M",
+                      kCitizenship:@"Singaporean",
+                      @"ts":@"2017-07-02 12:42:42",
+                      @"nric":@"S3214321B"
+                      },
+                    @{@"resident_id":@3,
+                      @"resident_name":@"MICHELLE OBAMA",
+                      kNeighbourhood:@"KGL",
+                      kGender:@"F",
+                      kBirthDate:@"1940-01-01",
+                      kCitizenship:@"Foreigner",
+                      @"ts":@"2017-07-03 08:41:44",
+                      @"nric":@"G1342231K"
+                      }];
+    }
+    
 ;
     self.screeningResidents = [[NSMutableArray alloc] initWithArray:patients];
     
@@ -834,6 +870,7 @@ typedef enum residentDataSource {
     [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kCitizenship] forKey:@"ResidentCitizenship"];
     [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kGender] forKey:@"ResidentGender"];
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:age] forKey:@"ResidentAge"];
+    [[NSUserDefaults standardUserDefaults] setObject:_neighbourhood forKey:@"Neighbourhood"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

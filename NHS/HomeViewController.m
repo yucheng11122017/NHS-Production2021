@@ -77,9 +77,10 @@
 - (void) createButtons {
     // Rounded rectangular default color button
     int yPos1 = (self.view.frame.size.height - (self.navigationController.navigationBar.frame.size.height + 60 + 40))/5;
-    CGRect frame1 = CGRectMake(30, yPos1, self.view.frame.size.width - 60, 50);
+    CGRect frame1 = CGRectMake(30, yPos1, self.view.frame.size.width - 60, 100);
     self.screeningBtn = [[HTPressableButton alloc] initWithFrame:frame1 buttonStyle:HTPressableButtonStyleRounded];
     [self.screeningBtn setTitle:@"Screening" forState:UIControlStateNormal];
+    [self.screeningBtn setTitleFont:[UIFont systemFontOfSize:25]];
     [self.screeningBtn addTarget:self action:@selector(screeningBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.screeningBtn];
     
@@ -102,29 +103,30 @@
 //    [self.view addSubview:self.followUpBtn];
 
     int yPos3 = yPos1*3;
-    CGRect frame3 = CGRectMake(30, yPos3, self.view.frame.size.width - 60, 50);
+    CGRect frame3 = CGRectMake(30, yPos3, self.view.frame.size.width - 60, 100);
     self.drawingBtn = [[HTPressableButton alloc] initWithFrame:frame3 buttonStyle:HTPressableButtonStyleRounded];
     [self.drawingBtn setButtonColor:[UIColor ht_amethystColor]];
     [self.drawingBtn setShadowColor:[UIColor ht_wisteriaColor]];
-    [self.drawingBtn setTitle:@"Launch CamScanner" forState:UIControlStateNormal];
+    [self.drawingBtn setTitle:@"Download CamScanner" forState:UIControlStateNormal];
+    [self.drawingBtn setTitleFont:[UIFont systemFontOfSize:23]];
     [self.drawingBtn addTarget:self action:@selector(drawingBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.drawingBtn];
     
-    int yPos4 = yPos1*4;
-    CGRect frame4 = CGRectMake(30, yPos4, self.view.frame.size.width - 60, 50);
-    self.selectPhotoBtn = [[HTPressableButton alloc] initWithFrame:frame4 buttonStyle:HTPressableButtonStyleRounded];
-    [self.selectPhotoBtn setButtonColor:[UIColor ht_grapeFruitColor]];
-    [self.selectPhotoBtn setShadowColor:[UIColor ht_grapeFruitDarkColor]];
-    [self.selectPhotoBtn setTitle:@"Select Photo" forState:UIControlStateNormal];
-    [self.selectPhotoBtn addTarget:self action:@selector(selectPhoto:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:self.selectPhotoBtn];
+//    int yPos4 = yPos1*4;
+//    CGRect frame4 = CGRectMake(30, yPos4, self.view.frame.size.width - 60, 50);
+//    self.selectPhotoBtn = [[HTPressableButton alloc] initWithFrame:frame4 buttonStyle:HTPressableButtonStyleRounded];
+//    [self.selectPhotoBtn setButtonColor:[UIColor ht_grapeFruitColor]];
+//    [self.selectPhotoBtn setShadowColor:[UIColor ht_grapeFruitDarkColor]];
+//    [self.selectPhotoBtn setTitle:@"Select Photo" forState:UIControlStateNormal];
+//    [self.selectPhotoBtn addTarget:self action:@selector(selectPhoto:) forControlEvents:UIControlEventTouchUpInside];
+//    [self.view addSubview:self.selectPhotoBtn];
     
     self.logoutBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"Logout"] style:UIBarButtonItemStylePlain target:self action:@selector(logoutBtnPressed:)];
 }
 
 #pragma mark - Buttons Action
 - (IBAction) screeningBtnPressed: (HTPressableButton *) sender {
-    [self performSegueWithIdentifier:@"HomeToScreeningListSegue" sender:self];
+    [self performSegueWithIdentifier:@"homeToVenueSelectionSegue" sender:self];
 }
 
 - (IBAction) followUpBtnPressed: (HTPressableButton *) sender {
@@ -132,7 +134,8 @@
 }
 
 - (IBAction) drawingBtnPressed: (HTPressableButton *) sender {
-    [self openScheme:@"camscannerfree:"];
+//    [self openScheme:@"camscannerfree:"];
+    [self downloadCamScanner];
 }
 
 - (IBAction) selectPhoto: (HTPressableButton *) sender {
@@ -194,10 +197,10 @@
 - (void) updateButtonsFrame {
     int yPos1 = (self.view.frame.size.height - (self.navigationController.navigationBar.frame.size.height + 60 + 40))/5;
 //    self.preRegBtn.frame = CGRectMake(30, yPos1, self.view.frame.size.width - 60, 50);
-    self.screeningBtn.frame = CGRectMake(30, yPos1*1, self.view.frame.size.width - 60, 50);
-    self.followUpBtn.frame = CGRectMake(30, yPos1*2, self.view.frame.size.width - 60, 50);
-    self.drawingBtn.frame = CGRectMake(30, yPos1*3, self.view.frame.size.width - 60, 50);
-    self.selectPhotoBtn.frame = CGRectMake(30, yPos1*4, self.view.frame.size.width - 60, 50);
+    self.screeningBtn.frame = CGRectMake(30, yPos1*1, self.view.frame.size.width - 60, 100);
+//    self.followUpBtn.frame = CGRectMake(30, yPos1*2, self.view.frame.size.width - 60, 50);
+    self.drawingBtn.frame = CGRectMake(30, yPos1*3, self.view.frame.size.width - 60, 100);
+//    self.selectPhotoBtn.frame = CGRectMake(30, yPos1*4, self.view.frame.size.width - 60, 50);
 }
 /*
 #pragma mark - Navigation

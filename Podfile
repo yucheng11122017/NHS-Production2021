@@ -17,6 +17,7 @@ abstract_target 'CocoaPods' do
   pod 'ACEDrawingView'
   pod 'FontAwesomeKit', '~> 2.2'
 #  pod 'LiquidFloatingActionButton', '~> 1.2'
+  
 
   target 'NHS' do
     # Uncomment this line if you're using Swift or would like to use dynamic frameworks

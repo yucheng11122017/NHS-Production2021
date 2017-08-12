@@ -71,6 +71,10 @@
 {
     selectedRow = [NSNumber numberWithInteger:indexPath.row];
     
+    if (indexPath.row == 0) {
+        [self performSegueWithIdentifier:@"socialWorkToDemographicsSegue" sender:self];
+    }
+    
     if (indexPath.row == 1) {
         [self performSegueWithIdentifier:@"socialWorkToFormVC" sender:self];
     }
