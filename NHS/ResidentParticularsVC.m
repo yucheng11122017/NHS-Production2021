@@ -17,7 +17,7 @@
 #import "XLForm.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
-#define DEFAULT_FONT_SIZE 15
+
 
 //[row.cellConfigAtConfigure setObject:[NSNumber numberWithFloat:0.7] forKey:XLFormTextFieldLengthPercentage];      //for changing the answer's fontSize
 
@@ -379,6 +379,83 @@
     
     [self deselectFormRow:sender];
 }
+
+
+//- (void) saveResidentParticulars {
+//    NSDictionary *fields = [self.form formValues];
+//    NSMutableDictionary *resi_particulars = [[self.fullScreeningForm objectForKey:@"resi_particulars"] mutableCopy];
+//
+//    if ([fields objectForKey:kGender] != [NSNull null]) {
+//        if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
+//            [resi_particulars setObject:@"M" forKey:kGender];
+//        } else if ([[fields objectForKey:kGender] isEqualToString:@"Female"]) {
+//            [resi_particulars setObject:@"F" forKey:kGender];
+//        }
+//    }
+//
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kName] forKey:@"resident_name"];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kNRIC] forKey:kNRIC];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kDOB] forKey:@"birth_year"];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kContactNumber] forKey:@"contact_no"];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kAddPostCode] forKey:@"address_postcode"];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kAddStreet] forKey:@"address_street"];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kAddBlock] forKey:@"address_block"];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kAddUnit] forKey:@"address_unit"];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kConsentNUS] forKey:kConsentNUS];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kConsentHPB] forKey:kConsentHPB];
+////    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kConsentGoodlife] forKey:kConsentGoodlife];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kAddYears] forKey:@"address_num_years"];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kContactNumber2] forKey:@"contact_no2"];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kSpokenLangOthers] forKey:@"lang_others_text"];
+//
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kEthnicity] forKey:kEthnicity];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kMaritalStatus] forKey:kMaritalStatus];
+//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kHighestEduLvl] forKey:@"highest_edu_lvl"];
+//
+//    //Init them to zero first
+//    [resi_particulars setObject:@"0" forKey:@"lang_canto"];
+//    [resi_particulars setObject:@"0" forKey:@"lang_english"];
+//    [resi_particulars setObject:@"0" forKey:@"lang_hokkien"];
+//    [resi_particulars setObject:@"0" forKey:@"lang_hindi"];
+//    [resi_particulars setObject:@"0" forKey:@"lang_malay"];
+//    [resi_particulars setObject:@"0" forKey:@"lang_mandrin"];
+//    [resi_particulars setObject:@"0" forKey:@"lang_tamil"];
+//    [resi_particulars setObject:@"0" forKey:@"lang_teochew"];
+//    [resi_particulars setObject:@"0" forKey:@"lang_others"];
+//
+//    if ([[fields objectForKey:kSpokenLanguage] count]!=0) {
+//        NSArray *spokenLangArray = [fields objectForKey:kSpokenLanguage];
+//        for (int i=0; i<[spokenLangArray count]; i++) {
+//
+//            if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Cantonese"]) [resi_particulars setObject:@"1" forKey:@"lang_canto"];
+//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"English"]) [resi_particulars setObject:@"1" forKey:@"lang_english"];
+//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Hindi"]) [resi_particulars setObject:@"1" forKey:@"lang_hindi"];
+//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Hokkien"]) [resi_particulars setObject:@"1" forKey:@"lang_hokkien"];
+//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Malay"]) [resi_particulars setObject:@"1" forKey:@"lang_malay"];
+//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Mandarin"]) [resi_particulars setObject:@"1" forKey:@"lang_mandrin"];
+//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Tamil"]) [resi_particulars setObject:@"1" forKey:@"lang_tamil"];
+//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Teochew"]) [resi_particulars setObject:@"1" forKey:@"lang_teochew"];
+//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Others"]) [resi_particulars setObject:@"1" forKey:@"lang_others"];
+//        }
+//    }
+//
+//    NSString *room;
+//    NSUInteger loc;
+//    if (([fields objectForKey:kHousingType] != [NSNull null]) && ([fields objectForKey:kHousingType])) {
+//        NSString *houseType = [fields objectForKey:kHousingType];
+//        if ([houseType rangeOfString:@"Owned"].location != NSNotFound) {
+//            [resi_particulars setObject:@"0" forKey:@"housing_owned_rented"];
+//        } else if ([houseType rangeOfString:@"Rental"].location != NSNotFound) {
+//            [resi_particulars setObject:@"1" forKey:@"housing_owned_rented"];
+//        }
+//
+//        loc = [houseType rangeOfString:@"-"].location;
+//        room = [houseType substringWithRange:NSMakeRange(loc-1, 1)];
+//        [resi_particulars setObject:room forKey:@"housing_num_rooms"];
+//    }
+//
+//    [self.fullScreeningForm setObject:resi_particulars forKey:@"resi_particulars"];
+//}
 
 /*
 #pragma mark - Navigation

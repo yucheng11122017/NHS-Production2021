@@ -10,6 +10,8 @@
 
 @interface AppConstants : NSObject
 
+#define DEFAULT_FONT_SIZE 15
+
 /*
  * Form Constants
  ********************************************/
@@ -276,8 +278,236 @@ extern NSString *const kBp3Sys;
 extern NSString *const kBp3Dias;
 
 
-/* Snellen Eye Test
- ********************************************/
+#pragma mark - Snellen Eye Test
+
+extern NSString *const kRightEye;
+extern NSString *const kLeftEye;
+extern NSString *const kSix12;
+extern NSString *const kTunnel;
+extern NSString *const kVisitEye12Mths;
+
+
+#pragma mark - Additional Services
+
+extern NSString *const kAppliedChas;
+extern NSString *const kReferColonos;
+extern NSString *const kReceiveFit;
+extern NSString *const kReferMammo;
+extern NSString *const kReferPapSmear;
+
+#pragma mark - Doctor's consult
+
+extern NSString *const kDocNotes;
+extern NSString *const kDocName;
+extern NSString *const kDocReferred;
+
+
+#pragma mark - Basic dental check-up
+
+extern NSString *const kDentalUndergone;
+extern NSString *const kDentistReferred;
+
+
+#pragma mark - SERI Advanced Eye Screening
+
+/* Medical History */
+extern NSString *const kChiefComp;
+extern NSString *const kOcuHist;
+extern NSString *const kHealthHist;
+
+/* Visual Acuity */
+extern NSString *const kVaDone;
+extern NSString *const kVa;
+extern NSString *const kVaSnellenOd;
+extern NSString *const kVaLogmarOd;
+extern NSString *const kPinSnellenOd;
+extern NSString *const kPinLogmarOd;
+extern NSString *const kPinSnellenOs;
+extern NSString *const  kPinLogmarOs;
+extern NSString *const kNearLogmarOd;
+extern NSString *const kNearNxOd;
+extern NSString *const kNearLogmarOs;
+extern NSString *const kNearNxOs;
+extern NSString *const kVaComments;
+
+/* Autorefractor */
+extern NSString *const kAutoDone;
+extern NSString *const kSpRightR1;
+extern NSString *const kSpRightR2;
+extern NSString *const kSpRightR3;
+extern NSString *const kSpRightR4;
+extern NSString *const kSpRightR5;
+extern NSString *const kCylRightR1;
+extern NSString *const kCylRightR2;
+extern NSString *const kCylRightR3;
+extern NSString *const kCylRightR4;
+extern NSString *const kCylRightR5;
+extern NSString *const kAxisRightR1;
+extern NSString *const kAxisRightR2;
+extern NSString *const kAxisRightR3;
+extern NSString *const kAxisRightR4;
+extern NSString *const kAxisRightR5;
+extern NSString *const kKerMmRightR1;
+extern NSString *const kKerMmRightR2;
+extern NSString *const kKerDioRightR1;
+extern NSString *const kKerDioRightR2;
+extern NSString *const kKerAxRightR1;
+extern NSString *const kKerAxRightR2;
+extern NSString *const kSpLeftR1;
+extern NSString *const kSpLeftR2;
+extern NSString *const kSpLeftR3;
+extern NSString *const kSpLeftR4;
+extern NSString *const kSpLeftR5;
+extern NSString *const kCylLeftR1;
+extern NSString *const kCylLeftR2;
+extern NSString *const kCylLeftR3;
+extern NSString *const kCylLeftR4;
+extern NSString *const kCylLeftR5;
+extern NSString *const kAxisLeftR1;
+extern NSString *const kAxisLeftR2;
+extern NSString *const kAxisLeftR3;
+extern NSString *const kAxisLeftR4;
+extern NSString *const kAxisLeftR5;
+extern NSString *const kKerMmLeftR1;
+extern NSString *const kKerMmLeftR2;
+extern NSString *const kKerDioLeftR1;
+extern NSString *const kKerDioLeftR2;
+extern NSString *const kKerAxLeftR1;
+extern NSString *const kKerAxLeftR2;
+extern NSString *const kPupilDist;
+extern NSString *const kAutorefractorComment;
+
+/* Intra-ocular Pressure */
+extern NSString *const kIopDone;
+extern NSString *const kIopRight;
+extern NSString *const kIopLeft;
+extern NSString *const kIopComment;
+
+/* Anterior Health Examination */
+extern NSString *const kAheDone;
+extern NSString *const kAheOd;
+extern NSString *const kAheOdRemark;
+extern NSString *const kAheOs;
+extern NSString *const kAheOsRemark;
+extern NSString *const kAheComment;
+
+/* Posterior Health Examination */
+extern NSString *const kPheDone;
+extern NSString *const kPheFundusOd;
+extern NSString *const kPheFundusOdRemark;
+extern NSString *const kPheFundusOs;
+extern NSString *const kPheFundusOsRemark;
+extern NSString *const kPheComment;
+
+/* Diagnosis and Follow-up */
+extern NSString *const kOdNormal;
+extern NSString *const kOdRefractive;
+extern NSString *const kOdCataract;
+extern NSString *const kOdGlaucoma;
+extern NSString *const kOdAge;
+extern NSString *const kOdDiabetic;
+extern NSString *const kOdOthers;
+extern NSString *const kDiagOdOthers;
+extern NSString *const kOsNormal;
+extern NSString *const kOsRefractive;
+extern NSString *const kOsCataract;
+extern NSString *const kOsGlaucoma;
+extern NSString *const kOsAge;
+extern NSString *const kOsDiabetic;
+extern NSString *const kOsOthers;
+extern NSString *const kDiagOsOthers;
+extern NSString *const kFollowUp;
+extern NSString *const kEyeSpecRef;
+extern NSString *const kNonUrgentRefMths;
+extern NSString *const kDiagComment;
+
+#pragma mark - Fall Risk Assessment
+
+/*
+ (Enable only if criteria is fulfilled in PROFILING tab)
+ (Fall Risk Assmt Tab does not need to be completed for final submission)"
+ */
+
+extern NSString *const kPsfuFRA;
+extern NSString *const kBalance;
+extern NSString *const kGaitSpeed;
+extern NSString *const kChairStand;
+extern NSString *const kTotal;
+extern NSString *const kReqFollowupFRA;
+
+
+#pragma mark - Geriatric Dementia Assessment
+
+/*
+ (Enable only if criteria is fulfilled in PROFILING tab)
+ (Geriatric Dementia Tab does not need to be completed for final submission)"
+ */
+
+extern NSString *const kPsfuGDA;
+extern NSString *const kAmtScore;
+extern NSString *const kEduStatus;
+extern NSString *const kReqFollowupGDA;
+
+
+#pragma mark - Health Education
+
+
+/* Pre-education Knowledge Quiz */
+extern NSString *const kPreEdu1;
+extern NSString *const kPreEdu2;
+extern NSString *const kPreEdu3;
+extern NSString *const kPreEdu4;
+extern NSString *const kPreEdu5;
+extern NSString *const kPreEdu6;
+extern NSString *const kPreEdu7;
+extern NSString *const kPreEdu8;
+extern NSString *const kPreEdu9;
+extern NSString *const kPreEdu10;
+extern NSString *const kPreEdu11;
+extern NSString *const kPreEdu12;
+extern NSString *const kPreEdu13;
+extern NSString *const kPreEdu14;
+extern NSString *const kPreEdu15;
+extern NSString *const kPreEdu16;
+extern NSString *const kPreEdu17;
+extern NSString *const kPreEdu18;
+extern NSString *const kPreEdu19;
+extern NSString *const kPreEdu20;
+extern NSString *const kPreEdu21;
+extern NSString *const kPreEdu22;
+extern NSString *const kPreEdu23;
+extern NSString *const kPreEdu24;
+extern NSString *const kPreEdu25;
+extern NSString *const kPreEdScore;
+
+/* Post-education Knowledge Quiz */
+
+extern NSString *const kPostEdu1;
+extern NSString *const kPostEdu2;
+extern NSString *const kPostEdu3;
+extern NSString *const kPostEdu4;
+extern NSString *const kPostEdu5;
+extern NSString *const kPostEdu6;
+extern NSString *const kPostEdu7;
+extern NSString *const kPostEdu8;
+extern NSString *const kPostEdu9;
+extern NSString *const kPostEdu10;
+extern NSString *const kPostEdu11;
+extern NSString *const kPostEdu12;
+extern NSString *const kPostEdu13;
+extern NSString *const kPostEdu14;
+extern NSString *const kPostEdu15;
+extern NSString *const kPostEdu16;
+extern NSString *const kPostEdu17;
+extern NSString *const kPostEdu18;
+extern NSString *const kPostEdu19;
+extern NSString *const kPostEdu20;
+extern NSString *const kPostEdu21;
+extern NSString *const kPostEdu22;
+extern NSString *const kPostEdu23;
+extern NSString *const kPostEdu24;
+extern NSString *const kPostEdu25;
+extern NSString *const kPostEdScore;
 
 
 

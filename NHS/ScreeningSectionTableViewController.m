@@ -155,12 +155,17 @@ typedef enum typeOfForm {
             cell.accessoryType = UITableViewCellAccessoryNone;
         }
         
-        if (indexPath.row > 4) {
+        if (indexPath.row > 6) {
+            
+            if (indexPath.row == 10) {
+                //Enable SERI
+                if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"needSERI"] isEqual:@1]) {
+                    return cell;    //don't disable.
+                }
+            }
             cell.userInteractionEnabled = NO;
             [cell.textLabel setTextColor:[UIColor grayColor]];
         }
-        
-        
     } else {
         cell = [tableView dequeueReusableCellWithIdentifier:buttonTableIdentifier];
         if (cell == nil) {
@@ -210,7 +215,12 @@ typedef enum typeOfForm {
         } else if (indexPath.row == 4) {
             [self performSegueWithIdentifier:@"screenSectionToSocialWorkSegue" sender:self];
             return;
+        } else if (indexPath.row == 5) {    //clinical results
+            selectedRow = [NSNumber numberWithInteger:3];
+        } else if (indexPath.row == 6) {    //snellen eye test
+            selectedRow = [NSNumber numberWithInteger:4];
         }
+
         
         [self performSegueWithIdentifier:@"screeningSectionToFormSegue" sender:self];
         NSLog(@"Form segue performed!");

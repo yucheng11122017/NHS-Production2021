@@ -981,7 +981,7 @@
 - (id) initPsychWellbeing {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Psychological Well-being"];
     XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
+//    XLFormRowDescriptor * row;
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Psychotic Disorder"];
     [formDescriptor addFormSection:section];
 
@@ -1133,6 +1133,153 @@
     
     return [super initWithForm:formDescriptor];
 }
+
+//- (void) saveCurrentSocioSituation {
+//    NSDictionary *fields = [self.form formValues];
+//    NSMutableDictionary *currSocioSituation_dict = [[self.fullScreeningForm objectForKey:@"socioecon"] mutableCopy];
+//
+//    if ([fields objectForKey:kMultiPlan] != (id) [NSNull null]) {
+//        NSArray *plansOptionArray = [fields objectForKey:kMultiPlan];
+//        for(int i=0;i<[plansOptionArray count];i++) {
+//            if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@0]) [currSocioSituation_dict setObject:@"1" forKey:@"medisave"];
+//            else if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@1]) [currSocioSituation_dict setObject:@"1" forKey:@"insurance"];
+//            else if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@2]) [currSocioSituation_dict setObject:@"1" forKey:@"cpf_pays"];
+//            else if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@3]) [currSocioSituation_dict setObject:@"1" forKey:@"pgp"];
+//            else if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@4]) [currSocioSituation_dict setObject:@"1" forKey:@"chas"];
+//            else if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@5]) [currSocioSituation_dict setObject:@"1" forKey:@"apply_chas"];
+//        }
+//    }
+//
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kCPFAmt] forKey:kCPFAmt];
+//
+//    //CHAS COLOR
+//    if ([fields objectForKey:kChasColour] != (id)[NSNull null]) {
+//        if ([[fields objectForKey:kChasColour] isEqualToString:@"Blue"]) [currSocioSituation_dict setObject:@"0" forKey:kChasColour];
+//        else if ([[fields objectForKey:kChasColour] isEqualToString:@"Orange"]) [currSocioSituation_dict setObject:@"1" forKey:kChasColour];
+//        else if ([[fields objectForKey:kChasColour] isEqualToString:@"N.A."]) [currSocioSituation_dict setObject:@"2" forKey:kChasColour];
+//    }
+//
+//    //reset values to 0 first
+//    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_med"];
+//    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_daily"];
+//    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_arrears"];
+//    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_others"];
+//
+//    if ([fields objectForKey:kHouseCopingReason] != (id) [NSNull null]) {
+//        NSArray *houseCopingArray = [fields objectForKey:kHouseCopingReason];
+//        for(int i=0;i<[houseCopingArray count];i++) {
+//            if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Medical expenses"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_med"];
+//            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Daily living expenses"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_daily"];
+//            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Arrears / Debts"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_arrears"];
+//            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Others"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_others"];
+//        }
+//    }
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHouseCoping] forKey:kHouseCoping];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kHouseCopingReasonOthers] forKey:kHouseCopingReasonOthers];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kEmployStatus] forKey:kEmployStatus];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEmployStatusOthers] forKey:kEmployStatusOthers];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:TextView formDescriptorWithTag:kManageExpenses] forKey:kManageExpenses];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kHouseholdIncome] forKey:kHouseholdIncome];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kPplInHouse] forKey:kPplInHouse];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kAnyAssist] forKey:kAnyAssist];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kSeekHelp] forKey:kSeekHelp];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kHelpOrg] forKey:kHelpOrg];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:TextView formDescriptorWithTag:kHelpDescribe] forKey:kHelpDescribe];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kHelpAmt] forKey:kHelpAmt];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kHelpPeriod] forKey:kHelpPeriod];
+//    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHelpHelpful] forKey:kHelpHelpful];
+//
+//    [self.fullScreeningForm setObject:currSocioSituation_dict forKey:@"socioecon"];
+//}
+
+
+
+//
+//- (void) saveSocialSupportAssessment {
+//    NSDictionary *fields = [self.form formValues];
+//    NSMutableDictionary *socialSuppAssessment_dict = [[self.fullScreeningForm objectForKey:@"social_support"] mutableCopy];
+//
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHasCaregiver] forKey:kHasCaregiver];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverName] forKey:kCaregiverName];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverRs] forKey:kCaregiverRs];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kCaregiverContactNum] forKey:kCaregiverContactNum];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverNric] forKey:kCaregiverNric];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverAddress] forKey:kCaregiverAddress];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kEContact] forKey:kEContact];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactName] forKey:kEContactName];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactRs] forKey:kEContactRs];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kEContactNum] forKey:kEContactNum];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactNric] forKey:kEContactNric];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactAddress] forKey:kEContactAddress];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kGettingSupport] forKey:kGettingSupport];
+//    //Support in terms of..... multi selector
+//
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"care_giving"];
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"food"];
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"money"];
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"others"];
+//
+//    if([fields objectForKey:kMultiSupport]!= [NSNull null]) {
+//        NSArray *multiSupportArray = [fields objectForKey:kMultiSupport];
+//
+//        if ([multiSupportArray count]>0) {
+//            for(int i=0;i<[multiSupportArray count];i++) {
+//                if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Care-giving"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"care_giving"];
+//                else if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Food"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"food"];
+//                else if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Money"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"money"];
+//                else if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Others"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"others"];
+//
+//            }
+//        }
+//    }
+//
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kSupportOthers] forKey:@"others_text"];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kRelativesContact] forKey:kRelativesContact];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kRelativesEase] forKey:kRelativesEase];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kRelativesClose] forKey:kRelativesClose];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsContact] forKey:kFriendsContact];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsEase] forKey:kFriendsEase];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsClose] forKey:kFriendsClose];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kSocialScore] forKey:kSocialScore];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kLackCompan] forKey:kLackCompan];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFeelLeftOut] forKey:kFeelLeftOut];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFeelIsolated] forKey:kFeelIsolated];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kAwareActivities] forKey:kAwareActivities];
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kParticipateActivities] forKey:kParticipateActivities];
+//
+//    //reset values first
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"sac"];
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"fsc"];
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"cc"];
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"rc"];
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"ro"];
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"so"];
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"oth"];
+//    [socialSuppAssessment_dict setObject:@"0" forKey:@"na"];
+//
+//    if([fields objectForKey:kMultiHost]!= [NSNull null]) {
+//        NSArray *multiHostArray = [fields objectForKey:kMultiHost];
+//
+//        if ([multiHostArray count]>0) {
+//            for(int i=0;i<[multiHostArray count];i++) {
+//                if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Senior Activity Centre (SAC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"sac"];
+//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Family Services Centre (FSC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"fsc"];
+//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Community Centre (CC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"cc"];
+//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Residents' Committee (RC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"rc"];
+//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Religious Organisations"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"ro"];
+//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Self-organised"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"so"];
+//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Others"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"oth"];
+//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"N.A."]) [socialSuppAssessment_dict setObject:@"1" forKey:@"na"];
+//
+//            }
+//        }
+//    }
+//
+//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kHostOthers] forKey:kHostOthers];
+//
+//    [self.fullScreeningForm setObject:socialSuppAssessment_dict forKey:@"social_support"];
+//}
+
 
 
 #pragma mark - Button methods

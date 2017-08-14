@@ -232,6 +232,8 @@
 		0130D1851F2AEAD00073901D /* UNUSED */ = {
 			isa = PBXGroup;
 			children = (
+				8E23D5521D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.h */,
+				8E23D5531D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m */,
 				0154D0651EED6AF7000348B9 /* DrawingViewController.h */,
 				0154D0661EED6AF7000348B9 /* DrawingViewController.m */,
 			);
@@ -320,8 +322,6 @@
 				01D48EC01F3327B5002C3928 /* ScreeningSelectProfileTableVC.m */,
 				01D48EC21F346C36002C3928 /* ResidentParticularsVC.h */,
 				01D48EC31F346C36002C3928 /* ResidentParticularsVC.m */,
-				8E23D5521D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.h */,
-				8E23D5531D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m */,
 				8EC56F851D60C16300938C2A /* ScreeningSectionTableViewController.h */,
 				8EC56F861D60C16300938C2A /* ScreeningSectionTableViewController.m */,
 				8EC56F7F1D60B88D00938C2A /* ScreeningFormViewController.h */,

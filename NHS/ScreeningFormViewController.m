@@ -39,23 +39,6 @@ typedef enum typeOfForm {
     ViewScreenedScreeningForm
 } typeOfForm;
 
-
-//NSString *const kBpSystolic = @"bp_systolic";
-//NSString *const kBpDiastolic = @"bp_diastolic";
-//NSString *const kWeight = @"weight";
-//NSString *const kHeight = @"height";
-//NSString *const kBMI = @"bmi";
-//NSString *const kWaistCircum = @"waist_circum";
-//NSString *const kHipCircum = @"hip_circum";
-//NSString *const kWaistHipRatio = @"waist_hip_ratio";
-//NSString *const kCbg = @"cbg";
-//NSString *const kBpSystolic2 = @"bp_systolic2";
-//NSString *const kBpDiastolic2 = @"bp_diastolic2";
-//NSString *const kBpSystolicAvg = @"bp_systolic_avg";
-//NSString *const kBpDiastolicAvg = @"bp_diastolic_avg";
-//NSString *const kBpSystolic3 = @"bp_systolic3";
-//NSString *const kBpDiastolic3 = @"bp_diastolic3";
-
 //Screening of Risk Factors
 NSString *const kExYesNo = @"ex_yes_no";
 NSString *const kExNoWhy = @"ex_no_why";
@@ -82,19 +65,6 @@ NSString *const kAlcoholConsumpn = @"alcohol_consumpn";
 NSString *const kAlcoholPreference = @"alcohol_preference";
 NSString *const kAlcoholIntentToCut = @"alcohol_intent_to_cut";
 
-// Diabetes Mellitus
-//NSString *const kDiabetesHasInformed = @"diabetes_has_informed";
-//NSString *const kDiabetesCheckedBlood = @"diabetes_checked_blood";
-//NSString *const kDiabetesSeeingDocRegularly = @"diabetes_seeing_doc_regularly";
-//NSString *const kDiabetesCurrentlyPrescribed = @"diabetes_currently_prescribed";
-//NSString *const kDiabetesTakingRegularly = @"diabetes_taking_regularly";
-
-//Hyperlipidemia
-//NSString *const kLipidHasInformed = @"lipid_has_informed";
-//NSString *const kLipidCheckedBlood = @"lipid_checked_blood";
-//NSString *const kLipidSeeingDocRegularly = @"lipid_seeing_doc_regularly";
-//NSString *const kLipidCurrentlyPrescribed = @"lipid_currently_prescribed";
-//NSString *const kLipidTakingRegularly = @"lipid_taking_regularly";
 NSString *const kQuestionOne = @"q1";
 NSString *const kQuestionTwo = @"q2";
 NSString *const kQuestionThree = @"q3";
@@ -110,14 +80,6 @@ NSString *const kQuestionTwelve = @"q12";
 NSString *const kQuestionThirteen = @"q13";
 NSString *const kQuestionFourteen = @"q14";
 NSString *const kQuestionFifteen = @"q15";
-
-
-//HyperTension
-//NSString *const kHTHasInformed = @"tension_has_informed";
-//NSString *const kHTCheckedBP = @"tension_checked_blood";
-//NSString *const kHTSeeingDocRegularly = @"tension_seeing_doc_regularly";
-//NSString *const kHTCurrentlyPrescribed = @"tension_currently_prescribed";
-//NSString *const kHTTakingRegularly = @"tension_taking_regularly";
 
 //Cancer Screening
 NSString *const kMultiCancerDiagnosed = @"multi_cancer_diagnosed";
@@ -190,57 +152,6 @@ NSString *const kSafePlaces = @"safe_places";
 //Current Physical Issues
 NSString *const kMultiADL = @"multi_adl";
 
-//Current Socioeconomic Situation
-NSString *const kMultiPlan = @"multi_plan";
-NSString *const kCPFAmt = @"cpf_amt";
-NSString *const kChasColour = @"chas_colour";
-NSString *const kHouseCoping = @"house_coping";
-NSString *const kHouseCopingReason = @"house_coping_reason";
-NSString *const kHouseCopingReasonOthers = @"house_coping_reason_others";
-NSString *const kEmployStatus = @"employ_status";
-NSString *const kEmployStatusOthers = @"employ_status_others";
-NSString *const kManageExpenses = @"manage_expenses";
-NSString *const kHouseholdIncome = @"household_income";
-NSString *const kPplInHouse = @"ppl_in_house";
-NSString *const kAnyAssist = @"any_assist";
-NSString *const kSeekHelp = @"seek_help";
-NSString *const kHelpType = @"help_type";
-NSString *const kHelpOrg = @"help_org";
-NSString *const kHelpDescribe = @"help_describe";
-NSString *const kHelpAmt = @"help_amt";
-NSString *const kHelpPeriod = @"help_period";
-NSString *const kHelpHelpful = @"help_helpful";
-
-//Social Support Assessment
-//NSString *const kHasCaregiver = @"has_caregiver";
-//NSString *const kCaregiverName = @"caregiver_name";
-//NSString *const kCaregiverRs = @"caregiver_rs";
-//NSString *const kCaregiverContactNum = @"caregiver_contact_num";
-//NSString *const kCaregiverNric = @"caregiver_nric";
-//NSString *const kCaregiverAddress = @"caregiver_address";
-//NSString *const kEContact = @"e_contact";
-//NSString *const kEContactName = @"e_contact_name";
-//NSString *const kEContactRs = @"e_contact_rs";
-//NSString *const kEContactNum = @"e_contact_num";
-//NSString *const kEContactNric = @"e_contact_nric";
-//NSString *const kEContactAddress = @"e_contact_address";
-//NSString *const kGettingSupport = @"getting_support";
-//NSString *const kMultiSupport = @"multi_support";
-//NSString *const kSupportOthers = @"support_others";
-//NSString *const kRelativesContact = @"relatives_contact";
-//NSString *const kRelativesEase = @"relatives_ease";
-//NSString *const kRelativesClose = @"relatives_close";
-//NSString *const kFriendsContact = @"friends_contact";
-//NSString *const kFriendsEase = @"friends_ease";
-//NSString *const kFriendsClose = @"friends_close";
-//NSString *const kSocialScore = @"social_score";
-//NSString *const kLackCompan = @"lack_compan";
-//NSString *const kFeelLeftOut = @"feel_left_out";
-//NSString *const kFeelIsolated = @"feel_isolated";
-//NSString *const kAwareActivities = @"aware_activities";
-//NSString *const kParticipateActivities = @"participate_activities";
-//NSString *const kMultiHost = @"multi_host";
-//NSString *const kHostOthers = @"host_others";
 
 //Referral for Doctor Consult
 //NSString *const kReferralChecklist = @"referral_checklist";
@@ -302,8 +213,10 @@ NSString *const kHelpHelpful = @"help_helpful";
             break;
         case 2: form = [self initProfiling];
             break;
-//        case 7: form = [self initCancerScreening];
-//            break;
+        case 3: form = [self initTriage];
+            break;
+        case 4: form = [self initSnellenEyeTest];
+            break;
 //        case 8: form = [self initOtherMedicalIssues];
 //            break;
 //        case 9: form = [self initPrimaryCareSource];
@@ -506,7 +419,7 @@ NSString *const kHelpHelpful = @"help_helpful";
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
 
-    XLFormRowDescriptor *noOfPplInHouse = [XLFormRowDescriptor formRowDescriptorWithTag:kPplInHouse rowType:XLFormRowDescriptorTypeNumber title:@"No. of people in the household"];
+    XLFormRowDescriptor *noOfPplInHouse = [XLFormRowDescriptor formRowDescriptorWithTag:kNumPplInHouse rowType:XLFormRowDescriptorTypeNumber title:@"No. of people in the household"];
     [noOfPplInHouse.cellConfig setObject:[UIFont systemFontOfSize:15] forKey:@"textLabel.font"];   //the description too long. Default fontsize is 16
     [noOfPplInHouse.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     noOfPplInHouse.required = NO;
@@ -887,206 +800,278 @@ NSString *const kHelpHelpful = @"help_helpful";
     return [super initWithForm:formDescriptor];
 }
 
-//
-//- (id) initClinicalResults {
+
+- (id) initTriage {
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Clinical Results"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    NSDictionary *clinicalResultsDict = [[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"clinical_results"];
+    NSArray *bpRecordsArray = [[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"bp_record"];
 //    
-//    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Clinical Results"];
-//    XLFormSectionDescriptor * section;
-//    XLFormRowDescriptor * row;
-//    NSDictionary *clinicalResultsDict = [[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"clinical_results"];
-//    NSArray *bpRecordsArray = [[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"bp_record"];
-////    
-////    if ([_formType integerValue] == ViewScreenedScreeningForm) {
-////        [formDescriptor setDisabled:YES];
-////    }
-//    
-//    
-//    formDescriptor.assignFirstResponderOnShow = YES;
-//    
-//    // Basic Information - Section
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//    
-//    XLFormRowDescriptor *systolic_1;
-//    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic rowType:XLFormRowDescriptorTypeNumber title:@"BP (1. Systolic number) *"];
-//    systolic_1.required = YES;
-//    systolic_1.value = [[bpRecordsArray objectAtIndex:1] objectForKey:@"systolic_bp"];
-//    [section addFormRow:systolic_1];
-//    
-//    XLFormRowDescriptor *diastolic_1;
-//    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic rowType:XLFormRowDescriptorTypeNumber title:@"BP (2. Diastolic number) *"];
-//    diastolic_1.required = YES;
-//    diastolic_1.value = [[bpRecordsArray objectAtIndex:1] objectForKey:@"diastolic_bp"];
-//    [section addFormRow:diastolic_1];
-//    
-//    XLFormRowDescriptor *height;
-//    height = [XLFormRowDescriptor formRowDescriptorWithTag:kHeight rowType:XLFormRowDescriptorTypeNumber title:@"Height (cm) *"];
-//    height.required = YES;
-//    height.value = [clinicalResultsDict objectForKey:@"height_cm"];
-//    [section addFormRow:height];
-//    
-//    XLFormRowDescriptor *weight;
-//    weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeight rowType:XLFormRowDescriptorTypeNumber title:@"Weight (kg) *"];
-//    weight.required = YES;
-//    weight.value = [clinicalResultsDict objectForKey:@"weight_kg"];
-//    [section addFormRow:weight];
-//    
-//    XLFormRowDescriptor *bmi;
-//    bmi = [XLFormRowDescriptor formRowDescriptorWithTag:kBMI rowType:XLFormRowDescriptorTypeText title:@"BMI"];
-////    bmi.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kHeight, kWeight]];
-//    //Initial value only
-//    if ([clinicalResultsDict objectForKey:@"bmi"] != [NSNull null]) {
-//        if (![[clinicalResultsDict objectForKey:@"bmi"] isEqualToString:@""]) {
-//            bmi.value = [clinicalResultsDict objectForKey:@"bmi"];
-//        } else {
-//            if (!isnan([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2))) {  //check for not nan first!
-//                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
-//            }
-//        }
+//    if ([_formType integerValue] == ViewScreenedScreeningForm) {
+//        [formDescriptor setDisabled:YES];
 //    }
-//    bmi.disabled = @(1);
-//    [section addFormRow:bmi];
-//    
-//    weight.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if (oldValue != newValue) {
-//            if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
-//                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
-//                [self updateFormRow:bmi];
-//            }
-//        }
-//    };
-//    height.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if (oldValue != newValue) {
-//            if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
-//                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
-//                [self updateFormRow:bmi];
-//            }
-//        }
-//    };
-//    
-//    XLFormRowDescriptor *waist;
-//    waist = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistCircum rowType:XLFormRowDescriptorTypeNumber title:@"Waist Circumference (cm) *"];
-//    waist.required = YES;
-//    waist.value = [clinicalResultsDict objectForKey:@"waist_circum"];
-//    [section addFormRow:waist];
-//    
-//    XLFormRowDescriptor *hip;
-//    hip = [XLFormRowDescriptor formRowDescriptorWithTag:kHipCircum rowType:XLFormRowDescriptorTypeNumber title:@"Hip Circumference (cm) *"];
-//    hip.required = YES;
-//    hip.value = [clinicalResultsDict objectForKey:@"hip_circum"];
-//    [section addFormRow:hip];
-//    
-//    XLFormRowDescriptor *waistHipRatio;
-//    waistHipRatio = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistHipRatio rowType:XLFormRowDescriptorTypeText title:@"Waist : Hip Ratio"];
-//    waistHipRatio.required = YES;
-////    waistHipRatio.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kWaistCircum, kHipCircum]];
-//    //Initial value
-//    if(![[clinicalResultsDict objectForKey:@"waist_hip_ratio"] isEqualToString:@""]) {
-//        waistHipRatio.value = [clinicalResultsDict objectForKey:@"waist_hip_ratio"];
-//    }
-//    waistHipRatio.disabled = @(1);
-//    [section addFormRow:waistHipRatio];
-//    
-//    waist.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if (oldValue != newValue) {
-//            if ([waist.value integerValue] != 0 && [hip.value integerValue] != 0) {
-//                waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
-//                [self updateFormRow:waistHipRatio];
-//            }
-//        }
-//    };
-//    hip.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if (oldValue != newValue) {
-//            if ([waist.value integerValue] != 0 && [hip.value integerValue] != 0) {
-//                waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
-//                [self updateFormRow:waistHipRatio];
-//            }
-//        }
-//    };
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeText title:@"CBG *"];
-//    row.required = YES;
-//    row.value = [clinicalResultsDict objectForKey:@"cbg"];
-//    [section addFormRow:row];
-//    
-//    XLFormRowDescriptor *systolic_2;
-//    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic2 rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (2nd Systolic) *"];
-//    systolic_2.required = YES;
-//    systolic_2.value = [[bpRecordsArray objectAtIndex:2] objectForKey:@"systolic_bp"];
-//    [section addFormRow:systolic_2];
-//    
-//    XLFormRowDescriptor *diastolic_2;
-//    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic2 rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (2nd Diastolic) *"];
-//    diastolic_2.required = YES;
-//    diastolic_2.value = [[bpRecordsArray objectAtIndex:2] objectForKey:@"diastolic_bp"];
-//    [section addFormRow:diastolic_2];
-//    
-//    XLFormRowDescriptor *systolic_avg;
-//    systolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolicAvg rowType:XLFormRowDescriptorTypeText title:@"BP (Avg. of 1st & 2nd systolic)"];
-//    systolic_avg.required = YES;
-//    if (![[[bpRecordsArray objectAtIndex:0] objectForKey:@"systolic_bp"] isEqualToString:@""]) {
-//        systolic_avg.value = [[bpRecordsArray objectAtIndex:0] objectForKey:@"systolic_bp"];
-//    }
-////    systolic_avg.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kBpSystolic, kBpSystolic2]];
-//    systolic_avg.disabled = @(1);   //permanent
-//    [section addFormRow:systolic_avg];
-//    
-//    systolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if ( oldValue != newValue) {
-//            systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
-//            [self updateFormRow:systolic_avg];
-//        }
-//        
-//    };
-//    
-//    systolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if ( oldValue != newValue) {
-//            systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
-//            [self updateFormRow:systolic_avg];
-//        }
-//        
-//    };
-//    
-//    XLFormRowDescriptor *diastolic_avg;
-//    diastolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolicAvg rowType:XLFormRowDescriptorTypeText title:@"BP (Avg. of 1st & 2nd diastolic) *"];
-//    diastolic_avg.required = YES;
-//    if (![[[bpRecordsArray objectAtIndex:0] objectForKey:@"diastolic_bp"] isEqualToString:@""]) {
-//        diastolic_avg.value = [[bpRecordsArray objectAtIndex:0] objectForKey:@"diastolic_bp"];
-//    }
-//    diastolic_avg.disabled = @(1);
-//    [section addFormRow:diastolic_avg];
-//    
-////    diastolic_avg.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kBpDiastolic, kBpDiastolic2]];        //somehow must disable first ... @.@"
-//    
-//    diastolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if ( oldValue != newValue) {
-//            diastolic_avg.value = @(([diastolic_1.value integerValue]+ [diastolic_2.value integerValue])/2);
-//            [self updateFormRow:diastolic_avg];
-//        }
-//    };
-//    
-//    diastolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if ( oldValue != newValue) {
-//            diastolic_avg.value = @(([diastolic_1.value integerValue]+ [diastolic_2.value integerValue])/2);
-//            [self updateFormRow:diastolic_avg];
-//        }
-//    };
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpSystolic3 rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (3rd Systolic)"];
-//    row.required = NO;
-//    [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
-//    row.value = [[bpRecordsArray objectAtIndex:3] objectForKey:@"systolic_bp"];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBpDiastolic3 rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (3rd Diastolic)"];
-//    [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
-//    row.required = NO;
-//    row.value = [[bpRecordsArray objectAtIndex:3] objectForKey:@"diastolic_bp"];
-//    [section addFormRow:row];
-//    
-//    return [super initWithForm:formDescriptor];
-//    
-//}
+    
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    // Basic Information - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *systolic_1;
+    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Sys rowType:XLFormRowDescriptorTypeNumber title:@"BP (1. Systolic number) *"];
+    systolic_1.required = YES;
+    systolic_1.value = [[bpRecordsArray objectAtIndex:1] objectForKey:@"systolic_bp"];
+    [systolic_1.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:systolic_1];
+    
+    XLFormRowDescriptor *diastolic_1;
+    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Dias rowType:XLFormRowDescriptorTypeNumber title:@"BP (2. Diastolic number) *"];
+    diastolic_1.required = YES;
+    diastolic_1.value = [[bpRecordsArray objectAtIndex:1] objectForKey:@"diastolic_bp"];
+    [diastolic_1.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:diastolic_1];
+    
+    XLFormRowDescriptor *height;
+    height = [XLFormRowDescriptor formRowDescriptorWithTag:kHeightCm rowType:XLFormRowDescriptorTypeNumber title:@"Height (cm) *"];
+    height.required = YES;
+    height.value = [clinicalResultsDict objectForKey:@"height_cm"];
+    [height.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:height];
+    
+    XLFormRowDescriptor *weight;
+    weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeightKg rowType:XLFormRowDescriptorTypeNumber title:@"Weight (kg) *"];
+    weight.required = YES;
+    weight.value = [clinicalResultsDict objectForKey:@"weight_kg"];
+    [weight.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:weight];
+    
+    XLFormRowDescriptor *bmi;
+    bmi = [XLFormRowDescriptor formRowDescriptorWithTag:kBmi rowType:XLFormRowDescriptorTypeText title:@"BMI"];
+//    bmi.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kHeight, kWeight]];
+    //Initial value only
+    if ([clinicalResultsDict objectForKey:@"bmi"] != [NSNull null]) {
+        if (![[clinicalResultsDict objectForKey:@"bmi"] isEqualToString:@""]) {
+            bmi.value = [clinicalResultsDict objectForKey:@"bmi"];
+        } else {
+            if (!isnan([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2))) {  //check for not nan first!
+                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+            }
+        }
+    }
+    bmi.disabled = @(1);
+    [bmi.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:bmi];
+    
+    weight.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
+                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+                [self updateFormRow:bmi];
+            }
+        }
+    };
+    height.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
+                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+                [self updateFormRow:bmi];
+            }
+        }
+    };
+    
+    XLFormRowDescriptor *waist;
+    waist = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistCircum rowType:XLFormRowDescriptorTypeNumber title:@"Waist Circumference (cm) *"];
+    waist.required = YES;
+    waist.value = [clinicalResultsDict objectForKey:@"waist_circum"];
+    [waist.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:waist];
+    
+    XLFormRowDescriptor *hip;
+    hip = [XLFormRowDescriptor formRowDescriptorWithTag:kHipCircum rowType:XLFormRowDescriptorTypeNumber title:@"Hip Circumference (cm) *"];
+    hip.required = YES;
+    hip.value = [clinicalResultsDict objectForKey:@"hip_circum"];
+    [hip.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:hip];
+    
+    XLFormRowDescriptor *waistHipRatio;
+    waistHipRatio = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistHipRatio rowType:XLFormRowDescriptorTypeText title:@"Waist : Hip Ratio"];
+    waistHipRatio.required = YES;
+    [waistHipRatio.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+//    waistHipRatio.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kWaistCircum, kHipCircum]];
+    //Initial value
+    if(![[clinicalResultsDict objectForKey:@"waist_hip_ratio"] isEqualToString:@""]) {
+        waistHipRatio.value = [clinicalResultsDict objectForKey:@"waist_hip_ratio"];
+    }
+    waistHipRatio.disabled = @(1);
+    [section addFormRow:waistHipRatio];
+    
+    waist.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([waist.value integerValue] != 0 && [hip.value integerValue] != 0) {
+                waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
+                [self updateFormRow:waistHipRatio];
+            }
+        }
+    };
+    hip.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([waist.value integerValue] != 0 && [hip.value integerValue] != 0) {
+                waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
+                [self updateFormRow:waistHipRatio];
+            }
+        }
+    };
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeText title:@"CBG (mmol/L) *"];
+    row.required = YES;
+    row.value = [clinicalResultsDict objectForKey:@"cbg"];
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *systolic_2;
+    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Sys rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (2nd Systolic) *"];
+    systolic_2.required = YES;
+    systolic_2.value = [[bpRecordsArray objectAtIndex:2] objectForKey:@"systolic_bp"];
+    [systolic_2.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:systolic_2];
+    
+    XLFormRowDescriptor *diastolic_2;
+    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Dias rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (2nd Diastolic) *"];
+    diastolic_2.required = YES;
+    diastolic_2.value = [[bpRecordsArray objectAtIndex:2] objectForKey:@"diastolic_bp"];
+    [diastolic_2.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:diastolic_2];
+    
+    XLFormRowDescriptor *systolic_avg;
+    systolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgSys rowType:XLFormRowDescriptorTypeText title:@"BP (Avg. of 1st & 2nd systolic)"];
+    systolic_avg.required = YES;
+    if (![[[bpRecordsArray objectAtIndex:0] objectForKey:@"systolic_bp"] isEqualToString:@""]) {
+        systolic_avg.value = [[bpRecordsArray objectAtIndex:0] objectForKey:@"systolic_bp"];
+    }
+//    systolic_avg.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kBpSystolic, kBpSystolic2]];
+    systolic_avg.disabled = @(1);   //permanent
+    [systolic_avg.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:systolic_avg];
+    
+    systolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if ( oldValue != newValue) {
+            systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
+            [self updateFormRow:systolic_avg];
+        }
+        
+    };
+    
+    systolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if ( oldValue != newValue) {
+            systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
+            [self updateFormRow:systolic_avg];
+        }
+        
+    };
+    
+    XLFormRowDescriptor *diastolic_avg;
+    diastolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgDias rowType:XLFormRowDescriptorTypeText title:@"BP (Avg. of 1st & 2nd diastolic) *"];
+    diastolic_avg.required = YES;
+    if (![[[bpRecordsArray objectAtIndex:0] objectForKey:@"diastolic_bp"] isEqualToString:@""]) {
+        diastolic_avg.value = [[bpRecordsArray objectAtIndex:0] objectForKey:@"diastolic_bp"];
+    }
+    [diastolic_avg.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    diastolic_avg.disabled = @(1);
+    [section addFormRow:diastolic_avg];
+    
+//    diastolic_avg.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kBpDiastolic, kBpDiastolic2]];        //somehow must disable first ... @.@"
+    
+    diastolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if ( oldValue != newValue) {
+            diastolic_avg.value = @(([diastolic_1.value integerValue]+ [diastolic_2.value integerValue])/2);
+            [self updateFormRow:diastolic_avg];
+        }
+    };
+    
+    diastolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if ( oldValue != newValue) {
+            diastolic_avg.value = @(([diastolic_1.value integerValue]+ [diastolic_2.value integerValue])/2);
+            [self updateFormRow:diastolic_avg];
+        }
+    };
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Sys rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (3rd Systolic)"];
+    row.required = NO;
+    [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
+    row.value = [[bpRecordsArray objectAtIndex:3] objectForKey:@"systolic_bp"];
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Dias rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (3rd Diastolic)"];
+    [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
+    row.required = NO;
+    row.value = [[bpRecordsArray objectAtIndex:3] objectForKey:@"diastolic_bp"];
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:row];
+    
+    return [super initWithForm:formDescriptor];
+    
+}
+
+
+- (id) initSnellenEyeTest {
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Snellen Eye Test"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+ 
+    //
+    //    if ([_formType integerValue] == ViewScreenedScreeningForm) {
+    //        [formDescriptor setDisabled:YES];
+    //    }
+    
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRightEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"1. Right Eye: "];
+    row.required = YES;
+    row.selectorOptions = @[@"6/6", @"6/9", @"6/12", @"6/18", @"6/24", @"6/36", @"6/60"];
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLeftEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"2. Left Eye: "];
+    row.required = YES;
+    row.selectorOptions = @[@"6/6", @"6/9", @"6/12", @"6/18", @"6/24", @"6/36", @"6/60"];
+    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *six12Row = [XLFormRowDescriptor formRowDescriptorWithTag:kSix12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"3. Does either eye (or both) have vision poorer than 6/12?"];
+    six12Row.required = YES;
+    six12Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [six12Row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:six12Row];
+    
+    XLFormRowDescriptor *tunnelRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTunnel rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"4. Does resident have genuine visual complaints (e.g. floaters, tunnel vision, bright spots etc.)?"];
+    tunnelRow.required = YES;
+    tunnelRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [tunnelRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:tunnelRow];
+    
+    XLFormRowDescriptor *visitEye12Mths = [XLFormRowDescriptor formRowDescriptorWithTag:kVisitEye12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"5. Resident has not visited eye specialist in 12 months"];
+    visitEye12Mths.required = YES;
+    visitEye12Mths.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [visitEye12Mths.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [section addFormRow:visitEye12Mths];
+    
+    if (([six12Row.value isEqual:@1] || ([tunnelRow.value isEqual:@(1)])) && ([visitEye12Mths.value isEqual:@(1)])) { // (3 OR 4) AND 5
+        [[NSUserDefaults standardUserDefaults] setObject:@1 forKey:@"needSERI"];
+    }
+    
+    return [super initWithForm:formDescriptor];
+    
+}
 
 -(id)initScreeningOfRiskFactors {
     
@@ -1771,100 +1756,6 @@ NSString *const kHelpHelpful = @"help_helpful";
 }
 
 
-
--(id) initCancerScreening {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Cancer Screening"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    NSDictionary *cancerScreenDict = [self.fullScreeningForm objectForKey:@"cancer"];
-    
-    formDescriptor.assignFirstResponderOnShow = YES;
-
-    
-    // Introduction - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Note:"];
-    section.footerTitle = @"Do note the screening criteria below to avoid embarrassment (e.g. asking a male resident about his Pap smear)";
-    [formDescriptor addFormSection:section];
-    
-    // Cancer Screening - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Have you ever been diagnosed with any of these cancers? (tick all that apply)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiCancerDiagnosed rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
-    row.selectorOptions = @[@"Cervical (子宫颈癌)", @"Breast (乳腺癌)", @"Colorectal (大肠癌)"];
-    //value
-    NSMutableArray *array = [[NSMutableArray alloc] init];
-    if ([[cancerScreenDict objectForKey:@"cervical"] isEqualToString:@"1"]) [array addObject:@"Cervical (子宫颈癌)"];
-    if ([[cancerScreenDict objectForKey:@"breast"] isEqualToString:@"1"]) [array addObject:@"Breast (乳腺癌)"];
-    if ([[cancerScreenDict objectForKey:@"colorectal"] isEqualToString:@"1"]) [array addObject:@"Colorectal (大肠癌)"];
-    row.value = array;
-    row.noValueDisplayText = @"Tap here for options";
-    [section addFormRow:row];
-    
-
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Do you go for a pap smear regularly? (once every 3 years for sexually active ladies ≤ 69 years old)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPapSmear rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO", @"N.A."];
-    
-    //value
-    if (![[cancerScreenDict objectForKey:kPapSmear] isEqualToString:@""]) {
-        if ([[cancerScreenDict objectForKey:kPapSmear] isEqualToString:@"1"]) row.value = @"YES";
-        else if ([[cancerScreenDict objectForKey:kPapSmear] isEqualToString:@"0"]) row.value = @"NO";
-        else if ([[cancerScreenDict objectForKey:kPapSmear] isEqualToString:@"2"]) row.value = @"N.A.";
-    }
-    
-    
-    [section addFormRow:row];
-    
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Do you go for regular mammograms? (Once every 2 years for ladies aged 40-49; yearly for ladies ≥ 50)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMammogram rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO", @"N.A."];
-    
-    //value
-    if (![[cancerScreenDict objectForKey:kMammogram] isEqualToString:@""]) {
-        if ([[cancerScreenDict objectForKey:kMammogram] isEqualToString:@"1"]) row.value = @"YES";
-        else if ([[cancerScreenDict objectForKey:kMammogram] isEqualToString:@"0"]) row.value = @"NO";
-        else if ([[cancerScreenDict objectForKey:kMammogram] isEqualToString:@"2"]) row.value = @"N.A.";
-    }
-    
-    [section addFormRow:row];
-    
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFour
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Do you go for FOBT regularly? (once a year for ≥ 50)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFobt rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO", @"N.A."];
-    
-    //value
-    if (![[cancerScreenDict objectForKey:kFobt] isEqualToString:@""]) {
-        if ([[cancerScreenDict objectForKey:kFobt] isEqualToString:@"1"]) row.value = @"YES";
-        else if ([[cancerScreenDict objectForKey:kFobt] isEqualToString:@"0"]) row.value = @"NO";
-        else if ([[cancerScreenDict objectForKey:kFobt] isEqualToString:@"2"]) row.value = @"N.A.";
-    }
-    
-    [section addFormRow:row];
-    
-    return [super initWithForm:formDescriptor];
-}
-
 -(id) initOtherMedicalIssues {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Other Medical Issues"];
     XLFormSectionDescriptor * section;
@@ -2252,229 +2143,6 @@ NSString *const kHelpHelpful = @"help_helpful";
 //    return [super initWithForm:formDescriptor];
 //}
 
-//-(id) initMyHealthAndMyNeighbourhood {
-//    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"My Health & My Neighbourhood"];
-//    XLFormSectionDescriptor * section;
-//    XLFormRowDescriptor * row;
-//    NSDictionary *healthNeighbourhoodDict = [self.fullScreeningForm objectForKey:@"self_rated"];
-//    
-//    formDescriptor.assignFirstResponderOnShow = YES;
-//
-//    
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne rowType:XLFormRowDescriptorTypeInfo title:@"Mobility"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    
-//    XLFormRowDescriptor *mobilityRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMobility
-//                                                         rowType:XLFormRowDescriptorTypeSelectorActionSheet
-//                                                           title:@""];
-//    mobilityRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no problem in walking about"],
-//                                     [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight problems in walking about"],
-//                                     [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate problems in walking about"],
-//                                     [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I have severe problems in walking about"],
-//                                     [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I am unable to walk about"]];
-//    //value
-//    NSArray *options = mobilityRow.selectorOptions;
-//    if (![[healthNeighbourhoodDict objectForKey:kMobility]isEqualToString:@""]) {
-//        mobilityRow.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kMobility] integerValue]];
-//    }
-//    mobilityRow.noValueDisplayText = @"Tap here for options";
-//    [section addFormRow:mobilityRow];
-//    
-//    XLFormRowDescriptor *mobilityAidQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"If you have difficulty walking, what mobility aid are you using?"];
-//    mobilityAidQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:mobilityAidQRow];
-//    XLFormRowDescriptor *mobilityAidRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMobilityAid
-//                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
-//                                                  title:@""];
-//    mobilityRow.noValueDisplayText = @"Tap here for options";
-//    mobilityAidRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Walking stick/frame"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Wheelchair-bound"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Bedridden"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Have problems walking but do not use aids"]];
-//    
-//    //value
-//    options = mobilityAidRow.selectorOptions;
-//    if (![[healthNeighbourhoodDict objectForKey:kMobilityAid]isEqualToString:@""]) {
-//        mobilityAidRow.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kMobilityAid] integerValue]];
-//    }
-//    
-//    [section addFormRow:mobilityAidRow];
-//    
-//    mobilityRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if (oldValue != newValue) {
-//            if ([[newValue formValue] isEqual:@(0)]) {
-//                mobilityAidQRow.hidden = @(1);  //hide
-//                mobilityAidRow.hidden = @(1);  //hide
-//            } else {
-//                mobilityAidQRow.hidden = @(0);  //hide
-//                mobilityAidRow.hidden = @(0);  //hide
-//            }
-//        }
-//    };
-//    
-//    
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree rowType:XLFormRowDescriptorTypeInfo title:@"Self-care"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSelfCare
-//                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
-//                                                  title:@""];
-//    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no problem washing or dressing myself"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight problems washing or dressing myself"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate problems washing or dressing myself"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I have severe problems washing or dressing myself"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"I am unable to wash or dress myself"]];
-//    row.noValueDisplayText = @"Tap here for options";
-//    //value
-//    options = row.selectorOptions;
-//    if (![[healthNeighbourhoodDict objectForKey:kSelfCare]isEqualToString:@""]) {
-//        row.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kSelfCare] integerValue]];
-//    }
-//    
-//    [section addFormRow:row];
-//
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive rowType:XLFormRowDescriptorTypeInfo title:@"Usual Activities (e.g. work, study, housework, family or leisure activities)"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUsualActivities
-//                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
-//                                                  title:@""];
-//    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no problem doing my usual activities"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight problems doing my usual activities"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate problems doing my usual activities"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I have severe problems doing my usual activities"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"I am unable to do my usual activities"]];
-//    //value
-//    options = row.selectorOptions;
-//    if (![[healthNeighbourhoodDict objectForKey:kUsualActivities]isEqualToString:@""]) {
-//        row.value = [options objectAtIndex:[[healthNeighbourhoodDict objectForKey:kUsualActivities] integerValue]];
-//    }
-//    row.noValueDisplayText = @"Tap here for options";
-//    [section addFormRow:row];
-//    
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@"Your health today"];
-//    section.footerTitle = @"100 means the BEST health you can imagine.\n0 means the WORST health you can imagine.";
-//    [formDescriptor addFormSection:section];
-//
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSeven
-//                                                rowType:XLFormRowDescriptorTypeInfo
-//                                                  title:@"We would like to know how good or bad your health is TODAY. The scale is numbered from 0 to 100. *"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHealthToday rowType:XLFormRowDescriptorTypeNumber title:@""];
-//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between 0 and 100" regex:@"^(0|[0-9][0-9]|100|[0-9])$"]];
-//    row.required = YES;
-//    row.value = [healthNeighbourhoodDict objectForKey:kHealthToday];
-//    [section addFormRow:row];
-//    
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//    
-//    
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@"Park"];
-//    [formDescriptor addFormSection:section];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionEight
-//                                                rowType:XLFormRowDescriptorTypeInfo
-//                                                  title:@"How long does it take (mins) for you to reach to a park or rest areas where you like to walk and enjoy yourself, playing sports or games, from your house? *"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kParkTime rowType:XLFormRowDescriptorTypeNumber title:@""];
-//    row.required = YES;
-//    row.value = [healthNeighbourhoodDict objectForKey:kParkTime];
-//    [section addFormRow:row];
-//    
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@"Tick all that applies"];
-//    [formDescriptor addFormSection:section];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelSafe rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel safe when I walk around my neighbourhood by myself at night."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kFeelSafe];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCrimeLow rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel that crime rate (i.e. damage or stealing) is low in my neighbourhood."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kCrimeLow];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDrunkenPpl rowType:XLFormRowDescriptorTypeBooleanCheck title:@"In the morning, or later in the day, I can see drunken people on the street in my neighbourhood."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kDrunkenPpl];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBrokenBottles rowType:XLFormRowDescriptorTypeBooleanCheck title:@"In my neighbourhood, there are broken bottles or trash lying around."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kBrokenBottles];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUnclearSigns rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I and my visitors have been lost because of no or unclear signs of directions."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kUnclearSigns];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHomelessPpl rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I see destitute or homeless people walking or sitting around in my neighbourhood."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kHomelessPpl];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPublicTrans rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to take public transportations in my neighbourhood (i.e. bus stops, MRT)"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kPublicTrans];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSeeDoc rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to see a doctor in my neighbourhood."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kSeeDoc];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBuyMedi rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to buy medication in my neighbourhood."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kBuyMedi];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kGrocery rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to do grocery shopping in my neighbourhood."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kGrocery];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCommCentre rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit community centres in my neighbourhood."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kCommCentre];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSSCentres rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit social service centres (i.e. Senior Activity Centres, Family Service Centres) in my neighbourhood."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kSSCentres];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBankingPost rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit banking and post services (banks, post offices, etc.)"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kBankingPost];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReligiousPlaces rowType:XLFormRowDescriptorTypeBooleanCheck title:@"I feel convenient to visit religious places (i.e., temples, churches, synagogue, etc.)"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kReligiousPlaces];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kInteract rowType:XLFormRowDescriptorTypeBooleanCheck title:@"The people in my neighbourhood actively interact with each other (i.e., playing sports together, having meals together, etc.)."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kInteract];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSafePlaces rowType:XLFormRowDescriptorTypeBooleanCheck title:@"There are plenty of safe places to walk or play outdoors in my neighbourhood."];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.value = [healthNeighbourhoodDict objectForKey:kSafePlaces];
-//    [section addFormRow:row];
-//    
-//    return [super initWithForm:formDescriptor];
-//}
-
 -(id) initDemographics {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Demographics"];
     XLFormSectionDescriptor * section;
@@ -2838,24 +2506,16 @@ NSString *const kHelpHelpful = @"help_helpful";
             break;
 //        case 4: [self saveDiabetesMellitus];
 //            break;
-        case 5: [self saveHyperlipidemia];
-            break;
 //        case 6: [self saveHypertension];
 //            break;
-        case 7: [self saveCancerScreening];
-            break;
         case 8: [self saveOtherMedicalIssues];
             break;
 //        case 9: [self savePrimaryCareSource];
 //            break;
-        case 10: [self saveMyHealthAndMyNeighbourhood];
-            break;
-        case 11: [self saveDemographics];
-            break;
-        case 12: [self saveCurrentPhysicalIssues];
-            break;
-        case 13: [self saveCurrentSocioSituation];
-            break;
+//        case 12: [self saveCurrentPhysicalIssues];
+//            break;
+//        case 13: [self saveCurrentSocioSituation];
+//            break;
 //        case 14: [self saveSocialSupportAssessment];
 //            break;
 //        case 15: [self saveRefForDoctorConsult];
@@ -2863,92 +2523,7 @@ NSString *const kHelpHelpful = @"help_helpful";
     }
 }
 
-//- (void) saveNeighbourhood {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *neighbourhood = [[self.fullScreeningForm objectForKey:@"neighbourhood"] mutableCopy];
-//    
-//    [neighbourhood setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kNeighbourhoodLoc] forKey:kNeighbourhoodLoc];
-//    [neighbourhood setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kNeighbourhoodOthers] forKey:kNeighbourhoodOthers];
-//
-//    [self.fullScreeningForm setObject:neighbourhood forKey:@"neighbourhood"];
-//    
-//}
-////
-//- (void) saveResidentParticulars {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *resi_particulars = [[self.fullScreeningForm objectForKey:@"resi_particulars"] mutableCopy];
-//    
-//    if ([fields objectForKey:kGender] != [NSNull null]) {
-//        if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
-//            [resi_particulars setObject:@"M" forKey:kGender];
-//        } else if ([[fields objectForKey:kGender] isEqualToString:@"Female"]) {
-//            [resi_particulars setObject:@"F" forKey:kGender];
-//        }
-//    }
-//    
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kName] forKey:@"resident_name"];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kNRIC] forKey:kNRIC];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kDOB] forKey:@"birth_year"];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kContactNumber] forKey:@"contact_no"];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kAddPostCode] forKey:@"address_postcode"];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kAddStreet] forKey:@"address_street"];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kAddBlock] forKey:@"address_block"];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kAddUnit] forKey:@"address_unit"];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kConsentNUS] forKey:kConsentNUS];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kConsentHPB] forKey:kConsentHPB];
-////    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kConsentGoodlife] forKey:kConsentGoodlife];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kAddYears] forKey:@"address_num_years"];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kContactNumber2] forKey:@"contact_no2"];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kSpokenLangOthers] forKey:@"lang_others_text"];
-//    
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kEthnicity] forKey:kEthnicity];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kMaritalStatus] forKey:kMaritalStatus];
-//    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kHighestEduLvl] forKey:@"highest_edu_lvl"];
-//
-//    //Init them to zero first
-//    [resi_particulars setObject:@"0" forKey:@"lang_canto"];
-//    [resi_particulars setObject:@"0" forKey:@"lang_english"];
-//    [resi_particulars setObject:@"0" forKey:@"lang_hokkien"];
-//    [resi_particulars setObject:@"0" forKey:@"lang_hindi"];
-//    [resi_particulars setObject:@"0" forKey:@"lang_malay"];
-//    [resi_particulars setObject:@"0" forKey:@"lang_mandrin"];
-//    [resi_particulars setObject:@"0" forKey:@"lang_tamil"];
-//    [resi_particulars setObject:@"0" forKey:@"lang_teochew"];
-//    [resi_particulars setObject:@"0" forKey:@"lang_others"];
-//    
-//    if ([[fields objectForKey:kSpokenLanguage] count]!=0) {
-//        NSArray *spokenLangArray = [fields objectForKey:kSpokenLanguage];
-//        for (int i=0; i<[spokenLangArray count]; i++) {
-//            
-//            if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Cantonese"]) [resi_particulars setObject:@"1" forKey:@"lang_canto"];
-//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"English"]) [resi_particulars setObject:@"1" forKey:@"lang_english"];
-//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Hindi"]) [resi_particulars setObject:@"1" forKey:@"lang_hindi"];
-//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Hokkien"]) [resi_particulars setObject:@"1" forKey:@"lang_hokkien"];
-//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Malay"]) [resi_particulars setObject:@"1" forKey:@"lang_malay"];
-//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Mandarin"]) [resi_particulars setObject:@"1" forKey:@"lang_mandrin"];
-//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Tamil"]) [resi_particulars setObject:@"1" forKey:@"lang_tamil"];
-//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Teochew"]) [resi_particulars setObject:@"1" forKey:@"lang_teochew"];
-//            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Others"]) [resi_particulars setObject:@"1" forKey:@"lang_others"];
-//        }
-//    }
-//    
-//    NSString *room;
-//    NSUInteger loc;
-//    if (([fields objectForKey:kHousingType] != [NSNull null]) && ([fields objectForKey:kHousingType])) {
-//        NSString *houseType = [fields objectForKey:kHousingType];
-//        if ([houseType rangeOfString:@"Owned"].location != NSNotFound) {
-//            [resi_particulars setObject:@"0" forKey:@"housing_owned_rented"];
-//        } else if ([houseType rangeOfString:@"Rental"].location != NSNotFound) {
-//            [resi_particulars setObject:@"1" forKey:@"housing_owned_rented"];
-//        }
-//        
-//        loc = [houseType rangeOfString:@"-"].location;
-//        room = [houseType substringWithRange:NSMakeRange(loc-1, 1)];
-//        [resi_particulars setObject:room forKey:@"housing_num_rooms"];
-//    }
-//    
-//    [self.fullScreeningForm setObject:resi_particulars forKey:@"resi_particulars"];
-//}
+
 //
 //- (void) saveClinicalResults {
 //    NSDictionary *fields = [self.form formValues];
@@ -3110,75 +2685,8 @@ NSString *const kHelpHelpful = @"help_helpful";
     [self.fullScreeningForm setObject:risk_factors forKey:@"risk_factors"];
     
 }
-//
-//- (void) saveDiabetesMellitus {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *diabetes_dict = [[self.fullScreeningForm objectForKey:@"diabetes"] mutableCopy];
-//    
-//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesHasInformed] forKey:@"has_informed"];
-//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kDiabetesCheckedBlood] forKey:@"checked_blood"];
-//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
-//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesCurrentlyPrescribed] forKey:@"currently_prescribed"];
-//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesTakingRegularly] forKey:@"taking_regularly"];
-//    
-//    [self.fullScreeningForm setObject:diabetes_dict forKey:@"diabetes"];
-//}
 
-- (void) saveHyperlipidemia {
-    NSDictionary *fields = [self.form formValues];
-    NSMutableDictionary *hyperlipid_dict = [[self.fullScreeningForm objectForKey:@"hyperlipid"] mutableCopy];
-    
-    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidHasInformed] forKey:@"has_informed"];
-    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kLipidCheckedBlood] forKey:@"checked_blood"];
-    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
-    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidCurrentlyPrescribed] forKey:@"currently_prescribed"];
-    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidTakingRegularly] forKey:@"taking_regularly"];
-    
-    [self.fullScreeningForm setObject:hyperlipid_dict forKey:@"hyperlipid"];
-}
-//
-//- (void) saveHypertension {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *hypertension_dict = [[self.fullScreeningForm objectForKey:@"hypertension"] mutableCopy];
-//    
-//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTHasInformed] forKey:@"has_informed"];
-//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTCheckedBP] forKey:@"checked_bp"];
-//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
-//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTCurrentlyPrescribed] forKey:@"currently_prescribed"];
-//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTTakingRegularly] forKey:@"taking_regularly"];
-//    
-//    [self.fullScreeningForm setObject:hypertension_dict forKey:@"hypertension"];
-//}
 
-- (void) saveCancerScreening {
-    
-    NSDictionary *fields = [self.form formValues];
-    NSMutableDictionary *cancer_dict = [[self.fullScreeningForm objectForKey:@"cancer"] mutableCopy];
-    
-
-    //set all to 0 first
-    [cancer_dict setObject:@"0" forKey:@"cervical"];
-    [cancer_dict setObject:@"0" forKey:@"breast"];
-    [cancer_dict setObject:@"0" forKey:@"colorectal"];
-    
-    if ([[fields objectForKey:kMultiCancerDiagnosed] count]!=0) {
-        NSArray *cancerDiagnosedArray = [fields objectForKey:kMultiCancerDiagnosed];
-        
-        for (int i=0; i<[cancerDiagnosedArray count]; i++) {
-            if([[cancerDiagnosedArray objectAtIndex:i] isEqualToString:@"Cervical (子宫颈癌)"]) [cancer_dict setObject:@"1" forKey:@"cervical"];
-            else if([[cancerDiagnosedArray objectAtIndex:i] isEqualToString:@"Breast (乳腺癌)"]) [cancer_dict setObject:@"1" forKey:@"breast"];
-            else if([[cancerDiagnosedArray objectAtIndex:i] isEqualToString:@"Colorectal (大肠癌)"]) [cancer_dict setObject:@"1" forKey:@"colorectal"];
-        }
-    }
-    
-    
-    [cancer_dict setObject:[self getStringWithDictionary:fields rowType:YesNoNA formDescriptorWithTag:kPapSmear] forKey:kPapSmear];
-    [cancer_dict setObject:[self getStringWithDictionary:fields rowType:YesNoNA formDescriptorWithTag:kMammogram] forKey:kMammogram];
-    [cancer_dict setObject:[self getStringWithDictionary:fields rowType:YesNoNA formDescriptorWithTag:kFobt] forKey:kFobt];
-    
-    [self.fullScreeningForm setObject:cancer_dict forKey:@"cancer"];
-    
-}
 
 - (void) saveOtherMedicalIssues {
     NSDictionary *fields = [self.form formValues];
@@ -3233,231 +2741,36 @@ NSString *const kHelpHelpful = @"help_helpful";
 //    
 //    [self.fullScreeningForm setObject:primaryCare_dict forKey:@"primary_care"];
 //}
-
-- (void) saveMyHealthAndMyNeighbourhood {
-    NSDictionary *fields = [self.form formValues];
-    NSMutableDictionary *healthNeighbourhood_dict = [[self.fullScreeningForm objectForKey:@"self_rated"] mutableCopy];
-    
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kMobility] forKey:kMobility];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kMobilityAid] forKey:kMobilityAid];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kSelfCare] forKey:kSelfCare];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kUsualActivities] forKey:kUsualActivities];
-    
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kHealthToday] forKey:kHealthToday];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kParkTime] forKey:kParkTime];
-    
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kFeelSafe] forKey:kFeelSafe];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kCrimeLow] forKey:kCrimeLow];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDrunkenPpl] forKey:kDrunkenPpl];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kBrokenBottles] forKey:kBrokenBottles];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kUnclearSigns] forKey:kUnclearSigns];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kHomelessPpl] forKey:kHomelessPpl];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kPublicTrans] forKey:kPublicTrans];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kSeeDoc] forKey:kSeeDoc];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kBuyMedi] forKey:kBuyMedi];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kGrocery] forKey:kGrocery];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kCommCentre] forKey:kCommCentre];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kSSCentres] forKey:kSSCentres];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kBankingPost] forKey:kBankingPost];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kReligiousPlaces] forKey:kReligiousPlaces];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kInteract] forKey:kInteract];
-    [healthNeighbourhood_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kSafePlaces] forKey:kSafePlaces];
-
-    
-    [self.fullScreeningForm setObject:healthNeighbourhood_dict forKey:@"self_rated"];
-}
-
-- (void) saveDemographics {
-    NSDictionary *fields = [self.form formValues];
-    NSMutableDictionary *demographics_dict = [[self.fullScreeningForm objectForKey:@"demographics"] mutableCopy];
-    
-    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_sso_tj"] forKey:@"consent_sso_tj"];
-    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_fsc_mp"] forKey:@"consent_fsc_mp"];
-    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_ntuc_tj"] forKey:@"consent_ntuc_tj"];
-    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_gl"] forKey:@"consent_gl"];
-    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_fysc"] forKey:@"consent_fysc"];
-    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:@"consent_sso_bgs"] forKey:@"consent_sso_bgs"];
-    
-    
-    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kCitizenship] forKey:kCitizenship];
-    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kReligion] forKey:kReligion];
-    [demographics_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kReligionOthers] forKey:kReligionOthers];
-    
-    [self.fullScreeningForm setObject:demographics_dict forKey:@"demographics"];
-    
-}
-
-- (void) saveCurrentPhysicalIssues {
-    NSDictionary *fields = [self.form formValues];
-    NSMutableDictionary *currPhyIssues_dict = [[self.fullScreeningForm objectForKey:@"adls"] mutableCopy];
-    
-    if ([fields objectForKey:kMultiADL] != (id) [NSNull null]) {    //check for null first, if not crash may happen
-        //Clear all first
-        [currPhyIssues_dict setObject:@"0" forKey:@"bathe"];
-        [currPhyIssues_dict setObject:@"0" forKey:@"dress"];
-        [currPhyIssues_dict setObject:@"0" forKey:@"eat"];
-        [currPhyIssues_dict setObject:@"0" forKey:@"hygiene"];
-        [currPhyIssues_dict setObject:@"0" forKey:@"toileting"];
-        [currPhyIssues_dict setObject:@"0" forKey:@"walk"];
-        
-        if ([[fields objectForKey:kMultiADL] count]!=0) {
-            NSArray *adlArray = [fields objectForKey:kMultiADL];
-            for (int i=0; i<[adlArray count]; i++) {
-                if([[[adlArray objectAtIndex:i] formValue] isEqual:@(0)]) [currPhyIssues_dict setObject:@"1" forKey:@"bathe"];
-                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(1)]) [currPhyIssues_dict setObject:@"1" forKey:@"dress"];
-                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(2)]) [currPhyIssues_dict setObject:@"1" forKey:@"eat"];
-                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(3)]) [currPhyIssues_dict setObject:@"1" forKey:@"hygiene"];
-                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(4)]) [currPhyIssues_dict setObject:@"1" forKey:@"toileting"];
-                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(5)]) [currPhyIssues_dict setObject:@"1" forKey:@"walk"];
-            }
-        }
-    }
-    
-    [self.fullScreeningForm setObject:currPhyIssues_dict forKey:@"adls"];
-}
-
-- (void) saveCurrentSocioSituation {
-    NSDictionary *fields = [self.form formValues];
-    NSMutableDictionary *currSocioSituation_dict = [[self.fullScreeningForm objectForKey:@"socioecon"] mutableCopy];
-    
-    if ([fields objectForKey:kMultiPlan] != (id) [NSNull null]) {
-        NSArray *plansOptionArray = [fields objectForKey:kMultiPlan];
-        for(int i=0;i<[plansOptionArray count];i++) {
-            if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@0]) [currSocioSituation_dict setObject:@"1" forKey:@"medisave"];
-            else if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@1]) [currSocioSituation_dict setObject:@"1" forKey:@"insurance"];
-            else if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@2]) [currSocioSituation_dict setObject:@"1" forKey:@"cpf_pays"];
-            else if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@3]) [currSocioSituation_dict setObject:@"1" forKey:@"pgp"];
-            else if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@4]) [currSocioSituation_dict setObject:@"1" forKey:@"chas"];
-            else if ([[[plansOptionArray objectAtIndex:i] formValue] isEqual:@5]) [currSocioSituation_dict setObject:@"1" forKey:@"apply_chas"];
-        }
-    }
-    
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kCPFAmt] forKey:kCPFAmt];
-    
-    //CHAS COLOR
-    if ([fields objectForKey:kChasColour] != (id)[NSNull null]) {
-        if ([[fields objectForKey:kChasColour] isEqualToString:@"Blue"]) [currSocioSituation_dict setObject:@"0" forKey:kChasColour];
-        else if ([[fields objectForKey:kChasColour] isEqualToString:@"Orange"]) [currSocioSituation_dict setObject:@"1" forKey:kChasColour];
-        else if ([[fields objectForKey:kChasColour] isEqualToString:@"N.A."]) [currSocioSituation_dict setObject:@"2" forKey:kChasColour];
-    }
-    
-    //reset values to 0 first
-    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_med"];
-    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_daily"];
-    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_arrears"];
-    [currSocioSituation_dict setObject:@"0" forKey:@"cant_cope_others"];
-    
-    if ([fields objectForKey:kHouseCopingReason] != (id) [NSNull null]) {
-        NSArray *houseCopingArray = [fields objectForKey:kHouseCopingReason];
-        for(int i=0;i<[houseCopingArray count];i++) {
-            if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Medical expenses"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_med"];
-            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Daily living expenses"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_daily"];
-            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Arrears / Debts"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_arrears"];
-            else if ([[houseCopingArray objectAtIndex:i] isEqualToString:@"Others"]) [currSocioSituation_dict setObject:@"1" forKey:@"cant_cope_others"];
-        }
-    }
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHouseCoping] forKey:kHouseCoping];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kHouseCopingReasonOthers] forKey:kHouseCopingReasonOthers];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kEmployStatus] forKey:kEmployStatus];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEmployStatusOthers] forKey:kEmployStatusOthers];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:TextView formDescriptorWithTag:kManageExpenses] forKey:kManageExpenses];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kHouseholdIncome] forKey:kHouseholdIncome];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kPplInHouse] forKey:kPplInHouse];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kAnyAssist] forKey:kAnyAssist];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kSeekHelp] forKey:kSeekHelp];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kHelpOrg] forKey:kHelpOrg];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:TextView formDescriptorWithTag:kHelpDescribe] forKey:kHelpDescribe];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kHelpAmt] forKey:kHelpAmt];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kHelpPeriod] forKey:kHelpPeriod];
-    [currSocioSituation_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHelpHelpful] forKey:kHelpHelpful];
-    
-    [self.fullScreeningForm setObject:currSocioSituation_dict forKey:@"socioecon"];
-}
 //
-//- (void) saveSocialSupportAssessment {
+//- (void) saveCurrentPhysicalIssues {
 //    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *socialSuppAssessment_dict = [[self.fullScreeningForm objectForKey:@"social_support"] mutableCopy];
+//    NSMutableDictionary *currPhyIssues_dict = [[self.fullScreeningForm objectForKey:@"adls"] mutableCopy];
 //    
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHasCaregiver] forKey:kHasCaregiver];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverName] forKey:kCaregiverName];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverRs] forKey:kCaregiverRs];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kCaregiverContactNum] forKey:kCaregiverContactNum];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverNric] forKey:kCaregiverNric];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCaregiverAddress] forKey:kCaregiverAddress];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kEContact] forKey:kEContact];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactName] forKey:kEContactName];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactRs] forKey:kEContactRs];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kEContactNum] forKey:kEContactNum];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactNric] forKey:kEContactNric];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kEContactAddress] forKey:kEContactAddress];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kGettingSupport] forKey:kGettingSupport];
-//    //Support in terms of..... multi selector
-//    
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"care_giving"];
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"food"];
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"money"];
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"others"];
-//    
-//    if([fields objectForKey:kMultiSupport]!= [NSNull null]) {
-//        NSArray *multiSupportArray = [fields objectForKey:kMultiSupport];
+//    if ([fields objectForKey:kMultiADL] != (id) [NSNull null]) {    //check for null first, if not crash may happen
+//        //Clear all first
+//        [currPhyIssues_dict setObject:@"0" forKey:@"bathe"];
+//        [currPhyIssues_dict setObject:@"0" forKey:@"dress"];
+//        [currPhyIssues_dict setObject:@"0" forKey:@"eat"];
+//        [currPhyIssues_dict setObject:@"0" forKey:@"hygiene"];
+//        [currPhyIssues_dict setObject:@"0" forKey:@"toileting"];
+//        [currPhyIssues_dict setObject:@"0" forKey:@"walk"];
 //        
-//        if ([multiSupportArray count]>0) {
-//            for(int i=0;i<[multiSupportArray count];i++) {
-//                if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Care-giving"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"care_giving"];
-//                else if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Food"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"food"];
-//                else if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Money"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"money"];
-//                else if ([[multiSupportArray objectAtIndex:i] isEqualToString:@"Others"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"others"];
-//                
+//        if ([[fields objectForKey:kMultiADL] count]!=0) {
+//            NSArray *adlArray = [fields objectForKey:kMultiADL];
+//            for (int i=0; i<[adlArray count]; i++) {
+//                if([[[adlArray objectAtIndex:i] formValue] isEqual:@(0)]) [currPhyIssues_dict setObject:@"1" forKey:@"bathe"];
+//                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(1)]) [currPhyIssues_dict setObject:@"1" forKey:@"dress"];
+//                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(2)]) [currPhyIssues_dict setObject:@"1" forKey:@"eat"];
+//                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(3)]) [currPhyIssues_dict setObject:@"1" forKey:@"hygiene"];
+//                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(4)]) [currPhyIssues_dict setObject:@"1" forKey:@"toileting"];
+//                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(5)]) [currPhyIssues_dict setObject:@"1" forKey:@"walk"];
 //            }
 //        }
 //    }
 //    
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kSupportOthers] forKey:@"others_text"];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kRelativesContact] forKey:kRelativesContact];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kRelativesEase] forKey:kRelativesEase];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kRelativesClose] forKey:kRelativesClose];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsContact] forKey:kFriendsContact];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsEase] forKey:kFriendsEase];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFriendsClose] forKey:kFriendsClose];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kSocialScore] forKey:kSocialScore];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kLackCompan] forKey:kLackCompan];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFeelLeftOut] forKey:kFeelLeftOut];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:SelectorPush formDescriptorWithTag:kFeelIsolated] forKey:kFeelIsolated];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kAwareActivities] forKey:kAwareActivities];
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kParticipateActivities] forKey:kParticipateActivities];
-//    
-//    //reset values first
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"sac"];
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"fsc"];
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"cc"];
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"rc"];
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"ro"];
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"so"];
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"oth"];
-//    [socialSuppAssessment_dict setObject:@"0" forKey:@"na"];
-//    
-//    if([fields objectForKey:kMultiHost]!= [NSNull null]) {
-//        NSArray *multiHostArray = [fields objectForKey:kMultiHost];
-//        
-//        if ([multiHostArray count]>0) {
-//            for(int i=0;i<[multiHostArray count];i++) {
-//                if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Senior Activity Centre (SAC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"sac"];
-//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Family Services Centre (FSC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"fsc"];
-//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Community Centre (CC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"cc"];
-//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Residents' Committee (RC)"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"rc"];
-//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Religious Organisations"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"ro"];
-//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Self-organised"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"so"];
-//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"Others"]) [socialSuppAssessment_dict setObject:@"1" forKey:@"oth"];
-//                else if ([[multiHostArray objectAtIndex:i] isEqualToString:@"N.A."]) [socialSuppAssessment_dict setObject:@"1" forKey:@"na"];
-//                
-//            }
-//        }
-//    }
-//    
-//    [socialSuppAssessment_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kHostOthers] forKey:kHostOthers];
-//
-//    [self.fullScreeningForm setObject:socialSuppAssessment_dict forKey:@"social_support"];
+//    [self.fullScreeningForm setObject:currPhyIssues_dict forKey:@"adls"];
 //}
+//
 //
 //- (void) saveRefForDoctorConsult {
 //    NSDictionary *fields = [self.form formValues];

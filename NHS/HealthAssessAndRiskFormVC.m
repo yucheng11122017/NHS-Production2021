@@ -565,6 +565,46 @@ NSString *const kQ15 = @"q15";
     
     return [super initWithForm:formDescriptor];
 }
+
+//
+//- (void) saveDiabetesMellitus {
+//    NSDictionary *fields = [self.form formValues];
+//    NSMutableDictionary *diabetes_dict = [[self.fullScreeningForm objectForKey:@"diabetes"] mutableCopy];
+//
+//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesHasInformed] forKey:@"has_informed"];
+//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kDiabetesCheckedBlood] forKey:@"checked_blood"];
+//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
+//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesCurrentlyPrescribed] forKey:@"currently_prescribed"];
+//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesTakingRegularly] forKey:@"taking_regularly"];
+//
+//    [self.fullScreeningForm setObject:diabetes_dict forKey:@"diabetes"];
+//}
+//
+//- (void) saveHyperlipidemia {
+//    NSDictionary *fields = [self.form formValues];
+//    NSMutableDictionary *hyperlipid_dict = [[self.fullScreeningForm objectForKey:@"hyperlipid"] mutableCopy];
+//    
+//    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidHasInformed] forKey:@"has_informed"];
+//    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kLipidCheckedBlood] forKey:@"checked_blood"];
+//    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
+//    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidCurrentlyPrescribed] forKey:@"currently_prescribed"];
+//    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidTakingRegularly] forKey:@"taking_regularly"];
+//    
+//    [self.fullScreeningForm setObject:hyperlipid_dict forKey:@"hyperlipid"];
+//}
+//
+//- (void) saveHypertension {
+//    NSDictionary *fields = [self.form formValues];
+//    NSMutableDictionary *hypertension_dict = [[self.fullScreeningForm objectForKey:@"hypertension"] mutableCopy];
+//
+//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTHasInformed] forKey:@"has_informed"];
+//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTCheckedBP] forKey:@"checked_bp"];
+//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
+//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTCurrentlyPrescribed] forKey:@"currently_prescribed"];
+//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTTakingRegularly] forKey:@"taking_regularly"];
+//
+//    [self.fullScreeningForm setObject:hypertension_dict forKey:@"hypertension"];
+//}
 /*
 #pragma mark - Navigation
 
