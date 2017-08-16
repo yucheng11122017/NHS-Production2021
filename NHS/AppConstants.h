@@ -11,6 +11,7 @@
 @interface AppConstants : NSObject
 
 #define DEFAULT_FONT_SIZE 15
+#define DEFAULT_FONT_NAME @"AppleSDGothicNeo-Regular"
 
 /*
  * Form Constants
@@ -453,60 +454,35 @@ extern NSString *const kReqFollowupGDA;
 
 
 /* Pre-education Knowledge Quiz */
-extern NSString *const kPreEdu1;
-extern NSString *const kPreEdu2;
-extern NSString *const kPreEdu3;
-extern NSString *const kPreEdu4;
-extern NSString *const kPreEdu5;
-extern NSString *const kPreEdu6;
-extern NSString *const kPreEdu7;
-extern NSString *const kPreEdu8;
-extern NSString *const kPreEdu9;
-extern NSString *const kPreEdu10;
-extern NSString *const kPreEdu11;
-extern NSString *const kPreEdu12;
-extern NSString *const kPreEdu13;
-extern NSString *const kPreEdu14;
-extern NSString *const kPreEdu15;
-extern NSString *const kPreEdu16;
-extern NSString *const kPreEdu17;
-extern NSString *const kPreEdu18;
-extern NSString *const kPreEdu19;
-extern NSString *const kPreEdu20;
-extern NSString *const kPreEdu21;
-extern NSString *const kPreEdu22;
-extern NSString *const kPreEdu23;
-extern NSString *const kPreEdu24;
-extern NSString *const kPreEdu25;
+extern NSString *const kEdu1;
+extern NSString *const kEdu2;
+extern NSString *const kEdu3;
+extern NSString *const kEdu4;
+extern NSString *const kEdu5;
+extern NSString *const kEdu6;
+extern NSString *const kEdu7;
+extern NSString *const kEdu8;
+extern NSString *const kEdu9;
+extern NSString *const kEdu10;
+extern NSString *const kEdu11;
+extern NSString *const kEdu12;
+extern NSString *const kEdu13;
+extern NSString *const kEdu14;
+extern NSString *const kEdu15;
+extern NSString *const kEdu16;
+extern NSString *const kEdu17;
+extern NSString *const kEdu18;
+extern NSString *const kEdu19;
+extern NSString *const kEdu20;
+extern NSString *const kEdu21;
+extern NSString *const kEdu22;
+extern NSString *const kEdu23;
+extern NSString *const kEdu24;
+extern NSString *const kEdu25;
 extern NSString *const kPreEdScore;
 
 /* Post-education Knowledge Quiz */
 
-extern NSString *const kPostEdu1;
-extern NSString *const kPostEdu2;
-extern NSString *const kPostEdu3;
-extern NSString *const kPostEdu4;
-extern NSString *const kPostEdu5;
-extern NSString *const kPostEdu6;
-extern NSString *const kPostEdu7;
-extern NSString *const kPostEdu8;
-extern NSString *const kPostEdu9;
-extern NSString *const kPostEdu10;
-extern NSString *const kPostEdu11;
-extern NSString *const kPostEdu12;
-extern NSString *const kPostEdu13;
-extern NSString *const kPostEdu14;
-extern NSString *const kPostEdu15;
-extern NSString *const kPostEdu16;
-extern NSString *const kPostEdu17;
-extern NSString *const kPostEdu18;
-extern NSString *const kPostEdu19;
-extern NSString *const kPostEdu20;
-extern NSString *const kPostEdu21;
-extern NSString *const kPostEdu22;
-extern NSString *const kPostEdu23;
-extern NSString *const kPostEdu24;
-extern NSString *const kPostEdu25;
 extern NSString *const kPostEdScore;
 
 

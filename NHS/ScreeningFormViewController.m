@@ -81,39 +81,6 @@ NSString *const kQuestionThirteen = @"q13";
 NSString *const kQuestionFourteen = @"q14";
 NSString *const kQuestionFifteen = @"q15";
 
-//Cancer Screening
-NSString *const kMultiCancerDiagnosed = @"multi_cancer_diagnosed";
-NSString *const kPapSmear = @"pap_smear";
-NSString *const kMammogram = @"mammogram";
-NSString *const kFobt = @"fobt";
-
-//Other Medical Issues
-NSString *const kHeartAttack = @"heart_attack";
-NSString *const kHeartFailure = @"heart_failure";
-NSString *const kCopd = @"copd";
-NSString *const kAsthma = @"asthma";
-NSString *const kStroke = @"stroke";
-NSString *const kDementia = @"dementia";
-NSString *const kHemiplegia = @"hemiplegia";
-NSString *const kSolidOrganCancer = @"solid_organ_cancer";
-NSString *const kBloodCancer = @"blood_cancer";
-NSString *const kMetastaticCancer = @"metastatic_cancer";
-NSString *const kDiabetesWODamage = @"diabetes_wo_damage";
-NSString *const kDiabetesWDamage = @"diabetes_w_damage";
-NSString *const kKidneyFailure = @"kidney_failure";
-NSString *const kPepticUlcer = @"peptic_ulcer";
-NSString *const kMildLiver = @"mild_liver";
-NSString *const kModerateSevereLiver = @"moderate_severe_liver";
-NSString *const kVascularDisease = @"vascular_disease";
-NSString *const kTissueDisease = @"tissue_disease";
-NSString *const kOsteoarthritis = @"osteoarthritis";
-NSString *const kAids = @"aids";
-NSString *const kOtherMedIssues = @"other_medical_issues";
-NSString *const kNA = @"NA";
-NSString *const kPain = @"pain";
-NSString *const kPainDuration = @"pain_duration";
-NSString *const kAnxiety = @"anxiety";
-
 
 //Primary Care Source
 //NSString *const kCareGiverID = @"care_giver_id";
@@ -173,7 +140,8 @@ NSString *const kMultiADL = @"multi_adl";
 @interface ScreeningFormViewController () {
     NSString *gender;
     NSArray *spoken_lang_value;
-    XLFormRowDescriptor *relativesContactRow, *relativesEaseRow, *relativesCloseRow, *friendsContactRow, *friendsEaseRow, *friendsCloseRow, *socialScoreRow;
+    XLFormRowDescriptor *preEdScoreRow, *postEdScoreRow, *showPostEdSectionBtnRow;
+    XLFormSectionDescriptor *preEdSection, *postEdSection;
     NSString *neighbourhood, *citizenship;
     NSNumber *age;
     BOOL sporean, age50, relColorectCancer, colon3Yrs, wantColRef, disableFIT;
@@ -217,26 +185,23 @@ NSString *const kMultiADL = @"multi_adl";
             break;
         case 4: form = [self initSnellenEyeTest];
             break;
-//        case 8: form = [self initOtherMedicalIssues];
-//            break;
-//        case 9: form = [self initPrimaryCareSource];
-//            break;
+        case 5: form = [self initAdditionalSvcs];
+            break;
+        case 6: form = [self initRefForDoctorConsult];
+            break;
 ////        case 10: form = [self initMyHealthAndMyNeighbourhood];
 ////            break;
-//        case 11: form = [self initDemographics];
-//            break;
 //        case 12: form = [self initCurrentPhysicalIssues];
 //            break;
-//        case 13: form = [self initCurrentSocioSituation];
-//            break;
+        case 11: form = [self initHealthEducation];
+            break;
 //        case 14: form = [self initSocialSupportAssessment];
 //            break;
 //        case 15: form = [self initRefForDoctorConsult];
 //            break;
-}
-    NSLog(@"%@", [form class]);
+    }
     
-    NSLog(@"Form type: %@", self.formType);
+    self.form.addAsteriskToRequiredRowsTitle = YES;
     
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
     
@@ -295,7 +260,7 @@ NSString *const kMultiADL = @"multi_adl";
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kScreenMode rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Pick one *"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kScreenMode rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Pick one"];
     row.selectorOptions = @[@"Centralised", @"Door-to-door"];
     row.required = YES;
     [section addFormRow:row];
@@ -742,7 +707,7 @@ NSString *const kMultiADL = @"multi_adl";
     row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPapSmear rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free pap smear referral?"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReferPapSmear rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free pap smear referral?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
@@ -821,31 +786,31 @@ NSString *const kMultiADL = @"multi_adl";
     [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *systolic_1;
-    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Sys rowType:XLFormRowDescriptorTypeNumber title:@"BP (1. Systolic number) *"];
+    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Sys rowType:XLFormRowDescriptorTypeNumber title:@"BP (1. Systolic number)"];
     systolic_1.required = YES;
     systolic_1.value = [[bpRecordsArray objectAtIndex:1] objectForKey:@"systolic_bp"];
-    [systolic_1.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:systolic_1];
     [section addFormRow:systolic_1];
     
     XLFormRowDescriptor *diastolic_1;
-    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Dias rowType:XLFormRowDescriptorTypeNumber title:@"BP (2. Diastolic number) *"];
+    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Dias rowType:XLFormRowDescriptorTypeNumber title:@"BP (2. Diastolic number)"];
     diastolic_1.required = YES;
     diastolic_1.value = [[bpRecordsArray objectAtIndex:1] objectForKey:@"diastolic_bp"];
-    [diastolic_1.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:diastolic_1];
     [section addFormRow:diastolic_1];
     
     XLFormRowDescriptor *height;
-    height = [XLFormRowDescriptor formRowDescriptorWithTag:kHeightCm rowType:XLFormRowDescriptorTypeNumber title:@"Height (cm) *"];
+    height = [XLFormRowDescriptor formRowDescriptorWithTag:kHeightCm rowType:XLFormRowDescriptorTypeNumber title:@"Height (cm)"];
     height.required = YES;
     height.value = [clinicalResultsDict objectForKey:@"height_cm"];
-    [height.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:height];
     [section addFormRow:height];
     
     XLFormRowDescriptor *weight;
-    weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeightKg rowType:XLFormRowDescriptorTypeNumber title:@"Weight (kg) *"];
+    weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeightKg rowType:XLFormRowDescriptorTypeNumber title:@"Weight (kg)"];
     weight.required = YES;
     weight.value = [clinicalResultsDict objectForKey:@"weight_kg"];
-    [weight.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:weight];
     [section addFormRow:weight];
     
     XLFormRowDescriptor *bmi;
@@ -862,7 +827,7 @@ NSString *const kMultiADL = @"multi_adl";
         }
     }
     bmi.disabled = @(1);
-    [bmi.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:bmi];
     [section addFormRow:bmi];
     
     weight.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -883,23 +848,23 @@ NSString *const kMultiADL = @"multi_adl";
     };
     
     XLFormRowDescriptor *waist;
-    waist = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistCircum rowType:XLFormRowDescriptorTypeNumber title:@"Waist Circumference (cm) *"];
+    waist = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistCircum rowType:XLFormRowDescriptorTypeNumber title:@"Waist Circumference (cm)"];
     waist.required = YES;
     waist.value = [clinicalResultsDict objectForKey:@"waist_circum"];
-    [waist.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:waist];
     [section addFormRow:waist];
     
     XLFormRowDescriptor *hip;
-    hip = [XLFormRowDescriptor formRowDescriptorWithTag:kHipCircum rowType:XLFormRowDescriptorTypeNumber title:@"Hip Circumference (cm) *"];
+    hip = [XLFormRowDescriptor formRowDescriptorWithTag:kHipCircum rowType:XLFormRowDescriptorTypeNumber title:@"Hip Circumference (cm)"];
     hip.required = YES;
     hip.value = [clinicalResultsDict objectForKey:@"hip_circum"];
-    [hip.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:hip];
     [section addFormRow:hip];
     
     XLFormRowDescriptor *waistHipRatio;
     waistHipRatio = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistHipRatio rowType:XLFormRowDescriptorTypeText title:@"Waist : Hip Ratio"];
     waistHipRatio.required = YES;
-    [waistHipRatio.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:waistHipRatio];
 //    waistHipRatio.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kWaistCircum, kHipCircum]];
     //Initial value
     if(![[clinicalResultsDict objectForKey:@"waist_hip_ratio"] isEqualToString:@""]) {
@@ -925,24 +890,24 @@ NSString *const kMultiADL = @"multi_adl";
         }
     };
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeText title:@"CBG (mmol/L) *"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeText title:@"CBG (mmol/L)"];
     row.required = YES;
     row.value = [clinicalResultsDict objectForKey:@"cbg"];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     XLFormRowDescriptor *systolic_2;
-    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Sys rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (2nd Systolic) *"];
+    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Sys rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (2nd Systolic)"];
     systolic_2.required = YES;
     systolic_2.value = [[bpRecordsArray objectAtIndex:2] objectForKey:@"systolic_bp"];
-    [systolic_2.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:systolic_2];
     [section addFormRow:systolic_2];
     
     XLFormRowDescriptor *diastolic_2;
-    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Dias rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (2nd Diastolic) *"];
+    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Dias rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (2nd Diastolic)"];
     diastolic_2.required = YES;
     diastolic_2.value = [[bpRecordsArray objectAtIndex:2] objectForKey:@"diastolic_bp"];
-    [diastolic_2.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:diastolic_2];
     [section addFormRow:diastolic_2];
     
     XLFormRowDescriptor *systolic_avg;
@@ -953,7 +918,7 @@ NSString *const kMultiADL = @"multi_adl";
     }
 //    systolic_avg.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kBpSystolic, kBpSystolic2]];
     systolic_avg.disabled = @(1);   //permanent
-    [systolic_avg.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:systolic_avg];
     [section addFormRow:systolic_avg];
     
     systolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -973,12 +938,12 @@ NSString *const kMultiADL = @"multi_adl";
     };
     
     XLFormRowDescriptor *diastolic_avg;
-    diastolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgDias rowType:XLFormRowDescriptorTypeText title:@"BP (Avg. of 1st & 2nd diastolic) *"];
+    diastolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgDias rowType:XLFormRowDescriptorTypeText title:@"BP (Avg. of 1st & 2nd diastolic)"];
     diastolic_avg.required = YES;
     if (![[[bpRecordsArray objectAtIndex:0] objectForKey:@"diastolic_bp"] isEqualToString:@""]) {
         diastolic_avg.value = [[bpRecordsArray objectAtIndex:0] objectForKey:@"diastolic_bp"];
     }
-    [diastolic_avg.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:diastolic_avg];
     diastolic_avg.disabled = @(1);
     [section addFormRow:diastolic_avg];
     
@@ -1002,14 +967,14 @@ NSString *const kMultiADL = @"multi_adl";
     row.required = NO;
     [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
     row.value = [[bpRecordsArray objectAtIndex:3] objectForKey:@"systolic_bp"];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Dias rowType:XLFormRowDescriptorTypeNumber title:@"BP Taking (3rd Diastolic)"];
     [row.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
     row.required = NO;
     row.value = [[bpRecordsArray objectAtIndex:3] objectForKey:@"diastolic_bp"];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
@@ -1038,36 +1003,53 @@ NSString *const kMultiADL = @"multi_adl";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kRightEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"1. Right Eye: "];
     row.required = YES;
     row.selectorOptions = @[@"6/6", @"6/9", @"6/12", @"6/18", @"6/24", @"6/36", @"6/60"];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kLeftEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"2. Left Eye: "];
     row.required = YES;
     row.selectorOptions = @[@"6/6", @"6/9", @"6/12", @"6/18", @"6/24", @"6/36", @"6/60"];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     XLFormRowDescriptor *six12Row = [XLFormRowDescriptor formRowDescriptorWithTag:kSix12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"3. Does either eye (or both) have vision poorer than 6/12?"];
     six12Row.required = YES;
     six12Row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [six12Row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:six12Row];
     [section addFormRow:six12Row];
     
     XLFormRowDescriptor *tunnelRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTunnel rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"4. Does resident have genuine visual complaints (e.g. floaters, tunnel vision, bright spots etc.)?"];
     tunnelRow.required = YES;
     tunnelRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [tunnelRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:tunnelRow];
     [section addFormRow:tunnelRow];
     
     XLFormRowDescriptor *visitEye12Mths = [XLFormRowDescriptor formRowDescriptorWithTag:kVisitEye12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"5. Resident has not visited eye specialist in 12 months"];
     visitEye12Mths.required = YES;
     visitEye12Mths.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [visitEye12Mths.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:visitEye12Mths];
     [section addFormRow:visitEye12Mths];
     
-    if (([six12Row.value isEqual:@1] || ([tunnelRow.value isEqual:@(1)])) && ([visitEye12Mths.value isEqual:@(1)])) { // (3 OR 4) AND 5
-        [[NSUserDefaults standardUserDefaults] setObject:@1 forKey:@"needSERI"];
-    }
+
+    [self checkForSeriEligibilityWithRow3:six12Row andRow4:tunnelRow andRow5:visitEye12Mths];
+    
+    six12Row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (oldValue != newValue) {
+            [self checkForSeriEligibilityWithRow3:rowDescriptor andRow4:tunnelRow andRow5:visitEye12Mths];
+        }
+    };
+    
+    tunnelRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (oldValue != newValue) {
+            [self checkForSeriEligibilityWithRow3:six12Row andRow4:rowDescriptor andRow5:visitEye12Mths];
+        }
+    };
+    
+    visitEye12Mths.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (oldValue != newValue) {
+            [self checkForSeriEligibilityWithRow3:six12Row andRow4:tunnelRow andRow5:rowDescriptor];
+        }
+    };
     
     return [super initWithForm:formDescriptor];
     
@@ -1756,545 +1738,6 @@ NSString *const kMultiADL = @"multi_adl";
 }
 
 
--(id) initOtherMedicalIssues {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Other Medical Issues"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    NSDictionary *otherMedIssuesDict = [self.fullScreeningForm objectForKey:@"others"];
-    
-    formDescriptor.assignFirstResponderOnShow = YES;
-    
-    // Introduction - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Introduction"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Charlson Comorbidity Index. Ask the resident, \"what medical conditions do you have?\". Compare against the list below and tick the condition if present. You can tick more than 1 box."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    
-    // Heart - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Heart"];
-    [formDescriptor addFormSection:section];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHeartAttack rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Heart Attack (心脏发作)"];
-    [section addFormRow:row];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kHeartAttack];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHeartFailure rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Heart Failure (心脏病)"];
-    
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kHeartFailure];
-    [section addFormRow:row];
-    
-    // Lung - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Lung"];
-    [formDescriptor addFormSection:section];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCopd rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Chronic Pulmonary Disease (COPD) (慢性肺部疾病)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kCopd];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAsthma rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Asthma (气喘)"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kAsthma];
-    [section addFormRow:row];
-    
-    // Brain - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Brain"];
-    [formDescriptor addFormSection:section];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kStroke rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Stroke (脑中风)"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kStroke];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDementia rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dementia (老人痴呆症)"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kDementia];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHemiplegia rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Hemiplegia (偏痴)"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kHemiplegia];
-    [section addFormRow:row];
-    
-    // Cancer - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Cancer"];
-    [formDescriptor addFormSection:section];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSolidOrganCancer rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Solid organ cancer (实体器官癌症)"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kSolidOrganCancer];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBloodCancer rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Blood cancer (eg. Leukemia/Lymphoma) (血症)"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kBloodCancer];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMetastaticCancer rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Metastatic cancer (转移癌)"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kMetastaticCancer];
-    [section addFormRow:row];
-    
-    // DM and Renal - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Diabetes and Renal"];
-    [formDescriptor addFormSection:section];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesWODamage rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Diabetes, without end-organ damage (eg. retinopathy, kidney problems, heart problems, amputation, strokes) (糖尿病－无器官受损）"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kDiabetesWODamage];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabetesWDamage rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Diabetes, with end organ damage (糖尿病－有器官受损)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kDiabetesWDamage];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKidneyFailure rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Kidney failure (肾功能衰竭)"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kKidneyFailure];
-    [section addFormRow:row];
-    
-    // Gut and Liver - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Gut and Liver"];
-    [formDescriptor addFormSection:section];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPepticUlcer rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Peptic Ulcer Disease (消化性溃疡病)"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kPepticUlcer];
-    [section addFormRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMildLiver rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Mild Liver Disease (肝病)"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kMildLiver];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kModerateSevereLiver rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Moderate-to-severe liver disease (has jaundice or ascites) (严重肝病)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    //value
-    row.value = [otherMedIssuesDict objectForKey:@"liver_disease"];
-    [section addFormRow:row];
-    
-    // Misc - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Misc"];
-    [formDescriptor addFormSection:section];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kVascularDisease rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Peripheral Vascular Disease (血管疾病)"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kVascularDisease];
-    [section addFormRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kTissueDisease rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Connective Tissue Disease (eg.Rheumatoid Arthritis (风湿关节炎)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kTissueDisease];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kOsteoarthritis rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Osteoarthritis (骨性关节炎)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kOsteoarthritis];
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAids rowType:XLFormRowDescriptorTypeBooleanCheck title:@"AIDS (爱滋病)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    //value
-    row.value = [otherMedIssuesDict objectForKey:kAids];
-    [section addFormRow:row];
-    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionFive rowType:XLFormRowDescriptorTypeInfo title:@"Other medical conditions:"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    
-//    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kOtherMedIssues rowType:XLFormRowDescriptorTypeTextView title:@""];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [row.cellConfigAtConfigure setObject:@"Other medical conditions:(specify)" forKey:@"textView.placeholder"];
-    //value
-    row.value = [otherMedIssuesDict objectForKey:@"others"];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"N.A."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    //value
-    row.value = [otherMedIssuesDict objectForKey:@"NA"];
-    [section addFormRow:row];
-    
-    // Pain and Anxiety - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    section.footerTitle = @"If resident selects any of the Extreme options, please refer them for doctor's consult.";
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix rowType:XLFormRowDescriptorTypeInfo title:@"Pain / Discomfort"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    
-    XLFormRowDescriptor *painRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPain
-                                                                         rowType:XLFormRowDescriptorTypeSelectorActionSheet
-                                                                           title:@""];
-    painRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I have no pain or discomfort"],
-                                [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I have slight pain or discomfort"],
-                                [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I have moderate pain or discomfort"],
-                                [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I have severe pain or discomfort"],
-                                [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I have extreme pain or discomfort"]];
-    //value
-    NSArray *options = painRow.selectorOptions;
-    if (![[otherMedIssuesDict objectForKey:kPain]isEqualToString:@""]) {
-        painRow.value = [options objectAtIndex:[[otherMedIssuesDict objectForKey:kPain] integerValue]];
-    }
-    painRow.noValueDisplayText = @"Tap here for options";
-    [section addFormRow:painRow];
-    
-    
-    
-    XLFormRowDescriptor *painDurQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionTwo rowType:XLFormRowDescriptorTypeInfo title:@"My pain has lasted ≥ 3 months)"];
-    painDurQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:painDurQRow];
-    
-    XLFormRowDescriptor *painDurationRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPainDuration
-                                                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                                                   title:@""];
-    painDurationRow.selectorOptions = @[@"YES", @"NO"];
-    //value
-    if (![[otherMedIssuesDict objectForKey:kPainDuration] isEqualToString:@""]) {
-        painDurationRow.value = [[otherMedIssuesDict objectForKey:kPainDuration] isEqualToString:@"1"]? @"YES":@"NO";
-    }
-    [section addFormRow:painDurationRow];
-    
-    //Initial hidden state
-    if([[otherMedIssuesDict objectForKey:kPain] isEqualToString:@""]) {
-        painDurQRow.hidden = @(1);
-        painDurationRow.hidden = @(1);
-    } else {
-        if ([[painRow.value formValue] isEqual:@(0)]) {
-            painDurQRow.hidden = @(1);
-            painDurationRow.hidden = @(1);
-        } else {
-            painDurQRow.hidden = @(0);
-            painDurationRow.hidden = @(0);
-        }
-    }
-    
-    painRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([[newValue formValue] isEqual:@(0)]) {
-                painDurQRow.hidden = @(1);  //hide
-                painDurationRow.hidden = @(1);  //hide
-            } else {
-                painDurQRow.hidden = @(0);  //hide
-                painDurationRow.hidden = @(0);  //hide
-            }
-        }
-    };
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionSix rowType:XLFormRowDescriptorTypeInfo title:@"Anxiety / Depression"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAnxiety
-                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
-                                                  title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"I am not anxious or depressed"],
-                                [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"I am slightly anxious or depressed"],
-                                [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"I am moderately anxious or depressed"],
-                                [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"I am severely anxious or depressed"],
-                                [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"I am extremely anxious or depressed"]];
-    //value
-    options = row.selectorOptions;
-    if (![[otherMedIssuesDict objectForKey:kAnxiety]isEqualToString:@""]) {
-        row.value = [options objectAtIndex:[[otherMedIssuesDict objectForKey:kAnxiety] integerValue]];
-    }
-    row.noValueDisplayText = @"Tap here for options";
-    [section addFormRow:row];
-
-    
-    
-    
-    return [super initWithForm:formDescriptor];
-}
-//
-//-(id) initPrimaryCareSource {
-//    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Primary Care Source"];
-//    XLFormSectionDescriptor * section;
-//    XLFormRowDescriptor * row;
-//    NSDictionary *primaryCareDict = [self.fullScreeningForm objectForKey:@"primary_care"];
-//    
-//    formDescriptor.assignFirstResponderOnShow = YES;
-//    
-//    
-//    // Hyperlipidemia - Section
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
-//                                                rowType:XLFormRowDescriptorTypeInfo
-//                                                  title:@"If you were sick who would you turn to first for medical treatment/advice? (ie. who is your primary care provider?"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    
-//    XLFormRowDescriptor *primaryCareSource;
-//    primaryCareSource = [XLFormRowDescriptor formRowDescriptorWithTag:kCareGiverID
-//                                                rowType:XLFormRowDescriptorTypeSelectorPush
-//                                                  title:@""];
-//    primaryCareSource.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"GP"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Polyclinic"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Hospital"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"TCM Practitioner"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Family"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Friends"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(6) displayText:@"Nobody, I rely on myself"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(7) displayText:@"Others"]];
-//    //value
-//    NSArray *options = primaryCareSource.selectorOptions;
-//    if (![[primaryCareDict objectForKey:kCareGiverID]isEqualToString:@""]) {
-//        primaryCareSource.value = [options objectAtIndex:[[primaryCareDict objectForKey:kCareGiverID] integerValue]];
-//    }
-//    primaryCareSource.noValueDisplayText = @"Tap here for options";
-//    [section addFormRow:primaryCareSource];
-//    
-//    XLFormRowDescriptor *sourceOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCareGiverOthers rowType:XLFormRowDescriptorTypeText title:@""];
-//    [sourceOthersRow.cellConfigAtConfigure setObject:@"If others, please state" forKey:@"textField.placeholder"];
-//    sourceOthersRow.value = [primaryCareDict objectForKey:kCareGiverOthers];
-//    [section addFormRow:sourceOthersRow];
-//    
-//    
-//    //Initial hidden state
-//    if([[primaryCareDict objectForKey:kCareGiverID] isEqualToString:@""]) {
-//        sourceOthersRow.hidden = @(1);
-//    } else {
-//        if ([[primaryCareSource.value formValue] isEqual:@(7)]) {
-//            sourceOthersRow.hidden = @(0);
-//        } else {
-//            sourceOthersRow.hidden = @(1);
-//        }
-//    }
-//    
-//    primaryCareSource.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if (oldValue != newValue) {
-//            if ([[newValue formValue] isEqual:@(7)]) {
-//                sourceOthersRow.hidden = @(0);  //show
-//            } else {
-//                sourceOthersRow.hidden = @(1);  //hide
-//            }
-//        }
-//    };
-//    
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
-//                                                rowType:XLFormRowDescriptorTypeInfo
-//                                                  title:@"Which is your main healthcare provider for followup?"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    XLFormRowDescriptor *careProvider;
-//    careProvider = [XLFormRowDescriptor formRowDescriptorWithTag:kCareProviderID
-//                                                              rowType:XLFormRowDescriptorTypeSelectorPush
-//                                                                title:@""];
-//    careProvider.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"N.A."],
-//                                          [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"GP"],
-//                                          [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Polyclinic"],
-//                                          [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Hospital"],
-//                                          [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Free Clinic"],
-//                                          [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Others"]];
-//    //value
-//    options = careProvider.selectorOptions;
-//    if (![[primaryCareDict objectForKey:kCareProviderID]isEqualToString:@""]) {
-//        careProvider.value = [options objectAtIndex:[[primaryCareDict objectForKey:kCareProviderID] integerValue]];
-//    }
-//    careProvider.noValueDisplayText = @"Tap here for options";
-//    [section addFormRow:careProvider];
-//    
-//    XLFormRowDescriptor *providerOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCareProviderOthers rowType:XLFormRowDescriptorTypeText title:@""];
-//    [providerOthersRow.cellConfigAtConfigure setObject:@"If others, please state" forKey:@"textField.placeholder"];
-//    providerOthersRow.value = [primaryCareDict objectForKey:kCareProviderOthers];
-//    [section addFormRow:providerOthersRow];
-//    
-//    //Initial hidden state
-//    if([[primaryCareDict objectForKey:kCareProviderID] isEqualToString:@""]) {
-//        providerOthersRow.hidden = @(1);
-//    } else {
-//        if ([[careProvider.value formValue] isEqual:@(5)]) {
-//            providerOthersRow.hidden = @(0);
-//        } else {
-//            providerOthersRow.hidden = @(1);
-//        }
-//    }
-//    
-//    careProvider.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if (oldValue != newValue) {
-//            if ([[newValue formValue] isEqual:@(5)]) {
-//                providerOthersRow.hidden = @(0);  //hide
-//            } else {
-//                providerOthersRow.hidden = @(1);  //hide
-//            }
-//        }
-//    };
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
-//                                                rowType:XLFormRowDescriptorTypeInfo
-//                                                  title:@"How many times did you visit A&E in past 6 months? *"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAneVisit rowType:XLFormRowDescriptorTypeInteger title:@"Number of time(s)"];
-//    row.required = YES;
-//    row.value = [primaryCareDict objectForKey:kAneVisit];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionThree
-//                                                rowType:XLFormRowDescriptorTypeInfo
-//                                                  title:@"How many times have you been hospitalized in past 1 year? *"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHospitalized rowType:XLFormRowDescriptorTypeInteger title:@"Number of time(s)"];
-//    row.required = YES;
-//    row.value = [primaryCareDict objectForKey:kHospitalized];
-//    [section addFormRow:row];
-//    
-//    return [super initWithForm:formDescriptor];
-//}
-
--(id) initDemographics {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Demographics"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    NSDictionary *demographicsDict = [self.fullScreeningForm objectForKey:@"demographics"];
-    
-    formDescriptor.assignFirstResponderOnShow = YES;
-    
-    // Consent - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Consent to share particulars, personal information, screening results and other necessary information with the following"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_sso_tj" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"SSO @ Taman Jurong"];
-    row.required = NO;
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    if ([demographicsDict objectForKey:@"consent_sso_tj"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_sso_tj"])) {
-        if (([[demographicsDict objectForKey:@"consent_sso_tj"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_sso_tj"] isEqualToString:@"1"]))
-            row.value = [demographicsDict objectForKey:@"consent_sso_tj"];
-        else
-            row.value = @1;
-    } else {
-        row.value = @1;
-    }
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_ntuc_tj" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"NTUC Health Cluster Support @ Taman Jurong"];
-    row.required = NO;
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    if ([demographicsDict objectForKey:@"consent_ntuc_tj"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_ntuc_tj"])) {
-        if (([[demographicsDict objectForKey:@"consent_ntuc_tj"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_ntuc_tj"] isEqualToString:@"1"]))
-            row.value = [demographicsDict objectForKey:@"consent_ntuc_tj"];
-        else
-            row.value = @1;
-    } else {
-        row.value = @1;
-    }
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_fysc" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Fei Yue Family Service Centre"];
-    row.required = NO;
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    if ([demographicsDict objectForKey:@"consent_fysc"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_fysc"])) {
-        if (([[demographicsDict objectForKey:@"consent_fysc"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_fysc"] isEqualToString:@"1"]))
-            row.value = [demographicsDict objectForKey:@"consent_fysc"];
-        else
-            row.value = @1;
-    } else {
-        row.value = @1;
-    }
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_sso_bgs" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"SSO @ Bedok and Geylang Serai"];
-    row.required = NO;
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    if ([demographicsDict objectForKey:@"consent_sso_bgs"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_sso_bgs"])) {
-        if (([[demographicsDict objectForKey:@"consent_sso_bgs"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_sso_bgs"] isEqualToString:@"1"]))
-            row.value = [demographicsDict objectForKey:@"consent_sso_bgs"];
-        else
-            row.value = @1;
-    } else {
-        row.value = @1;
-    }
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_gl" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Goodlife"];
-    row.required = NO;
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    if ([demographicsDict objectForKey:@"consent_gl"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_gl"])) {
-        if (([[demographicsDict objectForKey:@"consent_gl"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_gl"] isEqualToString:@"1"]))
-            row.value = [demographicsDict objectForKey:@"consent_gl"];
-        else
-            row.value = @1;
-    } else {
-        row.value = @1;
-    }
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_fsc_mp" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Family Service Centre @ Marine Parade"];
-    row.required = NO;
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    if ([demographicsDict objectForKey:@"consent_fsc_mp"] != [NSNull null] && ([demographicsDict objectForKey:@"consent_fsc_mp"])) {
-        if (([[demographicsDict objectForKey:@"consent_fsc_mp"] isEqualToString:@"0"]) || ([[demographicsDict objectForKey:@"consent_fsc_mp"] isEqualToString:@"1"]))
-            row.value = [demographicsDict objectForKey:@"consent_fsc_mp"];
-        else
-            row.value = @1;
-    } else {
-        row.value = @1;
-    }
-    [section addFormRow:row];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCitizenship rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Citizenship"];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Singaporean"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Foreigner"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Permanent Resident"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Stateless"]
-                            ];
-    //value
-    NSArray *options = row.selectorOptions;
-    if (![[demographicsDict objectForKey:kUsualActivities]isEqualToString:@""]) {
-        row.value = [options objectAtIndex:[[demographicsDict objectForKey:kCitizenship] integerValue]];
-    }
-    [section addFormRow:row];
-    
-    XLFormRowDescriptor *religionRow = [XLFormRowDescriptor formRowDescriptorWithTag:kReligion rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Religion"];
-    religionRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Buddhism"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Taoism"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Islam"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Christianity"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Hinduism"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"No religion"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(6) displayText:@"Others"]
-                            ];
-    //value
-    options = religionRow.selectorOptions;
-    if (![[demographicsDict objectForKey:kReligion]isEqualToString:@""]) {
-        religionRow.value = [options objectAtIndex:[[demographicsDict objectForKey:kReligion] integerValue]];
-    }
-    religionRow.noValueDisplayText = @"Tap here for options";
-    [section addFormRow:religionRow];
-    
-    XLFormRowDescriptor *religionOthers = [XLFormRowDescriptor formRowDescriptorWithTag:kReligionOthers rowType:XLFormRowDescriptorTypeText title:@"Other Religion"];
-    religionOthers.value = [demographicsDict objectForKey:kReligionOthers];
-    religionOthers.noValueDisplayText = @"Specify here";
-    [section addFormRow:religionOthers];
-    
-    if (![[demographicsDict objectForKey:kReligion] isEqualToString:@""]) {
-        if ([[religionRow.value formValue] isEqual:@(6)]) {
-            religionOthers.hidden = @(0);  //show
-        } else {
-            religionOthers.hidden = @(1);
-        }
-    } else {
-        religionOthers.hidden = @(1);
-    }
-    
-    religionRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([[newValue formValue] isEqual:@(6)]) {
-                religionOthers.hidden = @(0);  //show
-            } else {
-                religionOthers.hidden = @(1);  //hide
-            }
-        }
-    };
-    
-    
-    return [super initWithForm:formDescriptor];
-}
-
 - (id) initCurrentPhysicalIssues {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Current Physical Issues"];
     XLFormSectionDescriptor * section;
@@ -2324,93 +1767,358 @@ NSString *const kMultiADL = @"multi_adl";
     return [super initWithForm:formDescriptor];
 }
 
-//- (id) initRefForDoctorConsult {
-//    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Referral for Doctor Consult"];
-//    XLFormSectionDescriptor * section;
-//    XLFormRowDescriptor * row;
+-(id) initAdditionalSvcs {
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Additional Services"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    return [super initWithForm:formDescriptor];
+}
+
+- (id) initRefForDoctorConsult {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Referral for Doctor Consult"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
 //    NSDictionary *refForDocConsultDict = [self.fullScreeningForm objectForKey:@"consult_record"];
-//    
-//    formDescriptor.assignFirstResponderOnShow = YES;
-//    
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
 //    section = [XLFormSectionDescriptor formSectionWithTitle:@"NOTE"];
 //    section.footerTitle = @"If it is appropriate to refer the resident doctor consult:\n- If resident is mobile, accompany him/her to the consultation booths at HQ\n- If resident is not mobile, call Ops to send a doctor to the resident's flat\n- Please refer for consult immediately. Teams that wait till they are done with all other units on their list often find that upon return to a previously-covered unit, the resident has gone out";
 //    [formDescriptor addFormSection:section];
 //    
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@"The resident has gone for/received the following: (Check all that apply)"];
-//    [formDescriptor addFormSection:section];
-//    
-////    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReferralChecklist rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Checklist:"];
-////    row.required = YES;
-////    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Doctor's consultation"],
-////                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Doctor's referral"],
-////                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"SERI"],
-////                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"SERI referral"],
-////                            [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Dental"],
-////                            [XLFormOptionsObject formOptionsObjectWithValue:@(6) displayText:@"Dental referral"],
-////                            [XLFormOptionsObject formOptionsObjectWithValue:@(7) displayText:@"Mammogram referral"],
-////                            [XLFormOptionsObject formOptionsObjectWithValue:@(8) displayText:@"FIT kit"],
-////                            [XLFormOptionsObject formOptionsObjectWithValue:@(9) displayText:@"Pap smear referral"],
-////                            [XLFormOptionsObject formOptionsObjectWithValue:@(10) displayText:@"Phlebotomy (Blood test)"],
-////                            [XLFormOptionsObject formOptionsObjectWithValue:@(11) displayText:@"N.A."]];
-////    row.required = YES;
-////    [section addFormRow:row];
-////
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocConsult rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Doctor's consultation"];
-//    row.value = [refForDocConsultDict objectForKey:kDocConsult];
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Doctor's referral"];
-//    row.value = [refForDocConsultDict objectForKey:kDocRef];
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSeri rowType:XLFormRowDescriptorTypeBooleanCheck title:@"SERI"];
-//    row.value = [refForDocConsultDict objectForKey:kSeri];
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSeriRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"SERI referral"];
-//    row.value = [refForDocConsultDict objectForKey:kSeriRef];
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentalConsult rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental"];
-//    row.value = [refForDocConsultDict objectForKey:kDentalConsult];
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentalRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Dental referral"];
-//    row.value = [refForDocConsultDict objectForKey:kDentalRef];
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMammoRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Mammogram referal"];
-//    row.value = [refForDocConsultDict objectForKey:kMammoRef];
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFitKit rowType:XLFormRowDescriptorTypeBooleanCheck title:@"FIT kit"];
-//    row.value = [refForDocConsultDict objectForKey:kFitKit];
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPapSmearRef rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Pap smear referral"];
-//    row.value = [refForDocConsultDict objectForKey:kPapSmearRef];
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhlebotomy rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Phlebotomy (Blood test)"];
-//    row.value = [refForDocConsultDict objectForKey:kPhlebotomy];
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRefNA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"N.A."];
-//    row.value = [refForDocConsultDict objectForKey:kRefNA];
-//    [section addFormRow:row];
-//    
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@"Doctor's notes"];
-//    [formDescriptor addFormSection:section];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocNotes
-//                                                rowType:XLFormRowDescriptorTypeTextView];
-//    [row.cellConfigAtConfigure setObject:@"Doctor's notes" forKey:@"textView.placeholder"];
-//    row.value = [refForDocConsultDict objectForKey:kDocNotes];
-//    [section addFormRow:row];
-//
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocName
-//                                                rowType:XLFormRowDescriptorTypeName title:@"Name of Doctor"];
-//    row.required = NO;
-//    row.value = [refForDocConsultDict objectForKey:kDocName];
-//    [section addFormRow:row];
-//    
-//    return [super initWithForm:formDescriptor];
-//}
 
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1" rowType:XLFormRowDescriptorTypeInfo title:@"Doctor's Notes"];
+    [self setDefaultFontWithRow:row];
+    [section addFormRow:row];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocNotes
+                                                rowType:XLFormRowDescriptorTypeTextView];
+    [row.cellConfigAtConfigure setObject:@"Type your notes here..." forKey:@"textView.placeholder"];
+//    row.value = [refForDocConsultDict objectForKey:kDocNotes];
+    [section addFormRow:row];
+
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocName
+                                                rowType:XLFormRowDescriptorTypeName title:@"Name of Doctor"];
+    [self setDefaultFontWithRow:row];
+    row.required = NO;
+//    row.value = [refForDocConsultDict objectForKey:kDocName];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocReferred rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Referred by doctor?"];
+    [self setDefaultFontWithRow:row];
+    row.required = NO;
+    [section addFormRow:row];
+    
+    return [super initWithForm:formDescriptor];
+}
+
+- (id) initHealthEducation {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Health Education"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    preEdSection = [XLFormSectionDescriptor formSectionWithTitle:@"Pre-education Knowledge Quiz"];
+    [formDescriptor addFormSection:preEdSection];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu1 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person always knows when they have heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu2 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If you have a family history of heart disease, you are at risk for developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu3 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"The older a person is, the greater their risk of having heart disease "];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu4 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Smoking is a risk factor for heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu5 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who stops smoking will lower their risk of developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu6 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High blood pressure is a risk factor for heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu7 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Keeping blood pressure under control will reduce a person’s risk for developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu8 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High cholesterol is a risk factor for developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu9 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Eating fatty foods does not affect blood cholesterol levels"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu10 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your ‘good’ cholesterol (HDL) is high you are at risk for heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu11 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your ‘bad’ cholesterol (LDL) is high you are at risk for heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Being overweight increases a person’s risk for heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu13 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Regular physical activity will lower a person’s chance of getting heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu14 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Only exercising at a gym or in an exercise class will lower a person’s chance of developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu15 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Walking is considered exercise that will help lower a person’s chance of developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu16 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Diabetes is a risk factor for developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu17 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High blood sugar puts a strain on the heart"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu18 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your blood sugar is high over several months it can cause your cholesterol level to go up and increase your risk of heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu19 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood sugar levels under control"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu20 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"People with diabetes rarely have high cholesterol"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu21 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If a person has diabetes, keeping their cholesterol under control will help to lower their chance of developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu22 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"People with diabetes tend to have low HDL (good) cholesterol"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu23 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood pressure under control"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu24 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their weight under control"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu25 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Men with diabetes have a higher risk of heart disease than women with diabetes "];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"preEdScoreButton" rowType:XLFormRowDescriptorTypeButton title:@"Calculate Pre-education Score"];
+    row.action.formSelector = @selector(calculateScore:);
+    row.required = NO;
+    [preEdSection addFormRow:row];
+    
+    preEdScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdScore rowType:XLFormRowDescriptorTypeInteger title:@"Pre-education Score"];
+    preEdScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    preEdScoreRow.noValueDisplayText = @"-/-";
+    preEdScoreRow.disabled = @YES;
+    [self setDefaultFontWithRow:preEdScoreRow];
+    [preEdSection addFormRow:preEdScoreRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    showPostEdSectionBtnRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"start_post_ed_button" rowType:XLFormRowDescriptorTypeButton title:@"Start Post-education asessment"];
+    showPostEdSectionBtnRow.action.formSelector = @selector(showPostEdSection:);
+    showPostEdSectionBtnRow.hidden = @YES;
+    showPostEdSectionBtnRow.required = NO;
+    [section addFormRow:showPostEdSectionBtnRow];
+    
+    postEdSection = [XLFormSectionDescriptor formSectionWithTitle:@"Post-Education Knowledge Quiz"];
+    [formDescriptor addFormSection:postEdSection];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu1 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person always knows when they have heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu2 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If you have a family history of heart disease, you are at risk for developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu3 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"The older a person is, the greater their risk of having heart disease "];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu4 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Smoking is a risk factor for heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu5 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who stops smoking will lower their risk of developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu6 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High blood pressure is a risk factor for heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu7 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Keeping blood pressure under control will reduce a person’s risk for developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu8 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High cholesterol is a risk factor for developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu9 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Eating fatty foods does not affect blood cholesterol levels"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu10 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your ‘good’ cholesterol (HDL) is high you are at risk for heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu11 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your ‘bad’ cholesterol (LDL) is high you are at risk for heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Being overweight increases a person’s risk for heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu13 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Regular physical activity will lower a person’s chance of getting heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu14 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Only exercising at a gym or in an exercise class will lower a person’s chance of developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu15 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Walking is considered exercise that will help lower a person’s chance of developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu16 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Diabetes is a risk factor for developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu17 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High blood sugar puts a strain on the heart"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu18 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your blood sugar is high over several months it can cause your cholesterol level to go up and increase your risk of heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu19 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood sugar levels under control"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu20 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"People with diabetes rarely have high cholesterol"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu21 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If a person has diabetes, keeping their cholesterol under control will help to lower their chance of developing heart disease"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu22 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"People with diabetes tend to have low HDL (good) cholesterol"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu23 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood pressure under control"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu24 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their weight under control"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu25 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Men with diabetes have a higher risk of heart disease than women with diabetes "];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [postEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"postEdScoreButton" rowType:XLFormRowDescriptorTypeButton title:@"Calculate Post-education Score"];
+    row.action.formSelector = @selector(calculateScore:);
+    row.required = NO;
+    [postEdSection addFormRow:row];
+    
+    postEdScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdScore rowType:XLFormRowDescriptorTypeInteger title:@"Post-education Score"];
+    postEdScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    postEdScoreRow.noValueDisplayText = @"-/-";
+    postEdScoreRow.disabled = @YES;
+    [self setDefaultFontWithRow:postEdScoreRow];
+    [postEdSection addFormRow:postEdScoreRow];
+    
+    
+    
+    [postEdSection setHidden:@YES]; //keep hidden first
+    
+    return [super initWithForm:formDescriptor];
+}
 #pragma mark - Buttons
 //-(void)returnBtnPressed:(id)sender
 //{
@@ -2498,25 +2206,15 @@ NSString *const kMultiADL = @"multi_adl";
     switch([self.sectionID integerValue]) {
         case 0: //[self saveNeighbourhood];
             break;
-//        case 1: [self saveResidentParticulars];
-//            break;
 //        case 2: [self saveClinicalResults];
 //            break;
         case 3: [self saveScreeningOfRiskFactors];
             break;
-//        case 4: [self saveDiabetesMellitus];
+//        case 8: [self saveOtherMedicalIssues];
 //            break;
-//        case 6: [self saveHypertension];
-//            break;
-        case 8: [self saveOtherMedicalIssues];
-            break;
 //        case 9: [self savePrimaryCareSource];
 //            break;
 //        case 12: [self saveCurrentPhysicalIssues];
-//            break;
-//        case 13: [self saveCurrentSocioSituation];
-//            break;
-//        case 14: [self saveSocialSupportAssessment];
 //            break;
 //        case 15: [self saveRefForDoctorConsult];
 //            break;
@@ -2687,43 +2385,6 @@ NSString *const kMultiADL = @"multi_adl";
 }
 
 
-
-- (void) saveOtherMedicalIssues {
-    NSDictionary *fields = [self.form formValues];
-    NSMutableDictionary *otherMedIssues_dict = [[self.fullScreeningForm objectForKey:@"others"] mutableCopy];
-    
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kHeartAttack] forKey:kHeartAttack];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kHeartFailure] forKey:kHeartFailure];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kCopd] forKey:kCopd];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kAsthma] forKey:kAsthma];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kStroke] forKey:kStroke];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDementia] forKey:kDementia];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kHemiplegia] forKey:kHemiplegia];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kSolidOrganCancer] forKey:kSolidOrganCancer];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kBloodCancer] forKey:kBloodCancer];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kMetastaticCancer] forKey:kMetastaticCancer];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDiabetesWODamage] forKey:kDiabetesWODamage];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDiabetesWDamage] forKey:kDiabetesWDamage];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kKidneyFailure] forKey:kKidneyFailure];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kPepticUlcer] forKey:kPepticUlcer];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kMildLiver] forKey:kMildLiver];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kModerateSevereLiver] forKey:@"liver_disease"];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kVascularDisease] forKey:kVascularDisease];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kTissueDisease] forKey:kTissueDisease];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kOsteoarthritis] forKey:kOsteoarthritis];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kAids] forKey:kAids];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kNA] forKey:@"NA"];
-    
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:TextView formDescriptorWithTag:kOtherMedIssues] forKey:@"others"];
-    
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kPain] forKey:kPain];
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kAnxiety] forKey:kAnxiety];
-    
-    [otherMedIssues_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kPainDuration] forKey:kPainDuration];
-    
-    [self.fullScreeningForm setObject:otherMedIssues_dict forKey:@"others"];
-    
-}
 //
 //- (void) savePrimaryCareSource {
 //    NSDictionary *fields = [self.form formValues];
@@ -2793,7 +2454,59 @@ NSString *const kMultiADL = @"multi_adl";
 //    
 //    [self.fullScreeningForm setObject:refForDoctorConsult_dict forKey:@"consult_record"];
 //}
+#pragma mark - Other Methods
+- (void) checkForSeriEligibilityWithRow3: (XLFormRowDescriptor *) six12Row
+                                                  andRow4: (XLFormRowDescriptor *) tunnelRow
+                                                  andRow5: (XLFormRowDescriptor *) visitEye12MthsRow {
+    
+    if (([six12Row.value isEqual:@1] || ([tunnelRow.value isEqual:@(1)])) && ([visitEye12MthsRow.value isEqual:@(1)])) { // (3 OR 4) AND 5
+        NSLog(@"SERI Enabled!");
+        [[NSUserDefaults standardUserDefaults] setObject:@1 forKey:@"needSERI"];
+    } else {
+        [[NSUserDefaults standardUserDefaults] setObject:@0 forKey:@"needSERI"];
+    }
+}
 
+- (void) calculateScore: (XLFormRowDescriptor *)sender {
+    
+    NSDictionary *dict = [self.form formValues];
+    int score, eachAns, count;
+    NSNumber *ans;
+    score = count = 0;
+    for (NSString *key in dict) {
+        if (![key isEqualToString:kPreEdScore] && ![key isEqualToString:kPostEdScore] && ![key isEqualToString:@"preEdScoreButton"] && ![key isEqualToString:@"postEdScoreButton"]) {
+            //prevent null cases
+            if (dict[key] != [NSNull null])
+                ans = dict[key];
+            else
+                ans = @0;
+            
+            eachAns = [ans intValue];
+            score = score + eachAns;
+            count++;
+        }
+    }
+    if ([sender.title rangeOfString:@"Pre-education"].location != NSNotFound) { // if it's pre-education button
+        preEdScoreRow.value = [NSString stringWithFormat:@"%d", score];
+        [self reloadFormRow:preEdScoreRow];
+        [showPostEdSectionBtnRow setHidden:@NO];
+        [self reloadFormRow:showPostEdSectionBtnRow];
+    } else {
+        postEdScoreRow.value = [NSString stringWithFormat:@"%d", score];
+        [self reloadFormRow:postEdScoreRow];
+    }
+    [self deselectFormRow:sender];
+    [sender setHidden:@YES];    //make it hidden, no need anymore.
+    
+}
+
+- (void) showPostEdSection: (XLFormRowDescriptor *) sender {
+    [self.form removeFormSection:preEdSection]; //remove it altogther.
+    [postEdSection setHidden:@NO];
+    [sender setHidden:@YES];    //make button hidden, no need anymore
+    
+    [self deselectFormRow:sender];
+}
 
 #pragma mark - Organize Dictionary Methods
 
@@ -2976,6 +2689,20 @@ NSString *const kMultiADL = @"multi_adl";
     return orgArray;
 }
 
+
+#pragma mark - UIFont methods
+- (void) setDefaultFontWithRow: (XLFormRowDescriptor *) row {
+    UIFont *font = [UIFont fontWithName:DEFAULT_FONT_NAME size:DEFAULT_FONT_SIZE];
+    UIFont *boldedFont = [self boldFontWithFont:font];
+    [row.cellConfig setObject:boldedFont forKey:@"textLabel.font"];
+}
+
+- (UIFont *)boldFontWithFont:(UIFont *)font
+{
+    UIFontDescriptor * fontD = [font.fontDescriptor
+                                fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+    return [UIFont fontWithDescriptor:fontD size:0];
+}
 /*
  #pragma mark - Navigation
  

@@ -67,7 +67,7 @@ NSString *const kQ15 = @"q15";
         default:
             break;
     }
-    
+    [self.form setAddAsteriskToRequiredRowsTitle:YES];
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
     
     [super viewDidLoad];
@@ -94,7 +94,7 @@ NSString *const kQ15 = @"q15";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ1
                                                 rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"1) (a) Has a western-trained doctor ever told you that you have diabetes? *"];
+                                                  title:@"1) (a) Has a western-trained doctor ever told you that you have diabetes?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
@@ -203,7 +203,7 @@ NSString *const kQ15 = @"q15";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ6
                                                 rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Has a western-trained doctor ever told you that you have high cholesterol? *"];
+                                                  title:@"Has a western-trained doctor ever told you that you have high cholesterol?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
@@ -339,7 +339,7 @@ NSString *const kQ15 = @"q15";
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ1
                                                 rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Has a western-trained doctor ever told you that you have high BP? *"];
+                                                  title:@"Has a western-trained doctor ever told you that you have high BP?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
@@ -514,7 +514,6 @@ NSString *const kQ15 = @"q15";
             [self reloadFormRow:phq9ScoreRow];
         }
     };
-    
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpReq
                                                 rowType:XLFormRowDescriptorTypeBooleanSwitch
@@ -561,8 +560,6 @@ NSString *const kQ15 = @"q15";
     row.required = YES;
     [section addFormRow:row];
 
-
-    
     return [super initWithForm:formDescriptor];
 }
 

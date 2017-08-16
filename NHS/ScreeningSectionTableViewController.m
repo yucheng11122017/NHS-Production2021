@@ -155,16 +155,19 @@ typedef enum typeOfForm {
             cell.accessoryType = UITableViewCellAccessoryNone;
         }
         
-        if (indexPath.row > 6) {
+        if ((indexPath.row > 8) && (indexPath.row != 13)) {
             
             if (indexPath.row == 10) {
                 //Enable SERI
                 if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"needSERI"] isEqual:@1]) {
+                    cell.userInteractionEnabled = YES;
+                    [cell.textLabel setTextColor:[UIColor blackColor]];
                     return cell;    //don't disable.
                 }
             }
             cell.userInteractionEnabled = NO;
             [cell.textLabel setTextColor:[UIColor grayColor]];
+        
         }
     } else {
         cell = [tableView dequeueReusableCellWithIdentifier:buttonTableIdentifier];
@@ -219,6 +222,12 @@ typedef enum typeOfForm {
             selectedRow = [NSNumber numberWithInteger:3];
         } else if (indexPath.row == 6) {    //snellen eye test
             selectedRow = [NSNumber numberWithInteger:4];
+        } else if (indexPath.row == 7) {    //Additional Services
+            selectedRow = [NSNumber numberWithInteger:5];
+        } else if (indexPath.row == 8) {    //Basic Dental Check-up
+            selectedRow = [NSNumber numberWithInteger:6];
+        } else if (indexPath.row == 13) {   //Health Education
+            selectedRow = [NSNumber numberWithInteger:11];
         }
 
         

@@ -17,6 +17,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
+    [[NSUserDefaults standardUserDefaults] setObject:@0 forKey:@"needSERI"];
+    
     return YES;
 }
 
