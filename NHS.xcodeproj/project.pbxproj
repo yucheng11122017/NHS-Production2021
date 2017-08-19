@@ -232,6 +232,8 @@
 		0130D1851F2AEAD00073901D /* UNUSED */ = {
 			isa = PBXGroup;
 			children = (
+				018C04251F3F4A1300582E82 /* NeighbourhoodSelectionVC.h */,
+				018C04261F3F4A1300582E82 /* NeighbourhoodSelectionVC.m */,
 				8E23D5521D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.h */,
 				8E23D5531D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m */,
 				0154D0651EED6AF7000348B9 /* DrawingViewController.h */,
@@ -390,6 +392,8 @@
 		E120E4051D431E9B002DBC7E /* NHS */ = {
 			isa = PBXGroup;
 			children = (
+				8EC56F881D60CDBB00938C2A /* AppConstants.h */,
+				8EC56F891D60CDBB00938C2A /* AppConstants.m */,
 				8E0852571D6DCCD7006E68FE /* blankScreeningForm.json */,
 				E1FCF92F1D45B76100478F7B /* Models */,
 				0130D1851F2AEAD00073901D /* UNUSED */,
@@ -438,8 +442,6 @@
 				E1A4F0DE1D66BC5A00EE9BBB /* LoginViewController.m */,
 				8E2527681D5766C400ACEE92 /* HomeViewController.h */,
 				8E2527691D5766C400ACEE92 /* HomeViewController.m */,
-				018C04251F3F4A1300582E82 /* NeighbourhoodSelectionVC.h */,
-				018C04261F3F4A1300582E82 /* NeighbourhoodSelectionVC.m */,
 				8E2527651D57600200ACEE92 /* Pre-Registration */,
 				8E2527661D57600900ACEE92 /* Screening */,
 				019072051D87A86300D188D6 /* Blood Test */,
@@ -451,8 +453,6 @@
 		E1FCF92F1D45B76100478F7B /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				8EC56F881D60CDBB00938C2A /* AppConstants.h */,
-				8EC56F891D60CDBB00938C2A /* AppConstants.m */,
 				E1A4F0DA1D61CB8A00EE9BBB /* Reachability.h */,
 				E1A4F0DB1D61CB8A00EE9BBB /* Reachability.m */,
 				E1FCF9301D45B77F00478F7B /* ServerComm.h */,

@@ -159,7 +159,7 @@ typedef enum typeOfForm {
             
             if (indexPath.row == 10) {
                 //Enable SERI
-                if ([[[NSUserDefaults standardUserDefaults] objectForKey:@"needSERI"] isEqual:@1]) {
+                if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeedSERI] isEqual:@1]) {
                     cell.userInteractionEnabled = YES;
                     [cell.textLabel setTextColor:[UIColor blackColor]];
                     return cell;    //don't disable.

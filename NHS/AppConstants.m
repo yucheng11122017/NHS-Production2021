@@ -11,6 +11,15 @@
 @implementation AppConstants
 
 
+#pragma mark - UserDefaults
+
+NSString *const kResidentAge = @"resident_age";
+NSString *const kNeedSERI = @"need_seri";
+NSString *const kQualifyColonsc = @"qualify_colonsc";
+NSString *const kQualifyMammo = @"qualify_mammo";
+NSString *const kQualifyFIT = @"qualify_fit";
+NSString *const kQualifyPapSmear = @"qualify_pap_smear";
+
 #pragma mark - Resident Particulars
 
 NSString *const kName = @"resident_name";
@@ -105,6 +114,7 @@ NSString *const kColonoscopy10Yrs= @"colonoscopy_10_yrs";
 NSString *const kWantFitKit= @"want_fit_kit";
 NSString *const kMammo2Yrs= @"mammo_2_yrs";
 NSString *const kHasChas= @"has_chas";
+NSString *const kSporean= @"sporean_pr";
 NSString *const kWantMammo= @"want_mammo";
 NSString *const kPap3Yrs= @"pap_3_yrs";
 NSString *const kEngagedSex= @"engaged_sex";
@@ -452,17 +462,16 @@ NSString *const kReqFollowupGDA = @"require_followup";
 
 #pragma mark - Health Education
 
-
 /* Pre-education Knowledge Quiz */
-NSString *const kEdu1 = @"edu_1";
-NSString *const kEdu2 = @"edu_2";
-NSString *const kEdu3 = @"edu_3";
-NSString *const kEdu4 = @"edu_4";
-NSString *const kEdu5 = @"edu_5";
-NSString *const kEdu6 = @"edu_6";
-NSString *const kEdu7 = @"edu_7";
-NSString *const kEdu8 = @"edu_8";
-NSString *const kEdu9 = @"edu_9";
+NSString *const kEdu1 = @"edu_01";
+NSString *const kEdu2 = @"edu_02";
+NSString *const kEdu3 = @"edu_03";
+NSString *const kEdu4 = @"edu_04";
+NSString *const kEdu5 = @"edu_05";
+NSString *const kEdu6 = @"edu_06";
+NSString *const kEdu7 = @"edu_07";
+NSString *const kEdu8 = @"edu_08";
+NSString *const kEdu9 = @"edu_09";
 NSString *const kEdu10 = @"edu_10";
 NSString *const kEdu11 = @"edu_11";
 NSString *const kEdu12 = @"edu_12";
@@ -482,7 +491,6 @@ NSString *const kEdu25 = @"edu_25";
 NSString *const kPreEdScore = @"pre_ed_score";
 
 /* Post-education Knowledge Quiz */
-
 NSString *const kPostEdScore = @"post_ed_score";
 
 

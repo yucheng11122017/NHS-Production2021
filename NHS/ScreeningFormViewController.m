@@ -144,7 +144,10 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormSectionDescriptor *preEdSection, *postEdSection;
     NSString *neighbourhood, *citizenship;
     NSNumber *age;
-    BOOL sporean, age50, relColorectCancer, colon3Yrs, wantColRef, disableFIT;
+    BOOL sporeanPr, age50, relColorectCancer, colon3Yrs, wantColRef, disableFIT;
+    BOOL fit12Mths, colonsc10Yrs, wantFitKit;
+    BOOL sporean, age5069 ,noMammo2Yrs, hasChas, wantMammo;
+    BOOL age2569, noPapSmear3Yrs, hadSex, wantPapSmear;
 }
 
 @end
@@ -161,13 +164,13 @@ NSString *const kMultiADL = @"multi_adl";
 //    age = [NSNumber numberWithInt:70];
     
     citizenship = [[NSUserDefaults standardUserDefaults]
-                            stringForKey:@"ResidentCitizenship"];
+                            stringForKey:kCitizenship];
     age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
-                             stringForKey:@"ResidentAge"];
+                             stringForKey:kResidentAge];
     gender = [[NSUserDefaults standardUserDefaults]
-              stringForKey:@"ResidentGender"];
+              stringForKey:kGender];
     neighbourhood = [[NSUserDefaults standardUserDefaults]
-              stringForKey:@"Neighbourhood"];
+              stringForKey:kNeighbourhood];
     
     
 //    form = [self initModeOfScreening];
@@ -333,7 +336,10 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormRowDescriptor * row;
     XLFormRowDescriptor *rowInfo;
     
-    sporean = age50 = relColorectCancer = colon3Yrs = wantColRef = disableFIT = false;
+    sporeanPr = age50 = relColorectCancer = colon3Yrs = wantColRef = disableFIT = false;
+    fit12Mths = colonsc10Yrs = wantFitKit = false;
+    age5069 = noMammo2Yrs = hasChas = wantMammo = false;
+    age2569 = noPapSmear3Yrs = hadSex = wantPapSmear = false;
     
     
     // Basic Information - Section
@@ -494,11 +500,12 @@ NSString *const kMultiADL = @"multi_adl";
     sporeanPrRow.disabled = @(1);
     if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"]) {
         sporeanPrRow.value = @1;
-        sporean = YES;
+        sporeanPr = YES;
     }
     else {
         sporeanPrRow.value = @0;
-        sporean = NO;
+        sporeanPr = NO;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
     }
     [section addFormRow:sporeanPrRow];
     
@@ -511,6 +518,7 @@ NSString *const kMultiADL = @"multi_adl";
     }
     else {
         age50Row.value = @0;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
         age50 = NO;
     }
     [section addFormRow:age50Row];
@@ -538,19 +546,31 @@ NSString *const kMultiADL = @"multi_adl";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
     row.required = NO;
     row.disabled = @(1);
-    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"])
+    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"]) {
+        sporeanPr = true;
         row.value = @1;
-    else
+    }
+    else {
+        sporeanPr = false;
         row.value = @0;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyFIT];
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove50 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Age 50 and above"];
     row.required = NO;
     row.disabled = @(1);
-    if ([age integerValue] >= 50)
+    if ([age integerValue] >= 50) {
+        age50 = true;
         row.value = @1;
-    else
+    }
+    else {
+        age50 = false;
         row.value = @0;
+        [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFIT];
+    }
+    
     [section addFormRow:row];
     
     XLFormRowDescriptor *fitLast12MthsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFitLast12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done FIT in the last 12 months?"];
@@ -558,15 +578,63 @@ NSString *const kMultiADL = @"multi_adl";
     fitLast12MthsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     [section addFormRow:fitLast12MthsRow];
     
+    fitLast12MthsRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                fit12Mths = TRUE;
+            } else {
+                fit12Mths = FALSE;
+            }
+            if (sporeanPr && age50 && fit12Mths && colonsc10Yrs && wantFitKit) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFIT];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFIT];
+            }
+            
+        }
+    };
+    
     XLFormRowDescriptor *colonoscopy10YrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy10Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 10 years?"];
     colonoscopy10YrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     colonoscopy10YrsRow.required = NO;
     [section addFormRow:colonoscopy10YrsRow];
     
+    colonoscopy10YrsRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                colonsc10Yrs = TRUE;
+            } else {
+                colonsc10Yrs = FALSE;
+            }
+            if (sporeanPr && age50 && fit12Mths && colonsc10Yrs && wantFitKit) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFIT];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFIT];
+            }
+            
+        }
+    };
+    
     XLFormRowDescriptor *wantFitKitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantFitKit rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free FIT kit?"];
     wantFitKitRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     wantFitKitRow.required = NO;
     [section addFormRow:wantFitKitRow];
+    
+    wantFitKitRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                wantFitKit = TRUE;
+            } else {
+                wantFitKit = FALSE;
+            }
+            if (sporeanPr && age50 && fit12Mths && colonsc10Yrs && wantFitKit) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFIT];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFIT];
+            }
+            
+        }
+    };
     
     relColCancerRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if (oldValue != newValue) {
@@ -574,7 +642,11 @@ NSString *const kMultiADL = @"multi_adl";
             else relColorectCancer = false;
         }
         
-        if (sporean && age50 && relColorectCancer && colon3Yrs && wantColRef) disableFIT = true;
+        if (sporeanPr && age50 && relColorectCancer && colon3Yrs && wantColRef) {
+            disableFIT = true;
+            [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyFIT];
+            [[NSUserDefaults standardUserDefaults]setObject:@"1" forKey:kQualifyColonsc];
+        }
         else disableFIT = false;
         fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
         colonoscopy10YrsRow.disabled = [NSNumber numberWithBool:disableFIT];
@@ -591,7 +663,11 @@ NSString *const kMultiADL = @"multi_adl";
             else colon3Yrs = false;
         }
         
-        if (sporean && age50 && relColorectCancer && colon3Yrs && wantColRef) disableFIT = true;
+        if (sporeanPr && age50 && relColorectCancer && colon3Yrs && wantColRef) {
+            disableFIT = true;
+            [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyFIT];
+            [[NSUserDefaults standardUserDefaults]setObject:@"1" forKey:kQualifyColonsc];
+        }
         else disableFIT = false;
         
         fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
@@ -609,7 +685,11 @@ NSString *const kMultiADL = @"multi_adl";
             else wantColRef = false;
         }
         
-        if (sporean && age50 && relColorectCancer && colon3Yrs && wantColRef) disableFIT = true;
+        if (sporeanPr && age50 && relColorectCancer && colon3Yrs && wantColRef) {
+            disableFIT = true;
+            [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyFIT];
+            [[NSUserDefaults standardUserDefaults]setObject:@"1" forKey:kQualifyColonsc];
+        }
         else disableFIT = false;
         fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
         colonoscopy10YrsRow.disabled = [NSNumber numberWithBool:disableFIT];
@@ -624,7 +704,11 @@ NSString *const kMultiADL = @"multi_adl";
     
     
     BOOL isMale;
-    if ([gender isEqualToString:@"M"]) isMale=true;
+    if ([gender isEqualToString:@"M"]) {
+        isMale=true;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyPapSmear];
+    }
     else isMale = false;
     
     // Eligibility Assessment for Mammogram - Section
@@ -634,40 +718,98 @@ NSString *const kMultiADL = @"multi_adl";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean"];
     row.required = NO;
     row.disabled = @(1);
-    if ([citizenship isEqualToString:@"Singaporean"])
+    if ([citizenship isEqualToString:@"Singaporean"]) {
+        sporean = YES;
         row.value = @1;
-    else
+    }
+    else {
+        sporean = NO;
         row.value = @0;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
+    }
+    
 //    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeCheck rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 50 to 69"];
     row.required = NO;
     row.disabled = @(1);
-    if (([age integerValue] >= 50) && ([age integerValue] < 70))
+    if (([age integerValue] >= 50) && ([age integerValue] < 70)) {
         row.value = @1;
-    else
+        age5069 = YES;
+    }
+    else {
         row.value = @0;
+        age5069 = NO;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
+    }
+    
 //    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMammo2Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done mammogram in the last 2 years?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:row];
+    XLFormRowDescriptor *mammo2YrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammo2Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done mammogram in the last 2 years?"];
+    mammo2YrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    mammo2YrsRow.required = NO;
+    mammo2YrsRow.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+    [section addFormRow:mammo2YrsRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHasChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has a valid CHAS card (blue/orange)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:row];
+    mammo2YrsRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                noMammo2Yrs = TRUE;
+            } else {
+                noMammo2Yrs = FALSE;
+            }
+            if (sporean && age5069 && noMammo2Yrs && hasChas && wantMammo) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyMammo];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyMammo];
+            }
+                
+        }
+    };
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantMammo rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free mammogram referral?"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:row];
+    XLFormRowDescriptor *hasChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHasChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has a valid CHAS card (blue/orange)"];
+    hasChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    hasChasRow.required = NO;
+    hasChasRow.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+    [section addFormRow:hasChasRow];
+    
+    hasChasRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                hasChas = TRUE;
+            } else {
+                hasChas = FALSE;
+            }
+            if (sporean && age5069 && noMammo2Yrs && hasChas && wantMammo) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyMammo];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyMammo];
+            }
+        }
+    };
+    
+    XLFormRowDescriptor *wantMammoRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantMammo rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free mammogram referral?"];
+    wantMammoRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    wantMammoRow.required = NO;
+    wantMammoRow.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+    [section addFormRow:wantMammoRow];
+    
+    wantMammoRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                wantMammo = TRUE;
+            } else {
+                wantMammo = FALSE;
+            }
+            if (sporean && age5069 && noMammo2Yrs && hasChas && wantMammo) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyMammo];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyMammo];
+            }
+        }
+    };
     
     // Eligibility Assessment for pap smear - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Pap Smear"];
@@ -676,10 +818,15 @@ NSString *const kMultiADL = @"multi_adl";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
     row.required = NO;
     row.disabled = @(1);
-    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"])
+    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"]) {
+        sporeanPr = YES;
         row.value = @1;
-    else
+    }
+    else {
+        sporeanPr = NO;
         row.value = @0;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyPapSmear];
+    }
 //    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
@@ -688,10 +835,15 @@ NSString *const kMultiADL = @"multi_adl";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeCheck2 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 25 to 69"];
     row.required = NO;
     row.disabled = @(1);
-    if (([age integerValue] >= 25) && ([age integerValue] < 70))
+    if (([age integerValue] >= 25) && ([age integerValue] < 70)) {
+        age5069 = YES;
         row.value = @1;
-    else
+    }
+    else {
+        age5069 = NO;
         row.value = @0;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyPapSmear];
+    }
 //    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
@@ -701,17 +853,65 @@ NSString *const kMultiADL = @"multi_adl";
     row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
+    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                noPapSmear3Yrs = TRUE;
+            } else {
+                noPapSmear3Yrs = FALSE;
+            }
+            if (sporean && age5069 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
+            }
+            
+        }
+    };
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEngagedSex rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has engaged in sexual intercourse before"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
+    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                hadSex = TRUE;
+            } else {
+                hadSex = FALSE;
+            }
+            if (sporean && age5069 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
+            }
+            
+        }
+    };
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kReferPapSmear rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free pap smear referral?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
+    
+    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                wantPapSmear = TRUE;
+            } else {
+                wantPapSmear = FALSE;
+            }
+            if (sporean && age5069 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
+            }
+            
+        }
+    };
 
     
     // Eligibility for Fall Risk Assessment - Section
@@ -1773,6 +1973,65 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAppliedChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Applied for CHAS under NHS?"];
+    row.required = NO;
+    
+    NSString *str = [[NSUserDefaults standardUserDefaults]objectForKey:kWantChas];
+    
+    if ([str isEqualToString:@"1"])
+        row.disabled = @NO;
+    else
+        row.disabled = @YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReferColonos rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Referred for colonoscopy by NHS?"];
+    row.required = NO;
+    
+    str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyColonsc];
+    
+    if ([str isEqualToString:@"1"])
+        row.disabled = @NO;
+    else
+        row.disabled = @YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReceiveFit rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Receiving FIT kit from NHS?"];
+    row.required = NO;
+    
+    str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyFIT];
+    
+    if ([str isEqualToString:@"1"])
+        row.disabled = @NO;
+    else
+        row.disabled = @YES;
+    [section addFormRow:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReferMammo rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Referred for mammogram by NHS?"];
+    row.required = NO;
+    
+    str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyMammo];
+    
+    if ([str isEqualToString:@"1"])
+        row.disabled = @NO;
+    else
+        row.disabled = @YES;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReferPapSmear rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Referred for PAP smear by NHS?"];
+    row.required = NO;
+    
+    str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyPapSmear];
+    
+    if ([str isEqualToString:@"1"])
+        row.disabled = @NO;
+    else
+        row.disabled = @YES;
+    [section addFormRow:row];
+    
+    
     return [super initWithForm:formDescriptor];
 }
 
@@ -1827,127 +2086,152 @@ NSString *const kMultiADL = @"multi_adl";
     preEdSection = [XLFormSectionDescriptor formSectionWithTitle:@"Pre-education Knowledge Quiz"];
     [formDescriptor addFormSection:preEdSection];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu1 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person always knows when they have heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu1 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"1. A person always knows when they have heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu2 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If you have a family history of heart disease, you are at risk for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu2 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"2. If you have a family history of heart disease, you are at risk for developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu3 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"The older a person is, the greater their risk of having heart disease "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu3 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"3. The older a person is, the greater their risk of having heart disease "];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu4 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Smoking is a risk factor for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu4 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"4. Smoking is a risk factor for heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu5 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who stops smoking will lower their risk of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu5 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"5. A person who stops smoking will lower their risk of developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu6 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High blood pressure is a risk factor for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu6 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"6. High blood pressure is a risk factor for heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu7 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Keeping blood pressure under control will reduce a person’s risk for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu7 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"7. Keeping blood pressure under control will reduce a person’s risk for developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu8 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High cholesterol is a risk factor for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu8 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"8. High cholesterol is a risk factor for developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu9 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Eating fatty foods does not affect blood cholesterol levels"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu9 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"9. Eating fatty foods does not affect blood cholesterol levels"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu10 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your ‘good’ cholesterol (HDL) is high you are at risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu10 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"10. If your ‘good’ cholesterol (HDL) is high you are at risk for heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu11 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your ‘bad’ cholesterol (LDL) is high you are at risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu11 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"11. If your ‘bad’ cholesterol (LDL) is high you are at risk for heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Being overweight increases a person’s risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu12 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"12. Being overweight increases a person’s risk for heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu13 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Regular physical activity will lower a person’s chance of getting heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu13 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"13. Regular physical activity will lower a person’s chance of getting heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu14 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Only exercising at a gym or in an exercise class will lower a person’s chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu14 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"14. Only exercising at a gym or in an exercise class will lower a person’s chance of developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu15 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Walking is considered exercise that will help lower a person’s chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu15 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"15. Walking is considered exercise that will help lower a person’s chance of developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu16 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Diabetes is a risk factor for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu16 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"16. Diabetes is a risk factor for developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu17 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High blood sugar puts a strain on the heart"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu17 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"17. High blood sugar puts a strain on the heart"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu18 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your blood sugar is high over several months it can cause your cholesterol level to go up and increase your risk of heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu18 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"18. If your blood sugar is high over several months it can cause your cholesterol level to go up and increase your risk of heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu19 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood sugar levels under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu19 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"19. A person who has diabetes can reduce their risk of developing heart disease if they keep their blood sugar levels under control"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu20 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"People with diabetes rarely have high cholesterol"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [self setDefaultFontWithRow:row];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu21 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If a person has diabetes, keeping their cholesterol under control will help to lower their chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu20 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"20. People with diabetes rarely have high cholesterol"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu22 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"People with diabetes tend to have low HDL (good) cholesterol"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu21 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"21. If a person has diabetes, keeping their cholesterol under control will help to lower their chance of developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu23 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood pressure under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu22 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"22. People with diabetes tend to have low HDL (good) cholesterol"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu24 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their weight under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu23 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"23. A person who has diabetes can reduce their risk of developing heart disease if they keep their blood pressure under control"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu25 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Men with diabetes have a higher risk of heart disease than women with diabetes "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu24 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"24. A person who has diabetes can reduce their risk of developing heart disease if they keep their weight under control"];
+    row.selectorOptions = @[@"True", @"False"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [preEdSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"25. Men with diabetes have a higher risk of heart disease than women with diabetes "];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [preEdSection addFormRow:row];
@@ -1976,127 +2260,152 @@ NSString *const kMultiADL = @"multi_adl";
     postEdSection = [XLFormSectionDescriptor formSectionWithTitle:@"Post-Education Knowledge Quiz"];
     [formDescriptor addFormSection:postEdSection];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu1 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person always knows when they have heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu1 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person always knows when they have heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu2 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If you have a family history of heart disease, you are at risk for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu2 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If you have a family history of heart disease, you are at risk for developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu3 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"The older a person is, the greater their risk of having heart disease "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu3 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"The older a person is, the greater their risk of having heart disease "];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu4 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Smoking is a risk factor for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu4 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Smoking is a risk factor for heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu5 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who stops smoking will lower their risk of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu5 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who stops smoking will lower their risk of developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu6 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High blood pressure is a risk factor for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu6 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"High blood pressure is a risk factor for heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu7 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Keeping blood pressure under control will reduce a person’s risk for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu7 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Keeping blood pressure under control will reduce a person’s risk for developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu8 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High cholesterol is a risk factor for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu8 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"High cholesterol is a risk factor for developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu9 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Eating fatty foods does not affect blood cholesterol levels"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu9 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Eating fatty foods does not affect blood cholesterol levels"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu10 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your ‘good’ cholesterol (HDL) is high you are at risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu10 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If your ‘good’ cholesterol (HDL) is high you are at risk for heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu11 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your ‘bad’ cholesterol (LDL) is high you are at risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu11 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If your ‘bad’ cholesterol (LDL) is high you are at risk for heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Being overweight increases a person’s risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu12 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Being overweight increases a person’s risk for heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu13 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Regular physical activity will lower a person’s chance of getting heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu13 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Regular physical activity will lower a person’s chance of getting heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu14 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Only exercising at a gym or in an exercise class will lower a person’s chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu14 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Only exercising at a gym or in an exercise class will lower a person’s chance of developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu15 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Walking is considered exercise that will help lower a person’s chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu15 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Walking is considered exercise that will help lower a person’s chance of developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu16 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Diabetes is a risk factor for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu16 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Diabetes is a risk factor for developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu17 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"High blood sugar puts a strain on the heart"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu17 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"High blood sugar puts a strain on the heart"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu18 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If your blood sugar is high over several months it can cause your cholesterol level to go up and increase your risk of heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu18 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If your blood sugar is high over several months it can cause your cholesterol level to go up and increase your risk of heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu19 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood sugar levels under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu19 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood sugar levels under control"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu20 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"People with diabetes rarely have high cholesterol"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu20 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"People with diabetes rarely have high cholesterol"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu21 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"If a person has diabetes, keeping their cholesterol under control will help to lower their chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu21 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If a person has diabetes, keeping their cholesterol under control will help to lower their chance of developing heart disease"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu22 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"People with diabetes tend to have low HDL (good) cholesterol"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu22 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"People with diabetes tend to have low HDL (good) cholesterol"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu23 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood pressure under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu23 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood pressure under control"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu24 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their weight under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu24 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their weight under control"];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu25 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Men with diabetes have a higher risk of heart disease than women with diabetes "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Men with diabetes have a higher risk of heart disease than women with diabetes "];
+    row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     [postEdSection addFormRow:row];
@@ -2461,32 +2770,66 @@ NSString *const kMultiADL = @"multi_adl";
     
     if (([six12Row.value isEqual:@1] || ([tunnelRow.value isEqual:@(1)])) && ([visitEye12MthsRow.value isEqual:@(1)])) { // (3 OR 4) AND 5
         NSLog(@"SERI Enabled!");
-        [[NSUserDefaults standardUserDefaults] setObject:@1 forKey:@"needSERI"];
+        [[NSUserDefaults standardUserDefaults] setObject:@1 forKey:kNeedSERI];
     } else {
-        [[NSUserDefaults standardUserDefaults] setObject:@0 forKey:@"needSERI"];
+        [[NSUserDefaults standardUserDefaults] setObject:@0 forKey:kNeedSERI];
     }
 }
 
 - (void) calculateScore: (XLFormRowDescriptor *)sender {
     
     NSDictionary *dict = [self.form formValues];
-    int score, eachAns, count;
-    NSNumber *ans;
-    score = count = 0;
+    int score, eachAns, i;
+    NSString *ans;
+    
+    score = i = 0;
+
+    NSDictionary *correctAnswers = @{kEdu1:@"False",//1
+                                     kEdu2:@"True", //2
+                                     kEdu3:@"True", //3
+                                     kEdu4: @"True", //4
+                                     kEdu5: @"True", //5
+                                     kEdu6: @"True", //6
+                                     kEdu7: @"True", //7
+                                     kEdu8: @"True", //8
+                                     kEdu9:@"False",//9
+                                     kEdu10:@"False",//10
+                                     kEdu11:@"True", //11
+                                     kEdu12:@"True", //12
+                                     kEdu13:@"True", //13
+                                     kEdu14:@"False",//14
+                                     kEdu15:@"True", //15
+                                     kEdu16:@"True", //16
+                                     kEdu17:@"True", //17
+                                     kEdu18:@"True", //18
+                                     kEdu19:@"True", //19
+                                     kEdu20:@"False",//20
+                                     kEdu21:@"True", //21
+                                     kEdu22:@"True", //22
+                                     kEdu23:@"True", //23
+                                     kEdu24:@"True", //24
+                                     kEdu25:@"False" //25
+                                     };
+    
     for (NSString *key in dict) {
         if (![key isEqualToString:kPreEdScore] && ![key isEqualToString:kPostEdScore] && ![key isEqualToString:@"preEdScoreButton"] && ![key isEqualToString:@"postEdScoreButton"]) {
             //prevent null cases
-            if (dict[key] != [NSNull null])
+            if (dict[key] != [NSNull null]) {//only take non-null values;
                 ans = dict[key];
-            else
-                ans = @0;
             
-            eachAns = [ans intValue];
-            score = score + eachAns;
-            count++;
+                if ([ans isEqualToString:correctAnswers[key]]) {
+                    eachAns = 1;
+                } else
+                    eachAns = 0;
+                
+                score = score + eachAns;
+                ans = @"";
+            }
         }
     }
+    i=0;
     if ([sender.title rangeOfString:@"Pre-education"].location != NSNotFound) { // if it's pre-education button
+        
         preEdScoreRow.value = [NSString stringWithFormat:@"%d", score];
         [self reloadFormRow:preEdScoreRow];
         [showPostEdSectionBtnRow setHidden:@NO];

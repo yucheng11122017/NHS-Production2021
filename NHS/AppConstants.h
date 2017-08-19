@@ -13,9 +13,20 @@
 #define DEFAULT_FONT_SIZE 15
 #define DEFAULT_FONT_NAME @"AppleSDGothicNeo-Regular"
 
+#pragma mark - UserDefaults
+
+extern NSString *const kResidentAge;
+extern NSString *const kNeedSERI;
+extern NSString *const kQualifyColonsc;
+extern NSString *const kQualifyMammo;
+extern NSString *const kQualifyFIT;
+extern NSString *const kQualifyPapSmear;
+
+
 /*
  * Form Constants
  ********************************************/
+
 extern NSString *const kName;
 extern NSString *const kNRIC;
 extern NSString *const kGender;
@@ -103,6 +114,7 @@ extern NSString *const kWantColonoscopyRef;
 extern NSString *const kFitLast12Mths;
 extern NSString *const kColonoscopy10Yrs;
 extern NSString *const kWantFitKit;
+extern NSString *const kSporean;
 extern NSString *const kMammo2Yrs;
 extern NSString *const kHasChas;
 extern NSString *const kWantMammo;

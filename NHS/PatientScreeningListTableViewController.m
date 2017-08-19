@@ -297,7 +297,7 @@ typedef enum residentDataSource {
 
     [SVProgressHUD showWithStatus:@"Loading..."];
     
-    
+    [self resetAllUserDefaults];
     
     if (tableView == self.tableView) {      //not in the searchResult view
         //check if user clicked on drafts first
@@ -832,6 +832,15 @@ typedef enum residentDataSource {
                       kCitizenship:@"Foreigner",
                       @"ts":@"2017-07-03 08:41:44",
                       @"nric":@"G1342231K"
+                      },
+                    @{@"resident_id":@4,
+                      @"resident_name":@"WONG AH MEI",
+                      kNeighbourhood:@"KGL",
+                      kGender:@"F",
+                      kBirthDate:@"1955-02-02",
+                      kCitizenship:@"Singaporean",
+                      @"ts":@"2017-07-03 10:41:44",
+                      @"nric":@"S1231234T"
                       }];
     }
     
@@ -856,6 +865,19 @@ typedef enum residentDataSource {
     [self.refreshControl endRefreshing];
 }
 
+- (void) resetAllUserDefaults {
+    NSArray *allUserDefaults = [NSArray arrayWithObjects:kCitizenship, kResidentAge, kGender, kNeighbourhood, kNeedSERI, kQualifyFIT, kQualifyMammo, kQualifyColonsc, kQualifyPapSmear,nil];
+    
+    //clear everything before starting a new patient
+//    for (NSString *str in allUserDefaults) {
+//        [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:str];
+//    }
+    
+    NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
+    [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+    
+}
+
 - (void) saveAgeGenderAndCitizenship {
     NSMutableString *str = [_sampleResidentDict[kBirthDate] mutableCopy];
     NSString *yearOfBirth = [str substringWithRange:NSMakeRange(0, 4)];
@@ -867,10 +889,10 @@ typedef enum residentDataSource {
     
     NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
 
-    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kCitizenship] forKey:@"ResidentCitizenship"];
-    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kGender] forKey:@"ResidentGender"];
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:age] forKey:@"ResidentAge"];
-    [[NSUserDefaults standardUserDefaults] setObject:_neighbourhood forKey:@"Neighbourhood"];
+    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kCitizenship] forKey:kCitizenship];
+    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kGender] forKey:kGender];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:age] forKey:kResidentAge];
+    [[NSUserDefaults standardUserDefaults] setObject:_neighbourhood forKey:kNeighbourhood];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

@@ -7,6 +7,7 @@
 //
 
 #import "HealthAssessAndRiskTableVC.h"
+#import "AppConstants.h"
 
 @interface HealthAssessAndRiskTableVC () {
     NSNumber *destinationFormID;
@@ -23,7 +24,7 @@
     [super viewDidLoad];
     
     age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
-                        stringForKey:@"ResidentAge"];
+                        stringForKey:kResidentAge];
     
     self.navigationItem.title = @"Health Assessment and Risk Stratisfaction";
     _rowLabelsText= [[NSArray alloc] initWithObjects:@"Medical History",@"Geriatric Depression Assessment",@"Risk Stratification", nil];
