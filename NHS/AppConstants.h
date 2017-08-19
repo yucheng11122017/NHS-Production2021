@@ -21,6 +21,7 @@ extern NSString *const kQualifyColonsc;
 extern NSString *const kQualifyMammo;
 extern NSString *const kQualifyFIT;
 extern NSString *const kQualifyPapSmear;
+extern NSString *const kQualifyFallAssess;
 
 
 /*

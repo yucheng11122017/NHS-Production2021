@@ -23,6 +23,24 @@ typedef enum typeOfForm {
     ViewScreenedScreeningForm
 } typeOfForm;
 
+typedef enum sectionRowNumber {
+    ModeOfScreening,
+    Phlebotomy,
+    Profiling,
+    HealthAssessment_RiskStratification,
+    SocialWork,
+    Triage,
+    SnellenEyeTest,
+    AdditionalServices,
+    DoctorsConsultation,
+    BasicDentalCheckup,
+    SeriAdvancedEyeScreening,
+    FallRiskAssessment,
+    GeriatricDementiaAssess,
+    HealthEducation
+} sectionRowNumber;
+
+
 
 @interface ScreeningSectionTableViewController ()
 
@@ -155,19 +173,24 @@ typedef enum typeOfForm {
             cell.accessoryType = UITableViewCellAccessoryNone;
         }
         
-        if ((indexPath.row > 8) && (indexPath.row != 13)) {
-            
-            if (indexPath.row == 10) {
+        if ((indexPath.row >= SeriAdvancedEyeScreening) && (indexPath.row <= GeriatricDementiaAssess)) {   //between 10 to 12
+            if (indexPath.row == SeriAdvancedEyeScreening) {  //SERI
                 //Enable SERI
-                if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeedSERI] isEqual:@1]) {
+                if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeedSERI] isEqual:@"1"]) {
+                    cell.userInteractionEnabled = YES;
+                    [cell.textLabel setTextColor:[UIColor blackColor]];
+                    return cell;    //don't disable.
+                }
+            } else if (indexPath.row == FallRiskAssessment) {
+                if ([[[NSUserDefaults standardUserDefaults] objectForKey:kQualifyFallAssess] isEqual:@"1"]) {
                     cell.userInteractionEnabled = YES;
                     [cell.textLabel setTextColor:[UIColor blackColor]];
                     return cell;    //don't disable.
                 }
             }
+            
             cell.userInteractionEnabled = NO;
             [cell.textLabel setTextColor:[UIColor grayColor]];
-        
         }
     } else {
         cell = [tableView dequeueReusableCellWithIdentifier:buttonTableIdentifier];
@@ -224,8 +247,15 @@ typedef enum typeOfForm {
             selectedRow = [NSNumber numberWithInteger:4];
         } else if (indexPath.row == 7) {    //Additional Services
             selectedRow = [NSNumber numberWithInteger:5];
-        } else if (indexPath.row == 8) {    //Basic Dental Check-up
+        } else if (indexPath.row == 8) {    //Doctor's consultation
             selectedRow = [NSNumber numberWithInteger:6];
+        }
+          else if (indexPath.row == 9) {    //Basic Dental Check-up
+                selectedRow = [NSNumber numberWithInteger:7];
+          } else if (indexPath.row == 10) {    //SERI EYE TEST
+              selectedRow = [NSNumber numberWithInteger:8];
+          } else if (indexPath.row == 11) {    //SERI EYE TEST
+              selectedRow = [NSNumber numberWithInteger:9];
         } else if (indexPath.row == 13) {   //Health Education
             selectedRow = [NSNumber numberWithInteger:11];
         }

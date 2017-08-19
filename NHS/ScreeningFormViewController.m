@@ -148,6 +148,7 @@ NSString *const kMultiADL = @"multi_adl";
     BOOL fit12Mths, colonsc10Yrs, wantFitKit;
     BOOL sporean, age5069 ,noMammo2Yrs, hasChas, wantMammo;
     BOOL age2569, noPapSmear3Yrs, hadSex, wantPapSmear;
+    BOOL age65, feelFall, scaredFall, fallen12Mths;
 }
 
 @end
@@ -192,10 +193,10 @@ NSString *const kMultiADL = @"multi_adl";
             break;
         case 6: form = [self initRefForDoctorConsult];
             break;
-////        case 10: form = [self initMyHealthAndMyNeighbourhood];
-////            break;
-//        case 12: form = [self initCurrentPhysicalIssues];
-//            break;
+        case 7: form = [self initDentalCheckup];
+            break;
+        case 9: form = [self initFallRiskAssessment];
+            break;
         case 11: form = [self initHealthEducation];
             break;
 //        case 14: form = [self initSocialSupportAssessment];
@@ -830,8 +831,6 @@ NSString *const kMultiADL = @"multi_adl";
 //    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
     [section addFormRow:row];
     
-#warning need to change the age name
-    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeCheck2 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 25 to 69"];
     row.required = NO;
     row.disabled = @(1);
@@ -918,29 +917,83 @@ NSString *const kMultiADL = @"multi_adl";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility for Fall Risk Assessment"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove50 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 65 and above?"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove65 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 65 and above?"];
     row.required = NO;
     row.disabled = @(1);
-    if ([age integerValue] >= 65)
+    if ([age integerValue] >= 65) {
         row.value = @1;
-    else
+        age65 = YES;
+    }
+    else {
         row.value = @0;
+        age65 = NO;
+    }
     [section addFormRow:row];
+    
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFallen12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Have you fallen in the past 12 months?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
     
+    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                fallen12Mths = TRUE;
+            } else {
+                fallen12Mths = FALSE;
+            }
+            if (age65 && fallen12Mths && scaredFall && feelFall) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFallAssess];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFallAssess];
+            }
+            
+        }
+    };
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kScaredFall rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Do you avoid going out because you are scared of falling?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
     
+    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                scaredFall = TRUE;
+            } else {
+                scaredFall = FALSE;
+            }
+            if (age65 && fallen12Mths && scaredFall && feelFall) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFallAssess];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFallAssess];
+            }
+            
+        }
+    };
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelFall rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Do you feel like you are going to fall when getting up or walking?"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
+    
+    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                feelFall = TRUE;
+            } else {
+                feelFall = FALSE;
+            }
+            if (age65 && fallen12Mths && scaredFall && feelFall) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFallAssess];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFallAssess];
+            }
+            
+        }
+    };
+    
     
     // Eligibility for Geriatric dementia assessment - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility for Geriatric dementia assessment"];
@@ -2078,6 +2131,108 @@ NSString *const kMultiADL = @"multi_adl";
     return [super initWithForm:formDescriptor];
 }
 
+- (id) initDentalCheckup {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Basic Dental Check-up"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentalUndergone rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Undergone dental check-up?"];
+    [self setDefaultFontWithRow:row];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentistReferred
+                                                rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Referred by dentist?"];
+    [self setDefaultFontWithRow:row];
+    [section addFormRow:row];
+    
+    return [super initWithForm:formDescriptor];
+}
+
+- (id) initFallRiskAssessment {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Fall Risk Assessment"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPsfuFRA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"To be completed during PSFU"];
+    [self setDefaultFontWithRow:row];
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *balanceRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBalance
+                                                rowType:XLFormRowDescriptorTypeStepCounter title:@"Balance Test"];
+    balanceRow.value = @(0);
+    [balanceRow.cellConfigAtConfigure setObject:@(4) forKey:@"stepControl.maximumValue"];
+    [balanceRow.cellConfigAtConfigure setObject:@(0) forKey:@"stepControl.minimumValue"];
+    [balanceRow.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
+    [self setDefaultFontWithRow:balanceRow];
+    [section addFormRow:balanceRow];
+    
+    XLFormRowDescriptor *GaitSpeedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBalance
+                                                rowType:XLFormRowDescriptorTypeStepCounter title:@"Gait Speed Test"];
+    GaitSpeedRow.value = @(0);
+    [GaitSpeedRow.cellConfigAtConfigure setObject:@(3) forKey:@"stepControl.maximumValue"];
+    [GaitSpeedRow.cellConfigAtConfigure setObject:@(0) forKey:@"stepControl.minimumValue"];
+    [GaitSpeedRow.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
+    [self setDefaultFontWithRow:GaitSpeedRow];
+    [section addFormRow:GaitSpeedRow];
+    
+    XLFormRowDescriptor *chairStandRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBalance
+                                                rowType:XLFormRowDescriptorTypeStepCounter title:@"Chair Stand Test"];
+    chairStandRow.value = @(0);
+    [chairStandRow.cellConfigAtConfigure setObject:@(2) forKey:@"stepControl.maximumValue"];
+    [chairStandRow.cellConfigAtConfigure setObject:@(0) forKey:@"stepControl.minimumValue"];
+    [chairStandRow.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
+    [self setDefaultFontWithRow:chairStandRow];
+    [section addFormRow:chairStandRow];
+    
+    XLFormRowDescriptor *totalRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTotal rowType:XLFormRowDescriptorTypeInfo title:@"Total Score for SPPB"];
+    [self setDefaultFontWithRow:totalRow];
+    
+    balanceRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            int total = [newValue intValue] + [GaitSpeedRow.value intValue] + [chairStandRow.value intValue];
+            totalRow.value = [NSNumber numberWithInt:total];
+            [self reloadFormRow:totalRow];
+        }
+    };
+    
+    GaitSpeedRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            int total = [balanceRow.value intValue] + [newValue intValue] + [chairStandRow.value intValue];
+            totalRow.value = [NSNumber numberWithInt:total];
+            [self reloadFormRow:totalRow];
+        }
+    };
+    
+    chairStandRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            int total = [balanceRow.value intValue] + [GaitSpeedRow.value intValue] + [newValue intValue];
+            totalRow.value = [NSNumber numberWithInt:total];
+            [self reloadFormRow:totalRow];
+        }
+    };
+    
+    
+    [section addFormRow:totalRow];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqFollowupFRA
+                                                rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident require further follow up?"];
+    [self setDefaultFontWithRow:row];
+    [section addFormRow:row];
+    
+    return [super initWithForm:formDescriptor];
+}
+
+
 - (id) initHealthEducation {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Health Education"];
     XLFormSectionDescriptor * section;
@@ -2770,9 +2925,9 @@ NSString *const kMultiADL = @"multi_adl";
     
     if (([six12Row.value isEqual:@1] || ([tunnelRow.value isEqual:@(1)])) && ([visitEye12MthsRow.value isEqual:@(1)])) { // (3 OR 4) AND 5
         NSLog(@"SERI Enabled!");
-        [[NSUserDefaults standardUserDefaults] setObject:@1 forKey:kNeedSERI];
+        [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kNeedSERI];
     } else {
-        [[NSUserDefaults standardUserDefaults] setObject:@0 forKey:kNeedSERI];
+        [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kNeedSERI];
     }
 }
 

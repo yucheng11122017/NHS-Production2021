@@ -19,6 +19,7 @@ NSString *const kQualifyColonsc = @"qualify_colonsc";
 NSString *const kQualifyMammo = @"qualify_mammo";
 NSString *const kQualifyFIT = @"qualify_fit";
 NSString *const kQualifyPapSmear = @"qualify_pap_smear";
+NSString *const kQualifyFallAssess = @"qualify_fall_assess";
 
 #pragma mark - Resident Particulars
 
