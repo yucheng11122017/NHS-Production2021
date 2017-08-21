@@ -197,6 +197,8 @@ NSString *const kMultiADL = @"multi_adl";
             break;
         case 9: form = [self initFallRiskAssessment];
             break;
+        case 10: form = [self initDementiaAssessment];
+            break;
         case 11: form = [self initHealthEducation];
             break;
 //        case 14: form = [self initSocialSupportAssessment];
@@ -1002,19 +1004,32 @@ NSString *const kMultiADL = @"multi_adl";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove65 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 65 and above?"];
     row.required = NO;
     row.disabled = @(1);
-    if ([age integerValue] >= 65)
+    if ([age integerValue] >= 65) {
+        age65 = true;
         row.value = @1;
-    else
+    }
+    else {
         row.value = @0;
+        age65 = false;
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident shows signs of cognitive impairment(e.g. forgetfulness, carelessness, lack of awareness)"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
     [section addFormRow:row];
+    
+    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@(1)] && age65) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyDementia];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyDementia];
+            }
+        }
+    };
 
-    
-    
     return [super initWithForm:formDescriptor];
 }
 
@@ -2232,6 +2247,60 @@ NSString *const kMultiADL = @"multi_adl";
     return [super initWithForm:formDescriptor];
 }
 
+- (id) initDementiaAssessment {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Geriatric Dementia Assessment"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPsfuFRA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"To be completed during PSFU"];
+    [self setDefaultFontWithRow:row];
+    [section addFormRow:row];
+    
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    section.footerTitle = @"greater than 0 and less than 255";
+    [formDescriptor addFormSection:section];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAmtScore rowType:XLFormRowDescriptorTypeNumber title:@"Total score for AMT"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"greater than 0 and less than 256" regex:@"^([0-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])$"]];
+    
+    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if (newValue != [NSNull null]) {
+                if ([newValue intValue] < 0 || [newValue intValue] > 255) {
+                    [self showValidationError];
+                }
+            }
+        }
+    };
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEduStatus rowType:XLFormRowDescriptorTypeSelectorPush title:@"Resident's education status"];
+    row.selectorOptions = @[@"1 year", @"2 years", @"3 years", @"4 years", @"5 years", @"6 years", @"more than 6 years"];
+    [self setDefaultFontWithRow:row];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqFollowupGDA rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident require further follow up?"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    [section addFormRow:row];
+    
+    
+    
+    return [super initWithForm:formDescriptor];
+}
+
+
 
 - (id) initHealthEducation {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Health Education"];
@@ -3004,6 +3073,23 @@ NSString *const kMultiADL = @"multi_adl";
     [sender setHidden:@YES];    //make button hidden, no need anymore
     
     [self deselectFormRow:sender];
+}
+
+- (void) showValidationError {
+    NSArray * validationErrors = [self formValidationErrors];
+    if (validationErrors.count > 0){
+        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+            cell.backgroundColor = [UIColor colorWithRed:255/255.0 green:102/255.0 blue:102/255.0 alpha:1.0];
+            [UIView animateWithDuration:0.3 animations:^{
+                cell.backgroundColor = [UIColor whiteColor];
+            }];
+        }];
+        [self showFormValidationError:[validationErrors firstObject]];
+        
+        return;
+    }
 }
 
 #pragma mark - Organize Dictionary Methods

@@ -22,6 +22,7 @@ extern NSString *const kQualifyMammo;
 extern NSString *const kQualifyFIT;
 extern NSString *const kQualifyPapSmear;
 extern NSString *const kQualifyFallAssess;
+extern NSString *const kQualifyDementia;
 
 
 /*

@@ -187,6 +187,12 @@ typedef enum sectionRowNumber {
                     [cell.textLabel setTextColor:[UIColor blackColor]];
                     return cell;    //don't disable.
                 }
+            } else if (indexPath.row == GeriatricDementiaAssess) {
+                if ([[[NSUserDefaults standardUserDefaults] objectForKey:kQualifyDementia] isEqual:@"1"]) {
+                    cell.userInteractionEnabled = YES;
+                    [cell.textLabel setTextColor:[UIColor blackColor]];
+                    return cell;    //don't disable.
+                }
             }
             
             cell.userInteractionEnabled = NO;
@@ -235,28 +241,30 @@ typedef enum sectionRowNumber {
     if (indexPath.section == 0) {
         selectedRow = [NSNumber numberWithInteger:indexPath.row];
         
-        if (indexPath.row == 3) {
+        if (indexPath.row == HealthAssessment_RiskStratification) {
             [self performSegueWithIdentifier:@"sectionToHARSSegue" sender:self];
             return;
-        } else if (indexPath.row == 4) {
+        } else if (indexPath.row == SocialWork) {
             [self performSegueWithIdentifier:@"screenSectionToSocialWorkSegue" sender:self];
             return;
-        } else if (indexPath.row == 5) {    //clinical results
+        } else if (indexPath.row == Triage) {
             selectedRow = [NSNumber numberWithInteger:3];
-        } else if (indexPath.row == 6) {    //snellen eye test
+        } else if (indexPath.row == SnellenEyeTest) {
             selectedRow = [NSNumber numberWithInteger:4];
-        } else if (indexPath.row == 7) {    //Additional Services
+        } else if (indexPath.row == AdditionalServices) {
             selectedRow = [NSNumber numberWithInteger:5];
-        } else if (indexPath.row == 8) {    //Doctor's consultation
+        } else if (indexPath.row == DoctorsConsultation) {
             selectedRow = [NSNumber numberWithInteger:6];
         }
-          else if (indexPath.row == 9) {    //Basic Dental Check-up
+          else if (indexPath.row == BasicDentalCheckup) {
                 selectedRow = [NSNumber numberWithInteger:7];
-          } else if (indexPath.row == 10) {    //SERI EYE TEST
+          } else if (indexPath.row == SeriAdvancedEyeScreening) {
               selectedRow = [NSNumber numberWithInteger:8];
-          } else if (indexPath.row == 11) {    //SERI EYE TEST
+          } else if (indexPath.row == FallRiskAssessment) {
               selectedRow = [NSNumber numberWithInteger:9];
-        } else if (indexPath.row == 13) {   //Health Education
+          } else if (indexPath.row == GeriatricDementiaAssess) {
+              selectedRow = [NSNumber numberWithInteger:10];
+          } else if (indexPath.row == HealthEducation) {
             selectedRow = [NSNumber numberWithInteger:11];
         }
 
