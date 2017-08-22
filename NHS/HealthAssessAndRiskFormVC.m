@@ -67,7 +67,7 @@ NSString *const kQ15 = @"q15";
         default:
             break;
     }
-    [self.form setAddAsteriskToRequiredRowsTitle:YES];
+    [self.form setAddAsteriskToRequiredRowsTitle:NO];
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
     
     [super viewDidLoad];
@@ -89,12 +89,12 @@ NSString *const kQ15 = @"q15";
     
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical History: Diabetes Mellitus"];
-    //    section.footerTitle = @"This is a long text that will appear on section footer";
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ1
                                                 rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"1) (a) Has a western-trained doctor ever told you that you have diabetes?"];
+                                                  title:@"1) (a) Has a western-trained doctor ever told you that you have diabetes? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
@@ -112,6 +112,7 @@ NSString *const kQ15 = @"q15";
     XLFormRowDescriptor *hasCheckedBloodQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ2
                                                                                      rowType:XLFormRowDescriptorTypeInfo
                                                                                        title:@"If no to (a), have you checked your blood sugar in the past 3 years?"];
+    [self setDefaultFontWithRow:hasCheckedBloodQRow];
     hasCheckedBloodQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     hasCheckedBloodQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformedRow];
     [section addFormRow:hasCheckedBloodQRow];
@@ -134,6 +135,7 @@ NSString *const kQ15 = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ3
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If yes to (a), are you seeing your doctor regularly for your diabetes?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
@@ -152,6 +154,7 @@ NSString *const kQ15 = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ4
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If yes to (a), are you currently prescribed medication for your diabetes?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
@@ -170,6 +173,7 @@ NSString *const kQ15 = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ5
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"If yes to (a), are you taking your diabetes meds regularly? (≥ 90% of time)"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
@@ -198,16 +202,17 @@ NSString *const kQ15 = @"q15";
     
     // Hyperlipidemia - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical History: Hyperlipidemia"];
-    //    section.footerTitle = @"This is a long text that will appear on section footer";
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ6
                                                 rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Has a western-trained doctor ever told you that you have high cholesterol?"];
+                                                  title:@"Has a western-trained doctor ever told you that you have high cholesterol? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
     XLFormRowDescriptor *hasInformed = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    [self setDefaultFontWithRow:hasInformed];
     hasInformed.selectorOptions = @[@"YES", @"NO"];
     hasInformed.required = YES;
     
@@ -221,6 +226,7 @@ NSString *const kQ15 = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ7
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Have you checked your blood cholesterol in the past 3 years?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
     [section addFormRow:row];
@@ -245,6 +251,7 @@ NSString *const kQ15 = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ8
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Are you seeing your doctor regularly? (regular = every 6 mths or less, or as per doctor scheduled to follow up)"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
     [section addFormRow:row];
@@ -263,6 +270,7 @@ NSString *const kQ15 = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ9
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Are you curently prescribed medication for your high cholesterol?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
     [section addFormRow:row];
@@ -281,12 +289,14 @@ NSString *const kQ15 = @"q15";
     XLFormRowDescriptor *takeRegularlyQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ10
                                                                                    rowType:XLFormRowDescriptorTypeInfo
                                                                                      title:@"Are you taking your cholesterol medication regularly?"];
+    [self setDefaultFontWithRow:takeRegularlyQRow];
     takeRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
     [section addFormRow:takeRegularlyQRow];
     
     // Segmented Control
     XLFormRowDescriptor *takeRegularlyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    [self setDefaultFontWithRow:row];
     takeRegularlyRow.selectorOptions = @[@"YES", @"NO"];
     
     //value
@@ -339,11 +349,13 @@ NSString *const kQ15 = @"q15";
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ1
                                                 rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Has a western-trained doctor ever told you that you have high BP?"];
+                                                  title:@"Has a western-trained doctor ever told you that you have high BP? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
     XLFormRowDescriptor *hasInformed_HT = [XLFormRowDescriptor formRowDescriptorWithTag:kHTHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    [self setDefaultFontWithRow:row];
     hasInformed_HT.selectorOptions = @[@"YES", @"NO"];
     hasInformed_HT.required = YES;
 
@@ -357,11 +369,13 @@ NSString *const kQ15 = @"q15";
     XLFormRowDescriptor *checkedBPQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ2
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Have you checked your BP in the last 1 year?"];
+    [self setDefaultFontWithRow:checkedBPQRow];
     checkedBPQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
 //    checkedBPQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed_HT];
     [section addFormRow:checkedBPQRow];
 
     XLFormRowDescriptor *checkedBP = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCheckedBp rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    [self setDefaultFontWithRow:checkedBP];
     checkedBP.selectorOptions = @[@"YES", @"NO"];
 
     //value
@@ -375,6 +389,7 @@ NSString *const kQ15 = @"q15";
     XLFormRowDescriptor *seeDocRegularlyQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ3
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Are you seeing your doctor regularly for your high BP?"];
+    [self setDefaultFontWithRow:seeDocRegularlyQRow];
     seeDocRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     seeDocRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
     [section addFormRow:seeDocRegularlyQRow];
@@ -393,11 +408,13 @@ NSString *const kQ15 = @"q15";
     XLFormRowDescriptor *prescribedQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ4
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Are you curently prescribed medication for your high BP?"];
+    [self setDefaultFontWithRow:prescribedQRow];
     prescribedQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     prescribedQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
     [section addFormRow:prescribedQRow];
 
     XLFormRowDescriptor *prescribedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    [self setDefaultFontWithRow:prescribedRow];
     prescribedRow.selectorOptions = @[@"YES", @"NO"];
     prescribedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
 
@@ -411,12 +428,14 @@ NSString *const kQ15 = @"q15";
     XLFormRowDescriptor *takeRegularlyQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ5
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Are you taking your BP medication regularly?"];
+    [self setDefaultFontWithRow:takeRegularlyQRow];
     takeRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
     [section addFormRow:takeRegularlyQRow];
 
     // Segmented Control
     XLFormRowDescriptor *takeRegularlyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHTTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    [self setDefaultFontWithRow:takeRegularlyRow];
     takeRegularlyRow.selectorOptions = @[@"YES", @"NO"];
 
     //value
@@ -467,6 +486,7 @@ NSString *const kQ15 = @"q15";
     XLFormRowDescriptor* phqQ1Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ1
                                                 rowType:XLFormRowDescriptorTypeStepCounter
                                                   title:@"Score for PHQ-2 question 1"];
+    [self setDefaultFontWithRow:phqQ1Row];
     phqQ1Row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [phqQ1Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
     [phqQ1Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
@@ -477,6 +497,7 @@ NSString *const kQ15 = @"q15";
     XLFormRowDescriptor* phqQ2Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ2
                                                 rowType:XLFormRowDescriptorTypeStepCounter
                                                   title:@"Score for PHQ-2 question 2"];
+    [self setDefaultFontWithRow:phqQ2Row];
     phqQ2Row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [phqQ2Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
     [phqQ2Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
@@ -487,6 +508,7 @@ NSString *const kQ15 = @"q15";
     XLFormRowDescriptor* phq9ScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhq9Score
                                                 rowType:XLFormRowDescriptorTypeNumber
                                                   title:@"Total score for PHQ-9"];
+    [self setDefaultFontWithRow:phq9ScoreRow];
     phq9ScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     phq9ScoreRow.disabled = @(1);
     [section addFormRow:phq9ScoreRow];
@@ -518,6 +540,7 @@ NSString *const kQ15 = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpReq
                                                 rowType:XLFormRowDescriptorTypeBooleanSwitch
                                                   title:@"Does resident require further follow up?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
@@ -534,28 +557,32 @@ NSString *const kQ15 = @"q15";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabeticFriend
                                                 rowType:XLFormRowDescriptorTypeBooleanSwitch
-                                                  title:@"Do you have a first degree relative with diabetes mellitus?"];
+                                                  title:@"Do you have a first degree relative with diabetes mellitus? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDelivered4kgOrGestational
                                                 rowType:XLFormRowDescriptorTypeBooleanSwitch
-                                                  title:@"Have you delivered a baby 4 kg or more; or were previously diagnosed with gestational diabetes mellitus?"];
+                                                  title:@"Have you delivered a baby 4 kg or more; or were previously diagnosed with gestational diabetes mellitus? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCardioHistory
                                                 rowType:XLFormRowDescriptorTypeBooleanSwitch
-                                                  title:@"Do you have a history of cardiovascular disease (heart/vascular problems e.g. angina, myocardial infarction, aneurysms)?"];
+                                                  title:@"Do you have a history of cardiovascular disease (heart/vascular problems e.g. angina, myocardial infarction, aneurysms)? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmoke
                                                 rowType:XLFormRowDescriptorTypeBooleanSwitch
-                                                  title:@"Do you smoke?"];
+                                                  title:@"Do you smoke? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.required = YES;
     [section addFormRow:row];
@@ -563,6 +590,20 @@ NSString *const kQ15 = @"q15";
     return [super initWithForm:formDescriptor];
 }
 
+
+#pragma mark - UIFont methods
+- (void) setDefaultFontWithRow: (XLFormRowDescriptor *) row {
+    UIFont *font = [UIFont fontWithName:DEFAULT_FONT_NAME size:DEFAULT_FONT_SIZE];
+    UIFont *boldedFont = [self boldFontWithFont:font];
+    [row.cellConfig setObject:boldedFont forKey:@"textLabel.font"];
+}
+
+- (UIFont *)boldFontWithFont:(UIFont *)font
+{
+    UIFontDescriptor * fontD = [font.fontDescriptor
+                                fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+    return [UIFont fontWithDescriptor:fontD size:0];
+}
 //
 //- (void) saveDiabetesMellitus {
 //    NSDictionary *fields = [self.form formValues];

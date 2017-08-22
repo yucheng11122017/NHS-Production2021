@@ -15,6 +15,7 @@
 
 NSString *const kResidentAge = @"resident_age";
 NSString *const kNeedSERI = @"need_seri";
+NSString *const kQualifyCHAS = @"qualify_chas";
 NSString *const kQualifyColonsc = @"qualify_colonsc";
 NSString *const kQualifyMammo = @"qualify_mammo";
 NSString *const kQualifyFIT = @"qualify_fit";
@@ -333,6 +334,8 @@ NSString *const kVaDone = @"va_done";
 NSString *const kVa = @"va";
 NSString *const kVaSnellenOd = @"va_snellen_od";
 NSString *const kVaLogmarOd = @"va_logmar_od";
+NSString *const kVaSnellenOs = @"va_snellen_os";
+NSString *const kVaLogmarOs = @"va_logmar_os";
 NSString *const kPinSnellenOd = @"pin_snellen_od";
 NSString *const kPinLogmarOd = @"pin_logmar_od";
 NSString *const kPinSnellenOs = @"pin_snellen_os";
@@ -433,6 +436,11 @@ NSString *const kFollowUp = @"follow_up";
 NSString *const kEyeSpecRef = @"eye_spec_ref";
 NSString *const kNonUrgentRefMths = @"non_urgent_ref_mths";
 NSString *const kDiagComment = @"diag_comment";
+
+//Just for the questions sake
+NSString *const kDiagnosisOd = @"diagnosis_od";
+NSString *const kDiagnosisOs = @"diagnosis_os";
+
 
 #pragma mark - Fall Risk Assessment
 

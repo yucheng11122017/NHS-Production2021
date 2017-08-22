@@ -81,7 +81,7 @@
         <scene sceneID="ONk-W0-KvO">
             <objects>
                 <navigationController id="VRC-uk-dfE" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="EE7-Mo-03T">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="EE7-Mo-03T">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -97,7 +97,7 @@
         <scene sceneID="ghv-Tl-EhR">
             <objects>
                 <navigationController id="4hd-Bl-fwT" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="aX3-Fq-m5k">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="aX3-Fq-m5k">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -122,7 +122,7 @@
                                 <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ybJ-s1-0Jk" id="AD4-wi-PxG">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -359,7 +359,7 @@
         <scene sceneID="5uC-Ep-V9e">
             <objects>
                 <navigationController id="6lt-nE-hrg" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="5Ly-Fg-5bi">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="5Ly-Fg-5bi">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -492,7 +492,6 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <segue destination="nRG-LZ-Hpk" kind="show" identifier="NewScreeningFormSegue" id="Lod-au-JK3"/>
                         <segue destination="6lt-nE-hrg" kind="presentation" identifier="SelectPreRegSegue" id="dvx-gg-8NF"/>
                         <segue destination="Rmh-CE-vE7" kind="show" identifier="showSelectProfileTableVC" id="gep-8f-DgT"/>
                     </connections>
@@ -610,11 +609,12 @@
                         <segue destination="AnT-Sf-0o0" kind="show" identifier="ScreeningSectionToSummaryPageSegue" id="r8t-KI-lSO"/>
                         <segue destination="uR5-Fz-HYV" kind="show" identifier="sectionToHARSSegue" id="8Kp-zN-PFp"/>
                         <segue destination="qsH-2F-Qlj" kind="show" identifier="screenSectionToSocialWorkSegue" id="DBp-7a-Jbo"/>
+                        <segue destination="ZLK-YH-8Fj" kind="show" identifier="screeningSectionToSeriSubsectionSegue" id="rvG-bt-hxs"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="p9q-dF-195" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2210" y="1336"/>
+            <point key="canvasLocation" x="2242" y="1340"/>
         </scene>
         <!--Root View Controller-->
         <scene sceneID="me8-8y-DzS">
@@ -667,7 +667,7 @@
         <scene sceneID="fGs-Jp-ddu">
             <objects>
                 <navigationController id="m5X-8q-vBA" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="lh1-zx-sf6">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="lh1-zx-sf6">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -696,6 +696,55 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2xD-9v-bZp" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3026" y="1418"/>
+        </scene>
+        <!--Seri Subsection TableVC-->
+        <scene sceneID="WQ0-mD-dwI">
+            <objects>
+                <tableViewController id="ZLK-YH-8Fj" customClass="SeriSubsectionTableVC" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="TbK-GC-s3j">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="406-0a-AAf">
+                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="406-0a-AAf" id="2QI-y9-e9g">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="ZLK-YH-8Fj" id="a8w-BJ-Goa"/>
+                            <outlet property="delegate" destination="ZLK-YH-8Fj" id="3Hm-rK-7wo"/>
+                        </connections>
+                    </tableView>
+                    <connections>
+                        <segue destination="PIW-Kh-TA6" kind="show" identifier="seriSectionToFormSegue" id="DT8-cd-nG7"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xvo-HA-l5Q" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3872" y="1325"/>
+        </scene>
+        <!--Seri FormVC-->
+        <scene sceneID="TQH-5X-9aZ">
+            <objects>
+                <viewController id="PIW-Kh-TA6" customClass="SeriFormVC" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="nCJ-mn-xpE"/>
+                        <viewControllerLayoutGuide type="bottom" id="BXf-OR-qzA"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="9Ss-wh-uAQ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="2Nc-wq-crU" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4843" y="1334"/>
         </scene>
         <!--Health Assess And Risk TableVC-->
         <scene sceneID="dYc-Z1-thX">
@@ -1062,6 +1111,14 @@
                                     <action selector="goToPage:" destination="tkH-eR-TYk" eventType="valueChanged" id="SSn-Gm-SkF"/>
                                 </connections>
                             </pageControl>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yc5-Xb-NVT">
+                                <rect key="frame" x="223" y="270" width="22" height="22"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="infoBtnPressed:" destination="tkH-eR-TYk" eventType="touchUpInside" id="RIu-e2-Ujs"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -1090,9 +1147,8 @@
         <image name="camscannerIcon" width="100" height="100"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="EDv-zZ-nX6"/>
-        <segue reference="dqs-tI-c0S"/>
         <segue reference="2e3-ut-INl"/>
-        <segue reference="Lod-au-JK3"/>
+        <segue reference="dqs-tI-c0S"/>
+        <segue reference="EDv-zZ-nX6"/>
     </inferredMetricsTieBreakers>
 </document>

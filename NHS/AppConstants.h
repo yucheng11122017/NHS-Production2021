@@ -12,18 +12,19 @@
 
 #define DEFAULT_FONT_SIZE 15
 #define DEFAULT_FONT_NAME @"AppleSDGothicNeo-Regular"
+#define DEFAULT_ROW_HEIGHT_FOR_SECTIONS 70.0
 
 #pragma mark - UserDefaults
 
 extern NSString *const kResidentAge;
 extern NSString *const kNeedSERI;
+extern NSString *const kQualifyCHAS;
 extern NSString *const kQualifyColonsc;
 extern NSString *const kQualifyMammo;
 extern NSString *const kQualifyFIT;
 extern NSString *const kQualifyPapSmear;
 extern NSString *const kQualifyFallAssess;
 extern NSString *const kQualifyDementia;
-
 
 /*
  * Form Constants
@@ -335,6 +336,8 @@ extern NSString *const kVaDone;
 extern NSString *const kVa;
 extern NSString *const kVaSnellenOd;
 extern NSString *const kVaLogmarOd;
+extern NSString *const kVaSnellenOs;
+extern NSString *const kVaLogmarOs;
 extern NSString *const kPinSnellenOd;
 extern NSString *const kPinLogmarOd;
 extern NSString *const kPinSnellenOs;
@@ -435,6 +438,10 @@ extern NSString *const kFollowUp;
 extern NSString *const kEyeSpecRef;
 extern NSString *const kNonUrgentRefMths;
 extern NSString *const kDiagComment;
+
+//Just for the questions sake
+extern NSString *const kDiagnosisOd;
+extern NSString *const kDiagnosisOs;
 
 #pragma mark - Fall Risk Assessment
 

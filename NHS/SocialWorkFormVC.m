@@ -71,6 +71,7 @@
     
     
     XLFormRowDescriptor *copeFinancialRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCopeFin rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Are you able to cope financially?"];
+    [self setDefaultFontWithRow:copeFinancialRow];
     copeFinancialRow.selectorOptions = @[@"Yes", @"No"];
     copeFinancialRow.required = YES;
     copeFinancialRow.value = @"Yes";
@@ -78,6 +79,7 @@
     [section addFormRow:copeFinancialRow];
     
     XLFormRowDescriptor *whyNotCopeFinanRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWhyNotCopeFin rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"If not, why?"];
+    [self setDefaultFontWithRow:whyNotCopeFinanRow];
     whyNotCopeFinanRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Medical Expenses"],
                                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Housing Rent"],
                                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Arrears/Debts"],
@@ -104,60 +106,22 @@
 //        }
 //    };
     XLFormRowDescriptor *whatYouHaveRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"what_you_have" rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Do you have the following?"];
+    [self setDefaultFontWithRow:whatYouHaveRow];
     whatYouHaveRow.selectorOptions = @[@"Community Health Assist Scheme", @"Pioneer Generation Package", @"Medisave", @"Insurance Coverage", @"CPF Pay Outs"];
     whatYouHaveRow.required = YES;
     [section addFormRow:whatYouHaveRow];
     
-    
-
-    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeInfo title:@"Do you have the following?"];
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHasChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Community Health Assist Scheme"];
-//    row.required = YES;
-//    [row.cellConfig setObject:[UIFont systemFontOfSize:12] forKey:@"textLabel.font"];   //the description too
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHasPgp rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Pioneer Generation Package"];
-//    row.required = YES;
-//    [row.cellConfig setObject:[UIFont systemFontOfSize:12] forKey:@"textLabel.font"];   //the description too
-//    [section addFormRow:row];
-//    
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHasMedisave rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Medisave"];
-//    row.required = YES;
-//    [row.cellConfig setObject:[UIFont systemFontOfSize:12] forKey:@"textLabel.font"];   //the description too
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHasInsure rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Insurance coverage	"];
-//    row.required = YES;
-//    [row.cellConfig setObject:[UIFont systemFontOfSize:12] forKey:@"textLabel.font"];   //the description too
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHasCpfPayouts rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"CPF Pay Outs"];
-//    row.required = YES;
-//    [row.cellConfig setObject:[UIFont systemFontOfSize:12] forKey:@"textLabel.font"];   //the description too
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCpfAmt rowType:XLFormRowDescriptorTypeNumber
-//                                                  title:@"If yes, Amount:$ "];
-//    row.required = YES;
-//    [row.cellConfig setObject:[UIFont systemFontOfSize:12] forKey:@"textLabel.font"];   //the description too
-//    [section addFormRow:row];
-//    
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//
-    XLFormRowDescriptor *cpfAmtRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCpfAmt
+        XLFormRowDescriptor *cpfAmtRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCpfAmt
                                                                                    rowType:XLFormRowDescriptorTypeNumber
                                                                                      title:@"CPF Payouts amount: $"];
+    [self setDefaultFontWithRow:cpfAmtRow];
     cpfAmtRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     cpfAmtRow.required = NO;
     cpfAmtRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'CPF Pay Outs'", whatYouHaveRow];
     [section addFormRow:cpfAmtRow];
     
     XLFormRowDescriptor *receiveFinAssistRow = [XLFormRowDescriptor formRowDescriptorWithTag:kReceivingFinAssist rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Are you receiving any form of social/financial assistance?"];
+    [self setDefaultFontWithRow:receiveFinAssistRow];
     receiveFinAssistRow.required = YES;
     receiveFinAssistRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     [section addFormRow:receiveFinAssistRow];
@@ -167,26 +131,31 @@
     finanAssistSection.hidden = @(1); //default hidden
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFinAssistName rowType:XLFormRowDescriptorTypeText title:@"Name"];
+    [self setDefaultFontWithRow:row];
     row.required = NO;
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     [finanAssistSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFinAssistOrg rowType:XLFormRowDescriptorTypeText title:@"Organisation"];
+    [self setDefaultFontWithRow:row];
     row.required = NO;
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     [finanAssistSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFinAssistAmt rowType:XLFormRowDescriptorTypeText title:@"Amount"];
+    [self setDefaultFontWithRow:row];
     row.required = NO;
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     [finanAssistSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFinAssistPeriod rowType:XLFormRowDescriptorTypeText title:@"Period"];
+    [self setDefaultFontWithRow:row];
     row.required = NO;
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     [finanAssistSection addFormRow:row];
 
     XLFormRowDescriptor *finAssistEnufRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFinAssistEnuf rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has the assistance rendered been sufficient?"];
+    [self setDefaultFontWithRow:finAssistEnufRow];
     finAssistEnufRow.required = NO;
     finAssistEnufRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     [finanAssistSection addFormRow:finAssistEnufRow];
@@ -221,6 +190,7 @@
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSocSvcAware rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Are you aware of the social services available in your area?"];
+    [self setDefaultFontWithRow:row];
     row.required = NO;
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     [section addFormRow:row];
@@ -246,9 +216,12 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1"
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"Can you perform the following activities without assistance? (Tick those activities that the resident CAN perform on his/her own)."];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"multiple_ADL" rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Activities"];
+    [self setDefaultFontWithRow:row];
     row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Bathe/Shower"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Dress"],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Eat"],
@@ -260,18 +233,21 @@
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Mobility Status"];
+    [self setDefaultFontWithRow:row];
     [formDescriptor addFormSection:section];
     
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kMobilityStatus
                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                  title:@"Mobility Status"];
+    [self setDefaultFontWithRow:row];
     row.selectorOptions = @[@"Ambulant", @"Able to walk with assistance (stick/frame)", @"Wheelchair-bound", @"Bed-ridden"];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kMobilityEquipment
                                                 rowType:XLFormRowDescriptorTypeBooleanSwitch
                                                   title:@"Do you require mobility equipment in your household? (e.g. non-slip mat, handle bar, etc)"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
@@ -549,6 +525,7 @@
     [formDescriptor addFormSection:hasPriCaregiversection];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1" rowType:XLFormRowDescriptorTypeInfo title:@"Do you have a Primary Caregiver?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [hasPriCaregiversection addFormRow:row];
 
@@ -567,14 +544,17 @@
     [formDescriptor addFormSection:careGiverSection];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverName rowType:XLFormRowDescriptorTypeName title:@"Name"];
+    [self setDefaultFontWithRow:row];
 //    row.value = [socialSuppAssessmentDict objectForKey:kCaregiverName];
     [careGiverSection addFormRow:row];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverRs rowType:XLFormRowDescriptorTypeText title:@"Relationship"];
+    [self setDefaultFontWithRow:row];
 //    row.value = [socialSuppAssessmentDict objectForKey:kCaregiverRs];
     [careGiverSection addFormRow:row];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverContactNum rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    [self setDefaultFontWithRow:row];
 //    row.value = [socialSuppAssessmentDict objectForKey:kCaregiverContactNum];
     [careGiverSection addFormRow:row];
 
@@ -583,6 +563,7 @@
     [formDescriptor addFormSection:askEmerContactSection];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q2" rowType:XLFormRowDescriptorTypeInfo title:@"Do you have any emergency contact person?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [askEmerContactSection addFormRow:row];
     XLFormRowDescriptor *hasEmerContactRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEContact rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
@@ -600,14 +581,17 @@
     [formDescriptor addFormSection:EmerContactSection];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactName rowType:XLFormRowDescriptorTypeName title:@"Name"];
+    [self setDefaultFontWithRow:row];
 //    row.value = [socialSuppAssessmentDict objectForKey:kEContactName];
     [EmerContactSection addFormRow:row];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactRs rowType:XLFormRowDescriptorTypeText title:@"Relationship"];
+    [self setDefaultFontWithRow:row];
 //    row.value = [socialSuppAssessmentDict objectForKey:kEContactRs];
     [EmerContactSection addFormRow:row];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactNum rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    [self setDefaultFontWithRow:row];
 //    row.value = [socialSuppAssessmentDict objectForKey:kEContactNum];
     [EmerContactSection addFormRow:row];
     
@@ -616,6 +600,7 @@
     [formDescriptor addFormSection:hasCaregivingSection];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q3" rowType:XLFormRowDescriptorTypeInfo title:@"Are you a caregiver for somebody else?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [hasCaregivingSection addFormRow:row];
     
@@ -627,16 +612,17 @@
     
     //Details of being a caregiver
     XLFormSectionDescriptor *caregivingSection = [XLFormSectionDescriptor formSectionWithTitle:@"Caregiving Details"];
-    
     caregivingSection.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasCaregivingRow];
     [formDescriptor addFormSection:caregivingSection];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kUCareStress rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Are you facing caregiver stress?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     //    row.value = [socialSuppAssessmentDict objectForKey:kEContactName];
     [caregivingSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q4" rowType:XLFormRowDescriptorTypeInfo title:@"Describe your caregiving responsibilities (e.g. frequency, caregiving tasks)"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [caregivingSection addFormRow:row];
     
@@ -644,10 +630,12 @@
     [caregivingSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregivingAssist rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Would you like to receive caregiving assistance?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [caregivingSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q5" rowType:XLFormRowDescriptorTypeInfo title:@"If yes, Type of assistance preferred:"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [caregivingSection addFormRow:row];
     
@@ -661,6 +649,7 @@
     [formDescriptor addFormSection:section];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q3" rowType:XLFormRowDescriptorTypeInfo title:@"Are you getting support from your family/relatives/friends?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     XLFormRowDescriptor *getSupportRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGettingSupport rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
@@ -674,6 +663,7 @@
     [section addFormRow:getSupportRow];
 
     XLFormRowDescriptor *multiSupportRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_support" rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Support in terms of:"];
+    [self setDefaultFontWithRow:multiSupportRow];
     multiSupportRow.hidden =[NSString stringWithFormat:@"NOT $%@.value contains 'YES'", getSupportRow];
     multiSupportRow.selectorOptions = @[@"Care-giving", @"Food", @"Money", @"Others"];
 
@@ -682,6 +672,7 @@
     [section addFormRow:multiSupportRow];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"support_others" rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    [self setDefaultFontWithRow:row];
     [row.cellConfigAtConfigure setObject:@"Specify here" forKey:@"textField.placeholder"];
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", multiSupportRow];
 //    row.value = [socialSuppAssessmentDict objectForKey:kSupportOthers];
@@ -695,6 +686,7 @@
     [formDescriptor addFormSection:section];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q4" rowType:XLFormRowDescriptorTypeInfo title:@"How many relatives do you see or hear from at least once a month? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
@@ -718,6 +710,7 @@
     [section addFormRow:relativesContactRow];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q5" rowType:XLFormRowDescriptorTypeInfo title:@"How many relatives do you feel at ease with that you can talk about private matters? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
 
@@ -740,6 +733,7 @@
     [section addFormRow:relativesEaseRow];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q6" rowType:XLFormRowDescriptorTypeInfo title:@"How many relatives do you feel close to such that you could call on them for help? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     relativesCloseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kRelativesClose rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
@@ -766,6 +760,7 @@
     [formDescriptor addFormSection:section];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q7" rowType:XLFormRowDescriptorTypeInfo title:@"How many friends do you see or hear from at least once a month? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     friendsContactRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsContact rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
@@ -787,6 +782,7 @@
     [section addFormRow:friendsContactRow];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q8" rowType:XLFormRowDescriptorTypeInfo title:@"How many friends do you feel at ease with that you can talk about private matters? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     friendsEaseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsEase rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
@@ -808,6 +804,7 @@
     [section addFormRow:friendsEaseRow];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q9" rowType:XLFormRowDescriptorTypeInfo title:@"How many of your friends do you feel close to such that you could call on them for help? *"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     friendsCloseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFriendsClose rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
@@ -837,6 +834,7 @@
     [section addFormRow:row];
 
     socialScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSocialScore rowType:XLFormRowDescriptorTypeText title:@"Computed Social Score"];
+    [self setDefaultFontWithRow:row];
     socialScoreRow.disabled = @(1);
     socialScoreRow.cellConfig[@"textLabel.textColor"] = [UIColor blackColor];
     socialScoreRow.cellConfig[@"textField.textColor"] = [UIColor blueColor];
@@ -850,69 +848,11 @@
 
     [section addFormRow:socialScoreRow];
 
-    //MEASURING LONELINESS
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@"Measuring Loneliness"];
-//    [formDescriptor addFormSection:section];
-
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q10" rowType:XLFormRowDescriptorTypeInfo title:@"How often do you feel lack of companionship? *"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLackCompan rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
-//    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Hardly Ever"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Sometimes"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Often"]];
-//    row.required = YES;
-
-    //value
-//    options = row.selectorOptions;
-//    if (![[socialSuppAssessmentDict objectForKey:kLackCompan] isEqualToString:@""]) {
-//        int index = [[socialSuppAssessmentDict objectForKey:kLackCompan] intValue];
-//        row.value = [options objectAtIndex:index];
-//    }
-
-//    [section addFormRow:row];
-
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q11" rowType:XLFormRowDescriptorTypeInfo title:@"How often do you feel left out? *"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelLeftOut rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
-//    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Hardly Ever"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Sometimes"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Often"]];
-//    row.required = YES;
-
-    //value
-//    options = row.selectorOptions;
-//    if (![[socialSuppAssessmentDict objectForKey:kFeelLeftOut] isEqualToString:@""]) {
-//        int index = [[socialSuppAssessmentDict objectForKey:kFeelLeftOut] intValue];
-//        row.value = [options objectAtIndex:index];
-//    }
-
-//    [section addFormRow:row];
-
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q12" rowType:XLFormRowDescriptorTypeInfo title:@"How often do you feel isolated from others? *"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelIsolated rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
-//    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Hardly Ever"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Sometimes"],
-//                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Often"]];
-//    row.required = YES;
-
-    //value
-//    options = row.selectorOptions;
-//    if (![[socialSuppAssessmentDict objectForKey:kFeelIsolated] isEqualToString:@""]) {
-//        int index = [[socialSuppAssessmentDict objectForKey:kFeelIsolated] intValue];
-//        row.value = [options objectAtIndex:index];
-//    }
-//
-//    [section addFormRow:row];
-
-    //Last part
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q14" rowType:XLFormRowDescriptorTypeInfo title:@"Do you participate in any community activities?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
@@ -928,6 +868,7 @@
     
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q15" rowType:XLFormRowDescriptorTypeInfo title:@"If yes, where do you participate in such activities?"];
+    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", gotCommActivitiesRow];
     [section addFormRow:row];
@@ -942,6 +883,7 @@
     [section addFormRow:multiOrgActivitiesRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHostOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
+    [self setDefaultFontWithRow:row];
     row.required = NO;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", multiOrgActivitiesRow];
     //    row.value = [socialSuppAssessmentDict objectForKey:@"others_text"];
@@ -950,6 +892,7 @@
     
     
     XLFormRowDescriptor *multiNoCommActivRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_why_not_comm_activities" rowType:XLFormRowDescriptorTypeMultipleSelector title:@"If no, why not?"];
+    [self setDefaultFontWithRow:multiNoCommActivRow];
     multiNoCommActivRow.selectorOptions = @[@"Don't know", @"Don't like", @"Mobility Issues", @"Others"];
     multiNoCommActivRow.hidden = @YES;
     gotCommActivitiesRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
@@ -963,6 +906,7 @@
     [section addFormRow:multiNoCommActivRow];
     
     XLFormRowDescriptor *NoCommActivOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"why_not_comm_activities_others" rowType:XLFormRowDescriptorTypeTextView title:@"Others:"];
+    [self setDefaultFontWithRow:NoCommActivOthersRow];
     [NoCommActivOthersRow.cellConfigAtConfigure setObject:@"Please elaborate more..." forKey:@"textView.placeholder"];
     NoCommActivOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", multiNoCommActivRow];
     
@@ -987,6 +931,7 @@
 
     
     XLFormRowDescriptor *symptomPsychRow = [XLFormRowDescriptor formRowDescriptorWithTag:kIsPsychotic rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does the resident exhibit symptoms of psychotic disorders (i.e. bipolar disorder, schizophrenia)?"];
+    [self setDefaultFontWithRow:symptomPsychRow];
     symptomPsychRow.required = YES;
     symptomPsychRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:symptomPsychRow];
@@ -1010,6 +955,7 @@
     [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *suicideIdeasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSuicideIdeas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does the resident have/had suicide ideations?"];
+    [self setDefaultFontWithRow:suicideIdeasRow];
     suicideIdeasRow.required = YES;
     suicideIdeasRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:suicideIdeasRow];
@@ -1043,11 +989,13 @@
     
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kBedbug rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Household is suspected/at risk of bedbug infection"];
+    [self setDefaultFontWithRow:row];
     row.required = YES;
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
     XLFormRowDescriptor *bedbugProofRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBedbugOthers rowType:XLFormRowDescriptorTypeMultipleSelector title:@"If yes, select from this checklist:"];
+    [self setDefaultFontWithRow:bedbugProofRow];
     bedbugProofRow.selectorOptions = @[@"Dried scars on body",
                                        @"Hoarding behavior",
                                        @"Itchy bites on skin",
@@ -1060,10 +1008,12 @@
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kBedbugOthersText rowType:XLFormRowDescriptorTypeTextView title:@""];
     [row.cellConfigAtConfigure setObject:@"Specify here" forKey:@"textView.placeholder"];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others (specify in next field)'",bedbugProofRow];
     //    moreWhyNotCopeFinanRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'No'", copeFinancialRow];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"bedbug_other_svs" rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Services required:"];
+    [self setDefaultFontWithRow:row];
     row.selectorOptions = @[@"1. Bedbug eradication services",
                             @"2. Decluttering services"
                             ];
@@ -1083,6 +1033,7 @@
     [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *infoRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1" rowType:XLFormRowDescriptorTypeInfo title:@"Presenting Problems"];
+    [self setDefaultFontWithRow:infoRow];
     infoRow.required = NO;
     [section addFormRow:infoRow];
     
@@ -1111,6 +1062,7 @@
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaseCat rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Follow-up case category"];
+    [self setDefaultFontWithRow:row];
     row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"R1"],
                                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"R2"],
                                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"R3"],
@@ -1123,10 +1075,12 @@
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSwVolName rowType:XLFormRowDescriptorTypeName title:@"Volunteer Name"];
+    [self setDefaultFontWithRow:row];
     row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSwVolContactNum rowType:XLFormRowDescriptorTypePhone title:@"Volunteer Contact No"];
+    [self setDefaultFontWithRow:row];
     row.required = YES;
     [section addFormRow:row];
     
@@ -1290,6 +1244,20 @@
     [self updateFormRow:socialScoreRow];
     
     [self deselectFormRow:sender];
+}
+
+#pragma mark - UIFont methods
+- (void) setDefaultFontWithRow: (XLFormRowDescriptor *) row {
+    UIFont *font = [UIFont fontWithName:DEFAULT_FONT_NAME size:DEFAULT_FONT_SIZE];
+    UIFont *boldedFont = [self boldFontWithFont:font];
+    [row.cellConfig setObject:boldedFont forKey:@"textLabel.font"];
+}
+
+- (UIFont *)boldFontWithFont:(UIFont *)font
+{
+    UIFontDescriptor * fontD = [font.fontDescriptor
+                                fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+    return [UIFont fontWithDescriptor:fontD size:0];
 }
 /*
 #pragma mark - Navigation

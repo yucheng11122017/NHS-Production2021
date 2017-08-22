@@ -407,19 +407,20 @@ typedef enum residentDataSource {
     
 }
 
-
+#pragma mark - Navigation Button
 
 - (IBAction)addBtnPressed:(UIBarButtonItem *)sender {
     [self.retrievedResidentData removeAllObjects];  //clear the dictionary
     
     UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"New screening form", nil)
-                                                                              message:@"Choose one of the options"
+                                                                              message:@""
                                                                        preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"New resident", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
                                                           selectedResidentID = @(-1);
-                                                          [self performSegueWithIdentifier:@"NewScreeningFormSegue" sender:self];
+                                                          _sampleResidentDict = @{};
+                                                          [self performSegueWithIdentifier:@"showSelectProfileTableVC" sender:self];
                                                       }]];
     [self presentViewController:alertController animated:YES completion:^{
         UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
@@ -866,13 +867,6 @@ typedef enum residentDataSource {
 }
 
 - (void) resetAllUserDefaults {
-    NSArray *allUserDefaults = [NSArray arrayWithObjects:kCitizenship, kResidentAge, kGender, kNeighbourhood, kNeedSERI, kQualifyFIT, kQualifyMammo, kQualifyColonsc, kQualifyPapSmear,nil];
-    
-    //clear everything before starting a new patient
-//    for (NSString *str in allUserDefaults) {
-//        [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:str];
-//    }
-    
     NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
     [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
     
@@ -893,6 +887,8 @@ typedef enum residentDataSource {
     [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kGender] forKey:kGender];
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:age] forKey:kResidentAge];
     [[NSUserDefaults standardUserDefaults] setObject:_neighbourhood forKey:kNeighbourhood];
+    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kName] forKey:kName];
+    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kNRIC] forKey:kNRIC];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

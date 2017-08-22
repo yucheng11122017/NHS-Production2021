@@ -8,6 +8,8 @@
 
 #import "ScreeningSelectProfileTableVC.h"
 #import "ResidentParticularsVC.h"
+#import "AppConstants.h"
+
 @interface ScreeningSelectProfileTableVC ()
 
 
@@ -66,6 +68,10 @@
     }
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return DEFAULT_ROW_HEIGHT_FOR_SECTIONS;
+}
+
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
@@ -82,7 +88,16 @@
     } else {
         NSString *text = [_yearlyProfile objectAtIndex:indexPath.row];
         
-        if ([text containsString:@"2018"] || [text containsString:@"2019"]) {
+        NSString *str = [_residentDetails objectForKey:@"resident_id"];
+        
+        BOOL newEntry = str? NO:YES;
+        
+        if([text containsString:@"2017"] && newEntry) {
+            [cell setUserInteractionEnabled:NO];
+            [cell.textLabel setTextColor:[UIColor grayColor]];
+        }
+        else if ([text containsString:@"2018"] || [text containsString:@"2019"]) {
+            [cell setUserInteractionEnabled:NO];
             [cell.textLabel setTextColor:[UIColor grayColor]];
         }
         [cell.textLabel setText:text];

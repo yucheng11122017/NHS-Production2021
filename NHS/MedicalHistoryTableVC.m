@@ -8,6 +8,7 @@
 
 #import "MedicalHistoryTableVC.h"
 #import "HealthAssessAndRiskFormVC.h"
+#import "AppConstants.h"
 @interface MedicalHistoryTableVC () {
     NSNumber *selectedRow;
     
@@ -53,6 +54,10 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [_rowLabelsText count];
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return DEFAULT_ROW_HEIGHT_FOR_SECTIONS;
 }
 
 

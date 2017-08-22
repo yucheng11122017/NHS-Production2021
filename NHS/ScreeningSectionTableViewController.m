@@ -89,7 +89,7 @@ typedef enum sectionRowNumber {
     
 //    self.rowTitles = @[@"Resident Particulars", @"Clinical Results",@"Screening of Risk Factors", @"Diabetes Mellitus", @"Hyperlipidemia", @"Hypertension", @"Cancer Screening", @"Other Medical Issues", @"Primary Care Source", @"My Health and My Neighbourhood", @"Demographics", @"Current Physical Issues", @"Current Socioeconomics Situation", @"Social Support Assessment", @"Referral for Doctor Consultation"];
     
-    self.rowTitles = @[@"Mode of Screening", @"Phlebotomy",@"Profiling", @"Health Assessment & Risk Stratification", @"Social Work", @"Triage", @"Snellen Eye Test", @"Additional Services", @"Doctor's Consultation", @"Basic Dental Check-up", @"SERI Advanced Eye Screening", @"Fall Risk Assessment", @"Geriatric Dementia Asssesment", @"Health Education", @"Not more..."];
+    self.rowTitles = @[@"Mode of Screening", @"Phlebotomy",@"Profiling", @"Health Assessment & Risk Stratification", @"Social Work", @"Triage", @"Snellen Eye Test", @"Additional Services", @"Doctor's Consultation", @"Basic Dental Check-up", @"SERI Advanced Eye Screening", @"Fall Risk Assessment", @"Geriatric Dementia Asssesment", @"Health Education"];
     
      self.clearsSelectionOnViewWillAppear = YES;
     
@@ -152,7 +152,6 @@ typedef enum sectionRowNumber {
     if(section == 0) return [self.rowTitles count];
     else return 1;
 }
-
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *simpleTableIdentifier = @"SimpleTableItem";
@@ -259,7 +258,8 @@ typedef enum sectionRowNumber {
           else if (indexPath.row == BasicDentalCheckup) {
                 selectedRow = [NSNumber numberWithInteger:7];
           } else if (indexPath.row == SeriAdvancedEyeScreening) {
-              selectedRow = [NSNumber numberWithInteger:8];
+              [self performSegueWithIdentifier:@"screeningSectionToSeriSubsectionSegue" sender:self];
+              return;
           } else if (indexPath.row == FallRiskAssessment) {
               selectedRow = [NSNumber numberWithInteger:9];
           } else if (indexPath.row == GeriatricDementiaAssess) {
