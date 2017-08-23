@@ -59,7 +59,7 @@
       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
     
-    NSInteger opCode = 51;
+    NSInteger opCode = 1700;
     NSDictionary *dict = [[NSDictionary alloc]
                           initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     
@@ -117,14 +117,15 @@
     
 }
 
-#pragma mark - Pre-registration methods
+#pragma mark - Resident Particulars
 
-- (void)postPersonalInfoWithDict:(NSDictionary *) personalInfoDict
+//updated
+- (void)postNewResidentWithDict:(NSDictionary *) personalInfoDict
                    progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
                     successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                     andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
     
-    NSInteger opCode = 53;
+    NSInteger opCode = 1701;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     
@@ -133,6 +134,26 @@
     dataDict = @{@"data": personalInfoDict};
     
     NSLog(@"%@", dataDict);
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
+- (void)postDataGivenSectionAndFieldName:(NSDictionary *) dict
+                 progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                  andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 1703;
+    NSDictionary *url = [[NSDictionary alloc]
+                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dataDict;
+    
+    dataDict = @{@"data": dict};
     
     [self POST:[url objectForKey:@"op_code"]
     parameters:dataDict
@@ -596,61 +617,61 @@
 }
 
 #pragma mark - Blood Test API
-- (void) getAllBloodTestResidents:(void (^)(NSProgress *downloadProgress))progressBlock
-                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
-    
-    NSInteger opCode = 403;
-    NSDictionary *url = [[NSDictionary alloc]
-                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+//- (void) getAllBloodTestResidents:(void (^)(NSProgress *downloadProgress))progressBlock
+//                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+//                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+//    
+//    NSInteger opCode = 403;
+//    NSDictionary *url = [[NSDictionary alloc]
+//                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+////    NSDictionary *dataDict;
+//    
+////    dataDict = @{@"data": @{@"resident_id":residentID}};
+//    
+//    [self POST:[url objectForKey:@"op_code"]
+//    parameters:NULL
+//      progress:progressBlock
+//       success:successBlock
+//       failure:[self checkForBadHTTP:failBlock]];
+//}
+//
+//- (void) getBloodTestWithResidentID: (NSNumber *) residentID
+//                     progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+//                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+//                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+//    
+//    NSInteger opCode = 401;
+//    NSDictionary *url = [[NSDictionary alloc]
+//                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
 //    NSDictionary *dataDict;
-    
+//    
 //    dataDict = @{@"data": @{@"resident_id":residentID}};
-    
-    [self POST:[url objectForKey:@"op_code"]
-    parameters:NULL
-      progress:progressBlock
-       success:successBlock
-       failure:[self checkForBadHTTP:failBlock]];
-}
-
-- (void) getBloodTestWithResidentID: (NSNumber *) residentID
-                     progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
-    
-    NSInteger opCode = 401;
-    NSDictionary *url = [[NSDictionary alloc]
-                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict;
-    
-    dataDict = @{@"data": @{@"resident_id":residentID}};
-    
-    [self POST:[url objectForKey:@"op_code"]
-    parameters:dataDict
-      progress:progressBlock
-       success:successBlock
-       failure:[self checkForBadHTTP:failBlock]];
-}
-
-- (void) postBloodTestResultWithDict: (NSDictionary *) dictionary
-                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
-    
-    NSInteger opCode = 402;
-    NSDictionary *url = [[NSDictionary alloc]
-                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
-    NSDictionary *dataDict;
-    
-    dataDict = @{@"data": @{@"blood_test":dictionary}};
-    
-    [self POST:[url objectForKey:@"op_code"]
-    parameters:dataDict
-      progress:progressBlock
-       success:successBlock
-       failure:[self checkForBadHTTP:failBlock]];
-}
+//    
+//    [self POST:[url objectForKey:@"op_code"]
+//    parameters:dataDict
+//      progress:progressBlock
+//       success:successBlock
+//       failure:[self checkForBadHTTP:failBlock]];
+//}
+//
+//- (void) postBloodTestResultWithDict: (NSDictionary *) dictionary
+//                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+//                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+//                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+//    
+//    NSInteger opCode = 402;
+//    NSDictionary *url = [[NSDictionary alloc]
+//                         initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+//    NSDictionary *dataDict;
+//    
+//    dataDict = @{@"data": @{@"blood_test":dictionary}};
+//    
+//    [self POST:[url objectForKey:@"op_code"]
+//    parameters:dataDict
+//      progress:progressBlock
+//       success:successBlock
+//       failure:[self checkForBadHTTP:failBlock]];
+//}
 
 #pragma mark - Follow Up API
 - (void) getAllFollowedUpResidents:(void (^)(NSProgress *downloadProgress))progressBlock

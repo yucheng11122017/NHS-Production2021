@@ -411,7 +411,7 @@ typedef enum residentDataSource {
 
 - (IBAction)addBtnPressed:(UIBarButtonItem *)sender {
     [self.retrievedResidentData removeAllObjects];  //clear the dictionary
-    
+
     UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"New screening form", nil)
                                                                               message:@""
                                                                        preferredStyle:UIAlertControllerStyleAlert];
@@ -420,6 +420,7 @@ typedef enum residentDataSource {
                                                       handler:^(UIAlertAction * action) {
                                                           selectedResidentID = @(-1);
                                                           _sampleResidentDict = @{};
+                                                          [self resetAllUserDefaults];
                                                           [self performSegueWithIdentifier:@"showSelectProfileTableVC" sender:self];
                                                       }]];
     [self presentViewController:alertController animated:YES completion:^{
@@ -431,6 +432,7 @@ typedef enum residentDataSource {
 }
 
 -(void)handleSingleTap:(UITapGestureRecognizer *)sender{
+    
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -778,8 +780,8 @@ typedef enum residentDataSource {
     [self.residentScreenTimestamp removeAllObjects];   //reset this array first
     NSArray *patients;
   
-    if ([_neighbourhood isEqualToString:@"EC"]) {   //kampung glam
-        patients =@[@{@"resident_id":@1,
+    if ([_neighbourhood isEqualToString:@"EC"]) {   //Eunos Crescent
+        patients =@[@{kResidentId:@1,
                       @"resident_name":@"NICHOLAS WONG",
                       kNeighbourhood:@"EC",
                       kGender:@"M",
@@ -788,7 +790,7 @@ typedef enum residentDataSource {
                       @"ts":@"2017-07-01 14:24:24",
                       @"nric":@"S1231234A"
                       },
-                    @{@"resident_id":@2,
+                    @{kResidentId:@2,
                       @"resident_name":@"YOGA KUMAR",
                       kNeighbourhood:@"EC",
                       kBirthDate:@"1962-05-05",
@@ -797,8 +799,8 @@ typedef enum residentDataSource {
                       @"ts":@"2017-07-02 12:42:42",
                       @"nric":@"S3214321B"
                       },
-                    @{@"resident_id":@3,
-                      @"resident_name":@"FOREIGNER MICHELLE",
+                    @{kResidentId:@3,
+                      @"resident_name":@"MICHELLE BUCHANAN",
                       kNeighbourhood:@"EC",
                       kGender:@"F",
                       kBirthDate:@"1947-01-01",
@@ -807,7 +809,7 @@ typedef enum residentDataSource {
                       @"nric":@"G1342231K"
                       }];
     } else {
-        patients =@[@{@"resident_id":@1,
+        patients =@[@{kResidentId:@1,
                       @"resident_name":@"MOHAMMAD YUSOF",
                       kNeighbourhood:@"KGL",
                       kGender:@"M",
@@ -816,8 +818,8 @@ typedef enum residentDataSource {
                       @"ts":@"2017-07-01 14:24:24",
                       @"nric":@"S1231234A"
                       },
-                    @{@"resident_id":@2,
-                      @"resident_name":@"JOSEPH SCHOOLING",
+                    @{kResidentId:@2,
+                      @"resident_name":@"JOSEPH TAN KOK LEONG",
                       kNeighbourhood:@"KGL",
                       kBirthDate:@"1960-05-05",
                       kGender:@"M",
@@ -825,8 +827,8 @@ typedef enum residentDataSource {
                       @"ts":@"2017-07-02 12:42:42",
                       @"nric":@"S3214321B"
                       },
-                    @{@"resident_id":@3,
-                      @"resident_name":@"MICHELLE OBAMA",
+                    @{kResidentId:@3,
+                      @"resident_name":@"MICHELLE HALLABAMA",
                       kNeighbourhood:@"KGL",
                       kGender:@"F",
                       kBirthDate:@"1940-01-01",
@@ -834,7 +836,7 @@ typedef enum residentDataSource {
                       @"ts":@"2017-07-03 08:41:44",
                       @"nric":@"G1342231K"
                       },
-                    @{@"resident_id":@4,
+                    @{kResidentId:@4,
                       @"resident_name":@"WONG AH MEI",
                       kNeighbourhood:@"KGL",
                       kGender:@"F",
@@ -883,6 +885,7 @@ typedef enum residentDataSource {
     
     NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
 
+    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kResidentId] forKey:kResidentId];
     [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kCitizenship] forKey:kCitizenship];
     [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kGender] forKey:kGender];
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:age] forKey:kResidentAge];
@@ -896,10 +899,10 @@ typedef enum residentDataSource {
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     [SVProgressHUD dismiss];
-    if ([segue.destinationViewController respondsToSelector:@selector(setResidentID:)]) {    //view submitted form
-        [segue.destinationViewController performSelector:@selector(setResidentID:)
-                                              withObject:selectedResidentID];
-    }
+//    if ([segue.destinationViewController respondsToSelector:@selector(setResidentID:)]) {    //view submitted form
+//        [segue.destinationViewController performSelector:@selector(setResidentID:)
+//                                              withObject:selectedResidentID];
+//    }
     
     if ([self.retrievedResidentData count]) {
         [segue.destinationViewController performSelector:@selector(setRetrievedData:)

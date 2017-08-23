@@ -45,12 +45,17 @@
                         andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
 
-#pragma mark - Pre-Registration
+#pragma mark - Resident Particulars
 
-- (void)postPersonalInfoWithDict:(NSDictionary *) personalInfoDict
+- (void)postNewResidentWithDict:(NSDictionary *) personalInfoDict
                      progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+
+- (void)postDataGivenSectionAndFieldName:(NSDictionary *) dict
+                           progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+                            successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+                            andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
 - (void)postSpokenLangWithDict:(NSDictionary *) spokenLangDict
                   progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
@@ -170,19 +175,19 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
 
 
 #pragma mark - Blood Test API
-- (void) getAllBloodTestResidents:(void (^)(NSProgress *downloadProgress))progressBlock
-                     successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                     andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) getBloodTestWithResidentID: (NSNumber *) residentID
-                      progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postBloodTestResultWithDict: (NSDictionary *) dictionary
-                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+//- (void) getAllBloodTestResidents:(void (^)(NSProgress *downloadProgress))progressBlock
+//                     successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+//                     andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+//
+//- (void) getBloodTestWithResidentID: (NSNumber *) residentID
+//                      progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+//                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+//                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+//
+//- (void) postBloodTestResultWithDict: (NSDictionary *) dictionary
+//                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+//                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+//                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
 #pragma mark - Follow Up API
 - (void) getAllFollowedUpResidents:(void (^)(NSProgress *downloadProgress))progressBlock

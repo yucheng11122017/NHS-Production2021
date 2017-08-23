@@ -9,11 +9,20 @@
 #import <XLForm/XLForm.h>
 #import "XLFormViewController.h"
 
-@interface ResidentParticularsVC : XLFormViewController
+@interface ResidentParticularsVC : XLFormViewController <XLFormViewControllerDelegate>
 
 @property (strong, nonatomic) NSDictionary* residentParticularsDict;
+@property (strong, nonatomic) NSNumber * loadDataFlag;
 
 // Public Methods
 - (void) setResidentParticularsDict:(NSDictionary *)residentParticularsDict;
+- (void) setLoadDataFlag:(NSNumber*) loadDataFlag;
+
+
+typedef enum patientDataSource {
+    server,
+    local
+} patientDataSource;
+
 
 @end

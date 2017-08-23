@@ -162,7 +162,7 @@ NSString *const kFit = @"fit";
         //    }
         [self.tableView endEditing:YES];
         [SVProgressHUD showWithStatus:@"Uploading..."];
-        [self submitBloodTestResult:[self prepareBloodTestDict]];
+//        [self submitBloodTestResult:[self prepareBloodTestDict]];
         
         [button setTitle:@"Edit"];
     }
@@ -193,20 +193,20 @@ NSString *const kFit = @"fit";
 
     [self.tableView endEditing:YES];
     [SVProgressHUD showWithStatus:@"Uploading..."];
-    [self submitBloodTestResult:[self prepareBloodTestDict]];
+//    [self submitBloodTestResult:[self prepareBloodTestDict]];
 }
 
 
 #pragma mark -
 
 #pragma mark Submission
-- (void) submitBloodTestResult:(NSDictionary *) dict {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client postBloodTestResultWithDict:dict
-                       progressBlock:[self progressBlock]
-                        successBlock:[self successBlock]
-                        andFailBlock:[self errorBlock]];
-}
+//- (void) submitBloodTestResult:(NSDictionary *) dict {
+//    ServerComm *client = [ServerComm sharedServerCommInstance];
+//    [client postBloodTestResultWithDict:dict
+//                       progressBlock:[self progressBlock]
+//                        successBlock:[self successBlock]
+//                        andFailBlock:[self errorBlock]];
+//}
 
 #pragma mark - Blocks
 

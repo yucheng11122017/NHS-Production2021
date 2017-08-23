@@ -439,10 +439,10 @@ typedef enum preRegSection {
 #pragma mark - Post data to server methods
 - (void) submitPersonalInfo:(NSDictionary *) dict {
     ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client postPersonalInfoWithDict:dict
-                       progressBlock:[self progressBlock]
-                        successBlock:[self personalInfoSuccessBlock]
-                        andFailBlock:[self errorBlock]];
+//    [client postPersonalInfoWithDict:dict
+//                       progressBlock:[self progressBlock]
+//                        successBlock:[self personalInfoSuccessBlock]
+//                        andFailBlock:[self errorBlock]];
 }
 
 - (void)submitOtherSections:(NSNotification *) notification{

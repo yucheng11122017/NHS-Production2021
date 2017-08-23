@@ -23,12 +23,20 @@ NSString *const kQualifyPapSmear = @"qualify_pap_smear";
 NSString *const kQualifyFallAssess = @"qualify_fall_assess";
 NSString *const kQualifyDementia = @"qualify_dementia";
 
+NSString *const kTimestamp = @"ts";
+NSString *const kResidentId = @"resident_id";
+NSString *const kSectionName = @"section_name";
+NSString *const kFieldName = @"field_name";
+NSString *const kNewContent = @"new_content";
+
+
 #pragma mark - Resident Particulars
 
 NSString *const kName = @"resident_name";
 NSString *const kNRIC = @"nric";
 NSString *const kGender = @"gender";
-NSString *const kBirthDate = @"birthdate";
+NSString *const kBirthDate = @"birth_date";
+NSString *const kBirthYear = @"birth_year";
 NSString *const kCitizenship = @"citizenship_status";
 NSString *const kReligion = @"religion";
 NSString *const kReligionOthers = @"religion_others";
@@ -53,12 +61,13 @@ NSString *const kHousingOwnedRented = @"housing_owned_rented";
 NSString *const kHousingNumRooms = @"housing_num_rooms";
 NSString *const kHighestEduLevel = @"highest_edu_level";
 
+NSString *const kAddress = @"address";  //not for submission
 NSString *const kAddressStreet = @"address_street";
 NSString *const kAddressBlock = @"address_block";
 NSString *const kAddressOthers = @"address_others";
 NSString *const kAddressUnitNum = @"address_unit_num";
 NSString *const kAddressDuration = @"address_duration";
-NSString *const kAddressPostCode = @"address_postcode";
+NSString *const kAddressPostCode = @"address_postalcode";
 
 NSString *const kIsFinal = @"is_final";
 

@@ -66,9 +66,15 @@
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Current Socioeconomic Situation"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Resident Particulars:"];
     [formDescriptor addFormSection:section];
     
+    section.footerTitle = [NSString stringWithFormat:@"Name: %@\nNRIC: %@\nCitizenship: %@\n", [defaults objectForKey:kName], [defaults objectForKey:kNRIC], [defaults objectForKey:kCitizenship]];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *copeFinancialRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCopeFin rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Are you able to cope financially?"];
     [self setDefaultFontWithRow:copeFinancialRow];

@@ -153,12 +153,12 @@ typedef enum residentDataSource {
     else if (status == ReachableViaWiFi)
     {
         NSLog(@"Wifi");
-        [self getAllBloodTestResidents];
+//        [self getAllBloodTestResidents];
     }
     else if (status == ReachableViaWWAN)
     {
         NSLog(@"3G");
-        [self getAllBloodTestResidents];
+//        [self getAllBloodTestResidents];
     }
 }
 
@@ -239,7 +239,7 @@ typedef enum residentDataSource {
         selectedResidentID = [selectedResident objectForKey:@"resident_id"];
     }
     
-    [self getBloodTestResultForOneResident];
+//    [self getBloodTestResultForOneResident];
     
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
 
@@ -482,21 +482,21 @@ typedef enum residentDataSource {
 
 #pragma mark - Blood Test API
 
-- (void)getAllBloodTestResidents {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getAllBloodTestResidents:[self progressBlock]
-                        successBlock:[self successBlock]
-                        andFailBlock:[self errorBlock]];
-}
-
-
-- (void)getBloodTestResultForOneResident {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getBloodTestWithResidentID:selectedResidentID
-                         progressBlock:[self progressBlock]
-                          successBlock:[self downloadBloodTestResultSuccessBlock]
-                          andFailBlock:[self downloadErrorBlock]];
-}
+//- (void)getAllBloodTestResidents {
+//    ServerComm *client = [ServerComm sharedServerCommInstance];
+//    [client getAllBloodTestResidents:[self progressBlock]
+//                        successBlock:[self successBlock]
+//                        andFailBlock:[self errorBlock]];
+//}
+//
+//
+//- (void)getBloodTestResultForOneResident {
+//    ServerComm *client = [ServerComm sharedServerCommInstance];
+//    [client getBloodTestWithResidentID:selectedResidentID
+//                         progressBlock:[self progressBlock]
+//                          successBlock:[self downloadBloodTestResultSuccessBlock]
+//                          andFailBlock:[self downloadErrorBlock]];
+//}
 
 #pragma mark - Blocks
 
@@ -637,7 +637,7 @@ typedef enum residentDataSource {
 
 - (void)refreshBTResidentTable:(NSNotification *) notification{
     NSLog(@"refreshBTResidentTable");
-    [self getAllBloodTestResidents];
+//    [self getAllBloodTestResidents];
 }
 
 - (void) selectedScreenedResidentToNewBTForm: (NSNotification *) notification {

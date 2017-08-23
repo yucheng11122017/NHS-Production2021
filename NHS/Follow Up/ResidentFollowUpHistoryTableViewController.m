@@ -233,7 +233,7 @@ typedef enum typeOfFollowUp {
         viewForm = @0;
         newForm = @0;
         [self getAllScreeningData];
-        [self getBloodTestResultForOneResident];
+//        [self getBloodTestResultForOneResident];
         
         [tableView deselectRowAtIndexPath:indexPath animated:NO];
         return;
@@ -266,13 +266,13 @@ typedef enum typeOfFollowUp {
                                             andFailBlock:[self errorBlock]];
 }
 
-- (void)getBloodTestResultForOneResident {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getBloodTestWithResidentID:_residentID
-                         progressBlock:[self progressBlock]
-                          successBlock:[self downloadBloodTestResultSuccessBlock]
-                          andFailBlock:[self errorBlock]];
-}
+//- (void)getBloodTestResultForOneResident {
+//    ServerComm *client = [ServerComm sharedServerCommInstance];
+//    [client getBloodTestWithResidentID:_residentID
+//                         progressBlock:[self progressBlock]
+//                          successBlock:[self downloadBloodTestResultSuccessBlock]
+//                          andFailBlock:[self errorBlock]];
+//}
 
 - (void)getAllFollowUpDataForOneResident {
     ServerComm *client = [ServerComm sharedServerCommInstance];

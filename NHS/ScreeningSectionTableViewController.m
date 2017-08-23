@@ -247,25 +247,24 @@ typedef enum sectionRowNumber {
             [self performSegueWithIdentifier:@"screenSectionToSocialWorkSegue" sender:self];
             return;
         } else if (indexPath.row == Triage) {
-            selectedRow = [NSNumber numberWithInteger:3];
+            selectedRow = [NSNumber numberWithInteger:Triage];
         } else if (indexPath.row == SnellenEyeTest) {
-            selectedRow = [NSNumber numberWithInteger:4];
+            selectedRow = [NSNumber numberWithInteger:SnellenEyeTest];
         } else if (indexPath.row == AdditionalServices) {
-            selectedRow = [NSNumber numberWithInteger:5];
+            selectedRow = [NSNumber numberWithInteger:AdditionalServices];
         } else if (indexPath.row == DoctorsConsultation) {
-            selectedRow = [NSNumber numberWithInteger:6];
-        }
-          else if (indexPath.row == BasicDentalCheckup) {
-                selectedRow = [NSNumber numberWithInteger:7];
+            selectedRow = [NSNumber numberWithInteger:DoctorsConsultation];
+        } else if (indexPath.row == BasicDentalCheckup) {
+            selectedRow = [NSNumber numberWithInteger:BasicDentalCheckup];
           } else if (indexPath.row == SeriAdvancedEyeScreening) {
               [self performSegueWithIdentifier:@"screeningSectionToSeriSubsectionSegue" sender:self];
               return;
           } else if (indexPath.row == FallRiskAssessment) {
-              selectedRow = [NSNumber numberWithInteger:9];
+              selectedRow = [NSNumber numberWithInteger:FallRiskAssessment];
           } else if (indexPath.row == GeriatricDementiaAssess) {
-              selectedRow = [NSNumber numberWithInteger:10];
+              selectedRow = [NSNumber numberWithInteger:GeriatricDementiaAssess];
           } else if (indexPath.row == HealthEducation) {
-            selectedRow = [NSNumber numberWithInteger:11];
+            selectedRow = [NSNumber numberWithInteger:HealthEducation];
         }
 
         

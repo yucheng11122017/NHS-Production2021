@@ -26,6 +26,12 @@ extern NSString *const kQualifyPapSmear;
 extern NSString *const kQualifyFallAssess;
 extern NSString *const kQualifyDementia;
 
+extern NSString *const kTimestamp;
+extern NSString *const kResidentId;
+extern NSString *const kSectionName;
+extern NSString *const kFieldName;
+extern NSString *const kNewContent;
+
 /*
  * Form Constants
  ********************************************/
@@ -34,6 +40,7 @@ extern NSString *const kName;
 extern NSString *const kNRIC;
 extern NSString *const kGender;
 extern NSString *const kBirthDate;
+extern NSString *const kBirthYear;
 extern NSString *const kCitizenship;
 extern NSString *const kReligion;
 extern NSString *const kReligionOthers;
@@ -58,6 +65,7 @@ extern NSString *const kHousingOwnedRented;
 extern NSString *const kHousingNumRooms;
 extern NSString *const kHighestEduLevel;
 
+extern NSString *const kAddress;  //not for submission
 extern NSString *const kAddressStreet;
 extern NSString *const kAddressBlock;
 extern NSString *const kAddressOthers;

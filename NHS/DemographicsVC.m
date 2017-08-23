@@ -8,6 +8,7 @@
 
 #import "DemographicsVC.h"
 #import "SVProgressHUD.h"
+#import "AppConstants.h"
 
 
 @interface DemographicsVC () {
@@ -19,6 +20,7 @@
 @property (weak, nonatomic) IBOutlet UIView *containerView;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (strong, nonatomic) UIImage* genogramImage;
+@property (strong, nonatomic) UIView *infoBox;
 
 
 @end
@@ -38,6 +40,14 @@
     }
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showImage:) name:@"displayImage" object:nil];
+    
+    UIButton* infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+    [infoButton addTarget:self action:@selector(infoButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *modalButton = [[UIBarButtonItem alloc] initWithCustomView:infoButton];
+    
+    self.navigationItem.rightBarButtonItem = modalButton;
+    
+    [self setupInfoBox];
 }
 
 - (void) viewDidLayoutSubviews {
@@ -135,6 +145,68 @@
     self.navigationController.hidesBarsOnTap = true;    //to hide the top bar when tapped elsewhere
 }
 
+- (void) infoButtonAction: (UIButton *) sender {
+    if (_infoBox.alpha == 0) {
+        [UIView animateWithDuration:0.5
+                              delay:0
+                            options: UIViewAnimationOptionCurveEaseIn
+                         animations:^{
+                             _infoBox.alpha = 1.0;
+                         }
+                         completion:^(BOOL finished){
+                             if (finished) {
+                                 //do nothing.
+                             }
+                             
+                         }];
+    } else {
+        [UIView animateWithDuration:0.5
+                              delay:0
+                            options: UIViewAnimationOptionCurveEaseOut
+                         animations:^{
+                             _infoBox.alpha = 0.0;
+                         }
+                         completion:^(BOOL finished){
+                             if (finished) {
+                                 //do nothing.
+                             }
+                             
+                         }];
+    }
+}
+
+- (void) setupInfoBox {
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    _infoBox = [[UIView alloc] initWithFrame:CGRectMake(100, 50, 250, 80)];     //trying to find out its center.
+    _infoBox.backgroundColor = [UIColor colorWithRed:193/255.0 green:241/255.0 blue:255/255.0 alpha:1.0];
+    _infoBox.layer.cornerRadius = 5.0;
+    
+    _infoBox.center = CGPointMake(CGRectGetMidX(self.view.bounds), _infoBox.center.y);  //only center horizontally, NOT vertically
+    [self.view addSubview:_infoBox];
+    
+    UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 200, 20)];
+    nameLabel.text = [NSString stringWithFormat:@"Name: %@", [defaults objectForKey:kName]];
+    nameLabel.font = [UIFont systemFontOfSize:12.0];
+    nameLabel.textColor = [UIColor blueColor];
+    [_infoBox addSubview:nameLabel];
+    
+    UILabel *nricLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 30, 200, 20)];
+    nricLabel.text = [NSString stringWithFormat:@"NRIC: %@", [defaults objectForKey:kNRIC]];
+    nricLabel.font = [UIFont systemFontOfSize:12.0];
+    nricLabel.textColor = [UIColor blueColor];
+    [_infoBox addSubview:nricLabel];
+    
+    UILabel *citizenshipLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 50, 200, 20)];
+    citizenshipLabel.text = [NSString stringWithFormat:@"Citizenship: %@", [defaults objectForKey:kCitizenship]];
+    citizenshipLabel.font = [UIFont systemFontOfSize:12.0];
+    citizenshipLabel.textColor = [UIColor blueColor];
+    [_infoBox addSubview:citizenshipLabel];
+    
+    _infoBox.alpha = 0;
+    
+}
 #pragma mark - NSNotificationCenter
 - (void) showImage: (NSNotification *) notification {
     _genogramImage = [notification.userInfo objectForKey:@"image"];

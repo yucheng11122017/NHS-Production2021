@@ -111,26 +111,22 @@ NSString *const kMultiADL = @"multi_adl";
             break;
         case 2: form = [self initProfiling];
             break;
-        case 3: form = [self initTriage];
+        case 5: form = [self initTriage];
             break;
-        case 4: form = [self initSnellenEyeTest];
+        case 6: form = [self initSnellenEyeTest];
             break;
-        case 5: form = [self initAdditionalSvcs];
+        case 7: form = [self initAdditionalSvcs];
             break;
-        case 6: form = [self initRefForDoctorConsult];
+        case 8: form = [self initRefForDoctorConsult];
             break;
-        case 7: form = [self initDentalCheckup];
+        case 9: form = [self initDentalCheckup];
             break;
-        case 9: form = [self initFallRiskAssessment];
+        case 11: form = [self initFallRiskAssessment];
             break;
-        case 10: form = [self initDementiaAssessment];
+        case 12: form = [self initDementiaAssessment];
             break;
-        case 11: form = [self initHealthEducation];
+        case 13: form = [self initHealthEducation];
             break;
-//        case 14: form = [self initSocialSupportAssessment];
-//            break;
-//        case 15: form = [self initRefForDoctorConsult];
-//            break;
     }
     
     self.form.addAsteriskToRequiredRowsTitle = YES;
@@ -1512,6 +1508,9 @@ NSString *const kMultiADL = @"multi_adl";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kPsfuFRA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"To be completed during PSFU"];
     [self setDefaultFontWithRow:row];
     [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *balanceRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBalance
                                                 rowType:XLFormRowDescriptorTypeStepCounter title:@"Balance Test"];

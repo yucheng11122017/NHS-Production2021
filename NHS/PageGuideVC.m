@@ -40,7 +40,6 @@
     self.pageControl.numberOfPages = numberPages;
     self.pageControl.currentPage = 0;
     
-    [self setupInfoBox];
     [self loadScrollViewWithPage:1];    //one is already done
 }
 
@@ -53,37 +52,6 @@
     NSUInteger numberPages = 2;
     self.scrollView.contentSize =
     CGSizeMake(CGRectGetWidth(self.scrollView.frame) * numberPages, CGRectGetHeight(self.scrollView.frame));
-}
-
-- (void) setupInfoBox {
-    
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    _infoBox = [[UIView alloc] initWithFrame:CGRectMake(0, 350, 250, 80)];
-    _infoBox.backgroundColor = [UIColor whiteColor];
-    _infoBox.layer.cornerRadius = 5.0;
-    [self.view addSubview:_infoBox];
-    
-    UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 200, 20)];
-    nameLabel.text = [NSString stringWithFormat:@"Name: %@", [defaults objectForKey:kName]];
-    nameLabel.font = [UIFont systemFontOfSize:12.0];
-    nameLabel.textColor = [UIColor blueColor];
-    [_infoBox addSubview:nameLabel];
-    
-    UILabel *nricLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 30, 200, 20)];
-    nricLabel.text = [NSString stringWithFormat:@"NRIC: %@", [defaults objectForKey:kNRIC]];
-    nricLabel.font = [UIFont systemFontOfSize:12.0];
-    nricLabel.textColor = [UIColor blueColor];
-    [_infoBox addSubview:nricLabel];
-    
-    UILabel *citizenshipLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 50, 200, 20)];
-    citizenshipLabel.text = [NSString stringWithFormat:@"Citizenship: %@", [defaults objectForKey:kCitizenship]];
-    citizenshipLabel.font = [UIFont systemFontOfSize:12.0];
-    citizenshipLabel.textColor = [UIColor blueColor];
-    [_infoBox addSubview:citizenshipLabel];
-    
-    _infoBox.alpha = 0;
-    
 }
 
 #pragma mark - Page stuffs
@@ -187,36 +155,6 @@
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:iTunesLink] options:@{} completionHandler:^(BOOL success) {
         NSLog(@"Open iTunes Link successful!");
     }];
-}
-- (IBAction)infoBtnPressed:(id)sender {
-    
-    if (_infoBox.alpha == 0) {
-        [UIView animateWithDuration:0.5
-                              delay:0
-                            options: UIViewAnimationOptionCurveEaseIn
-                         animations:^{
-                             _infoBox.alpha = 1.0;
-                         }
-                         completion:^(BOOL finished){
-                             if (finished) {
-                                 //do nothing.
-                             }
-                             
-                         }];
-    } else {
-        [UIView animateWithDuration:0.5
-                              delay:0
-                            options: UIViewAnimationOptionCurveEaseOut
-                         animations:^{
-                             _infoBox.alpha = 0.0;
-                         }
-                         completion:^(BOOL finished){
-                             if (finished) {
-                                 //do nothing.
-                             }
-                             
-                         }];
-    }
 }
 
 #pragma mark - UIImagePickerControllerDelegate methods
