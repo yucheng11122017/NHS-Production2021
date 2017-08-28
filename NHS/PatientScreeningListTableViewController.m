@@ -19,7 +19,7 @@
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
 //disable this if fetch data from server
-#define DISABLE_SERVER_DATA_FETCH
+//#define DISABLE_SERVER_DATA_FETCH         //to use generated fake patient data
 
 typedef enum getDataState {
     inactive,
@@ -76,6 +76,8 @@ typedef enum residentDataSource {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     appTesting = [defaults boolForKey:@"AppleTesting"];
     
+    [defaults setObject:_neighbourhood forKey:kNeighbourhood];
+    
     self.residentNames = [[NSMutableArray alloc] init];
     self.residentScreenTimestamp = [[NSMutableArray alloc] init];
     self.residentsGroupedInSections = [[NSMutableDictionary alloc] init];
@@ -100,11 +102,6 @@ typedef enum residentDataSource {
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(refreshScreeningResidentTable:)
                                                  name:@"refreshScreeningResidentTable"
-                                               object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(selectedPreRegResidentToNewScreenForm:)
-                                                 name:@"selectedPreRegResidentToNewScreenForm"
                                                object:nil];
     
     _resultsTableController = [[SearchResultsTableController alloc] init];
@@ -275,13 +272,23 @@ typedef enum residentDataSource {
         sectionTitle = [residentSectionTitles objectAtIndex:indexPath.section];
     }
     NSArray *residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
-    NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"resident_name"];
-    NSString *residentNric = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"nric"];
-    NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"ts"];
+    NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kName];
+    NSString *residentNric = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kNRIC];
+    NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kLastUpdateTs];
     
     cell.nameLabel.text = residentName;
     cell.NRICLabel.text = residentNric;
     cell.dateLabel.text = lastUpdatedTS;
+    
+    cell.regLabel.hidden = YES;
+    cell.verticalLine.hidden = YES;
+    cell.yearLabel.hidden = YES;
+    
+    if ([residentName isEqualToString:@"MICHELLE BUCHANAN"]) {
+        cell.regLabel.hidden = NO;
+        cell.verticalLine.hidden = NO;
+        cell.yearLabel.hidden = NO;
+    }
     
     return cell;
 }
@@ -315,19 +322,14 @@ typedef enum residentDataSource {
             }
         }
         
-        
-        
         //not part of draft
-        _sampleResidentDict = [[NSDictionary alloc] initWithDictionary:[self findResidentInfoFromSectionRow:indexPath]];
-        selectedResidentID = [selectedResident objectForKey:@"resident_id"];
-        
-        [self saveAgeGenderAndCitizenship];
+        selectedResident = [[NSDictionary alloc] initWithDictionary:[self findResidentInfoFromSectionRow:indexPath]];
+        selectedResidentID = [selectedResident objectForKey:kResidentId];
         
     } else {
         selectedResident = [[NSDictionary alloc] initWithDictionary:self.resultsTableController.filteredProducts[indexPath.row]];  //drafts not included in search!
-        selectedResidentID = [selectedResident objectForKey:@"resident_id"];
+        selectedResidentID = [selectedResident objectForKey:kResidentId];
     }
-    
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     
 #ifndef DISABLE_SERVER_DATA_FETCH
@@ -371,7 +373,7 @@ typedef enum residentDataSource {
         
         // Delete the row from the data source
         NSDictionary *residentInfo = [self findResidentInfoFromSectionRow:indexPath];
-        [self deleteResident:[residentInfo objectForKey:@"resident_id"]];
+        [self deleteResident:[residentInfo objectForKey:kResidentId]];
         //        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade]; //no need this for now...
         
     }
@@ -412,16 +414,18 @@ typedef enum residentDataSource {
 - (IBAction)addBtnPressed:(UIBarButtonItem *)sender {
     [self.retrievedResidentData removeAllObjects];  //clear the dictionary
 
-    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"New screening form", nil)
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Registration", nil)
                                                                               message:@""
                                                                        preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"New resident", nil)
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add new resident", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
                                                           selectedResidentID = @(-1);
                                                           _sampleResidentDict = @{};
                                                           [self resetAllUserDefaults];
-                                                          [self performSegueWithIdentifier:@"showSelectProfileTableVC" sender:self];
+                                                          [[NSUserDefaults standardUserDefaults] setObject:_neighbourhood forKey:kNeighbourhood];   //only keep neighbourhood
+                                                          [[NSUserDefaults standardUserDefaults] synchronize];
+                                                          [self performSegueWithIdentifier:@"addNewResidentSegue" sender:self];
                                                       }]];
     [self presentViewController:alertController animated:YES completion:^{
         UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
@@ -506,7 +510,7 @@ typedef enum residentDataSource {
         // NSPredicate is made up of smaller, atomic parts: two NSExpressions (a left-hand value and a right-hand value)
         
         // name field matching
-        NSExpression *lhs = [NSExpression expressionForKeyPath:@"resident_name"];
+        NSExpression *lhs = [NSExpression expressionForKeyPath:kName];
         NSExpression *rhs = [NSExpression expressionForConstantValue:searchString];
         NSPredicate *finalPredicate = [NSComparisonPredicate
                                        predicateWithLeftExpression:lhs
@@ -516,7 +520,7 @@ typedef enum residentDataSource {
                                        options:NSCaseInsensitivePredicateOption];
         [searchItemsPredicate addObject:finalPredicate];
         
-        lhs = [NSExpression expressionForKeyPath:@"nric"];
+        lhs = [NSExpression expressionForKeyPath:kNRIC];
         rhs = [NSExpression expressionForConstantValue:searchString];
         finalPredicate = [NSComparisonPredicate
                           predicateWithLeftExpression:lhs
@@ -661,16 +665,25 @@ typedef enum residentDataSource {
         [self.residentNames removeAllObjects];   //reset this array first
         [self.residentScreenTimestamp removeAllObjects];   //reset this array first
         NSArray *patients = [responseObject objectForKey:@"0"];      //somehow double brackets... (())
-        self.screeningResidents = [[NSMutableArray alloc] initWithArray:patients];
+        NSMutableArray *mutArray = [[NSMutableArray alloc] init];
+        
+        for (int i=0; i<[patients count];i++) {
+            if ([[patients[i] objectForKey:kScreenLocation] isEqualToString:_neighbourhood])
+                [mutArray addObject:patients[i]];
+        }
+        
+        
+        
+        self.screeningResidents = [[NSMutableArray alloc] initWithArray:mutArray];
         
         NSSortDescriptor *sortDescriptor;
-        sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"resident_name" ascending:YES];
+        sortDescriptor = [[NSSortDescriptor alloc] initWithKey:kName ascending:YES];
         NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
         self.screeningResidents = [[self.screeningResidents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
         
         for (i=0; i<[self.screeningResidents count]; i++) {
-            [self.residentNames addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:@"resident_name"]];
-            [self.residentScreenTimestamp addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:@"ts"]];
+            [self.residentNames addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:kName]];
+            [self.residentScreenTimestamp addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:kLastUpdateTs]];
         }
         
         //sort alphabetically
@@ -687,7 +700,9 @@ typedef enum residentDataSource {
         
         self.retrievedResidentData = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
         NSLog(@"%@", self.retrievedResidentData);
-        [self performSegueWithIdentifier:@"LoadScreeningFormSegue" sender:self];
+        
+        [self saveCoreData];
+        [self performSegueWithIdentifier:@"showSelectProfileTableVC" sender:self];
     };
 }
 
@@ -761,15 +776,17 @@ typedef enum residentDataSource {
 - (void)refreshScreeningResidentTable:(NSNotification *) notification{
     NSLog(@"refresh screening table");
     
-    [self getLocalSavedData];
+    if ([notification.userInfo objectForKey:kResidentId] != nil) {
+        selectedResidentID = [notification.userInfo objectForKey:kResidentId];
+        [self getAllDataForOneResident];
+    }
+    else {
+        [self getLocalSavedData];
 #ifndef DISABLE_SERVER_DATA_FETCH
-    [self getAllScreeningResidents];
+        [self getAllScreeningResidents];
 #endif
-}
-
-- (void) selectedPreRegResidentToNewScreenForm: (NSNotification *) notification {
-    selectedResidentID = [notification.userInfo objectForKey:@"resident_id"];
-    [self performSegueWithIdentifier:@"NewScreeningFormSegue" sender:self];
+    }
+    
 }
 
 
@@ -799,7 +816,7 @@ typedef enum residentDataSource {
                       @"ts":@"2017-07-02 12:42:42",
                       @"nric":@"S3214321B"
                       },
-                    @{kResidentId:@3,
+                    @{kResidentId:@4,
                       @"resident_name":@"MICHELLE BUCHANAN",
                       kNeighbourhood:@"EC",
                       kGender:@"F",
@@ -851,13 +868,13 @@ typedef enum residentDataSource {
     self.screeningResidents = [[NSMutableArray alloc] initWithArray:patients];
     
     NSSortDescriptor *sortDescriptor;
-    sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"resident_name" ascending:YES];
+    sortDescriptor = [[NSSortDescriptor alloc] initWithKey:kName ascending:YES];
     NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
     self.screeningResidents = [[self.screeningResidents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
     
     for (i=0; i<[self.screeningResidents count]; i++) {
-        [self.residentNames addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:@"resident_name"]];
-        [self.residentScreenTimestamp addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:@"ts"]];
+        [self.residentNames addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:kName]];
+        [self.residentScreenTimestamp addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:kLastUpdateTs]];
     }
     
     //sort alphabetically
@@ -874,24 +891,32 @@ typedef enum residentDataSource {
     
 }
 
-- (void) saveAgeGenderAndCitizenship {
-    NSMutableString *str = [_sampleResidentDict[kBirthDate] mutableCopy];
+- (void) saveCoreData {
+
+    NSDictionary *particularsDict =[_retrievedResidentData objectForKey:kResiParticulars];
+
+        // Calculate age
+    NSMutableString *str = [particularsDict[kBirthDate] mutableCopy];
     NSString *yearOfBirth = [str substringWithRange:NSMakeRange(0, 4)];
-    
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy"];
-    
     NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
-    
     NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
-
-    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kResidentId] forKey:kResidentId];
-    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kCitizenship] forKey:kCitizenship];
-    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kGender] forKey:kGender];
+    
+    
+//    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kGender] forKey:kGender];
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:age] forKey:kResidentAge];
-    [[NSUserDefaults standardUserDefaults] setObject:_neighbourhood forKey:kNeighbourhood];
-    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kName] forKey:kName];
-    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kNRIC] forKey:kNRIC];
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kResidentId] forKey:kResidentId];
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kScreenLocation] forKey:kNeighbourhood];
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kName] forKey:kName];
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kNRIC] forKey:kNRIC];
+    
+    
+    // For demographics
+    if (particularsDict[kCitizenship] != (id) [NSNull null])        //check for null first
+        [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kCitizenship] forKey:kCitizenship];
+    if (particularsDict[kReligion] != (id) [NSNull null])
+        [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kReligion] forKey:kReligion];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -905,19 +930,22 @@ typedef enum residentDataSource {
 //    }
     
     if ([self.retrievedResidentData count]) {
-        [segue.destinationViewController performSelector:@selector(setRetrievedData:)
-                                              withObject:self.retrievedResidentData];
+        if ([segue.destinationViewController respondsToSelector:@selector(setResidentDetails:)]) {
+            [segue.destinationViewController performSelector:@selector(setResidentDetails:)
+                                                  withObject:self.retrievedResidentData];
+        }
     }
     
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentLocalFileIndex:)]) {    //view submitted form
         [segue.destinationViewController performSelector:@selector(setResidentLocalFileIndex:)
                                               withObject:draftID];
     }
-    
+#ifdef DISABLE_SERVER_DATA_FETCH
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentDetails:)]) {
         [segue.destinationViewController performSelector:@selector(setResidentDetails:)
                                               withObject:_sampleResidentDict];
     }
+#endif
 }
 
 

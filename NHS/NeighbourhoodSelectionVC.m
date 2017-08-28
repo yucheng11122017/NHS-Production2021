@@ -8,6 +8,7 @@
 
 #import "NeighbourhoodSelectionVC.h"
 #import "PatientScreeningListTableViewController.h"
+#import "AppConstants.h"
 
 @interface NeighbourhoodSelectionVC () {
     NSString *selectedNeighbourhood;
@@ -27,11 +28,15 @@
     // Dispose of any resources that can be recreated.
 }
 - (IBAction)eunosCresBtnPressed:(id)sender {
-    selectedNeighbourhood = @"EC";
+    selectedNeighbourhood = @"Eunos Crescent";
+    [[NSUserDefaults standardUserDefaults] setObject:@"Eunos Crescent" forKey:kNeighbourhood];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     [self performSegueWithIdentifier:@"neighbourhoodToScreeningListSegue" sender:self];
 }
 - (IBAction)kampGlamBtnPressed:(id)sender {
-    selectedNeighbourhood = @"KGL";
+    selectedNeighbourhood = @"Kampong Glam";
+    [[NSUserDefaults standardUserDefaults] setObject:@"Kampong Glam" forKey:kNeighbourhood];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     [self performSegueWithIdentifier:@"neighbourhoodToScreeningListSegue" sender:self];
 }
 

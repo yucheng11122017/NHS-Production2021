@@ -33,6 +33,7 @@
 		01F154421D9A48D700D4B7D1 /* FollowUpEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 01F154411D9A48D700D4B7D1 /* FollowUpEntity.m */; };
 		01FC79F41D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01FC79F31D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m */; };
 		01FC79F71D882BB3003D3AB6 /* SummaryReportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01FC79F61D882BB3003D3AB6 /* SummaryReportViewController.m */; };
+		01FF80C11F53AF62002C7ADD /* NewScreeningResidentFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01FF80C01F53AF62002C7ADD /* NewScreeningResidentFormVC.m */; };
 		0365AA69F5F64A154E302724 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8964BE86125ACEAAC6F8C79B /* AVFoundation.framework */; };
 		45E30D748D4D9DB15E36E079 /* Pods_CocoaPods_NHS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF146E69B77C3775C935F8C /* Pods_CocoaPods_NHS.framework */; };
 		4A30721D483BF641740A849C /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42F8C126868498248C33D2EA /* CoreMedia.framework */; };
@@ -137,6 +138,8 @@
 		01FC79F31D8824FA003D3AB6 /* ResidentFollowUpHistoryTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ResidentFollowUpHistoryTableViewController.m; path = "Follow Up/ResidentFollowUpHistoryTableViewController.m"; sourceTree = "<group>"; };
 		01FC79F51D882BB3003D3AB6 /* SummaryReportViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SummaryReportViewController.h; path = "Follow Up/SummaryReportViewController.h"; sourceTree = "<group>"; };
 		01FC79F61D882BB3003D3AB6 /* SummaryReportViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SummaryReportViewController.m; path = "Follow Up/SummaryReportViewController.m"; sourceTree = "<group>"; };
+		01FF80BF1F53AF62002C7ADD /* NewScreeningResidentFormVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewScreeningResidentFormVC.h; sourceTree = "<group>"; };
+		01FF80C01F53AF62002C7ADD /* NewScreeningResidentFormVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewScreeningResidentFormVC.m; sourceTree = "<group>"; };
 		15C05F16B9AA0D95A6AE2EAA /* Pods-CocoaPods-NHS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPods-NHS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPods-NHS/Pods-CocoaPods-NHS.debug.xcconfig"; sourceTree = "<group>"; };
 		209345AB6DD8B9F1E078D209 /* Pods_NHSUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NHSUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		32CF155AD7EB396F62BB8DC1 /* Pods-CocoaPods-NHS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPods-NHS.release.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPods-NHS/Pods-CocoaPods-NHS.release.xcconfig"; sourceTree = "<group>"; };
@@ -238,8 +241,6 @@
 		0130D1851F2AEAD00073901D /* UNUSED */ = {
 			isa = PBXGroup;
 			children = (
-				018C04251F3F4A1300582E82 /* NeighbourhoodSelectionVC.h */,
-				018C04261F3F4A1300582E82 /* NeighbourhoodSelectionVC.m */,
 				8E23D5521D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.h */,
 				8E23D5531D69F30E0079D0D8 /* ScreeningSelectPreRegPatientTableViewController.m */,
 				0154D0651EED6AF7000348B9 /* DrawingViewController.h */,
@@ -337,6 +338,8 @@
 			children = (
 				E1EFB0911D433C3400510532 /* PatientScreeningListTableViewController.h */,
 				E1EFB0921D433C3400510532 /* PatientScreeningListTableViewController.m */,
+				01FF80BF1F53AF62002C7ADD /* NewScreeningResidentFormVC.h */,
+				01FF80C01F53AF62002C7ADD /* NewScreeningResidentFormVC.m */,
 				01D48EBF1F3327B5002C3928 /* ScreeningSelectProfileTableVC.h */,
 				01D48EC01F3327B5002C3928 /* ScreeningSelectProfileTableVC.m */,
 				01D48EC21F346C36002C3928 /* ResidentParticularsVC.h */,
@@ -460,6 +463,8 @@
 				E1A4F0DE1D66BC5A00EE9BBB /* LoginViewController.m */,
 				8E2527681D5766C400ACEE92 /* HomeViewController.h */,
 				8E2527691D5766C400ACEE92 /* HomeViewController.m */,
+				018C04251F3F4A1300582E82 /* NeighbourhoodSelectionVC.h */,
+				018C04261F3F4A1300582E82 /* NeighbourhoodSelectionVC.m */,
 				8E2527651D57600200ACEE92 /* Pre-Registration */,
 				8E2527661D57600900ACEE92 /* Screening */,
 				019072051D87A86300D188D6 /* Blood Test */,
@@ -825,6 +830,7 @@
 				E1A4F0DC1D61CB8A00EE9BBB /* Reachability.m in Sources */,
 				0190720E1D87DDAD00D188D6 /* BTFormViewController.m in Sources */,
 				8E25276A1D5766C400ACEE92 /* HomeViewController.m in Sources */,
+				01FF80C11F53AF62002C7ADD /* NewScreeningResidentFormVC.m in Sources */,
 				01D48EC71F39C8C0002C3928 /* HealthAssessAndRiskFormVC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -31,6 +31,8 @@
 #import "NSArray+XLFormAdditions.h"
 
 #define CELL_REUSE_IDENTIFIER  @"OptionCell"
+#define DEFAULT_FONT_NAME @"AppleSDGothicNeo-Regular"
+#define DEFAULT_FONT_SIZE 15
 
 @interface XLFormOptionsViewController () <UITableViewDataSource>
 
@@ -87,6 +89,9 @@
     XLFormRightDetailCell * cell = [tableView dequeueReusableCellWithIdentifier:CELL_REUSE_IDENTIFIER forIndexPath:indexPath];
     id cellObject =  [[self selectorOptions] objectAtIndex:indexPath.row];
     cell.textLabel.text = [self valueDisplayTextForOption:cellObject];
+    
+    cell.textLabel.font = [UIFont fontWithName:DEFAULT_FONT_NAME size:DEFAULT_FONT_SIZE];   //added by Nic 27th August
+    
     if ([self.rowDescriptor.rowType isEqualToString:XLFormRowDescriptorTypeMultipleSelector] || [self.rowDescriptor.rowType isEqualToString:XLFormRowDescriptorTypeMultipleSelectorPopover]){
         cell.accessoryType = ([self selectedValuesContainsOption:cellObject] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone);
     }

@@ -20,6 +20,9 @@
 @synthesize nameLabel = _nameLabel;
 @synthesize NRICLabel = _NRICLabel;
 @synthesize dateLabel = _dateLabel;
+@synthesize regLabel = _regLabel;
+@synthesize yearLabel = _yearLabel;
+@synthesize verticalLine = _verticalLine;
 
 
 - (void)awakeFromNib {

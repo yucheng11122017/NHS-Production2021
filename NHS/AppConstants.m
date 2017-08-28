@@ -24,10 +24,15 @@ NSString *const kQualifyFallAssess = @"qualify_fall_assess";
 NSString *const kQualifyDementia = @"qualify_dementia";
 
 NSString *const kTimestamp = @"ts";
+NSString *const kLastUpdateTs = @"last_updated_ts";
 NSString *const kResidentId = @"resident_id";
 NSString *const kSectionName = @"section_name";
 NSString *const kFieldName = @"field_name";
 NSString *const kNewContent = @"new_content";
+NSString *const kScreenLocation = @"screening_location";
+NSString *const kResiParticulars = @"resi_particulars";
+
+
 
 
 #pragma mark - Resident Particulars
@@ -115,7 +120,6 @@ NSString *const kDoesntOwnChasPioneer= @"does_not_own_chas_pioneer";
 NSString *const kLowHouseIncome= @"low_house_income";
 NSString *const kLowHomeValue= @"low_home_value";
 NSString *const kWantChas= @"want_chas";
-NSString *const kChasColor= @"chas_color";
 NSString *const kSporeanPr= @"sporean_pr";
 NSString *const kAgeAbove50= @"age_above_50";
 NSString *const kRelWColorectCancer= @"rel_w_colorect_cancer";
@@ -184,6 +188,7 @@ NSString *const kHasMedisave = @"has_medisave";
 NSString *const kHasInsure = @"has_insure";
 NSString *const kHasCpfPayouts = @"has_cpf_payouts";
 NSString *const kCpfAmt = @"cpf_amt";
+NSString *const kChasColor= @"chas_color";
 NSString *const kReceivingFinAssist = @"receiving_fin_assist";
 NSString *const kFinAssistName = @"fin_assist_name";
 NSString *const kFinAssistOrg = @"fin_assist_org";

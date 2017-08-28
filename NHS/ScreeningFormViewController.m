@@ -241,22 +241,22 @@ NSString *const kMultiADL = @"multi_adl";
     row.required = NO;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLDL rowType:XLFormRowDescriptorTypeDecimal title:@"LDL Cholestrol (mmol/L)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLDL rowType:XLFormRowDescriptorTypeDecimal title:@"LDL Cholesterol (mmol/L)"];
     [self setDefaultFontWithRow:row];
     row.required = NO;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHDL rowType:XLFormRowDescriptorTypeDecimal title:@"HDL Cholestrol (mmol/L)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHDL rowType:XLFormRowDescriptorTypeDecimal title:@"HDL Cholesterol (mmol/L)"];
     [self setDefaultFontWithRow:row];
     row.required = NO;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCholesterolHdlRatio rowType:XLFormRowDescriptorTypeDecimal title:@"Cholestrol/HDL ratio"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCholesterolHdlRatio rowType:XLFormRowDescriptorTypeDecimal title:@"Cholesterol/HDL ratio"];
     [self setDefaultFontWithRow:row];
     row.required = NO;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kTotCholesterol rowType:XLFormRowDescriptorTypeDecimal title:@"Total Cholestrol (mmol/L)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kTotCholesterol rowType:XLFormRowDescriptorTypeDecimal title:@"Total Cholesterol (mmol/L)"];
     [self setDefaultFontWithRow:row];
     row.required = NO;
     [section addFormRow:row];
@@ -437,15 +437,6 @@ NSString *const kMultiADL = @"multi_adl";
         }
     };
     
-    XLFormRowDescriptor *chasColorRow = [XLFormRowDescriptor formRowDescriptorWithTag:kChasColor rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If resident owns CHAS card, what colour?"];
-    [self setDefaultFontWithRow:chasColorRow];
-    chasColorRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    chasColorRow.required = NO;
-    chasColorRow.selectorOptions = @[@"Blue", @"Orange"];
-    [section addFormRow:chasColorRow];
-    
-    
-    
     // Disable all income related questions if not willing to disclose income
     noDiscloseIncomeRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if (oldValue != newValue) {
@@ -453,7 +444,6 @@ NSString *const kMultiADL = @"multi_adl";
                 mthHouseIncome.disabled = @(1);
                 noOfPplInHouse.disabled = @(1);
                 avgIncomePerHead.disabled = @(1);
-                chasColorRow.disabled = @(1);
                 chasNoChasRow.disabled = @(1);
                 wantChasRow.disabled = @(1);
                 lowHouseIncomeRow.disabled = @(1);
@@ -462,7 +452,6 @@ NSString *const kMultiADL = @"multi_adl";
                 mthHouseIncome.disabled = @(0);
                 noOfPplInHouse.disabled = @(0);
                 avgIncomePerHead.disabled = @(0);
-                chasColorRow.disabled = @(0);
                 chasNoChasRow.disabled = @(0);
                 wantChasRow.disabled = @(0);
                 lowHouseIncomeRow.disabled = @(0);
@@ -471,7 +460,6 @@ NSString *const kMultiADL = @"multi_adl";
             [self reloadFormRow:mthHouseIncome];
             [self reloadFormRow:noOfPplInHouse];
             [self reloadFormRow:avgIncomePerHead];
-            [self reloadFormRow:chasColorRow];
             [self reloadFormRow:chasNoChasRow];
             [self reloadFormRow:wantChasRow];
             [self reloadFormRow:lowHouseIncomeRow];
@@ -951,7 +939,7 @@ NSString *const kMultiADL = @"multi_adl";
             } else {
                 fallen12Mths = FALSE;
             }
-            if (age65 && fallen12Mths && scaredFall && feelFall) {
+            if (age65 && (fallen12Mths || scaredFall || feelFall)) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFallAssess];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFallAssess];
@@ -973,7 +961,7 @@ NSString *const kMultiADL = @"multi_adl";
             } else {
                 scaredFall = FALSE;
             }
-            if (age65 && fallen12Mths && scaredFall && feelFall) {
+            if (age65 && (fallen12Mths || scaredFall || feelFall)) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFallAssess];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFallAssess];
@@ -995,7 +983,7 @@ NSString *const kMultiADL = @"multi_adl";
             } else {
                 feelFall = FALSE;
             }
-            if (age65 && fallen12Mths && scaredFall && feelFall) {
+            if (age65 && (fallen12Mths || scaredFall || feelFall)) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFallAssess];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFallAssess];
@@ -1278,31 +1266,31 @@ NSString *const kMultiADL = @"multi_adl";
     [formDescriptor addFormSection:section];
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRightEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"1. Right Eye: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRightEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"Right Eye: "];
     row.required = YES;
     row.selectorOptions = @[@"6/6", @"6/9", @"6/12", @"6/18", @"6/24", @"6/36", @"6/60"];
     [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLeftEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"2. Left Eye: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLeftEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"Left Eye: "];
     row.required = YES;
     row.selectorOptions = @[@"6/6", @"6/9", @"6/12", @"6/18", @"6/24", @"6/36", @"6/60"];
     [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
-    XLFormRowDescriptor *six12Row = [XLFormRowDescriptor formRowDescriptorWithTag:kSix12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"3. Does either eye (or both) have vision poorer than 6/12?"];
+    XLFormRowDescriptor *six12Row = [XLFormRowDescriptor formRowDescriptorWithTag:kSix12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does either eye (or both) have vision poorer than 6/12?"];
     six12Row.required = YES;
     six12Row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:six12Row];
     [section addFormRow:six12Row];
     
-    XLFormRowDescriptor *tunnelRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTunnel rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"4. Does resident have genuine visual complaints (e.g. floaters, tunnel vision, bright spots etc.)?"];
+    XLFormRowDescriptor *tunnelRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTunnel rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident have genuine visual complaints (e.g. floaters, tunnel vision, bright spots etc.)?"];
     tunnelRow.required = YES;
     tunnelRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:tunnelRow];
     [section addFormRow:tunnelRow];
     
-    XLFormRowDescriptor *visitEye12Mths = [XLFormRowDescriptor formRowDescriptorWithTag:kVisitEye12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"5. Resident has not visited eye specialist in 12 months"];
+    XLFormRowDescriptor *visitEye12Mths = [XLFormRowDescriptor formRowDescriptorWithTag:kVisitEye12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident has not visited eye specialist in 12 months"];
     visitEye12Mths.required = YES;
     visitEye12Mths.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:visitEye12Mths];
@@ -1465,7 +1453,8 @@ NSString *const kMultiADL = @"multi_adl";
 //    row.value = [refForDocConsultDict objectForKey:kDocName];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocReferred rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Referred by doctor?"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocReferred rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred by doctor?"];
+    row.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:row];
     row.required = NO;
     [section addFormRow:row];
@@ -1483,12 +1472,14 @@ NSString *const kMultiADL = @"multi_adl";
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentalUndergone rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Undergone dental check-up?"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentalUndergone rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone dental check-up?"];
+    row.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentistReferred
-                                                rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Referred by dentist?"];
+                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred by dentist?"];
+    row.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
@@ -1595,7 +1586,7 @@ NSString *const kMultiADL = @"multi_adl";
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     section.footerTitle = @"greater than 0 and less than 255";
     [formDescriptor addFormSection:section];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAmtScore rowType:XLFormRowDescriptorTypeNumber title:@"Total score for AMT"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAmtScore rowType:XLFormRowDescriptorTypeInteger title:@"Total score for AMT"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
@@ -1616,7 +1607,7 @@ NSString *const kMultiADL = @"multi_adl";
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEduStatus rowType:XLFormRowDescriptorTypeSelectorPush title:@"Resident's education status"];
-    row.selectorOptions = @[@"1 year", @"2 years", @"3 years", @"4 years", @"5 years", @"6 years", @"more than 6 years"];
+    row.selectorOptions = @[@"1 year", @"2 years", @"3 years", @"4 years", @"5 years", @"6 years", @"more than 6 years", @"No formal education"];
     [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     

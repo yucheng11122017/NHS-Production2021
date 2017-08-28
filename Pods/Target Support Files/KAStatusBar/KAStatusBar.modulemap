@@ -1,0 +1,6 @@
+framework module KAStatusBar {
+  umbrella header "KAStatusBar-umbrella.h"
+
+  export *
+  module * { export * }
+}

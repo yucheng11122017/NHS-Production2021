@@ -8,7 +8,9 @@
 
 #import "ResidentParticularsVC.h"
 #import "ServerComm.h"
+#import "Reachability.h"
 #import "SVProgressHUD.h"
+#import "KAStatusBar.h"
 #import "AppConstants.h"
 #import "ScreeningSectionTableViewController.h"
 #import "math.h"
@@ -18,6 +20,13 @@
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 #define RESI_PART_SECTION @"resi_particulars"
+
+typedef enum getDataState {
+    inactive,
+    started,
+    failed,
+    successful
+} getDataState;
 
 typedef enum rowTypes {
     Text,
@@ -40,9 +49,11 @@ typedef enum rowTypes {
     NSString *neighbourhood;
     XLFormRowDescriptor* dobRow;
     int successCounter, failCounter;
+    NetworkStatus status;
+    int fetchDataState;
 }
 
-@property (strong, nonatomic) NSMutableDictionary *resiPartiDict;
+//@property (strong, nonatomic) NSMutableDictionary *resiPartiDict;
 @property (strong, nonatomic) NSNumber *resident_id;
 
 @end
@@ -56,7 +67,12 @@ typedef enum rowTypes {
     NSLog(@"Resident selected %@", _residentParticularsDict);
     
     neighbourhood = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
-    _resiPartiDict = [[NSMutableDictionary alloc] init];
+    
+    Reachability *reachability = [Reachability reachabilityForInternetConnection];
+    [reachability startNotifier];
+    
+    status = [reachability currentReachabilityStatus];
+    [self processConnectionStatus];
     
     //must init first before [super viewDidLoad]
     form = [self initResidentParticularsForm];
@@ -77,7 +93,7 @@ typedef enum rowTypes {
 
 - (void) viewWillDisappear:(BOOL)animated {
     
-    self.navigationController.navigationBar.topItem.title = @"Screening History";
+    self.navigationController.navigationBar.topItem.title = @"Integrated Profile";
 //    [self saveEntriesIntoDictionary];
 //    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateFullScreeningForm"
 //                                                        object:nil
@@ -117,45 +133,32 @@ typedef enum rowTypes {
     [formDescriptor addFormSection:section];
     
     // Name
-    XLFormRowDescriptor *nameRow = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeName title:@"Patient Name"];
+    XLFormRowDescriptor *nameRow = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeName title:@"Resident Name"];
     nameRow.required = YES;
     nameRow.value = _residentParticularsDict[kName];
-    [nameRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
-    [nameRow.cellConfig setObject:[UIFont fontWithName:@"Helvetica" size:14] forKey:@"textField.font"];
+    [self setDefaultFontWithRow:nameRow];
     [nameRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-//    [nameRow.cellConfigAtConfigure setObject:[NSNumber numberWithFloat:0.7] forKey:XLFormTextFieldLengthPercentage];      //for changing the length of the left side TextLabel
     [section addFormRow:nameRow];
     
-    nameRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        
-        if (![oldValue isEqual:newValue]) { //otherwise this segment will crash
-            
-        }
-    };
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Gender"];
     row.selectorOptions = @[@"Male", @"Female"];
-    if ([_residentParticularsDict[kGender] isEqualToString:@"M"])
-        row.value = @"Male";
-    else
-        row.value = @"Female";
-        
-    
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
-//    NSString *genderMF = [resiPartiDict objectForKey:@"gender"];
-//    if ([genderMF isEqualToString:@"M"]) {
-//        row.value = @"Male";
-//    } else if ([genderMF isEqualToString:@"F"]) {
-//        row.value = @"Female";
-//    }
+    [self setDefaultFontWithRow:row];
+    if ([_residentParticularsDict count] > 0) {
+        if ([_residentParticularsDict[kGender] isEqualToString:@"M"])
+            row.value = @"Male";
+        else
+            row.value = @"Female";
+    }
     row.required = YES;
     [section addFormRow:row];
+    
     
     XLFormRowDescriptor *nricRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC rowType:XLFormRowDescriptorTypeName title:@"NRIC"];
     nricRow.required = YES;
     nricRow.value = _residentParticularsDict[kNRIC];
     [nricRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [nricRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:nricRow];
     [section addFormRow:nricRow];
     
     nricRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -171,8 +174,10 @@ typedef enum rowTypes {
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.dateFormat = @"YYYY-MM-dd";
-    NSDate *date = [dateFormatter dateFromString:_residentParticularsDict[kBirthDate]];
-    dobRow.value = date;
+    if ([_residentParticularsDict count] > 0) {
+        NSDate *date = [dateFormatter dateFromString:_residentParticularsDict[kBirthDate]];
+        dobRow.value = date;
+    }
     [dobRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
     [section addFormRow:dobRow];
     
@@ -182,25 +187,19 @@ typedef enum rowTypes {
             NSLog(@"%@", newValue);
         }
     };
-
-    
-    //Hide this for now
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"button" rowType:XLFormRowDescriptorTypeButton title:@"Calculate Age!"];
-//    row.action.formSelector = @selector(calculateAge:);
-//    row.required = NO;
-////    [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCitizenship rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"Citizenship Status"];
     row.required = YES;
     row.value = _residentParticularsDict[kCitizenship];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
     row.selectorOptions = @[@"Singaporean", @"PR", @"Foreigner", @"Stateless"];
     [section addFormRow:row];
     
     XLFormRowDescriptor *religionRow;
     religionRow = [XLFormRowDescriptor formRowDescriptorWithTag:kReligion rowType:XLFormRowDescriptorTypeSelectorPush title:@"Religion"];
+    religionRow.value = _residentParticularsDict[kReligion];
     religionRow.selectorOptions = @[@"Buddhism", @"Taoism", @"Islam", @"Christianity", @"Hinduism", @"No Religion", @"Others"];
-    [religionRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:religionRow];
     religionRow.required = YES;
     [section addFormRow:religionRow];
     
@@ -214,35 +213,31 @@ typedef enum rowTypes {
     row.required = NO;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", religionRow];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHpNumber rowType:XLFormRowDescriptorTypePhone title:@"HP Number"];
     row.required = YES;
-//    row.value = [resiPartiDict objectForKey:@"contact_no"];
+    row.value = [_residentParticularsDict objectForKey:kHpNumber];
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHouseNumber rowType:XLFormRowDescriptorTypePhone title:@"House Phone Number"];
     row.required = YES;
-//    row.value = [resiPartiDict objectForKey:@"contact_no2"];
+    row.value = [_residentParticularsDict objectForKey:kHouseNumber];
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number(2) must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEthnicity rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Ethnicity"];
     row.selectorOptions = @[@"Chinese",@"Indian",@"Malay",@"Others"];
-    row.required = NO;
+    row.value = [_residentParticularsDict objectForKey:kEthnicity];
+    row.required = YES;
     row.noValueDisplayText = @"Tap here for options";
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
-//    if ([[resiPartiDict objectForKey:@"ethnicity_id"] isEqualToString:@""]) {
-//        
-//    } else {
-//        row.value = [row.selectorOptions objectAtIndex:[[resiPartiDict objectForKey:@"ethnicity_id"] integerValue]] ;
-//    }
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
@@ -255,10 +250,10 @@ typedef enum rowTypes {
     XLFormRowDescriptor * spokenLangRow;
     spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language"];
     spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
-    [spokenLangRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
-    row.required = YES;
+    [self setDefaultFontWithRow:spokenLangRow];
+    spokenLangRow.required = YES;
 
-//    spokenLangRow.value = [self getSpokenLangArray:resiPartiDict];
+    spokenLangRow.value = [self getSpokenLangArray:_residentParticularsDict];
 //        spokenLangRow.value = spoken_lang_value? spoken_lang_value:@[];
     [section addFormRow:spokenLangRow];
     
@@ -296,13 +291,13 @@ typedef enum rowTypes {
     row.required = NO;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", spokenLangRow];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
-//    row.value = [resiPartiDict objectForKey:@"lang_others_text"];
+    [self setDefaultFontWithRow:row];
+    row.value = [_residentParticularsDict objectForKey:kLangOthers];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kMaritalStatus rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Marital Status"];
     row.selectorOptions = @[@"Divorced", @"Married", @"Separated", @"Single", @"Widowed"];
-    
+    row.value = _residentParticularsDict[kMaritalStatus];
     row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
             [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:kMaritalStatus andNewContent:newValue];
@@ -314,24 +309,18 @@ typedef enum rowTypes {
 //    } else {
 //        row.value = [row.selectorOptions objectAtIndex:[[resiPartiDict objectForKey:@"marital_status"] integerValue]] ;
 //    }
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
     row.noValueDisplayText = @"Tap here";
-    row.required = NO;
+    row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHousingOwnedRented rowType:XLFormRowDescriptorTypeSelectorPush title:@"Housing Type"];
     row.selectorOptions = @[@"Owned, 1-room", @"Owned, 2-room", @"Owned, 3-room", @"Owned, 4-room", @"Owned, 5-room", @"Rental, 1-room", @"Rental, 2-room", @"Rental, 3-room", @"Rental, 4-room"];
     row.required = YES;
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
-//    if (![[resiPartiDict objectForKey:@"housing_owned_rented"] isEqualToString:@""]) { //if got value
-//        if([[resiPartiDict objectForKey:@"housing_owned_rented"] isEqualToString:@"0"]) {   //owned
-//            NSArray *options = row.selectorOptions;
-//            row.value = [options objectAtIndex:([[resiPartiDict objectForKey:@"housing_num_rooms"] integerValue] - 1)]; //do the math =D
-//        } else {
-//            NSArray *options = row.selectorOptions;
-//            row.value = [options objectAtIndex:([[resiPartiDict objectForKey:@"housing_num_rooms"] integerValue] + 4)];
-//        }
-//    }
+    [self setDefaultFontWithRow:row];
+    
+    row.value = [self getHousingOwnedRentedFromTwoValues];
+    
     [section addFormRow:row];
     
     row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
@@ -359,15 +348,11 @@ typedef enum rowTypes {
     };
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHighestEduLevel rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Highest Education Level"];
+    row.value = _residentParticularsDict[kHighestEduLevel];
     row.noValueDisplayText = @"Tap here";
     row.selectorOptions = @[@"ITE/Pre-U/JC", @"No formal qualifications", @"Primary",@"Secondary",@"University"];
-//    if ([[resiPartiDict objectForKey:@"highest_edu_lvl"] isEqualToString:@""]) {
-//        row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"ITE/Pre-U/JC"];   //default value
-//    } else {
-//        row.value = [row.selectorOptions objectAtIndex:[[resiPartiDict objectForKey:@"highest_edu_lvl"] integerValue]] ;
-//    }
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
-    row.required = NO;
+    [self setDefaultFontWithRow:row];
+    row.required = YES;
     [section addFormRow:row];
     
     row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
@@ -377,13 +362,22 @@ typedef enum rowTypes {
     };
     
     XLFormRowDescriptor *addressRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAddress rowType:XLFormRowDescriptorTypeSelectorPush title:@"Address"];
-    if ([neighbourhood isEqualToString:@"KGL"])
+    if ([neighbourhood isEqualToString:@"Kampong Glam"])
         addressRow.selectorOptions = @[@"Blk 4 Beach Rd",@"Blk 5 Beach Rd",@"Blk 6 Beach Rd", @"Blk 7 North Bridge Rd", @"Blk 8 North Bridge Rd", @"Blk 9 North Bridge Rd", @"Blk 10 North Bridge Rd", @"Blk 18 Jln Sultan", @"Blk 19 Jln Sultan", @"Others"];
     else
         addressRow.selectorOptions = @[@"1 Eunos Crescent", @"2 Eunos Crescent", @"12 Eunos Crescent", @"2 Upper Aljunied Lane", @"3 Upper Aljunied Lane", @"4 Upper Aljunied Lane", @"5 Upper Aljunied Lane", @"Others"];
+    addressRow.value = [self getAddressFromStreetAndBlock];
     addressRow.required = YES;
-    [addressRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:addressRow];
     [section addFormRow:addressRow];
+    
+    XLFormRowDescriptor *addrOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
+    addrOthersRow.value = _residentParticularsDict[kAddressOthers];
+    addrOthersRow.required = NO;
+    addrOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", addressRow];
+    [addrOthersRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [self setDefaultFontWithRow:addrOthersRow];
+    [section addFormRow:addrOthersRow];
     
     addressRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
@@ -397,15 +391,15 @@ typedef enum rowTypes {
                 //code to be executed on the main queue after delay
                 [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:kAddressBlock andNewContent:block];
             });
+            
+            if ([newValue containsString:@"Others"]) {
+                addrOthersRow.required = YES;  //force to fill in address if selected 'Others'
+            } else {
+                addrOthersRow.required = NO;
+            }
         }
     };
     
-    XLFormRowDescriptor *addrOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
-    addrOthersRow.required = NO;
-    addrOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", addressRow];
-    [addrOthersRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [addrOthersRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
-    [section addFormRow:addrOthersRow];
     
 //    addrOthersRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor) {
 //        
@@ -416,7 +410,9 @@ typedef enum rowTypes {
 //    };
     
     XLFormRowDescriptor *unitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressUnitNum rowType:XLFormRowDescriptorTypeText title:@"Unit No"];
-    [unitRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    unitRow.value = _residentParticularsDict[kAddressUnitNum];
+    [self setDefaultFontWithRow:unitRow];
+    [unitRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     unitRow.required = YES;
     [section addFormRow:unitRow];
     
@@ -429,17 +425,20 @@ typedef enum rowTypes {
     };
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressPostCode rowType:XLFormRowDescriptorTypeNumber title:@"PostCode"];
-    row.required = NO;
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressPostCode rowType:XLFormRowDescriptorTypeNumber title:@"Postal Code"];
+    row.value = _residentParticularsDict[kAddressPostCode];
+    row.required = YES;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Postal Code must be 6 digits" regex:@"^(?=.*\\d).{6}$"]];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressDuration rowType:XLFormRowDescriptorTypeDecimal title:@"How many years have you stayed at your current block? \n____ years (If months, put in decimals to 1 decimal place eg. 6 months = 0.5 years)"];
-    row.required = NO;
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressDuration rowType:XLFormRowDescriptorTypeDecimal title:@"No. of years resided in current block"];
+    row.value = _residentParticularsDict[kAddressDuration];
+    row.required = YES;
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [row.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
@@ -463,61 +462,34 @@ typedef enum rowTypes {
         [self reloadFormRow:rowDescriptor];
         //no return here...
     }
+        
+    NSArray * validationErrors = [self formValidationErrors];
+    if (validationErrors.count > 0) {
+        
+        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            
+            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+            
+            if ([validationStatus.rowDescriptor isEqual:rowDescriptor]) {
+                UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+                cell.backgroundColor = [UIColor orangeColor];
+                [UIView animateWithDuration:0.3 animations:^{
+                    cell.backgroundColor = [UIColor whiteColor];
+                }];
+                [self showFormValidationError:[validationErrors objectAtIndex:idx]];    //only show error if it's this specific row
+                return;
+            }
+        }];
+    }
     
     if (rowDescriptor.value != (id)[NSNull null] && rowDescriptor.value != nil) {
-        
-        NSArray * validationErrors = [self formValidationErrors];
-        if (validationErrors.count > 0) {
-            
-            [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                
-                XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
-                
-                if ([validationStatus.rowDescriptor isEqual:rowDescriptor]) {
-                    UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
-                    cell.backgroundColor = [UIColor orangeColor];
-                    [UIView animateWithDuration:0.3 animations:^{
-                        cell.backgroundColor = [UIColor whiteColor];
-                    }];
-                    [self showFormValidationError:[validationErrors objectAtIndex:idx]];    //only show error if it's this specific row
-                    return;
-                }
-            }];
-        }
-        
         [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
     }
 }
 
 #pragma mark -
 
-//- (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
-//    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
-//    if ([[dictionary objectForKey:@"lang_canto"] isKindOfClass:[NSString class]]) {
-//        
-//        if([[dictionary objectForKey:@"lang_canto"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
-//        if([[dictionary objectForKey:@"lang_english"] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
-//        if([[dictionary objectForKey:@"lang_hindi"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
-//        if([[dictionary objectForKey:@"lang_hokkien"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
-//        if([[dictionary objectForKey:@"lang_malay"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
-//        if([[dictionary objectForKey:@"lang_mandarin"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
-//        if([[dictionary objectForKey:@"lang_others"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
-//        if([[dictionary objectForKey:@"lang_tamil"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
-//        if([[dictionary objectForKey:@"lang_teochew"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
-//    }
-//    else if ([[dictionary objectForKey:@"lang_english"] isKindOfClass:[NSNumber class]]) {
-//        if([[dictionary objectForKey:@"lang_canto"] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
-//        if([[dictionary objectForKey:@"lang_english"] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
-//        if([[dictionary objectForKey:@"lang_hindi"] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
-//        if([[dictionary objectForKey:@"lang_hokkien"] isEqual:@(1)]) [spokenLangArray addObject:@"Hokkien"];
-//        if([[dictionary objectForKey:@"lang_malay"] isEqual:@(1)]) [spokenLangArray addObject:@"Malay"];
-//        if([[dictionary objectForKey:@"lang_mandarin"] isEqual:@(1)]) [spokenLangArray addObject:@"Mandarin"];
-//        if([[dictionary objectForKey:@"lang_others"] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
-//        if([[dictionary objectForKey:@"lang_tamil"] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
-//        if([[dictionary objectForKey:@"lang_teochew"] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
-//    }
-//    return spokenLangArray;
-//}
+
 
 - (void) calculateAge: (XLFormRowDescriptor *)sender {
     NSDate *dobDate = dobRow.value;
@@ -629,7 +601,7 @@ typedef enum rowTypes {
         [resi_particulars setObject:room forKey:@"housing_num_rooms"];
     }
 
-    [self.resiPartiDict setObject:resi_particulars forKey:@"resi_particulars"];
+//    [self.resiPartiDict setObject:resi_particulars forKey:@"resi_particulars"];
     
     NSString *timeNow = [self getTimeNowInString];
     
@@ -733,7 +705,7 @@ typedef enum rowTypes {
 - (NSString *) getBlockFromAddress: (NSString *) string {
     
     NSMutableString *subString;
-    if ([neighbourhood isEqualToString:@"KGL"]) {
+    if ([neighbourhood isEqualToString:@"Kampong Glam"]) {
         subString = [[string substringWithRange:NSMakeRange(0, 6)] mutableCopy];
         [subString stringByReplacingOccurrencesOfString:@"Blk" withString:@""];
     } else
@@ -745,7 +717,7 @@ typedef enum rowTypes {
 
 - (NSString *) getStreetFromAddress: (NSString *) string {
     
-    if ([neighbourhood isEqualToString:@"KGL"]) {
+    if ([neighbourhood isEqualToString:@"Kampong Glam"]) {
         if ([string containsString:@"Beach"]) return @"Beach Rd";
         else if ([string containsString:@"North"]) return @"North Bridge Rd";
         else if ([string containsString:@"Sultan"]) return @"Jln Sultan";
@@ -756,6 +728,47 @@ typedef enum rowTypes {
     }
 }
 
+- (NSString *) getAddressFromStreetAndBlock {
+    if (_residentParticularsDict[kAddressStreet] != (id) [NSNull null]) {
+        NSString *block = _residentParticularsDict[kAddressBlock];
+        NSString *street = _residentParticularsDict[kAddressStreet];
+        
+        if ([neighbourhood isEqualToString:@"Kampong Glam"])
+            return [NSString stringWithFormat:@"Blk %@ %@", block, street];
+        else
+            return [NSString stringWithFormat:@"%@ %@", block, street];
+    }
+    return @"";
+}
+
+- (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
+    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
+    //    if ([[dictionary objectForKey:kLangCanto] isKindOfClass:[NSString class]]) {
+    //
+    //        if([[dictionary objectForKey:kLangCanto] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
+    //        if([[dictionary objectForKey:kLangEng] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
+    //        if([[dictionary objectForKey:kLangHindi] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
+    //        if([[dictionary objectForKey:kLangHokkien] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
+    //        if([[dictionary objectForKey:kLangMalay] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
+    //        if([[dictionary objectForKey:kLangMandarin] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
+    //        if([[dictionary objectForKey:kLangOthers] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
+    //        if([[dictionary objectForKey:kLangTamil] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
+    //        if([[dictionary objectForKey:kLangTeoChew] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
+    //    }
+    //    else if ([[dictionary objectForKey:kLangCanto] isKindOfClass:[NSNumber class]]) {
+    if([[dictionary objectForKey:kLangCanto] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
+    if([[dictionary objectForKey:kLangEng] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
+    if([[dictionary objectForKey:kLangHindi] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
+    if([[dictionary objectForKey:kLangHokkien] isEqual:@(1)]) [spokenLangArray addObject:@"Hokkien"];
+    if([[dictionary objectForKey:kLangMalay] isEqual:@(1)]) [spokenLangArray addObject:@"Malay"];
+    if([[dictionary objectForKey:kLangMandarin] isEqual:@(1)]) [spokenLangArray addObject:@"Mandarin"];
+    if([[dictionary objectForKey:kLangOthers] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
+    if([[dictionary objectForKey:kLangTamil] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
+    if([[dictionary objectForKey:kLangTeoChew] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
+    //    }
+    return spokenLangArray;
+}
+
 - (NSString *) getTimeNowInString {
     // get current date/time
     NSDate *today = [NSDate date];
@@ -764,6 +777,17 @@ typedef enum rowTypes {
     NSDate* localDateTime = [NSDate dateWithTimeInterval:[[NSTimeZone systemTimeZone] secondsFromGMT] sinceDate:today];
     
     return [localDateTime description];
+}
+
+- (NSString *) getHousingOwnedRentedFromTwoValues {
+    
+    if (_residentParticularsDict[kHousingNumRooms] != (id) [NSNull null]) { //got some value
+        NSString *numRooms = _residentParticularsDict[kHousingNumRooms];
+        NSString *ownedRented = _residentParticularsDict[kHousingOwnedRented];
+        
+        return [NSString stringWithFormat:@"%@, %@-room", ownedRented, numRooms];
+    }
+    return @"";
 }
 
 - (void) postSpokenLangWithLangName:(NSString *) language andValue: (NSString *) value {
@@ -786,7 +810,7 @@ typedef enum rowTypes {
 -(void)submitBtnPressed:(UIBarButtonItem * __unused)button {
     
     NSDictionary *fields = [self.form formValues];
-    NSString *name, *nric, *gender, *birthDate;
+    NSString *name, *nric, *gender, *birthDate, *screenLocation;
     
     if ([fields objectForKey:kGender] != [NSNull null]) {
         if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
@@ -803,7 +827,7 @@ typedef enum rowTypes {
 //    [resi_particulars setObject:nric forKey:kNRIC];
     birthDate = [self getStringWithDictionary:fields rowType:Date formDescriptorWithTag:kBirthDate];
 //    [resi_particulars setObject:birthDate forKey:kBirthDate];
-    
+    screenLocation = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
     NSString *timeNow = [self getTimeNowInString];
     
     NSNumber *residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId];
@@ -814,7 +838,8 @@ typedef enum rowTypes {
                                kNRIC:nric,
                                kGender:gender,
                                kBirthDate:birthDate,
-                               kTimestamp:timeNow};
+                               kTimestamp:timeNow,
+                               kScreenLocation:screenLocation};
         [self submitNewResidentEntry:dict];
     } else {
         NSLog(@"Resident already exist!");
@@ -844,6 +869,26 @@ typedef enum rowTypes {
 
     
     
+#pragma mark - Download Server API
+- (void) processConnectionStatus {
+    if(status == NotReachable)
+    {
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"No Internet!", nil)
+                                                                                  message:@"You're not connected to Internet."
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction){
+//                                                              [self.refreshControl endRefreshing];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+    else if (status == ReachableViaWiFi || status == ReachableViaWWAN) {
+        
+    }
+
+}
 
 
 #pragma mark - Post data to server methods
@@ -867,6 +912,8 @@ typedef enum rowTypes {
                            };
     
     NSLog(@"Uploading %@ for $%@$ field", content, fieldName);
+    [KAStatusBar showWithStatus:@"Syncing..." andBarColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:0 alpha:1.0]];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client postDataGivenSectionAndFieldName:dict
@@ -905,6 +952,7 @@ typedef enum rowTypes {
 - (void (^)(NSProgress *downloadProgress))progressBlock {
     return ^(NSProgress *downloadProgress) {
         NSLog(@"POST in progress...");
+        
     };
 }
 
@@ -914,6 +962,11 @@ typedef enum rowTypes {
         
         successCounter++;
         NSLog(@"%d", successCounter);
+//        [KAStatusBar dismiss];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+        [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+        
+        
 //        if(successCounter == 4) {
 //            NSLog(@"SUBMISSION SUCCESSFUL!!");
 //            dispatch_async(dispatch_get_main_queue(), ^{
@@ -981,6 +1034,21 @@ typedef enum rowTypes {
         
     };
 }
+
+#pragma mark - UIFont methods
+- (void) setDefaultFontWithRow: (XLFormRowDescriptor *) row {
+    UIFont *font = [UIFont fontWithName:DEFAULT_FONT_NAME size:DEFAULT_FONT_SIZE];
+    UIFont *boldedFont = [self boldFontWithFont:font];
+    [row.cellConfig setObject:boldedFont forKey:@"textLabel.font"];
+}
+
+- (UIFont *)boldFontWithFont:(UIFont *)font
+{
+    UIFontDescriptor * fontD = [font.fontDescriptor
+                                fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+    return [UIFont fontWithDescriptor:fontD size:0];
+}
+
 /*
 #pragma mark - Navigation
 

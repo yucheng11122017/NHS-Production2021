@@ -13,5 +13,8 @@
 @property (nonatomic, weak) IBOutlet UILabel *nameLabel;
 @property (nonatomic, weak) IBOutlet UILabel *NRICLabel;
 @property (nonatomic, weak) IBOutlet UILabel *dateLabel;
+@property (nonatomic, weak) IBOutlet UILabel *regLabel;
+@property (nonatomic, weak) IBOutlet UILabel *yearLabel;
+@property (weak, nonatomic) IBOutlet UILabel *verticalLine;
 
 @end

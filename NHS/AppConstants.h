@@ -27,10 +27,13 @@ extern NSString *const kQualifyFallAssess;
 extern NSString *const kQualifyDementia;
 
 extern NSString *const kTimestamp;
+extern NSString *const kLastUpdateTs;
 extern NSString *const kResidentId;
 extern NSString *const kSectionName;
 extern NSString *const kFieldName;
 extern NSString *const kNewContent;
+extern NSString *const kScreenLocation;
+extern NSString *const kResiParticulars;
 
 /*
  * Form Constants
@@ -116,7 +119,6 @@ extern NSString *const kDoesntOwnChasPioneer;
 extern NSString *const kLowHouseIncome;
 extern NSString *const kLowHomeValue;
 extern NSString *const kWantChas;
-extern NSString *const kChasColor;
 extern NSString *const kSporeanPr;
 extern NSString *const kAgeAbove50;
 extern NSString *const kRelWColorectCancer;
@@ -184,6 +186,7 @@ extern NSString *const kHasMedisave;
 extern NSString *const kHasInsure;
 extern NSString *const kHasCpfPayouts;
 extern NSString *const kCpfAmt;
+extern NSString *const kChasColor;
 extern NSString *const kReceivingFinAssist;
 extern NSString *const kFinAssistName;
 extern NSString *const kFinAssistOrg;

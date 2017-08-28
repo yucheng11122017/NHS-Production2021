@@ -179,7 +179,7 @@
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
-    _infoBox = [[UIView alloc] initWithFrame:CGRectMake(100, 50, 250, 80)];     //trying to find out its center.
+    _infoBox = [[UIView alloc] initWithFrame:CGRectMake(100, 50, 250, 100)];     //trying to find out its center.
     _infoBox.backgroundColor = [UIColor colorWithRed:193/255.0 green:241/255.0 blue:255/255.0 alpha:1.0];
     _infoBox.layer.cornerRadius = 5.0;
     
@@ -203,6 +203,12 @@
     citizenshipLabel.font = [UIFont systemFontOfSize:12.0];
     citizenshipLabel.textColor = [UIColor blueColor];
     [_infoBox addSubview:citizenshipLabel];
+    
+    UILabel *religionLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 70, 200, 20)];
+    religionLabel.text = [NSString stringWithFormat:@"Religion: %@", [defaults objectForKey:kReligion]];
+    religionLabel.font = [UIFont systemFontOfSize:12.0];
+    religionLabel.textColor = [UIColor blueColor];
+    [_infoBox addSubview:religionLabel];
     
     _infoBox.alpha = 0;
     

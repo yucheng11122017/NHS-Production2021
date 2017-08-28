@@ -9,11 +9,30 @@
 #import "ScreeningSelectProfileTableVC.h"
 #import "ResidentParticularsVC.h"
 #import "AppConstants.h"
+#import "ServerComm.h"
+#import "Reachability.h"
+#import "SVProgressHUD.h"
 
-@interface ScreeningSelectProfileTableVC ()
+
+#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
+
+
+typedef enum getDataState {
+    inactive,
+    started,
+    failed,
+    successful
+} getDataState;
+
+@interface ScreeningSelectProfileTableVC () {
+    NetworkStatus status;
+    int fetchDataState;
+}
 
 
 @property (strong, nonatomic) NSArray *yearlyProfile;
+@property (strong, nonatomic) NSDictionary *residentParticulars;
+@property (strong, nonatomic) NSNumber *residentID;
 
 @end
 
@@ -22,13 +41,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.navigationItem.title = @"Screening History";
-    _yearlyProfile = [[NSArray alloc] initWithObjects:@"2017 Profile",@"2018 Profile",@"2019 Profile", nil];
+    self.navigationItem.title = @"Integrated Profile";
+    _yearlyProfile = [[NSArray alloc] initWithObjects:@"2017",@"2018",@"2019", nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     
     [self.tableView reloadData];
+    
+    _residentParticulars = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"resi_particulars"]];;
+    _residentID = _residentParticulars[kResidentId];
+
+    
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -41,6 +65,18 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    _residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId];
+    
+    Reachability *reachability = [Reachability reachabilityForInternetConnection];
+    [reachability startNotifier];
+    
+    status = [reachability currentReachabilityStatus];
+    [self processConnectionStatus];
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -50,9 +86,9 @@
 - (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     
     if (section ==0) {
-        return @"Info";
+        return @"Personal Information";
     } else if (section == 1) {
-        return @"Profiles";
+        return @"Screening Profiles";
     } else {
         return @"";
     }
@@ -88,7 +124,7 @@
     } else {
         NSString *text = [_yearlyProfile objectAtIndex:indexPath.row];
         
-        NSString *str = [_residentDetails objectForKey:@"resident_id"];
+        NSString *str = [[_residentDetails objectForKey:kResiParticulars] objectForKey:kResidentId];
         
         BOOL newEntry = str? NO:YES;
         
@@ -128,6 +164,131 @@
         }
     }
 }
+
+
+#pragma mark - Server API
+- (void) processConnectionStatus {
+    if(status == NotReachable)
+    {
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"No Internet!", nil)
+                                                                                  message:@"You're not connected to Internet."
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction){
+                                                              //                                                              [self.refreshControl endRefreshing];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+    else if (status == ReachableViaWiFi || status == ReachableViaWWAN) {
+        if (_residentID != nil && _residentID != (id) [NSNull null])
+            [self getAllDataForOneResident];
+    }
+    
+}
+
+- (void)getAllDataForOneResident {
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    [SVProgressHUD showWithStatus:@"Downloading data..."];
+    
+    [client getSingleScreeningResidentDataWithResidentID:_residentID
+                                           progressBlock:[self progressBlock]
+                                            successBlock:[self downloadSingleResidentDataSuccessBlock]
+                                            andFailBlock:[self downloadErrorBlock]];
+}
+
+#pragma mark - Blocks
+
+- (void (^)(NSProgress *downloadProgress))progressBlock {
+    return ^(NSProgress *downloadProgress) {
+        //        NSLog(@"Patients GET Request Started. In Progress.");
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSingleResidentDataSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        
+        self.residentDetails = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
+        NSLog(@"%@", self.residentDetails); //replace the existing one
+        _residentParticulars = self.residentDetails[kResiParticulars];  //update the residentParticulars
+        
+        [self saveCoreData];
+        [SVProgressHUD dismiss];
+//        [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+//        [SVProgressHUD showSuccessWithStatus:@"Done!"];
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"Patients data fetch was unsuccessful!");
+        fetchDataState = failed;
+        [self.tableView reloadData];
+        [self.refreshControl endRefreshing];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error", nil)
+                                                                                  message:@"Can't fetch data from server!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              [self.tableView reloadData];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))downloadErrorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"******UNSUCCESSFUL DOWNLOAD******!!");
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
+        NSLog(@"error: %@", errorString);
+        [SVProgressHUD dismiss];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Download Fail", nil)
+                                                                                  message:@"Download form failed!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              [self.tableView reloadData];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    };
+}
+
+#pragma mark - Save Core Data
+
+- (void) saveCoreData {
+    
+    NSDictionary *particularsDict =[_residentDetails objectForKey:kResiParticulars];
+    
+    // Calculate age
+    NSMutableString *str = [particularsDict[kBirthDate] mutableCopy];
+    NSString *yearOfBirth = [str substringWithRange:NSMakeRange(0, 4)];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy"];
+    NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
+    NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
+    
+    
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kGender] forKey:kGender];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:age] forKey:kResidentAge];
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kResidentId] forKey:kResidentId];
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kName] forKey:kName];
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kNRIC] forKey:kNRIC];
+    
+    
+    // For demographics
+    if (particularsDict[kCitizenship] != (id) [NSNull null])        //check for null first
+        [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kCitizenship] forKey:kCitizenship];
+    if (particularsDict[kReligion] != (id) [NSNull null])
+        [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kReligion] forKey:kReligion];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 
 
 /*
@@ -171,7 +332,7 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentParticularsDict:)]) {
         [segue.destinationViewController performSelector:@selector(setResidentParticularsDict:)
-                                              withObject:_residentDetails];
+                                              withObject:_residentParticulars];
     }
 }
 

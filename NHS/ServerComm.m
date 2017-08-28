@@ -7,6 +7,7 @@
 //
 
 #import "ServerComm.h"
+#import "AppConstants.h"
 
 //#define baseURL @"https://nus-nhs.ml/"        //for Development
 #define baseURL @"https://nhs-som.nus.edu.sg/"
@@ -81,7 +82,7 @@
     NSDictionary *dict;
     NSDictionary *dataDict;
     
-    dict = @{@"resident_id" : patientID};
+    dict = @{kResidentId : patientID};
     dataDict = @{@"data": dict};
     
     NSLog(@"%@",dataDict);
@@ -104,7 +105,7 @@
     NSDictionary *dict;
     NSDictionary *dataDict;
     
-    dict = @{@"resident_id" : residentID};
+    dict = @{kResidentId: residentID};
     dataDict = @{@"data": dict};
     
     NSLog(@"%@",dataDict);
@@ -257,7 +258,7 @@
       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
     
-    NSInteger opCode = 101;
+    NSInteger opCode = 1700;    //updated for 1700
     NSDictionary *dict = [[NSDictionary alloc]
                           initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     
@@ -273,13 +274,13 @@
                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
     
-    NSInteger opCode = 102;
+    NSInteger opCode = 1702;
     NSDictionary *url = [[NSDictionary alloc]
                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
     NSDictionary *dict;
     NSDictionary *dataDict;
     
-    dict = @{@"resident_id" : residentID};
+    dict = @{kResidentId : residentID};
     dataDict = @{@"data": dict};
     
     NSLog(@"%@",dataDict);
