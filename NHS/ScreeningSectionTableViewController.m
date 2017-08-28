@@ -26,8 +26,8 @@ typedef enum typeOfForm {
 } typeOfForm;
 
 typedef enum sectionRowNumber {
-    ModeOfScreening,
     Phlebotomy,
+    ModeOfScreening,
     Profiling,
     HealthAssessment_RiskStratification,
     SocialWork,
@@ -98,9 +98,7 @@ typedef enum sectionRowNumber {
     }
 #endif
     
-//    self.rowTitles = @[@"Resident Particulars", @"Clinical Results",@"Screening of Risk Factors", @"Diabetes Mellitus", @"Hyperlipidemia", @"Hypertension", @"Cancer Screening", @"Other Medical Issues", @"Primary Care Source", @"My Health and My Neighbourhood", @"Demographics", @"Current Physical Issues", @"Current Socioeconomics Situation", @"Social Support Assessment", @"Referral for Doctor Consultation"];
-    
-    self.rowTitles = @[@"Mode of Screening", @"Phlebotomy",@"Profiling", @"Health Assessment & Risk Stratification", @"Social Work", @"Triage", @"Snellen Eye Test", @"Additional Services", @"Doctor's Consultation", @"Basic Dental Check-up", @"SERI Advanced Eye Screening", @"Fall Risk Assessment", @"Geriatric Dementia Asssesment", @"Health Education"];
+    self.rowTitles = @[@"Phlebotomy", @"Mode of Screening",@"Profiling", @"Health Assessment & Risk Stratification", @"Social Work", @"Triage", @"Snellen Eye Test", @"Additional Services", @"Doctor's Consultation", @"Basic Dental Check-up", @"SERI Advanced Eye Screening", @"Fall Risk Assessment", @"Geriatric Dementia Asssesment", @"Health Education"];
     
      self.clearsSelectionOnViewWillAppear = YES;
     

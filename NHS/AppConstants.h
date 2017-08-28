@@ -66,6 +66,7 @@ extern NSString *const kQualifyFIT;
 extern NSString *const kQualifyPapSmear;
 extern NSString *const kQualifyFallAssess;
 extern NSString *const kQualifyDementia;
+extern NSString *const kQualifyPhleb;
 
 
 #pragma mark - Resident Particulars submission
@@ -132,6 +133,7 @@ extern NSString *const SearchBarIsFirstResponderKey;
 extern NSString *const kScreenMode;
 extern NSString *const kApptDate;
 extern NSString *const kApptTime;
+extern NSString *const kPhlebAppt;
 
 #pragma mark - Phlebotomy
 extern NSString *const kWasTaken;

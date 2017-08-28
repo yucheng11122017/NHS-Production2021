@@ -556,34 +556,38 @@ NSString *const kQ15 = @"q15";
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabeticFriend
-                                                rowType:XLFormRowDescriptorTypeBooleanSwitch
+                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                   title:@"Do you have a first degree relative with diabetes mellitus? *"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.selectorOptions = @[@"Yes", @"No"];
     row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDelivered4kgOrGestational
-                                                rowType:XLFormRowDescriptorTypeBooleanSwitch
+                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                   title:@"Have you delivered a baby 4 kg or more; or were previously diagnosed with gestational diabetes mellitus? *"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.selectorOptions = @[@"Yes", @"No"];
     row.required = YES;
     [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCardioHistory
-                                                rowType:XLFormRowDescriptorTypeBooleanSwitch
-                                                  title:@"Do you have a history of cardiovascular disease (heart/vascular problems e.g. angina, myocardial infarction, aneurysms)? *"];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.required = YES;
-    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCardioHistory
+//                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+//                                                  title:@"Do you have a history of cardiovascular disease (heart/vascular problems e.g. angina, myocardial infarction, aneurysms)? *"];
+//    [self setDefaultFontWithRow:row];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.selectorOptions = @[@"Yes", @"No"];
+//    row.required = YES;
+//    [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmoke
-                                                rowType:XLFormRowDescriptorTypeBooleanSwitch
+                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                   title:@"Do you smoke? *"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.selectorOptions = @[@"Yes", @"No"];
     row.required = YES;
     [section addFormRow:row];
 

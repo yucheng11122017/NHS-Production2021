@@ -301,7 +301,7 @@ typedef enum rowTypes {
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHousingOwnedRented rowType:XLFormRowDescriptorTypeSelectorPush title:@"Housing Type"];
-    row.selectorOptions = @[@"Owned, 1-room", @"Owned, 2-room", @"Owned, 3-room", @"Owned, 4-room", @"Owned, 5-room", @"Rental, 1-room", @"Rental, 2-room", @"Rental, 3-room", @"Rental, 4-room"];
+    row.selectorOptions = @[@"Owned, 1-room", @"Owned, 2-room", @"Owned, 3-room", @"Owned, 4-room", @"Owned, 5-room", @"Rental, 1-room", @"Rental, 2-room", @"Rental, 3-room", @"Rental, 4-room", @"Private"];
     row.required = YES;
     [self setDefaultFontWithRow:row];
     
@@ -411,7 +411,7 @@ typedef enum rowTypes {
     };
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressPostCode rowType:XLFormRowDescriptorTypeNumber title:@"Postal Code"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressPostCode rowType:XLFormRowDescriptorTypeInteger title:@"Postal Code"];
     row.value = _residentParticularsDict[kAddressPostCode];
     row.required = YES;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];

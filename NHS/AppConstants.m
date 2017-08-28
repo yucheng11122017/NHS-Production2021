@@ -22,6 +22,7 @@ NSString *const kQualifyFIT = @"qualify_fit";
 NSString *const kQualifyPapSmear = @"qualify_pap_smear";
 NSString *const kQualifyFallAssess = @"qualify_fall_assess";
 NSString *const kQualifyDementia = @"qualify_dementia";
+NSString *const kQualifyPhleb = @"qualify_phleb";
 
 NSString *const kTimestamp = @"ts";
 NSString *const kLastUpdateTs = @"last_updated_ts";
@@ -93,6 +94,7 @@ NSString *const kRemarks = @"remarks";
 NSString *const kScreenMode = @"screen_mode";
 NSString *const kApptDate = @"appt_date";
 NSString *const kApptTime = @"appt_time";
+NSString *const kPhlebAppt = @"phleb_appt";
 
 
 #pragma mark - Phlebotomy
