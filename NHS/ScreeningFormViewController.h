@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "XLFormViewController.h"
 
-@interface ScreeningFormViewController : XLFormViewController
+@interface ScreeningFormViewController : XLFormViewController <XLFormDescriptorDelegate>
 
 @property (strong, nonatomic) NSNumber* sectionID;
 @property (strong, nonatomic) NSNumber* formType;
@@ -18,7 +18,6 @@
 
 - (void) setSectionID:(NSNumber *)sectionID;
 - (void) setFormType:(NSNumber *)formType;
-- (void) setpreRegParticularsDict :(NSDictionary *)preRegParticularsDict;
 - (void) setFullScreeningForm: (NSMutableDictionary *) dictionary;
 
 

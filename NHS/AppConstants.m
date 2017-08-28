@@ -99,7 +99,7 @@ NSString *const kApptTime = @"appt_time";
 
 NSString *const kWasTaken = @"was_taken";
 NSString *const kFastingBloodGlucose = @"fasting_blood_glu";
-NSString *const kTriglycerides = @"trigycerides";
+NSString *const kTriglycerides = @"triglycerides";
 NSString *const kLDL= @"ldl";
 NSString *const kHDL= @"hdl";
 NSString *const kCholesterolHdlRatio= @"cholesterol_hdl_ratio";

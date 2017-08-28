@@ -14,6 +14,47 @@
 #define DEFAULT_FONT_NAME @"AppleSDGothicNeo-Regular"
 #define DEFAULT_ROW_HEIGHT_FOR_SECTIONS 70.0
 
+#pragma mark - Section Names for Submission
+
+#define SECTION_MODE_OF_SCREENING               @"mode_of_screening"
+#define SECTION_PHLEBOTOMY                      @"phlebotomy"
+#define SECTION_PROFILING_SOCIOECON             @"profiling_socioecon"
+#define SECTION_CHAS_PRELIM                     @"chas_prelim"
+#define SECTION_COLONOSCOPY_ELIGIBLE            @"colonoscopy_eligible"
+#define SECTION_FIT_ELIGIBLE                    @"fit_eligible"
+#define SECTION_MAMMOGRAM_ELIGIBLE              @"mammogram_eligible"
+#define SECTION_PAP_SMEAR_ELIGIBLE              @"pap_smear_eligible"
+#define SECTION_FALL_RISK_ELIGIBLE              @"fall_risk_eligible"
+#define SECTION_GERIATRIC_DEMENTIA_ELIGIBLE     @"geriatric_dementia_eligible"
+#define SECTION_DIABETES                        @"diabetes"
+#define SECTION_HYPERLIPIDEMIA                  @"hyperlipidemia"
+#define SECTION_HYPERTENSION                    @"hypertension"
+#define SECTION_DEPRESSION                      @"depression"
+#define SECTION_RISK_STRATIFICATION             @"risk_stratification"
+#define SECTION_CURRENT_SOCIOECO_SITUATION      @"current_socioeco_situation"
+#define SECTION_CURRENT_PHY_STATUS              @"current_phy_status"
+#define SECTION_SOCIAL_SUPPORT                  @"social_support"
+#define SECTION_PSYCH_WELL_BEING                @"psych_well_being"
+#define SECTION_SW_ADD_SERVICES                 @"sw_add_services"
+#define SECTION_SOC_WORK_SUMMARY                @"soc_work_summary"
+#define SECTION_CLINICAL RESULTS                @"clinical_results"
+#define SECTION_SNELLEN_TEST                    @"snellen_test"
+#define SECTION_ADD_SERVICES                    @"add_services"
+#define SECTION_DOC_CONSULT                     @"doc_consult"
+#define SECTION_BASIC_DENTAL                    @"basic_dental"
+#define SECTION_SERI_MED_HIST                   @"seri_med_hist"
+#define SECTION_SERI_VA                         @"seri_va"
+#define SECTION_SERI_AUTOREFRACTOR              @"seri_autorefractor"
+#define SECTION_SERI_IOP                        @"seri_iop"
+#define SECTION_SERI_AHE                        @"seri_ahe"
+#define SECTION_SERI_PHE                        @"seri_phe"
+#define SECTION_SERI_DAG                        @"seri_dag"
+#define SECTION_FALL_RISK_ASSMT                 @"fall_risk_assmt"
+#define SECTION_GERIATRIC_DEMENTIA_ASSMT        @"geriatric_dementia_assmt"
+#define SECTION_PRE_HEALTH_EDU                  @"pre_health_edu"
+#define SECTION_POST_HEALTH_EDU                 @"post_health_edu"
+
+
 #pragma mark - UserDefaults
 
 extern NSString *const kResidentAge;
@@ -26,6 +67,8 @@ extern NSString *const kQualifyPapSmear;
 extern NSString *const kQualifyFallAssess;
 extern NSString *const kQualifyDementia;
 
+
+#pragma mark - Resident Particulars submission
 extern NSString *const kTimestamp;
 extern NSString *const kLastUpdateTs;
 extern NSString *const kResidentId;
@@ -35,9 +78,7 @@ extern NSString *const kNewContent;
 extern NSString *const kScreenLocation;
 extern NSString *const kResiParticulars;
 
-/*
- * Form Constants
- ********************************************/
+#pragma mark - Resident Particulars
 
 extern NSString *const kName;
 extern NSString *const kNRIC;
@@ -81,21 +122,18 @@ extern NSString *const kIsFinal;
 extern NSString *const kNeighbourhood;
 extern NSString *const kRemarks;
 
-/* Search Bar constants
- ********************************************/
+#pragma mark - SearchBar constants
 extern NSString *const ViewControllerTitleKey;
 extern NSString *const SearchControllerIsActiveKey;
 extern NSString *const SearchBarTextKey;
 extern NSString *const SearchBarIsFirstResponderKey;
 
-/* Mode of Screening
-********************************************/
+#pragma mark - Mode of Screening
 extern NSString *const kScreenMode;
 extern NSString *const kApptDate;
 extern NSString *const kApptTime;
 
-/* Phlebotomy
- ********************************************/
+#pragma mark - Phlebotomy
 extern NSString *const kWasTaken;
 extern NSString *const kFastingBloodGlucose;
 extern NSString *const kTriglycerides;
@@ -105,8 +143,7 @@ extern NSString *const kCholesterolHdlRatio;
 extern NSString *const kTotCholesterol;
 
 
-/* Profiling
- ********************************************/
+#pragma mark - Profiling
 extern NSString *const kProfilingConsent;
 extern NSString *const kEmployStat;
 extern NSString *const kEmployReasons;
@@ -142,8 +179,8 @@ extern NSString *const kScaredFall;
 extern NSString *const kFeelFall;
 extern NSString *const kCognitiveImpair;
 
-/* Health Assessment and Risk Stratisfaction
- ********************************************/
+#pragma mark - Health Assessment and Risk Stratisfaction
+
 extern NSString *const kDMHasInformed;
 extern NSString *const kDMCheckedBlood;
 extern NSString *const kDMSeeingDocRegularly;
@@ -173,10 +210,9 @@ extern NSString *const kCardioHistory;
 extern NSString *const kSmoke;
 
 
-/* Social Work
-********************************************/
+#pragma mark - Social Work
 
-/* Current Socioeconomic Situation */
+#pragma mark Current Socioeconomic Situation
 extern NSString *const kCopeFin;
 extern NSString *const kWhyNotCopeFin;
 extern NSString *const kMoreWhyNotCopeFin;
@@ -196,7 +232,7 @@ extern NSString *const kFinAssistEnuf;
 extern NSString *const kFinAssistEnufWhy;
 extern NSString *const kSocSvcAware;
 
-/* Current Physical Status */
+#pragma mark Current Physical Status
 extern NSString *const kBathe;
 extern NSString *const kDress;
 extern NSString *const kEat;
@@ -206,7 +242,7 @@ extern NSString *const kWalk;
 extern NSString *const kMobilityStatus;
 extern NSString *const kMobilityEquipment;
 
-/* Social Support */
+#pragma mark Social Support
 extern NSString *const kHasCaregiver;
 extern NSString *const kCaregiverName;
 extern NSString *const kCaregiverRs;
@@ -249,13 +285,13 @@ extern NSString *const kWhyNotOthers;
 extern NSString *const kWhyNoParticipate;
 extern NSString *const kHostOthers;
 
-/* Psychological well-being*/
+#pragma mark Psychological well-being
 extern NSString *const kIsPsychotic;
 extern NSString *const kPsychoticRemarks;
 extern NSString *const kSuicideIdeas;
 extern NSString *const kSuicideIdeasRemarks;
 
-/* Additional Services */
+#pragma mark Additional Services
 extern NSString *const kBedbug;
 extern NSString *const kDriedScars;
 extern NSString *const kHoardingBeh;
@@ -267,7 +303,7 @@ extern NSString *const kBedbugOthersText;
 extern NSString *const kRequiresBedbug;
 extern NSString *const kRequiresDecluttering;
 
-/* Summary */
+#pragma mark Summary
 extern NSString *const kFinancial;
 extern NSString *const kEldercare;
 extern NSString *const kBasic;
@@ -284,10 +320,9 @@ extern NSString *const kSwVolName;
 extern NSString *const kSwVolContactNum;
 
 
-/* Triage
- ********************************************/
+#pragma mark - Triage
 
-/* Clinical Results */
+#pragma mark Clinical Results
 extern NSString *const kBp1Sys;
 extern NSString *const kBp1Dias;
 extern NSString *const kHeightCm;
@@ -337,12 +372,12 @@ extern NSString *const kDentistReferred;
 
 #pragma mark - SERI Advanced Eye Screening
 
-/* Medical History */
+#pragma mark Medical History
 extern NSString *const kChiefComp;
 extern NSString *const kOcuHist;
 extern NSString *const kHealthHist;
 
-/* Visual Acuity */
+#pragma mark Visual Acuity
 extern NSString *const kVaDone;
 extern NSString *const kVa;
 extern NSString *const kVaSnellenOd;
@@ -359,7 +394,7 @@ extern NSString *const kNearLogmarOs;
 extern NSString *const kNearNxOs;
 extern NSString *const kVaComments;
 
-/* Autorefractor */
+#pragma mark Autorefractor
 extern NSString *const kAutoDone;
 extern NSString *const kSpRightR1;
 extern NSString *const kSpRightR2;
@@ -406,13 +441,13 @@ extern NSString *const kKerAxLeftR2;
 extern NSString *const kPupilDist;
 extern NSString *const kAutorefractorComment;
 
-/* Intra-ocular Pressure */
+#pragma mark Intra-ocular Pressure
 extern NSString *const kIopDone;
 extern NSString *const kIopRight;
 extern NSString *const kIopLeft;
 extern NSString *const kIopComment;
 
-/* Anterior Health Examination */
+#pragma mark Anterior Health Examination
 extern NSString *const kAheDone;
 extern NSString *const kAheOd;
 extern NSString *const kAheOdRemark;
@@ -420,7 +455,7 @@ extern NSString *const kAheOs;
 extern NSString *const kAheOsRemark;
 extern NSString *const kAheComment;
 
-/* Posterior Health Examination */
+#pragma mark Posterior Health Examination
 extern NSString *const kPheDone;
 extern NSString *const kPheFundusOd;
 extern NSString *const kPheFundusOdRemark;
@@ -428,7 +463,7 @@ extern NSString *const kPheFundusOs;
 extern NSString *const kPheFundusOsRemark;
 extern NSString *const kPheComment;
 
-/* Diagnosis and Follow-up */
+#pragma mark Diagnosis and Follow-up
 extern NSString *const kOdNormal;
 extern NSString *const kOdRefractive;
 extern NSString *const kOdCataract;

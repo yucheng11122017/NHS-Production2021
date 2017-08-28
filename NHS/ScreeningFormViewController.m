@@ -9,7 +9,9 @@
 #import "ScreeningFormViewController.h"
 #import "PreRegFormViewController.h"
 #import "ServerComm.h"
+#import "Reachability.h"
 #import "SVProgressHUD.h"
+#import "KAStatusBar.h"
 #import "AppConstants.h"
 #import "ScreeningSectionTableViewController.h"
 #import "math.h"
@@ -63,6 +65,7 @@ NSString *const kQuestionFifteen = @"q15";
 NSString *const kMultiADL = @"multi_adl";
 
 @interface ScreeningFormViewController () {
+    NetworkStatus status;
     NSString *gender;
     NSArray *spoken_lang_value;
     XLFormRowDescriptor *preEdScoreRow, *postEdScoreRow, *showPostEdSectionBtnRow;
@@ -84,12 +87,7 @@ NSString *const kMultiADL = @"multi_adl";
 - (void)viewDidLoad {
     
     XLFormViewController *form;
-    
-    //fixed for now
-//    neighbourhood = @"KGL";
-//    citizenship = @"Singaporean";
-//    age = [NSNumber numberWithInt:70];
-    
+
     citizenship = [[NSUserDefaults standardUserDefaults]
                             stringForKey:kCitizenship];
     age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
@@ -99,8 +97,6 @@ NSString *const kMultiADL = @"multi_adl";
     neighbourhood = [[NSUserDefaults standardUserDefaults]
               stringForKey:kNeighbourhood];
     
-    
-//    form = [self initModeOfScreening];
     
     //must init first before [super viewDidLoad]
     switch([self.sectionID integerValue]) {
@@ -150,7 +146,7 @@ NSString *const kMultiADL = @"multi_adl";
 //    [self saveEntriesIntoDictionary];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"updateFullScreeningForm"
                                                         object:nil
-                                                      userInfo:self.fullScreeningForm];
+                                                      userInfo:nil];
     NSMutableDictionary *completionCheckUserInfo = [[NSMutableDictionary alloc] init];
     [completionCheckUserInfo setObject:self.sectionID forKey:@"section"];
     //Do a quick validation!
@@ -173,10 +169,6 @@ NSString *const kMultiADL = @"multi_adl";
     // Dispose of any resources that can be recreated.
 }
 
-- (void) setpreRegParticularsDict :(NSDictionary *)preRegParticularsDict {
-    self.preRegParticularsDict = [[NSDictionary alloc] initWithDictionary:preRegParticularsDict];
-}
-
 #pragma mark - Forms methods
 
 -(id)initModeOfScreening {
@@ -184,17 +176,21 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
+    NSDictionary *modeOfScreening = _fullScreeningForm[SECTION_MODE_OF_SCREENING];
+    
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kScreenMode rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Pick one"];
+    if (modeOfScreening != (id)[NSNull null]) row.value = modeOfScreening[kScreenMode];
     row.selectorOptions = @[@"Centralised", @"Door-to-door"];
     row.required = YES;
     [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kApptDate rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Appointment Date"];
+    if (modeOfScreening != (id)[NSNull null]) row.value = modeOfScreening[kApptDate];
     row.noValueDisplayText = @"Tap here";
     [self setDefaultFontWithRow:row];
     
@@ -207,6 +203,7 @@ NSString *const kMultiADL = @"multi_adl";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kApptTime rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Appointment Time"];
+    if (modeOfScreening != (id)[NSNull null]) row.value = modeOfScreening[kApptTime];
     row.noValueDisplayText = @"Tap here";
     row.selectorOptions= @[@"8am", @"10am", @"12pm", @"2pm"];
     row.required = NO;
@@ -221,42 +218,51 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
+    NSDictionary *phlebotomyDict = _fullScreeningForm[SECTION_PHLEBOTOMY];
+    
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kWasTaken rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Taken?"];
+    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kWasTaken];
     [self setDefaultFontWithRow:row];
     row.required = YES;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFastingBloodGlucose rowType:XLFormRowDescriptorTypeDecimal title:@"Fasting blood glucose (mmol/L)"];
+    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kFastingBloodGlucose];
     [row.cellConfig setObject:[UIFont systemFontOfSize:15] forKey:@"textLabel.font"];   //the description too long. Default fontsize is 16
     [self setDefaultFontWithRow:row];
     row.required = NO;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kTriglycerides rowType:XLFormRowDescriptorTypeDecimal title:@"Triglycerides (mmol/L)"];
+    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kTriglycerides];
     [self setDefaultFontWithRow:row];
     row.required = NO;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kLDL rowType:XLFormRowDescriptorTypeDecimal title:@"LDL Cholesterol (mmol/L)"];
+    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kLDL];
     [self setDefaultFontWithRow:row];
     row.required = NO;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHDL rowType:XLFormRowDescriptorTypeDecimal title:@"HDL Cholesterol (mmol/L)"];
+    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kHDL];
     [self setDefaultFontWithRow:row];
     row.required = NO;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCholesterolHdlRatio rowType:XLFormRowDescriptorTypeDecimal title:@"Cholesterol/HDL ratio"];
+    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kCholesterolHdlRatio];
     [self setDefaultFontWithRow:row];
     row.required = NO;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kTotCholesterol rowType:XLFormRowDescriptorTypeDecimal title:@"Total Cholesterol (mmol/L)"];
+    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kTotCholesterol];
     [self setDefaultFontWithRow:row];
     row.required = NO;
     [section addFormRow:row];
@@ -269,20 +275,28 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Profiling"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
-    XLFormRowDescriptor *rowInfo;
-    
+
     noChas = lowIncome = wantChas = false;
     sporeanPr = age50 = relColorectCancer = colon3Yrs = wantColRef = disableFIT = false;
     fit12Mths = colonsc10Yrs = wantFitKit = false;
     age5069 = noMammo2Yrs = hasChas = wantMammo = false;
     age2569 = noPapSmear3Yrs = hadSex = wantPapSmear = false;
     
+    NSDictionary *profilingDict = _fullScreeningForm[SECTION_PROFILING_SOCIOECON];
+    NSDictionary *chasPrelimDict = _fullScreeningForm[SECTION_CHAS_PRELIM];
+    NSDictionary *colonscoEligibDict = _fullScreeningForm[SECTION_COLONOSCOPY_ELIGIBLE];
+    NSDictionary *fitEligibDict = _fullScreeningForm[SECTION_FIT_ELIGIBLE];
+    NSDictionary *mammoEligibDict = _fullScreeningForm[SECTION_MAMMOGRAM_ELIGIBLE];
+    NSDictionary *papSmearEligibDict = _fullScreeningForm[SECTION_PAP_SMEAR_ELIGIBLE];
+    NSDictionary *fallRiskEligib = _fullScreeningForm[SECTION_FALL_RISK_ELIGIBLE];
+    NSDictionary *geriaDementAssmtDict = _fullScreeningForm[SECTION_GERIATRIC_DEMENTIA_ELIGIBLE];
     
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kProfilingConsent rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Consent to disclosure of information"];
+    if (profilingDict != (id)[NSNull null] && [profilingDict objectForKey:kProfilingConsent] != (id)[NSNull null]) row.value = profilingDict[kProfilingConsent];
     [self setDefaultFontWithRow:row];
     row.required = YES;
     [section addFormRow:row];
@@ -292,12 +306,14 @@ NSString *const kMultiADL = @"multi_adl";
     [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *employmentRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployStat rowType:XLFormRowDescriptorTypeSelectorPickerViewInline title:@"Employment status"];
+    if (profilingDict != (id)[NSNull null]) employmentRow.value = profilingDict[kEmployStat];
     [self setDefaultFontWithRow:employmentRow];
     employmentRow.required = NO;
     employmentRow.selectorOptions = @[@"Retired", @"Housewife/Homemaker",@"Self-employed",@"Part-time employed",@"Full-time employed", @"Unemployed", @"Others"];
     [section addFormRow:employmentRow];
     
     XLFormRowDescriptor *unemployReasonsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployReasons rowType:XLFormRowDescriptorTypeTextView title:@""];
+    if (profilingDict != (id)[NSNull null]) unemployReasonsRow.value = profilingDict[kEmployReasons];
     [self setDefaultFontWithRow:unemployReasonsRow];
     unemployReasonsRow.required = NO;
     unemployReasonsRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Unemployed'", employmentRow];
@@ -306,6 +322,7 @@ NSString *const kMultiADL = @"multi_adl";
     [section addFormRow:unemployReasonsRow];
     
     XLFormRowDescriptor *otherEmployRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployOthers rowType:XLFormRowDescriptorTypeText title:@"Other employment"];
+    if (profilingDict != (id)[NSNull null]) otherEmployRow.value = profilingDict[kEmployOthers];
     [self setDefaultFontWithRow:otherEmployRow];
     otherEmployRow.required = NO;
     otherEmployRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", employmentRow];
@@ -313,6 +330,7 @@ NSString *const kMultiADL = @"multi_adl";
     [section addFormRow:otherEmployRow];
     
     XLFormRowDescriptor *noDiscloseIncomeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiscloseIncome rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident does not want to disclose income"];
+    if (profilingDict != (id)[NSNull null] && [profilingDict objectForKey:kDiscloseIncome] != (id)[NSNull null]) noDiscloseIncomeRow.value = profilingDict[kProfilingConsent];
     [self setDefaultFontWithRow:noDiscloseIncomeRow];
 //    noDiscloseIncomeRow.selectorOptions = @[@"Yes", @"No"];
     noDiscloseIncomeRow.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -323,7 +341,9 @@ NSString *const kMultiADL = @"multi_adl";
     [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *mthHouseIncome = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgMthHouseIncome rowType:XLFormRowDescriptorTypeDecimal title:@"Average monthly household income"];
+    if (profilingDict != (id)[NSNull null]) mthHouseIncome.value = profilingDict[kAvgMthHouseIncome];
     [self setDefaultFontWithRow:mthHouseIncome];
+    [mthHouseIncome.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [mthHouseIncome.cellConfigAtConfigure setObject:@"Enter here" forKey:@"textField.placeholder"];
     mthHouseIncome.cellConfig[@"textLabel.numberOfLines"] = @0;
     mthHouseIncome.required = NO;
@@ -333,18 +353,22 @@ NSString *const kMultiADL = @"multi_adl";
     [formDescriptor addFormSection:section];
 
     XLFormRowDescriptor *noOfPplInHouse = [XLFormRowDescriptor formRowDescriptorWithTag:kNumPplInHouse rowType:XLFormRowDescriptorTypeNumber title:@"No. of people in the household"];
+    if (profilingDict != (id)[NSNull null]) noOfPplInHouse.value = profilingDict[kNumPplInHouse];
     [self setDefaultFontWithRow:noOfPplInHouse];
     [noOfPplInHouse.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     noOfPplInHouse.required = NO;
     [section addFormRow:noOfPplInHouse];
     
     XLFormRowDescriptor *avgIncomePerHead = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgIncomePerHead rowType:XLFormRowDescriptorTypeDecimal title:@"Average income per head"];   //auto-calculate
+    if (profilingDict != (id)[NSNull null]) avgIncomePerHead.value = profilingDict[avgIncomePerHead];
     [self setDefaultFontWithRow:avgIncomePerHead];
     [avgIncomePerHead.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     avgIncomePerHead.required = NO;
     
-    if (!isnan([mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue])) {  //check for not nan first!
-        avgIncomePerHead.value = [NSString stringWithFormat:@"$ %.2f", [mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue]];
+    if (mthHouseIncome.value != (id) [NSNull null] && noOfPplInHouse.value != (id)[NSNull null]) {
+        if (!isnan([mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue])) {  //check for not nan first!
+            avgIncomePerHead.value = [NSString stringWithFormat:@"$ %.2f", [mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue]];
+        }
     }
     
     avgIncomePerHead.disabled = @(1);
@@ -372,6 +396,7 @@ NSString *const kMultiADL = @"multi_adl";
     [formDescriptor addFormSection:section];
 
     XLFormRowDescriptor *chasNoChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDoesntOwnChasPioneer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does not currently own a CHAS card (blue/orange) or pioneer generation card"];
+    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kDoesntOwnChasPioneer] != (id)[NSNull null]) chasNoChasRow.value = chasPrelimDict[kDoesntOwnChasPioneer];
     [self setDefaultFontWithRow:chasNoChasRow];
     chasNoChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     chasNoChasRow.required = NO;
@@ -394,6 +419,7 @@ NSString *const kMultiADL = @"multi_adl";
     };
     
     XLFormRowDescriptor *lowHouseIncomeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLowHouseIncome rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"For households with income: Household monthly income per person is $1800 and below \nOR\nFor households with no income: Annual Value (AV) of home is $21,000 and below"];
+    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kLowHouseIncome] != (id)[NSNull null]) lowHouseIncomeRow.value = chasPrelimDict[kLowHouseIncome];
     [self setDefaultFontWithRow:lowHouseIncomeRow];
     lowHouseIncomeRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     lowHouseIncomeRow.required = NO;
@@ -416,6 +442,7 @@ NSString *const kMultiADL = @"multi_adl";
     };
     
     XLFormRowDescriptor *wantChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want to apply for CHAS?"];
+    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kWantChas] != (id)[NSNull null]) wantChasRow.value = chasPrelimDict[kWantChas];
     [self setDefaultFontWithRow:wantChasRow];
     wantChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     wantChasRow.required = NO;
@@ -501,6 +528,7 @@ NSString *const kMultiADL = @"multi_adl";
     [section addFormRow:age50Row];
     
     XLFormRowDescriptor *relColCancerRow = [XLFormRowDescriptor formRowDescriptorWithTag:kRelWColorectCancer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"First degree relative with colorectal cancer?"];
+    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kRelWColorectCancer] != (id)[NSNull null]) relColCancerRow.value = colonscoEligibDict[kRelWColorectCancer];
     [self setDefaultFontWithRow:relColCancerRow];
     relColCancerRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     relColCancerRow.required = NO;
@@ -508,12 +536,14 @@ NSString *const kMultiADL = @"multi_adl";
     
     
     XLFormRowDescriptor *colon3yrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy3yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 3 years?"];
+    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kColonoscopy3yrs] != (id)[NSNull null]) colon3yrsRow.value = colonscoEligibDict[kColonoscopy3yrs];
     [self setDefaultFontWithRow:colon3yrsRow];
     colon3yrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     colon3yrsRow.required = NO;
     [section addFormRow:colon3yrsRow];
     
     XLFormRowDescriptor *wantColonRefRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantColonoscopyRef rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a referral for free colonoscopy?"];
+    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kWantColonoscopyRef] != (id)[NSNull null]) wantColonRefRow.value = colonscoEligibDict[kWantColonoscopyRef];
     [self setDefaultFontWithRow:wantColonRefRow];
     wantColonRefRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     wantColonRefRow.required = NO;
@@ -556,6 +586,7 @@ NSString *const kMultiADL = @"multi_adl";
     [section addFormRow:row];
     
     XLFormRowDescriptor *fitLast12MthsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFitLast12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done FIT in the last 12 months?"];
+    if (fitEligibDict != (id)[NSNull null] && [fitEligibDict objectForKey:kFitLast12Mths] != (id)[NSNull null]) fitLast12MthsRow.value = fitEligibDict[kFitLast12Mths];
     [self setDefaultFontWithRow:fitLast12MthsRow];
     fitLast12MthsRow.required = NO;
     fitLast12MthsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
@@ -578,6 +609,7 @@ NSString *const kMultiADL = @"multi_adl";
     };
     
     XLFormRowDescriptor *colonoscopy10YrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy10Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 10 years?"];
+    if (fitEligibDict != (id)[NSNull null] && [fitEligibDict objectForKey:kColonoscopy10Yrs] != (id)[NSNull null]) colonoscopy10YrsRow.value = fitEligibDict[kColonoscopy10Yrs];
     [self setDefaultFontWithRow:colonoscopy10YrsRow];
     colonoscopy10YrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     colonoscopy10YrsRow.required = NO;
@@ -600,6 +632,7 @@ NSString *const kMultiADL = @"multi_adl";
     };
     
     XLFormRowDescriptor *wantFitKitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantFitKit rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free FIT kit?"];
+    if (fitEligibDict != (id)[NSNull null] && [fitEligibDict objectForKey:kWantFitKit] != (id)[NSNull null]) wantFitKitRow.value = fitEligibDict[kWantFitKit];
     [self setDefaultFontWithRow:wantFitKitRow];
     wantFitKitRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     wantFitKitRow.required = NO;
@@ -735,6 +768,7 @@ NSString *const kMultiADL = @"multi_adl";
     [section addFormRow:row];
     
     XLFormRowDescriptor *mammo2YrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammo2Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done mammogram in the last 2 years?"];
+    if (mammoEligibDict != (id)[NSNull null] && [mammoEligibDict objectForKey:kMammo2Yrs] != (id)[NSNull null]) mammo2YrsRow.value = mammoEligibDict[kMammo2Yrs];
     [self setDefaultFontWithRow:mammo2YrsRow];
     mammo2YrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     mammo2YrsRow.required = NO;
@@ -758,6 +792,7 @@ NSString *const kMultiADL = @"multi_adl";
     };
     
     XLFormRowDescriptor *hasChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHasChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has a valid CHAS card (blue/orange)"];
+    if (mammoEligibDict != (id)[NSNull null] && [mammoEligibDict objectForKey:kHasChas] != (id)[NSNull null]) hasChasRow.value = mammoEligibDict[kHasChas];
     [self setDefaultFontWithRow:hasChasRow];
     hasChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     hasChasRow.required = NO;
@@ -780,6 +815,7 @@ NSString *const kMultiADL = @"multi_adl";
     };
     
     XLFormRowDescriptor *wantMammoRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantMammo rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free mammogram referral?"];
+    if (mammoEligibDict != (id)[NSNull null] && [mammoEligibDict objectForKey:kWantMammo] != (id)[NSNull null]) wantMammoRow.value = mammoEligibDict[kWantMammo];
     [self setDefaultFontWithRow:wantMammoRow];
     wantMammoRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     wantMammoRow.required = NO;
@@ -838,6 +874,7 @@ NSString *const kMultiADL = @"multi_adl";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kPap3Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done pap smear in the last 3 years?"];
+    if (papSmearEligibDict != (id)[NSNull null] && [papSmearEligibDict objectForKey:kPap3Yrs] != (id)[NSNull null]) row.value = papSmearEligibDict[kPap3Yrs];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
@@ -861,6 +898,7 @@ NSString *const kMultiADL = @"multi_adl";
     };
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEngagedSex rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has engaged in sexual intercourse before"];
+    if (papSmearEligibDict != (id)[NSNull null] && [papSmearEligibDict objectForKey:kEngagedSex] != (id)[NSNull null]) row.value = papSmearEligibDict[kEngagedSex];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
@@ -883,7 +921,8 @@ NSString *const kMultiADL = @"multi_adl";
         }
     };
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReferPapSmear rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free pap smear referral?"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantPap rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free pap smear referral?"];
+    if (papSmearEligibDict != (id)[NSNull null] && [papSmearEligibDict objectForKey:kWantPap] != (id)[NSNull null]) row.value = papSmearEligibDict[kWantPap];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
@@ -927,6 +966,7 @@ NSString *const kMultiADL = @"multi_adl";
     
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFallen12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Have you fallen in the past 12 months?"];
+    if (fallRiskEligib != (id)[NSNull null] && [fallRiskEligib objectForKey:kFallen12Mths] != (id)[NSNull null]) row.value = fallRiskEligib[kFallen12Mths];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
@@ -949,6 +989,7 @@ NSString *const kMultiADL = @"multi_adl";
     };
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kScaredFall rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Do you avoid going out because you are scared of falling?"];
+    if (fallRiskEligib != (id)[NSNull null] && [fallRiskEligib objectForKey:kScaredFall] != (id)[NSNull null]) row.value = fallRiskEligib[kScaredFall];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
@@ -971,6 +1012,7 @@ NSString *const kMultiADL = @"multi_adl";
     };
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelFall rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Do you feel like you are going to fall when getting up or walking?"];
+    if (fallRiskEligib != (id)[NSNull null] && [fallRiskEligib objectForKey:kFeelFall] != (id)[NSNull null]) row.value = fallRiskEligib[kFeelFall];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
@@ -1012,7 +1054,8 @@ NSString *const kMultiADL = @"multi_adl";
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"" rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident shows signs of cognitive impairment(e.g. forgetfulness, carelessness, lack of awareness)"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCognitiveImpair rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident shows signs of cognitive impairment(e.g. forgetfulness, carelessness, lack of awareness)"];
+    if (geriaDementAssmtDict != (id)[NSNull null] && [geriaDementAssmtDict objectForKey:kCognitiveImpair] != (id)[NSNull null]) row.value = geriaDementAssmtDict[kCognitiveImpair];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     row.required = NO;
@@ -2053,25 +2096,126 @@ NSString *const kMultiADL = @"multi_adl";
 }
 
 
+#pragma mark - XLFormDescriptorDelegate
+
+-(void)formRowDescriptorValueHasChanged:(XLFormRowDescriptor *)rowDescriptor oldValue:(id)oldValue newValue:(id)newValue
+{
+    [super formRowDescriptorValueHasChanged:rowDescriptor oldValue:oldValue newValue:newValue];
+    
+    /* Mode of Screening */
+    
+    if ([rowDescriptor.tag isEqualToString:kScreenMode]) {
+        [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kScreenMode andNewContent:newValue];
+        
+    } else if ([rowDescriptor.tag isEqualToString:kApptDate]) {
+        [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kApptDate andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kApptTime]) {
+        [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kApptTime andNewContent:newValue];
+    }
+    
+    /* Phlebotomy */
+    else if ([rowDescriptor.tag isEqualToString:kWasTaken]) {
+        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY andFieldName:kWasTaken andNewContent:newValue];
+    }
+    
+    /* Profiling */
+    else if ([rowDescriptor.tag isEqualToString:kProfilingConsent]) {
+        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kProfilingConsent andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kEmployStat]) {
+        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kEmployStat andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kDiscloseIncome]) {
+        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kDiscloseIncome andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kAvgIncomePerHead]) {
+        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kAvgIncomePerHead andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kDoesntOwnChasPioneer]) {
+        [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kDoesntOwnChasPioneer andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kLowHouseIncome]) {
+        [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kLowHouseIncome andNewContent:newValue];
+//    } else if ([rowDescriptor.tag isEqualToString:kLowHomeValue]) {
+//        [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kLowHomeValue andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kWantChas]) {
+        [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kWantChas andNewContent:newValue];
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kRelWColorectCancer]) {
+        [self postSingleFieldWithSection:SECTION_COLONOSCOPY_ELIGIBLE andFieldName:kRelWColorectCancer andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kColonoscopy3yrs]) {
+        [self postSingleFieldWithSection:SECTION_COLONOSCOPY_ELIGIBLE andFieldName:kColonoscopy3yrs andNewContent:newValue];
+    }else if ([rowDescriptor.tag isEqualToString:kWantColonoscopyRef]) {
+        [self postSingleFieldWithSection:SECTION_COLONOSCOPY_ELIGIBLE andFieldName:kWantColonoscopyRef andNewContent:newValue];
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kFitLast12Mths]) {
+        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kFitLast12Mths andNewContent:newValue];
+    }else if ([rowDescriptor.tag isEqualToString:kColonoscopy10Yrs]) {
+        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kColonoscopy10Yrs andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kWantFitKit]) {
+        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kWantFitKit andNewContent:newValue];
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kMammo2Yrs]) {
+        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_ELIGIBLE andFieldName:kMammo2Yrs andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kHasChas]) {
+        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_ELIGIBLE andFieldName:kHasChas andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kWantMammo]) {
+        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_ELIGIBLE andFieldName:kWantMammo andNewContent:newValue];
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kPap3Yrs]) {
+        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kPap3Yrs andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kEngagedSex]) {
+        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kEngagedSex andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kWantPap]) {
+        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kWantPap andNewContent:newValue];
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kFallen12Mths]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kFallen12Mths andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kScaredFall]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kScaredFall andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kFeelFall]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kFeelFall andNewContent:newValue];
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kCognitiveImpair]) {
+        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ELIGIBLE andFieldName:kCognitiveImpair andNewContent:newValue];
+    }
+    
+    
+    
+}
+
+-(void)endEditing:(XLFormRowDescriptor *)rowDescriptor {    //works great for textField and textView
+    
+    /* Phlebotomy */
+    if ([rowDescriptor.tag isEqualToString:kFastingBloodGlucose]) {
+        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY andFieldName:kFastingBloodGlucose andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kTriglycerides]) {
+        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY andFieldName:kTriglycerides andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kLDL]) {
+        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY andFieldName:kLDL andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kHDL]) {
+        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY andFieldName:kHDL andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kCholesterolHdlRatio]) {
+        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY andFieldName:kCholesterolHdlRatio andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kTotCholesterol]) {
+        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY andFieldName:kTotCholesterol andNewContent:rowDescriptor.value];
+    }
+    
+    /* Profiling */
+    else if ([rowDescriptor.tag isEqualToString:kEmployReasons]) {
+        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kEmployReasons andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kEmployOthers]) {
+        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kEmployOthers andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kAvgMthHouseIncome]) {
+        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kAvgMthHouseIncome andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kNumPplInHouse]) {
+        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kNumPplInHouse andNewContent:rowDescriptor.value];
+    }
+    
+}
 
 #pragma mark - Save Dictionary methods
-
-- (void) saveEntriesIntoDictionary {
-    switch([self.sectionID integerValue]) {
-        case 0: //[self saveNeighbourhood];
-            break;
-//        case 2: [self saveClinicalResults];
-//            break;
-//        case 8: [self saveOtherMedicalIssues];
-//            break;
-//        case 9: [self savePrimaryCareSource];
-//            break;
-//        case 12: [self saveCurrentPhysicalIssues];
-//            break;
-//        case 15: [self saveRefForDoctorConsult];
-//            break;
-    }
-}
 
 
 //
@@ -2135,125 +2279,8 @@ NSString *const kMultiADL = @"multi_adl";
 //    [[self.fullScreeningForm objectForKey:@"clinical_results"] setObject:bp_record forKey:@"bp_record"];
 //    
 //}
-//
-//- (void) saveScreeningOfRiskFactors {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *risk_factors = [[self.fullScreeningForm objectForKey:@"risk_factors"] mutableCopy];
-//                                         
-//    //resident_id again
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kExYesNo] forKey:kExYesNo];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kExNoWhy] forKey:kExNoWhy];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kExNoOthers] forKey:kExNoOthers];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kSmoking] forKey:kSmoking];
-//
-//    NSArray *smokingTypes = [fields objectForKey:kTypeOfSmoke];
-//    if ((smokingTypes != (id)[NSNull null]) && smokingTypes) {
-//        for(int i=0; i<[smokingTypes count]; i++) {
-//            if ([[smokingTypes objectAtIndex:i] isEqualToString:@"Cigarettes"]) [risk_factors setObject:@"1" forKey:@"ciggs"];
-//            else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"Pipe"]) [risk_factors setObject:@"1" forKey:@"pipe"];
-//            else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"Self-rolled leaves \"ang hoon\""]) [risk_factors setObject:@"1" forKey:@"rolled_leaves"];
-//            else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"Shisha"]) [risk_factors setObject:@"1" forKey:@"shisha"];
-//            else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"Cigars"]) [risk_factors setObject:@"1" forKey:@"cigars"];
-//            else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"E-cigarettes"]) [risk_factors setObject:@"1" forKey:@"e_ciggs"];
-//            else if ([[smokingTypes objectAtIndex:i] isEqualToString:@"Others"]) [risk_factors setObject:@"1" forKey:@"others"];
-//        }
-//    }
-//    
-////    ciggs, pipe, rolled_leaves, shisha, cigars, e_ciggs, others
-////    @"Cigarettes", @"Pipe", @"self-rolled leaves \"ang hoon\"", @"Shisha", @"Cigars", @"E-cigarettes", @"Others"
-//    
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kSmokingNumYears] forKey:kSmokingNumYears];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kSmokeNumSticks] forKey:kSmokeNumSticks];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kSmokeAfterWaking] forKey:kSmokeAfterWaking];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kSmokingRefrain] forKey:kSmokingRefrain];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kSmokingWhichNotGiveUp] forKey:kSmokingWhichNotGiveUp];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kSmokingMornFreq] forKey:kSmokingMornFreq];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kSmokingSickInBed] forKey:kSmokingSickInBed];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kSmokingAttemptedQuit] forKey:kSmokingAttemptedQuit];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kSmokingNumQuitAttempts] forKey:kSmokingNumQuitAttempts];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kSmokingIntentionsToCut] forKey:kSmokingIntentionsToCut];
-//    
-//    [risk_factors setObject:@"0" forKey:@"smoking_how_by_myself"];
-//    [risk_factors setObject:@"0" forKey:@"smoking_how_join_cessation"];
-//    [risk_factors setObject:@"0" forKey:@"smoking_how_take_med"];
-//    [risk_factors setObject:@"0" forKey:@"smoking_how_encourage"];
-//    
-//    if ([[fields objectForKey:kSmokingHowQuit] count]!=0) {
-//        NSArray *smokingHowQuitArray = [fields objectForKey:kSmokingHowQuit];
-//        for (int i=0; i<[smokingHowQuitArray count]; i++) {
-//            if([[[smokingHowQuitArray objectAtIndex:i] formValue] isEqual:@(0)]) [risk_factors setObject:@"1" forKey:@"smoking_how_by_myself"];
-//            else if([[[smokingHowQuitArray objectAtIndex:i] formValue] isEqual:@(1)]) [risk_factors setObject:@"1" forKey:@"smoking_how_join_cessation"];
-//            else if([[[smokingHowQuitArray objectAtIndex:i] formValue] isEqual:@(2)]) [risk_factors setObject:@"1" forKey:@"smoking_how_take_med"];
-//            else if([[[smokingHowQuitArray objectAtIndex:i] formValue] isEqual:@(3)]) [risk_factors setObject:@"1" forKey:@"smoking_how_encourage"];
-//        }
-//    }
-//    
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kSmokingHowQuitOthers] forKey:kSmokingHowQuitOthers];
-//    
-//    [risk_factors setObject:@"0" forKey:@"smoking_why_health"];
-//    [risk_factors setObject:@"0" forKey:@"smoking_why_side"];
-//    [risk_factors setObject:@"0" forKey:@"smoking_why_harm"];
-//    [risk_factors setObject:@"0" forKey:@"smoking_why_advice"];
-//    [risk_factors setObject:@"0" forKey:@"smoking_why_ex"];
-//    
-//    
-//    if ([[fields objectForKey:kSmokingWhyQuit] count]!=0) {
-//        NSArray *smokingWhyQuitArray = [fields objectForKey:kSmokingWhyQuit];
-//        for (int i=0; i<[smokingWhyQuitArray count]; i++) {
-//            if([[[smokingWhyQuitArray objectAtIndex:i] formValue] isEqual:@(0)]) [risk_factors setObject:@"1" forKey:@"smoking_why_health"];
-//            else if([[[smokingWhyQuitArray objectAtIndex:i] formValue] isEqual:@(1)]) [risk_factors setObject:@"1" forKey:@"smoking_why_side"];
-//            else if([[[smokingWhyQuitArray objectAtIndex:i] formValue] isEqual:@(2)]) [risk_factors setObject:@"1" forKey:@"smoking_why_harm"];
-//            else if([[[smokingWhyQuitArray objectAtIndex:i] formValue] isEqual:@(3)]) [risk_factors setObject:@"1" forKey:@"smoking_why_advice"];
-//            else if([[[smokingWhyQuitArray objectAtIndex:i] formValue] isEqual:@(4)]) [risk_factors setObject:@"1" forKey:@"smoking_why_ex"];
-//        }
-//    }
-//
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kSmokingWhyQuitOthers] forKey:kSmokingWhyQuitOthers];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kAlcoholHowOften] forKey:kAlcoholHowOften];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kAlcoholNumYears] forKey:kAlcoholNumYears];
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kAlcoholConsumpn] forKey:kAlcoholConsumpn];
-//    
-//    NSString *alcoholPreference = [self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kAlcoholPreference];
-//    
-//    //reset all values first
-//    [risk_factors setObject:@"0" forKey:@"beer"];
-//    [risk_factors setObject:@"0" forKey:@"wine"];
-//    [risk_factors setObject:@"0" forKey:@"rice_wine"];
-//    [risk_factors setObject:@"0" forKey:@"spirits"];
-//    [risk_factors setObject:@"0" forKey:@"stout"];
-//    [risk_factors setObject:@"0" forKey:@"no_pref"];
-//    
-//    if ([alcoholPreference isEqualToString:@"0"]) [risk_factors setObject:@"1" forKey:@"beer"];
-//    else if ([alcoholPreference isEqualToString:@"1"]) [risk_factors setObject:@"1" forKey:@"wine"];
-//    else if ([alcoholPreference isEqualToString:@"2"]) [risk_factors setObject:@"1" forKey:@"rice_wine"];
-//    else if ([alcoholPreference isEqualToString:@"3"]) [risk_factors setObject:@"1" forKey:@"spirits"];
-//    else if ([alcoholPreference isEqualToString:@"4"]) [risk_factors setObject:@"1" forKey:@"stout"];
-//    else if ([alcoholPreference isEqualToString:@"5"]) [risk_factors setObject:@"1" forKey:@"no_pref"];
-//    
-//    [risk_factors setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kAlcoholIntentToCut] forKey:kAlcoholIntentToCut];
-//    
-//    [self.fullScreeningForm setObject:risk_factors forKey:@"risk_factors"];
-//    
-//}
 
 
-//
-//- (void) savePrimaryCareSource {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *primaryCare_dict = [[self.fullScreeningForm objectForKey:@"primary_care"] mutableCopy];
-//    
-//    [primaryCare_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kCareGiverID] forKey:kCareGiverID];
-//    [primaryCare_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kCareProviderID] forKey:kCareProviderID];
-//    
-//    [primaryCare_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCareGiverOthers] forKey:kCareGiverOthers];
-//    [primaryCare_dict setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCareProviderOthers] forKey:kCareProviderOthers];
-//    
-//    [primaryCare_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kAneVisit] forKey:kAneVisit];
-//    [primaryCare_dict setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kHospitalized] forKey:kHospitalized];
-//    
-//    
-//    [self.fullScreeningForm setObject:primaryCare_dict forKey:@"primary_care"];
-//}
 //
 //- (void) saveCurrentPhysicalIssues {
 //    NSDictionary *fields = [self.form formValues];
@@ -2593,6 +2620,96 @@ NSString *const kMultiADL = @"multi_adl";
 }
 
 
+#pragma mark - Download Server API
+- (void) processConnectionStatus {
+    if(status == NotReachable)
+    {
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"No Internet!", nil)
+                                                                                  message:@"You're not connected to Internet."
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction){
+                                                              //                                                              [self.refreshControl endRefreshing];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+    else if (status == ReachableViaWiFi || status == ReachableViaWWAN) {
+        
+    }
+    
+}
+
+
+#pragma mark - Post data to server methods
+
+- (void) postSingleFieldWithSection:(NSString *) section andFieldName: (NSString *) fieldName andNewContent: (NSString *) content {
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSNumber *resident_id = [defaults objectForKey:kResidentId];
+    
+    if ((content != (id)[NSNull null]) && (content != nil)) {   //make sure don't insert nil or null value to a dictionary
+        
+        NSDictionary *dict = @{kResidentId:resident_id,
+                               kSectionName:section,
+                               kFieldName:fieldName,
+                               kNewContent:content
+                               };
+        
+        NSLog(@"Uploading %@ for $%@$ field", content, fieldName);
+        [KAStatusBar showWithStatus:@"Syncing..." andBarColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:0 alpha:1.0]];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postDataGivenSectionAndFieldName:dict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
+    }
+}
+
+#pragma mark - Blocks
+
+- (void (^)(NSProgress *downloadProgress))progressBlock {
+    return ^(NSProgress *downloadProgress) {
+        
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"%@", responseObject);
+        
+        
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+        [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+        
+        };
+}
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"******UNSUCCESSFUL SUBMISSION******!!");
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+
+        [SVProgressHUD dismiss];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
+                                                                                  message:@"Form failed to upload!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              //do nothing for now
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+
+        
+    };
+}
+
 #pragma mark - UIFont methods
 - (void) setDefaultFontWithRow: (XLFormRowDescriptor *) row {
     UIFont *font = [UIFont fontWithName:DEFAULT_FONT_NAME size:DEFAULT_FONT_SIZE];
@@ -2606,6 +2723,9 @@ NSString *const kMultiADL = @"multi_adl";
                                 fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     return [UIFont fontWithDescriptor:fontD size:0];
 }
+
+
+
 /*
  #pragma mark - Navigation
  

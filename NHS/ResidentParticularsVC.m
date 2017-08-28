@@ -79,7 +79,7 @@ typedef enum rowTypes {
     [self.form setAddAsteriskToRequiredRowsTitle: YES];
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitBtnPressed:)];
+//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitBtnPressed:)];
     
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -94,22 +94,8 @@ typedef enum rowTypes {
 - (void) viewWillDisappear:(BOOL)animated {
     
     self.navigationController.navigationBar.topItem.title = @"Integrated Profile";
-//    [self saveEntriesIntoDictionary];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateFullScreeningForm"
-//                                                        object:nil
-//                                                      userInfo:self.fullScreeningForm];
-//    NSMutableDictionary *completionCheckUserInfo = [[NSMutableDictionary alloc] init];
-//    [completionCheckUserInfo setObject:self.sectionID forKey:@"section"];
-//    //Do a quick validation!
-//    NSArray * validationErrors = [self formValidationErrors];
-//    if (validationErrors.count > 0){
-//        [completionCheckUserInfo setObject:@0 forKey:@"value"];
-//    } else {
-//        [completionCheckUserInfo setObject:@1 forKey:@"value"];
-//    }
-//    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateCompletionCheck"
-//                                                        object:nil
-//                                                      userInfo:completionCheckUserInfo];
+
+    
     
     [super viewWillDisappear:animated];
     
@@ -600,8 +586,6 @@ typedef enum rowTypes {
         room = [houseType substringWithRange:NSMakeRange(loc-1, 1)];
         [resi_particulars setObject:room forKey:@"housing_num_rooms"];
     }
-
-//    [self.resiPartiDict setObject:resi_particulars forKey:@"resi_particulars"];
     
     NSString *timeNow = [self getTimeNowInString];
     
@@ -612,7 +596,7 @@ typedef enum rowTypes {
                                kGender:gender,
                                kBirthDate:birthDate,
                                kTimestamp:timeNow};
-        [self submitNewResidentEntry:dict];
+//        [self submitNewResidentEntry:dict];
     }
     NSLog(@"%@", resi_particulars);
     [self postAllOtherFields:resi_particulars];
@@ -807,44 +791,44 @@ typedef enum rowTypes {
 
 
 #pragma mark - Submit
--(void)submitBtnPressed:(UIBarButtonItem * __unused)button {
-    
-    NSDictionary *fields = [self.form formValues];
-    NSString *name, *nric, *gender, *birthDate, *screenLocation;
-    
-    if ([fields objectForKey:kGender] != [NSNull null]) {
-        if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
-//            [resi_particulars setObject:@"M" forKey:kGender];
-            gender = @"M";
-        } else if ([[fields objectForKey:kGender] isEqualToString:@"Female"]) {
-            gender = @"F";
-//            [resi_particulars setObject:@"F" forKey:kGender];
-        }
-    }
-    name = [self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kName];
-//    [resi_particulars setObject:name forKey:kName];
-    nric = [self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kNRIC];
-//    [resi_particulars setObject:nric forKey:kNRIC];
-    birthDate = [self getStringWithDictionary:fields rowType:Date formDescriptorWithTag:kBirthDate];
-//    [resi_particulars setObject:birthDate forKey:kBirthDate];
-    screenLocation = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
-    NSString *timeNow = [self getTimeNowInString];
-    
-    NSNumber *residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId];
-    
-    if ((residentID == nil) || residentID == (id)[NSNull null]) {   //only if no resident ID registered, then submit
-        NSLog(@"Registering new resident...");
-        NSDictionary *dict = @{kName:name,
-                               kNRIC:nric,
-                               kGender:gender,
-                               kBirthDate:birthDate,
-                               kTimestamp:timeNow,
-                               kScreenLocation:screenLocation};
-        [self submitNewResidentEntry:dict];
-    } else {
-        NSLog(@"Resident already exist!");
-    }
-    
+//-(void)submitBtnPressed:(UIBarButtonItem * __unused)button {
+//    
+//    NSDictionary *fields = [self.form formValues];
+//    NSString *name, *nric, *gender, *birthDate, *screenLocation;
+//    
+//    if ([fields objectForKey:kGender] != [NSNull null]) {
+//        if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
+////            [resi_particulars setObject:@"M" forKey:kGender];
+//            gender = @"M";
+//        } else if ([[fields objectForKey:kGender] isEqualToString:@"Female"]) {
+//            gender = @"F";
+////            [resi_particulars setObject:@"F" forKey:kGender];
+//        }
+//    }
+//    name = [self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kName];
+////    [resi_particulars setObject:name forKey:kName];
+//    nric = [self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kNRIC];
+////    [resi_particulars setObject:nric forKey:kNRIC];
+//    birthDate = [self getStringWithDictionary:fields rowType:Date formDescriptorWithTag:kBirthDate];
+////    [resi_particulars setObject:birthDate forKey:kBirthDate];
+//    screenLocation = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
+//    NSString *timeNow = [self getTimeNowInString];
+//    
+//    NSNumber *residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId];
+//    
+//    if ((residentID == nil) || residentID == (id)[NSNull null]) {   //only if no resident ID registered, then submit
+//        NSLog(@"Registering new resident...");
+//        NSDictionary *dict = @{kName:name,
+//                               kNRIC:nric,
+//                               kGender:gender,
+//                               kBirthDate:birthDate,
+//                               kTimestamp:timeNow,
+//                               kScreenLocation:screenLocation};
+//        [self submitNewResidentEntry:dict];
+//    } else {
+//        NSLog(@"Resident already exist!");
+//    }
+//    
     //    NSArray * validationErrors = [self formValidationErrors];
     //    if (validationErrors.count > 0){
     //        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
@@ -865,7 +849,7 @@ typedef enum rowTypes {
     //        
     //        [self saveResidentParticulars];
     //    }
-}
+//}
 
     
     
@@ -892,13 +876,6 @@ typedef enum rowTypes {
 
 
 #pragma mark - Post data to server methods
-- (void) submitNewResidentEntry:(NSDictionary *) dict {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client postNewResidentWithDict:@{@"resi_particulars":dict}
-                       progressBlock:[self progressBlock]
-                        successBlock:[self personalInfoSuccessBlock]
-                        andFailBlock:[self errorBlock]];
-}
 
 - (void) postSingleFieldWithSection:(NSString *) section andFieldName: (NSString *) fieldName andNewContent: (NSString *) content {
     
@@ -991,22 +968,6 @@ typedef enum rowTypes {
 //        }
 //        
         
-    };
-}
-
-- (void (^)(NSURLSessionDataTask *task, id responseObject))personalInfoSuccessBlock {
-    return ^(NSURLSessionDataTask *task, id responseObject){
-        NSLog(@"Personal info submission success");
-        self.resident_id = [responseObject objectForKey:kResidentId];
-        
-        [[NSUserDefaults standardUserDefaults] setObject:self.resident_id forKey:kResidentId];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        NSLog(@"I'm resident %@", self.resident_id);
-        
-        successCounter = failCounter = 0; //preparing for the rest of the submission
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"submittingOtherSections" object:nil];
     };
 }
 

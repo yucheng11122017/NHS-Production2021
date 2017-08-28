@@ -11,6 +11,8 @@
 #import "SummaryPageViewController.h"
 #import "ServerComm.h"
 #import "AppConstants.h"
+#import "SVProgressHUD.h"
+#import "Reachability.h"
 
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 #define DISABLE_SERVER_DATA_FETCH
@@ -42,10 +44,11 @@ typedef enum sectionRowNumber {
 
 
 
-@interface ScreeningSectionTableViewController ()
+@interface ScreeningSectionTableViewController () {
+    NetworkStatus status;
+}
 
 @property (strong, nonatomic) NSArray *rowTitles;
-@property (strong, nonatomic) NSMutableDictionary *preRegDictionary;
 @property (strong, nonatomic) NSMutableDictionary *fullScreeningForm;
 @property (strong, nonatomic) NSString *loadedFilepath;
 
@@ -63,10 +66,18 @@ typedef enum sectionRowNumber {
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(backBtnPressed:)];
     
     formType = NewScreeningForm;    //default value
-    [self createEmptyFormWithAllFields];
+    
     readyToSubmit = false;
     
-    self.preRegDictionary = [[NSMutableDictionary alloc] init];
+    self.fullScreeningForm = [[NSMutableDictionary alloc] init];
+    
+    _residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId]; //need this for fetching data
+    
+    Reachability *reachability = [Reachability reachabilityForInternetConnection];
+    [reachability startNotifier];
+    
+    status = [reachability currentReachabilityStatus];
+    [self processConnectionStatus];
     
     //positive number -> Pre-reg Resident/Uploaded Screening Form
     // (-1) New Screening Form
@@ -350,16 +361,18 @@ typedef enum sectionRowNumber {
 
 #pragma mark - NSNotification Methods
 - (void) updateFullScreeningForm: (NSNotification *) notification {
-    self.fullScreeningForm = [notification.userInfo mutableCopy];
-    NSLog(@"%@", self.fullScreeningForm);
+//    self.fullScreeningForm = [notification.userInfo mutableCopy];
+//    NSLog(@"%@", self.fullScreeningForm);
+//    
+//    if ([self.fullScreeningForm objectForKey:@"resi_particulars"] != [NSNull null]) {   //not null
+//        if (![[[self.fullScreeningForm objectForKey:@"resi_particulars"] objectForKey:@"nric"] isEqualToString:@""]) {  //not empty
+//            if (formType != ViewScreenedScreeningForm) {
+//                [self autoSave];
+//            }
+//        }
+//    }
     
-    if ([self.fullScreeningForm objectForKey:@"resi_particulars"] != [NSNull null]) {   //not null
-        if (![[[self.fullScreeningForm objectForKey:@"resi_particulars"] objectForKey:@"nric"] isEqualToString:@""]) {  //not empty
-            if (formType != ViewScreenedScreeningForm) {
-                [self autoSave];
-            }
-        }
-    }
+    [self getAllDataForOneResident];
 }
 
 - (void) updateCompletionCheck: (NSNotification *) notification {
@@ -496,115 +509,6 @@ typedef enum sectionRowNumber {
 }
 
 
-#pragma mark - Blocks
-
-- (void (^)(NSProgress *downloadProgress))progressBlock {
-    return ^(NSProgress *downloadProgress) {
-        NSLog(@"POST in progress...");
-    };
-}
-
-- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
-    return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"&******UNSUCCESSFUL SUBMISSION******!!");
-        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
-        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
-                                                            object:nil
-                                                          userInfo:nil];
-        [self.navigationController popViewControllerAnimated:YES];
-    };
-}
-
-#pragma mark Downloading Blocks
-- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSuccessBlock {
-    return ^(NSURLSessionDataTask *task, id responseObject){
-        self.preRegDictionary = [[responseObject objectForKey:@"0"] mutableCopy];
-        NSLog(@"%@", self.preRegDictionary);
-        
-        [self insertResiPartiIntoFullScreeningForm];
-    };
-}
-
-#pragma mark - Downloading Pre-registration data
-- (void) getPreRegistrationData {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getPatientDataWithPatientID:self.residentID
-                          progressBlock:[self progressBlock]
-                           successBlock:[self downloadSuccessBlock]
-                           andFailBlock:[self errorBlock]];
-}
-
-
-- (void) createEmptyFormWithAllFields {
-    
-    //ONLY IF FILE IS IN iOS APP
-//    NSString *fileName = @"blankScreeningForm.json";
-//    NSURL *documentsFolderURL = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-//    NSString *filePath = [documentsFolderURL.path stringByAppendingString:fileName];
-//    NSString *jsonString = [[NSString alloc] initWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
-//    NSError *jsonError;
-//    NSMutableDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&jsonError];
-    
-    NSString *fileName = [[NSBundle mainBundle] pathForResource:@"blankScreeningForm"   //load a blank screening form
-                                                         ofType:@"json"];
-    //check file exists
-    if (fileName) {
-        //retrieve file content
-        NSData *data = [[NSData alloc] initWithContentsOfFile:fileName];
-        //convert JSON NSData to a usable NSDictionary
-        NSError *error;
-        self.fullScreeningForm = [[NSMutableDictionary alloc] initWithDictionary:[NSJSONSerialization JSONObjectWithData:data
-                                                              options:0
-                                                                error:&error]];
-        if (error) {
-            NSLog(@"Something went wrong! %@", error.localizedDescription);
-        }
-        else {
-            NSLog(@"%@", self.fullScreeningForm);
-        }
-    }
-    else {
-        NSLog(@"Couldn't find file!");
-    }
-}
-
-- (void) insertResiPartiIntoFullScreeningForm {
-    NSDictionary *contact_info = [self.preRegDictionary objectForKey:@"contact_info"];
-    NSDictionary *personal_info = [self.preRegDictionary objectForKey:@"personal_info"];
-    NSDictionary *spoken_lang = [self.preRegDictionary objectForKey:@"spoken_lang"];
-    NSMutableDictionary *resi_particulars = [[self.fullScreeningForm objectForKey:@"resi_particulars"] mutableCopy];
-    
-    [resi_particulars setObject:[personal_info objectForKey:@"resident_name"] forKey:@"resident_name"];
-    [resi_particulars setObject:[personal_info objectForKey:@"gender"] forKey:@"gender"];
-    [resi_particulars setObject:[personal_info objectForKey:@"nric"] forKey:@"nric"];
-    [resi_particulars setObject:[personal_info objectForKey:@"resident_id"] forKey:@"resident_id"];
-    [resi_particulars setObject:[personal_info objectForKey:@"birth_year"] forKey:@"birth_year"];
-    
-    [resi_particulars setObject:[contact_info objectForKey:@"address_block"] forKey:@"address_block"];
-    [resi_particulars setObject:[contact_info objectForKey:@"address_postcode"] forKey:@"address_postcode"];
-    [resi_particulars setObject:[contact_info objectForKey:@"address_street"] forKey:@"address_street"];
-    [resi_particulars setObject:[contact_info objectForKey:@"address_unit"] forKey:@"address_unit"];
-    [resi_particulars setObject:[contact_info objectForKey:@"contact_no"] forKey:@"contact_no"];
-    
-    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_canto"] forKey:@"lang_canto"];
-    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_english"] forKey:@"lang_english"];
-    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_hindi"] forKey:@"lang_hindi"];
-    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_hokkien"] forKey:@"lang_hokkien"];
-    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_malay"] forKey:@"lang_malay"];
-    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_mandrin"] forKey:@"lang_mandrin"];
-    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_others"] forKey:@"lang_others"];
-    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_others_text"] forKey:@"lang_others_text"];
-    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_tamil"] forKey:@"lang_tamil"];
-    [resi_particulars setObject:[spoken_lang objectForKey:@"lang_teochew"] forKey:@"lang_teochew"];
-    
-    [self.fullScreeningForm setObject:resi_particulars forKey:@"resi_particulars"];     //replace the original form
-    [self.preRegDictionary removeAllObjects];   //clear the array
-    NSLog(@"********** UPDATED SCREENING FORM! ***********\n%@", self.fullScreeningForm);
-    
-}
-
 - (void) insertRequestDataToScreeningForm {
     NSArray* keys = [self.retrievedData allKeys];
     NSString *key;
@@ -637,7 +541,79 @@ typedef enum sectionRowNumber {
         }
     }
 }
-//[self.fullScreeningForm setObject:[self.retrievedData objectForKey:key] forKey:key];
+
+#pragma mark - Server API
+- (void) processConnectionStatus {
+    if(status == NotReachable)
+    {
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"No Internet!", nil)
+                                                                                  message:@"You're not connected to Internet."
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction){
+                                                              //                                                              [self.refreshControl endRefreshing];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+    else if (status == ReachableViaWiFi || status == ReachableViaWWAN) {
+        if (_residentID != nil && _residentID != (id) [NSNull null])
+            [self getAllDataForOneResident];
+    }
+    
+}
+
+- (void)getAllDataForOneResident {
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    [SVProgressHUD showWithStatus:@"Downloading data..."];
+    
+    [client getSingleScreeningResidentDataWithResidentID:_residentID
+                                           progressBlock:[self progressBlock]
+                                            successBlock:[self downloadSingleResidentDataSuccessBlock]
+                                            andFailBlock:[self downloadErrorBlock]];
+}
+
+#pragma mark - Blocks
+
+- (void (^)(NSProgress *downloadProgress))progressBlock {
+    return ^(NSProgress *downloadProgress) {
+        //        NSLog(@"Patients GET Request Started. In Progress.");
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSingleResidentDataSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        
+        self.fullScreeningForm = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
+        NSLog(@"%@", self.fullScreeningForm); //replace the existing one
+        
+        [SVProgressHUD dismiss];
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))downloadErrorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"******UNSUCCESSFUL DOWNLOAD******!!");
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
+        NSLog(@"error: %@", errorString);
+        [SVProgressHUD dismiss];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Download Fail", nil)
+                                                                                  message:@"Download form failed!"
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction) {
+                                                              [self.tableView reloadData];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    };
+}
+
+
+
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
