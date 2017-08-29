@@ -17,6 +17,7 @@
 #pragma mark - Section Names for Submission
 
 #define SECTION_MODE_OF_SCREENING               @"mode_of_screening"
+#define SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT    @"phlebotomy_eligibility_assmt"
 #define SECTION_PHLEBOTOMY                      @"phlebotomy"
 #define SECTION_PROFILING_SOCIOECON             @"profiling_socioecon"
 #define SECTION_CHAS_PRELIM                     @"chas_prelim"
@@ -129,14 +130,13 @@ extern NSString *const SearchControllerIsActiveKey;
 extern NSString *const SearchBarTextKey;
 extern NSString *const SearchBarIsFirstResponderKey;
 
-#pragma mark - Mode of Screening
-extern NSString *const kScreenMode;
-extern NSString *const kApptDate;
-extern NSString *const kApptTime;
-extern NSString *const kPhlebAppt;
 
 #pragma mark - Phlebotomy
-extern NSString *const kWasTaken;
+//extern NSString *const kWasTaken;
+extern NSString *const kAge40;
+extern NSString *const kChronicCond;
+extern NSString *const kWantFreeBt;
+extern NSString *const kDidPhleb;
 extern NSString *const kFastingBloodGlucose;
 extern NSString *const kTriglycerides;
 extern NSString *const kLDL;
@@ -144,6 +144,17 @@ extern NSString *const kHDL;
 extern NSString *const kCholesterolHdlRatio;
 extern NSString *const kTotCholesterol;
 
+#pragma mark - Mode of Screening
+extern NSString *const kScreenMode;
+extern NSString *const kApptDate;
+extern NSString *const kApptTime;
+
+extern NSString *const kTime_8_10;
+extern NSString *const kTime_10_12;
+extern NSString *const kTime_12_2;
+extern NSString *const kTime_2_4;
+
+extern NSString *const kPhlebAppt;
 
 #pragma mark - Profiling
 extern NSString *const kProfilingConsent;

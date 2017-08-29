@@ -79,6 +79,8 @@ NSString *const kIsFinal = @"is_final";
 
 NSString *const kNeighbourhood = @"neighbourhood";
 NSString *const kRemarks = @"remarks";
+NSString *const kPreregCompleted = @"prereg_completed";
+
 
 
 /* Search Bar constants
@@ -88,18 +90,13 @@ NSString *const kRemarks = @"remarks";
  NSString *const SearchBarTextKey = @"SearchBarTextKey";
  NSString *const SearchBarIsFirstResponderKey = @"SearchBarIsFirstResponderKey";
 
-
-#pragma mark - Mode of Screening
-
-NSString *const kScreenMode = @"screen_mode";
-NSString *const kApptDate = @"appt_date";
-NSString *const kApptTime = @"appt_time";
-NSString *const kPhlebAppt = @"phleb_appt";
-
-
 #pragma mark - Phlebotomy
 
-NSString *const kWasTaken = @"was_taken";
+//NSString *const kWasTaken = @"was_taken";     //no longer needed
+NSString *const kAge40 = @"age_40";
+NSString *const kChronicCond = @"chronic_cond";
+NSString *const kWantFreeBt = @"want_free_bt";
+NSString *const kDidPhleb = @"did_phleb";
 NSString *const kFastingBloodGlucose = @"fasting_blood_glu";
 NSString *const kTriglycerides = @"triglycerides";
 NSString *const kLDL= @"ldl";
@@ -107,6 +104,19 @@ NSString *const kHDL= @"hdl";
 NSString *const kCholesterolHdlRatio= @"cholesterol_hdl_ratio";
 NSString *const kTotCholesterol= @"total_cholesterol";
 
+
+#pragma mark - Mode of Screening
+
+NSString *const kScreenMode = @"screen_mode";
+NSString *const kApptDate = @"appt_date";
+NSString *const kApptTime = @"appt_time";
+
+NSString *const kTime_8_10 = @"time_8_10";
+NSString *const kTime_10_12 = @"time_10_12";
+NSString *const kTime_12_2 = @"time_12_2";
+NSString *const kTime_2_4 = @"time_2_4";
+
+NSString *const kPhlebAppt = @"phleb_appt";
 
 #pragma mark - Profiling
 

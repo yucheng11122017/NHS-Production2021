@@ -73,6 +73,7 @@ NSString *const kMultiADL = @"multi_adl";
     NSString *neighbourhood, *citizenship;
     NSNumber *age;
     BOOL noChas, lowIncome, wantChas;
+    BOOL age40, chronicCond, wantFreeBt; //for phleb
     BOOL sporeanPr, age50, relColorectCancer, colon3Yrs, wantColRef, disableFIT;
     BOOL fit12Mths, colonsc10Yrs, wantFitKit;
     BOOL sporean, age5069 ,noMammo2Yrs, hasChas, wantMammo;
@@ -173,6 +174,199 @@ NSString *const kMultiADL = @"multi_adl";
 
 #pragma mark - Forms methods
 
+- (id) initPhlebotomy {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Phlebotomy"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    sporeanPr = age40 = false;
+    
+    NSDictionary *phlebotomyEligibDict = _fullScreeningForm[SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT];
+    NSDictionary *phlebotomyDict = _fullScreeningForm[SECTION_PHLEBOTOMY];
+    
+    // Phlebotomy Eligibility Assessment - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Phlebotomy Eligibility Assessment"];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *sporeanPrRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
+    [self setDefaultFontWithRow:sporeanPrRow];
+    sporeanPrRow.required = NO;
+    sporeanPrRow.disabled = @(1);
+    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"]) {
+        sporeanPrRow.value = @1;
+        sporeanPr = YES;
+    }
+    else {
+        sporeanPrRow.value = @0;
+        sporeanPr = NO;
+    }
+    [section addFormRow:sporeanPrRow];
+    
+    XLFormRowDescriptor *age40Row = [XLFormRowDescriptor formRowDescriptorWithTag:kAge40 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 40 and above?"];
+    [self setDefaultFontWithRow:age40Row];
+    age40Row.disabled = @(1);
+    if ([age integerValue] >= 40) {
+        age40Row.value = @1;
+        age40 = YES;
+    }
+    else {
+        age40Row.value = @0;
+        age40 = NO;
+    }
+    [section addFormRow:age40Row];
+    
+    XLFormRowDescriptor *chronicCondRow = [XLFormRowDescriptor formRowDescriptorWithTag:kChronicCond rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"No previously diagnosed chronic condition OR Diagnosed with chronic condition but not under regular follow-up with primary care physician?"];
+    if (phlebotomyEligibDict != (id)[NSNull null] && [phlebotomyEligibDict objectForKey:kChronicCond] != (id)[NSNull null]) {
+        chronicCondRow.value = phlebotomyEligibDict[kChronicCond];
+        chronicCond = [chronicCondRow.value boolValue];
+    }
+    [self setDefaultFontWithRow:chronicCondRow];
+    chronicCondRow.required = YES;
+    chronicCondRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:chronicCondRow];
+    
+    
+    
+    XLFormRowDescriptor *wantFreeBtRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantFreeBt rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free blood test?"];
+    [self setDefaultFontWithRow:wantFreeBtRow];
+    if (phlebotomyEligibDict != (id)[NSNull null] && [phlebotomyEligibDict objectForKey:kWantFreeBt] != (id)[NSNull null]) {
+        wantFreeBtRow.value = phlebotomyEligibDict[kWantFreeBt];
+        wantFreeBt = [wantFreeBtRow.value boolValue];
+    }
+    wantFreeBtRow.required = YES;
+    wantFreeBtRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:wantFreeBtRow];
+    
+    XLFormRowDescriptor *didPhlebRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDidPhleb rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Undergone Phlebotomy?"];
+    if (phlebotomyEligibDict != (id)[NSNull null] && [phlebotomyEligibDict objectForKey:kDidPhleb] != (id)[NSNull null])
+        didPhlebRow.value = phlebotomyEligibDict[kDidPhleb];
+    
+    [self setDefaultFontWithRow:didPhlebRow];
+    didPhlebRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    didPhlebRow.disabled = [NSNumber numberWithBool:!(age40 && sporeanPr && chronicCond && kWantFreeBt)];
+    [section addFormRow:didPhlebRow];
+    
+    chronicCondRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1])
+                chronicCond = YES;
+            else
+                chronicCond = NO;
+            
+            if (sporeanPr && age40 && chronicCond && wantFreeBt) {
+                didPhlebRow.disabled = @NO;
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPhleb];
+            } else {
+                didPhlebRow.disabled = @YES;
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPhleb];
+            }
+            
+            [self reloadFormRow:didPhlebRow];
+        }
+    };
+    
+    wantFreeBtRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1])
+                wantFreeBt = YES;
+            else
+                wantFreeBt = NO;
+            
+            if (sporeanPr && age40 && chronicCond && wantFreeBt) {
+                didPhlebRow.disabled = @NO;
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPhleb];
+            } else {
+                didPhlebRow.disabled = @YES;
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPhleb];
+            }
+            [self reloadFormRow:didPhlebRow];
+            
+        }
+    };
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *glucoseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFastingBloodGlucose rowType:XLFormRowDescriptorTypeDecimal title:@"Fasting blood glucose (mmol/L)"];
+    if (phlebotomyDict != (id)[NSNull null]) glucoseRow.value = phlebotomyDict[kFastingBloodGlucose];
+    [self setDefaultFontWithRow:glucoseRow];
+    [section addFormRow:glucoseRow];
+    
+    XLFormRowDescriptor *triglyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTriglycerides rowType:XLFormRowDescriptorTypeDecimal title:@"Triglycerides (mmol/L)"];
+    if (phlebotomyDict != (id)[NSNull null]) triglyRow.value = phlebotomyDict[kTriglycerides];
+    [self setDefaultFontWithRow:triglyRow];
+    [section addFormRow:triglyRow];
+    
+    XLFormRowDescriptor *ldlRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLDL rowType:XLFormRowDescriptorTypeDecimal title:@"LDL Cholesterol (mmol/L)"];
+    if (phlebotomyDict != (id)[NSNull null]) ldlRow.value = phlebotomyDict[kLDL];
+    [self setDefaultFontWithRow:ldlRow];
+    [section addFormRow:ldlRow];
+    
+    XLFormRowDescriptor *hdlRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHDL rowType:XLFormRowDescriptorTypeDecimal title:@"HDL Cholesterol (mmol/L)"];
+    if (phlebotomyDict != (id)[NSNull null]) hdlRow.value = phlebotomyDict[kHDL];
+    [self setDefaultFontWithRow:hdlRow];
+    hdlRow.required = NO;
+    [section addFormRow:hdlRow];
+    
+    XLFormRowDescriptor *totCholesterolRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTotCholesterol rowType:XLFormRowDescriptorTypeDecimal title:@"Total Cholesterol (mmol/L)"];
+    if (phlebotomyDict != (id)[NSNull null]) totCholesterolRow.value = phlebotomyDict[kTotCholesterol];
+    [self setDefaultFontWithRow:totCholesterolRow];
+    [section addFormRow:totCholesterolRow];
+    
+    XLFormRowDescriptor *cholesHdlRatioRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCholesterolHdlRatio rowType:XLFormRowDescriptorTypeDecimal title:@"Cholesterol/HDL ratio"];
+    if (phlebotomyDict != (id)[NSNull null]) cholesHdlRatioRow.value = phlebotomyDict[kCholesterolHdlRatio];
+    [self setDefaultFontWithRow:cholesHdlRatioRow];
+    [section addFormRow:cholesHdlRatioRow];
+    
+    //For initial condition
+    if ([didPhlebRow.value isEqual:@1]) {
+        glucoseRow.disabled = @0;
+        triglyRow.disabled = @0;
+        hdlRow.disabled = @0;
+        ldlRow.disabled = @0;
+        totCholesterolRow.disabled = @0;
+        cholesHdlRatioRow.disabled = @0;
+    } else {
+        glucoseRow.disabled = @1;
+        triglyRow.disabled = @1;
+        hdlRow.disabled = @1;
+        ldlRow.disabled = @1;
+        totCholesterolRow.disabled = @1;
+        cholesHdlRatioRow.disabled = @1;
+    }
+    
+    // For when user make changes
+    didPhlebRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                glucoseRow.disabled = @0;
+                triglyRow.disabled = @0;
+                hdlRow.disabled = @0;
+                ldlRow.disabled = @0;
+                totCholesterolRow.disabled = @0;
+                cholesHdlRatioRow.disabled = @0;
+            } else {
+                glucoseRow.disabled = @1;
+                triglyRow.disabled = @1;
+                hdlRow.disabled = @1;
+                ldlRow.disabled = @1;
+                totCholesterolRow.disabled = @1;
+                cholesHdlRatioRow.disabled = @1;
+            }
+            
+            [self reloadFormRow:glucoseRow];
+            [self reloadFormRow:triglyRow];
+            [self reloadFormRow:hdlRow];
+            [self reloadFormRow:ldlRow];
+            [self reloadFormRow:totCholesterolRow];
+            [self reloadFormRow:cholesHdlRatioRow];
+        }
+    };
+    
+    return [super initWithForm:formDescriptor];
+}
+
+
 -(id)initModeOfScreening {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Mode of Screening"];
     XLFormSectionDescriptor * section;
@@ -208,9 +402,11 @@ NSString *const kMultiADL = @"multi_adl";
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kApptTime rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Door-to-Door Time"];
+    row.selectorOptions= @[@"8am-10am", @"10am-12pm", @"12pm-2pm", @"2pm-4pm"];
+    row.value = [self getScreeningTimeArrayFromDict:modeOfScreening andOptions:row.selectorOptions];
 //    if (modeOfScreening != (id)[NSNull null]) row.value = modeOfScreening[kApptTime];     //no value for now
     row.noValueDisplayText = @"Tap here";
-    row.selectorOptions= @[@"8am-10am", @"10am-12pm", @"12pm-2pm", @"2pm-4pm"];
+    
     row.required = NO;
     row.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
     [self setDefaultFontWithRow:row];
@@ -231,6 +427,7 @@ NSString *const kMultiADL = @"multi_adl";
         phlebApptRow.selectorOptions = @[@"7 Oct, 8-11am", @"8 Oct, 8-11am"];
     }
     phlebApptRow.noValueDisplayText = @"Tap here";
+    if (modeOfScreening != (id)[NSNull null]) phlebApptRow.value = modeOfScreening[kPhlebAppt];
     [self setDefaultFontWithRow:phlebApptRow];
     [section addFormRow:phlebApptRow];
     
@@ -251,62 +448,6 @@ NSString *const kMultiADL = @"multi_adl";
     return [super initWithForm:formDescriptor];
 }
 
-- (id) initPhlebotomy {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Phlebotomy"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    
-    NSDictionary *phlebotomyDict = _fullScreeningForm[SECTION_PHLEBOTOMY];
-    
-    // Basic Information - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWasTaken rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Taken?"];
-    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kWasTaken];
-    [self setDefaultFontWithRow:row];
-    row.required = YES;
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFastingBloodGlucose rowType:XLFormRowDescriptorTypeDecimal title:@"Fasting blood glucose (mmol/L)"];
-    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kFastingBloodGlucose];
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15] forKey:@"textLabel.font"];   //the description too long. Default fontsize is 16
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kTriglycerides rowType:XLFormRowDescriptorTypeDecimal title:@"Triglycerides (mmol/L)"];
-    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kTriglycerides];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLDL rowType:XLFormRowDescriptorTypeDecimal title:@"LDL Cholesterol (mmol/L)"];
-    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kLDL];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHDL rowType:XLFormRowDescriptorTypeDecimal title:@"HDL Cholesterol (mmol/L)"];
-    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kHDL];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kTotCholesterol rowType:XLFormRowDescriptorTypeDecimal title:@"Total Cholesterol (mmol/L)"];
-    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kTotCholesterol];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCholesterolHdlRatio rowType:XLFormRowDescriptorTypeDecimal title:@"Cholesterol/HDL ratio"];
-    if (phlebotomyDict != (id)[NSNull null]) row.value = phlebotomyDict[kCholesterolHdlRatio];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    [section addFormRow:row];
-    
-    return [super initWithForm:formDescriptor];
-}
 
 
 -(id) initProfiling {
@@ -1448,34 +1589,6 @@ NSString *const kMultiADL = @"multi_adl";
 
 
 
-- (id) initCurrentPhysicalIssues {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Current Physical Issues"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    NSDictionary *adlDict = [self.fullScreeningForm objectForKey:@"adls"];
-    
-    formDescriptor.assignFirstResponderOnShow = YES;
-
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Activities of Daily Living"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQuestionOne
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Can you perform the following activities without assistance? (Tick those activities that the resident CAN perform on his/her own)."];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMultiADL rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Activities"];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"Bathe/Shower"],
-                                    [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Dress"],
-                                    [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Eat"],
-                                    [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Personal Hygiene and Grooming"],
-                                    [XLFormOptionsObject formOptionsObjectWithValue:@(4) displayText:@"Toileting"],
-                                    [XLFormOptionsObject formOptionsObjectWithValue:@(5) displayText:@"Transfer/Walk"]];
-    row.value = [self getADLArrayFromDict:adlDict andOptions:row.selectorOptions];
-    [section addFormRow:row];
-    row.noValueDisplayText = @"Tap here for options";
-    return [super initWithForm:formDescriptor];
-}
 
 -(id) initAdditionalSvcs {
     
@@ -2210,14 +2323,20 @@ NSString *const kMultiADL = @"multi_adl";
     } else if ([rowDescriptor.tag isEqualToString:kApptDate]) {
         [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kApptDate andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kApptTime]) {
-//        [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kApptTime andNewContent:newValue];
-#warning ignore for now
+        [self processApptTimeSubmissionWithNewValue: newValue andOldValue:oldValue];
+    } else if ([rowDescriptor.tag isEqualToString:kPhlebAppt]) {
+        [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kPhlebAppt andNewContent:newValue];
     }
     
     /* Phlebotomy */
-    else if ([rowDescriptor.tag isEqualToString:kWasTaken]) {
-        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY andFieldName:kWasTaken andNewContent:newValue];
+    else if ([rowDescriptor.tag isEqualToString:kChronicCond]) {
+        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT andFieldName:kChronicCond andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kWantFreeBt]) {
+        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT andFieldName:kWantFreeBt andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kDidPhleb]) {
+        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT andFieldName:kDidPhleb andNewContent:newValue];
     }
+    
     
     /* Profiling */
     else if ([rowDescriptor.tag isEqualToString:kProfilingConsent]) {
@@ -2619,46 +2738,7 @@ NSString *const kMultiADL = @"multi_adl";
     return returnValue;
 }
 
-- (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
-    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
-    if ([[dictionary objectForKey:@"lang_canto"] isKindOfClass:[NSString class]]) {
 
-        if([[dictionary objectForKey:@"lang_canto"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
-        if([[dictionary objectForKey:@"lang_english"] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
-        if([[dictionary objectForKey:@"lang_hindi"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
-        if([[dictionary objectForKey:@"lang_hokkien"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
-        if([[dictionary objectForKey:@"lang_malay"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
-        if([[dictionary objectForKey:@"lang_mandrin"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
-        if([[dictionary objectForKey:@"lang_others"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
-        if([[dictionary objectForKey:@"lang_tamil"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
-        if([[dictionary objectForKey:@"lang_teochew"] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
-    }
-    else if ([[dictionary objectForKey:@"lang_english"] isKindOfClass:[NSNumber class]]) {
-        if([[dictionary objectForKey:@"lang_canto"] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
-        if([[dictionary objectForKey:@"lang_english"] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
-        if([[dictionary objectForKey:@"lang_hindi"] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
-        if([[dictionary objectForKey:@"lang_hokkien"] isEqual:@(1)]) [spokenLangArray addObject:@"Hokkien"];
-        if([[dictionary objectForKey:@"lang_malay"] isEqual:@(1)]) [spokenLangArray addObject:@"Malay"];
-        if([[dictionary objectForKey:@"lang_mandrin"] isEqual:@(1)]) [spokenLangArray addObject:@"Mandarin"];
-        if([[dictionary objectForKey:@"lang_others"] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
-        if([[dictionary objectForKey:@"lang_tamil"] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
-        if([[dictionary objectForKey:@"lang_teochew"] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
-    }
-    return spokenLangArray;
-}
-
-- (NSArray *) getADLArrayFromDict:(NSDictionary *) dictionary andOptions:(NSArray *) options {
-    NSMutableArray *adlArray = [[NSMutableArray alloc] init];
-    if([[dictionary objectForKey:@"bathe"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:0]];
-    if([[dictionary objectForKey:@"dress"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:1]];
-    if([[dictionary objectForKey:@"eat"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:2]];
-    if([[dictionary objectForKey:@"hygiene"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:3]];
-    if([[dictionary objectForKey:@"toileting"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:4]];
-    if([[dictionary objectForKey:@"walk"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:5]];
-    
-    return adlArray;
-    
-}
 
 - (NSArray *) getTypeOfSmokeFromIndivValues {
     NSDictionary *dictionary = [self.fullScreeningForm objectForKey:@"risk_factors"];
@@ -2674,74 +2754,82 @@ NSString *const kMultiADL = @"multi_adl";
     return array;
 }
 
-- (NSInteger) getAlcoholPrefFromIndivValues {
-    NSDictionary *dictionary = [self.fullScreeningForm objectForKey:@"risk_factors"];
-//    NSMutableArray *array = [[NSMutableArray alloc] init];
-//    if([[dictionary objectForKey:@"beer"] isEqualToString:@"1"]) [array addObject:@"Cigarettes"];
-//    if([[dictionary objectForKey:@"wine"] isEqualToString:@"1"]) [array addObject:@"Pipe"];
-//    if([[dictionary objectForKey:@"rice_wine"] isEqualToString:@"1"]) [array addObject:@"Self-rolled leaves \"ang hoon\""];
-//    if([[dictionary objectForKey:@"spirits"] isEqualToString:@"1"]) [array addObject:@"Shisha"];
-//    if([[dictionary objectForKey:@"stout"] isEqualToString:@"1"]) [array addObject:@"Cigars"];
-//    if([[dictionary objectForKey:@"no_pref"] isEqualToString:@"1"]) [array addObject:@"E-cigarettes"];
-    
-    if([[dictionary objectForKey:@"beer"] isEqualToString:@"1"]) return 0;
-    if([[dictionary objectForKey:@"wine"] isEqualToString:@"1"]) return 1;
-    if([[dictionary objectForKey:@"rice_wine"] isEqualToString:@"1"]) return 2;
-    if([[dictionary objectForKey:@"spirits"] isEqualToString:@"1"]) return 3;
-    if([[dictionary objectForKey:@"stout"] isEqualToString:@"1"]) return 4;
-    if([[dictionary objectForKey:@"no_pref"] isEqualToString:@"1"]) return 5;
 
-    return 10;   //default
+- (NSArray *) getScreeningTimeArrayFromDict:(NSDictionary *) dictionary andOptions:(NSArray *) options {
+    NSMutableArray *screeningTimeArray = [[NSMutableArray alloc] init];
+    
+    if ([dictionary objectForKey:kTime_8_10] != (id) [NSNull null]) {
+        if([[dictionary objectForKey:kTime_8_10] isEqual:@1])
+            [screeningTimeArray addObject:[options objectAtIndex:0]];
+    }
+    
+    if ([dictionary objectForKey:kTime_10_12] != (id) [NSNull null]) {
+    if([[dictionary objectForKey:kTime_10_12] isEqual:@1])
+        [screeningTimeArray addObject:[options objectAtIndex:1]];
+    }
+    
+    if ([dictionary objectForKey:kTime_12_2] != (id) [NSNull null]) {
+        if([[dictionary objectForKey:kTime_12_2] isEqual:@1])
+            [screeningTimeArray addObject:[options objectAtIndex:2]];
+    }
+    
+    if ([dictionary objectForKey:kTime_2_4] != (id) [NSNull null]) {
+        if([[dictionary objectForKey:kTime_2_4] isEqual:@1])
+            [screeningTimeArray addObject:[options objectAtIndex:3]];
+    }
+    
+    return screeningTimeArray;
 }
 
-- (NSArray *) getPlansArrayFromDict:(NSDictionary *) dictionary andOptions:(NSArray *) options {
-    NSMutableArray *adlArray = [[NSMutableArray alloc] init];
-    if([[dictionary objectForKey:@"medisave"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:0]];
-    if([[dictionary objectForKey:@"insurance"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:1]];
-    if([[dictionary objectForKey:@"cpf_pays"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:2]];
-    if([[dictionary objectForKey:@"pgp"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:3]];
-    if([[dictionary objectForKey:@"chas"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:4]];
-    if([[dictionary objectForKey:@"apply_chas"] isEqualToString:@"1"]) [adlArray addObject:[options objectAtIndex:5]];
+- (void) processApptTimeSubmissionWithNewValue: (NSArray *) newValue andOldValue: (NSArray *) oldValue {
     
-    return adlArray;
-    
+    if (newValue != oldValue) {
+        
+        if (newValue != nil && newValue != (id) [NSNull null]) {
+            if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
+                [oldSet addObjectsFromArray:oldValue];
+                NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
+                [newSet addObjectsFromArray:newValue];
+                
+                if ([newSet count] > [oldSet count]) {
+                    [newSet minusSet:oldSet];
+                    NSArray *array = [newSet allObjects];
+                    [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:[self getFieldNameFromApptTime:[array firstObject]] andNewContent:@"1"];
+                } else {
+                    [oldSet minusSet:newSet];
+                    NSArray *array = [oldSet allObjects];
+                    [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:[self getFieldNameFromApptTime:[array firstObject]] andNewContent:@"0"];
+                }
+            } else {
+                [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:[self getFieldNameFromApptTime:[newValue firstObject]] andNewContent:@"1"];
+            }
+        } else {
+            if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:[self getFieldNameFromApptTime:[oldValue firstObject]] andNewContent:@"0"];
+            }
+        }
+    }
+//    
+//    for (int i=0; i < [optionChosen count]; i++) {
+//        if ([optionChosen[i] isEqualToString:@"8am-10pm"]) {
+//            [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kTime_8_10 andNewContent:@"1"];
+//        } else if ([optionChosen[i] isEqualToString:@"10am-12pm"]) {
+//            [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kTime_10_12 andNewContent:@"1"];
+//        }else if ([optionChosen[i] isEqualToString:@"2pm-4pm"]) {
+//            [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kTime_12_2 andNewContent:@"1"];
+//        }else {
+//            [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kTime_2_4 andNewContent:@"1"];
+//        }
+//    }
 }
 
-- (NSArray *) getSupportArrayFromDict:(NSDictionary *) dictionary andOptions:(NSArray *) options {
-    NSMutableArray *supportArray = [[NSMutableArray alloc] init];
-    if([[dictionary objectForKey:@"care_giving"] isEqualToString:@"1"]) [supportArray addObject:[options objectAtIndex:0]];
-    if([[dictionary objectForKey:@"food"] isEqualToString:@"1"]) [supportArray addObject:[options objectAtIndex:1]];
-    if([[dictionary objectForKey:@"money"] isEqualToString:@"1"]) [supportArray addObject:[options objectAtIndex:2]];
-    if([[dictionary objectForKey:@"others"] isEqualToString:@"1"]) [supportArray addObject:[options objectAtIndex:3]];
-    
-    return supportArray;
+- (NSString *) getFieldNameFromApptTime: (NSString *) apptTime {
+    if ([apptTime isEqualToString:@"8am-10am"]) return kTime_8_10;
+    else if ([apptTime isEqualToString:@"10am-12pm"]) return kTime_10_12;
+    else if ([apptTime isEqualToString:@"12pm-2pm"]) return kTime_12_2;
+    else return kTime_2_4;
 }
-
-- (NSArray *) getCantCopeArrayFromDict:(NSDictionary *) dictionary andOptions:(NSArray *) options {
-    NSMutableArray *cantCopeArray = [[NSMutableArray alloc] init];
-    if([[dictionary objectForKey:@"cant_cope_med"] isEqualToString:@"1"]) [cantCopeArray addObject:[options objectAtIndex:0]];
-    if([[dictionary objectForKey:@"cant_cope_daily"] isEqualToString:@"1"]) [cantCopeArray addObject:[options objectAtIndex:1]];
-    if([[dictionary objectForKey:@"cant_cope_arrears"] isEqualToString:@"1"]) [cantCopeArray addObject:[options objectAtIndex:2]];
-    if([[dictionary objectForKey:@"cant_cope_others"] isEqualToString:@"1"]) [cantCopeArray addObject:[options objectAtIndex:3]];
-    
-    return cantCopeArray;
-}
-
-
-- (NSArray *) getOrgArrayFromDict: (NSDictionary *) dictionary andOptions:(NSArray *) options {
-    NSMutableArray *orgArray = [[NSMutableArray alloc] init];
-    if([[dictionary objectForKey:@"sac"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:0]];
-    if([[dictionary objectForKey:@"fsc"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:1]];
-    if([[dictionary objectForKey:@"cc"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:2]];
-    if([[dictionary objectForKey:@"rc"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:3]];
-    if([[dictionary objectForKey:@"ro"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:4]];
-    if([[dictionary objectForKey:@"so"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:5]];
-    if([[dictionary objectForKey:@"oth"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:6]];
-    if([[dictionary objectForKey:@"na"] isEqualToString:@"1"]) [orgArray addObject:[options objectAtIndex:7]];
-    
-    return orgArray;
-}
-
 
 #pragma mark - Download Server API
 - (void) processConnectionStatus {
