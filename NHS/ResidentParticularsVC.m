@@ -18,8 +18,7 @@
 //XLForms stuffs
 #import "XLForm.h"
 
-#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
-#define RESI_PART_SECTION @"resi_particulars"
+
 
 typedef enum getDataState {
     inactive,
@@ -55,6 +54,7 @@ typedef enum rowTypes {
 
 //@property (strong, nonatomic) NSMutableDictionary *resiPartiDict;
 @property (strong, nonatomic) NSNumber *resident_id;
+@property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
 
 @end
 
@@ -79,7 +79,18 @@ typedef enum rowTypes {
     [self.form setAddAsteriskToRequiredRowsTitle: YES];
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
     
-//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitBtnPressed:)];
+    NSNumber *preregCompleted = _residentParticularsDict[kPreregCompleted];
+    if ([preregCompleted isEqual:@1]) {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
+        [self.form setDisabled:YES];
+    }
+    else {
+        [self.form setDisabled:NO];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitBtnPressed:)];
+    }
+    
+    _pushPopTaskArray = [[NSMutableArray alloc] init];
+    
     
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -191,7 +202,7 @@ typedef enum rowTypes {
     
     religionRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
-            [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
+            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
         }
     };
     
@@ -228,7 +239,7 @@ typedef enum rowTypes {
     
     row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
-            [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
+            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
         }
     };
     
@@ -245,7 +256,7 @@ typedef enum rowTypes {
     
     spokenLangRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
-//            [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
+//            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
             if (newValue != nil && newValue != (id) [NSNull null]) {
                 if (oldValue != nil && oldValue != (id) [NSNull null]) {
                     NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
@@ -286,7 +297,7 @@ typedef enum rowTypes {
     row.value = _residentParticularsDict[kMaritalStatus];
     row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
-            [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:kMaritalStatus andNewContent:newValue];
+            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kMaritalStatus andNewContent:newValue];
         }
     };
     
@@ -300,7 +311,7 @@ typedef enum rowTypes {
     row.required = YES;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHousingOwnedRented rowType:XLFormRowDescriptorTypeSelectorPush title:@"Housing Type"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHousingType rowType:XLFormRowDescriptorTypeSelectorPush title:@"Housing Type"];
     row.selectorOptions = @[@"Owned, 1-room", @"Owned, 2-room", @"Owned, 3-room", @"Owned, 4-room", @"Owned, 5-room", @"Rental, 1-room", @"Rental, 2-room", @"Rental, 3-room", @"Rental, 4-room", @"Private"];
     row.required = YES;
     [self setDefaultFontWithRow:row];
@@ -312,23 +323,29 @@ typedef enum rowTypes {
     row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
             
-            NSString *ownedRented;
+            NSString *housingType;
             
             if ([newValue rangeOfString:@"Owned"].location != NSNotFound) {
-                ownedRented = @"Owned";
+                housingType = @"Owned";
             } else if ([newValue rangeOfString:@"Rental"].location != NSNotFound) {
-                ownedRented = @"Rented";
+                housingType = @"Rented";
+            } else {
+                housingType = @"Private";
             }
+            
+            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kHousingType andNewContent:housingType];
+            if ([housingType isEqualToString:@"Private"]) return;   //no need to post HousingNumRooms
+            
             
             NSUInteger loc = [newValue rangeOfString:@"-"].location;
             NSString *room = [newValue substringWithRange:NSMakeRange(loc-1, 1)];
             
-            [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:kHousingOwnedRented andNewContent:ownedRented];
+            
             double delayInSeconds = 1.0;
             dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
             dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
                 //code to be executed on the main queue after delay
-                [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:kHousingNumRooms andNewContent:room];
+                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kHousingNumRooms andNewContent:room];
             });
         }
     };
@@ -343,7 +360,7 @@ typedef enum rowTypes {
     
     row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
-            [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:kHighestEduLevel andNewContent:newValue];
+            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kHighestEduLevel andNewContent:newValue];
         }
     };
     
@@ -370,12 +387,12 @@ typedef enum rowTypes {
             NSString *street = [self getStreetFromAddress:newValue];
             NSString *block  = [self getBlockFromAddress:newValue];
             
-            [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:kAddressStreet andNewContent:street];
+            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kAddressStreet andNewContent:street];
             double delayInSeconds = 1.0;
             dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
             dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
                 //code to be executed on the main queue after delay
-                [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:kAddressBlock andNewContent:block];
+                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kAddressBlock andNewContent:block];
             });
             
             if ([newValue containsString:@"Others"]) {
@@ -469,7 +486,7 @@ typedef enum rowTypes {
     }
     
     if (rowDescriptor.value != (id)[NSNull null] && rowDescriptor.value != nil) {
-        [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
     }
 }
 
@@ -574,12 +591,14 @@ typedef enum rowTypes {
 
     NSString *room;
     NSUInteger loc;
-    if (([fields objectForKey:kHousingOwnedRented] != [NSNull null]) && ([fields objectForKey:kHousingOwnedRented])) {
-        NSString *houseType = [fields objectForKey:kHousingOwnedRented];
+    if (([fields objectForKey:kHousingType] != [NSNull null]) && ([fields objectForKey:kHousingType])) {
+        NSString *houseType = [fields objectForKey:kHousingType];
         if ([houseType rangeOfString:@"Owned"].location != NSNotFound) {
-            [resi_particulars setObject:@"Owned" forKey:@"housing_owned_rented"];
+            [resi_particulars setObject:@"Owned" forKey:kHousingType];
         } else if ([houseType rangeOfString:@"Rental"].location != NSNotFound) {
-            [resi_particulars setObject:@"Rented" forKey:@"housing_owned_rented"];
+            [resi_particulars setObject:@"Rented" forKey:kHousingType];
+        } else {
+            [resi_particulars setObject:@"Private" forKey:kHousingType];
         }
 
         loc = [houseType rangeOfString:@"-"].location;
@@ -767,9 +786,15 @@ typedef enum rowTypes {
     
     if (_residentParticularsDict[kHousingNumRooms] != (id) [NSNull null]) { //got some value
         NSString *numRooms = _residentParticularsDict[kHousingNumRooms];
-        NSString *ownedRented = _residentParticularsDict[kHousingOwnedRented];
+        NSString *housingType = _residentParticularsDict[kHousingType];
         
-        return [NSString stringWithFormat:@"%@, %@-room", ownedRented, numRooms];
+        if (housingType == (id)[NSNull null] || housingType == nil)     //don't continue
+            return @"";
+        
+        if (![housingType isEqualToString:@"Private"])
+            return [NSString stringWithFormat:@"%@, %@-room", housingType, numRooms];
+        else
+            return @"Private";
     }
     return @"";
 }
@@ -786,73 +811,42 @@ typedef enum rowTypes {
     else if ([language isEqualToString:@"Teochew"]) fieldName = kLangTeoChew;
     else if ([language isEqualToString:@"Others"]) fieldName = kLangOthers;
     
-    [self postSingleFieldWithSection:RESI_PART_SECTION andFieldName:fieldName andNewContent:value];
+    [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:fieldName andNewContent:value];
 }
 
 
-#pragma mark - Submit
-//-(void)submitBtnPressed:(UIBarButtonItem * __unused)button {
-//    
-//    NSDictionary *fields = [self.form formValues];
-//    NSString *name, *nric, *gender, *birthDate, *screenLocation;
-//    
-//    if ([fields objectForKey:kGender] != [NSNull null]) {
-//        if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
-////            [resi_particulars setObject:@"M" forKey:kGender];
-//            gender = @"M";
-//        } else if ([[fields objectForKey:kGender] isEqualToString:@"Female"]) {
-//            gender = @"F";
-////            [resi_particulars setObject:@"F" forKey:kGender];
-//        }
-//    }
-//    name = [self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kName];
-////    [resi_particulars setObject:name forKey:kName];
-//    nric = [self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kNRIC];
-////    [resi_particulars setObject:nric forKey:kNRIC];
-//    birthDate = [self getStringWithDictionary:fields rowType:Date formDescriptorWithTag:kBirthDate];
-////    [resi_particulars setObject:birthDate forKey:kBirthDate];
-//    screenLocation = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
-//    NSString *timeNow = [self getTimeNowInString];
-//    
-//    NSNumber *residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId];
-//    
-//    if ((residentID == nil) || residentID == (id)[NSNull null]) {   //only if no resident ID registered, then submit
-//        NSLog(@"Registering new resident...");
-//        NSDictionary *dict = @{kName:name,
-//                               kNRIC:nric,
-//                               kGender:gender,
-//                               kBirthDate:birthDate,
-//                               kTimestamp:timeNow,
-//                               kScreenLocation:screenLocation};
-//        [self submitNewResidentEntry:dict];
-//    } else {
-//        NSLog(@"Resident already exist!");
-//    }
-//    
-    //    NSArray * validationErrors = [self formValidationErrors];
-    //    if (validationErrors.count > 0){
-    //        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-    //            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
-    //            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
-    //            cell.backgroundColor = [UIColor orangeColor];
-    //            [UIView animateWithDuration:0.3 animations:^{
-    //                cell.backgroundColor = [UIColor whiteColor];
-    //            }];
-    //        }];
-    //        [self showFormValidationError:[validationErrors firstObject]];
-    //
-    //        return;
-    //    } else {
-    //
-    //        [SVProgressHUD setMinimumDismissTimeInterval:1.0f];
-    //        [SVProgressHUD showImage:[[UIImage imageNamed:@"ThumbsUp"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] status:@"Good!"];
-    //        
-    //        [self saveResidentParticulars];
-    //    }
-//}
+#pragma mark - UIBarButtonItem methods
+- (void) editBtnPressed: (UIBarButtonItem * __unused)button {
+    [self.form setDisabled:NO];
+    [self.tableView endEditing:YES];
+    [self.tableView reloadData];
+    
+    self.navigationItem.rightBarButtonItem = nil;
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitBtnPressed:)];
+}
 
+-(void)submitBtnPressed:(UIBarButtonItem * __unused)button {
     
-    
+    NSArray * validationErrors = [self formValidationErrors];
+    if (validationErrors.count > 0){
+        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+            cell.backgroundColor = [UIColor orangeColor];
+            [UIView animateWithDuration:0.3 animations:^{
+                cell.backgroundColor = [UIColor whiteColor];
+            }];
+        }];
+        [self showFormValidationError:[validationErrors firstObject]];
+        
+        return;
+    } else {
+        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kPreregCompleted andNewContent:@"1"];
+    }
+}
+
+
+
 #pragma mark - Download Server API
 - (void) processConnectionStatus {
     if(status == NotReachable)
@@ -893,10 +887,20 @@ typedef enum rowTypes {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     
     ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client postDataGivenSectionAndFieldName:dict
-                               progressBlock:[self progressBlock]
-                                successBlock:[self successBlock]
-                                andFailBlock:[self errorBlock]];
+    
+    if ([fieldName isEqualToString:kPreregCompleted]) {
+        [client postDataGivenSectionAndFieldName:dict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self preRegSuccessBlock]
+                                    andFailBlock:[self errorBlock]];
+    } else {
+        [_pushPopTaskArray addObject:dict];
+        [client postDataGivenSectionAndFieldName:dict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
+    }
+    
 }
 
 - (void) postAllOtherFields: (NSDictionary *) completeDict {
@@ -937,61 +941,90 @@ typedef enum rowTypes {
     return ^(NSURLSessionDataTask *task, id responseObject){
         NSLog(@"%@", responseObject);
         
-        successCounter++;
-        NSLog(@"%d", successCounter);
-//        [KAStatusBar dismiss];
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-        [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+        [_pushPopTaskArray removeObjectAtIndex:0];
+        
+        if ([[responseObject objectForKey:@"success"] isKindOfClass:[NSString class]]) {
+            if ([[responseObject objectForKey:@"success"]isEqualToString:@"1"]) {
+                [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+                [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+                            }
+        } else if ([[responseObject objectForKey:@"success"] isKindOfClass:[NSNumber class]]) {
+            if ([[responseObject objectForKey:@"success"]isEqual:@1]) {
+                [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+                [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+            }
+        }
+
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))preRegSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        
+        if ([[responseObject objectForKey:@"success"] isKindOfClass:[NSString class]]) {
+            if ([[responseObject objectForKey:@"success"]isEqualToString:@"1"]) {
+                [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+                [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+                
+                UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Sucessful", nil)
+                                                                                          message:@"Pre-registration completed!"
+                                                                                   preferredStyle:UIAlertControllerStyleAlert];
+                
+                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                                    style:UIAlertActionStyleDefault
+                                                                  handler:^(UIAlertAction * okAction) {
+                                                                      //                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                                                                      //                                                                                                                  object:nil
+                                                                      //                                                                                                                userInfo:nil];
+                                                                      [self.navigationController popViewControllerAnimated:YES];
+                                                                  }]];
+                [self presentViewController:alertController animated:YES completion:nil];
+
+            }
+        } else if ([[responseObject objectForKey:@"success"] isKindOfClass:[NSNumber class]]) {
+            if ([[responseObject objectForKey:@"success"]isEqual:@1]) {
+                [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+                [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+                
+                
+                UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Sucessful", nil)
+                                                                                          message:@"Pre-registration completed!"
+                                                                                   preferredStyle:UIAlertControllerStyleAlert];
+                
+                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                                    style:UIAlertActionStyleDefault
+                                                                  handler:^(UIAlertAction * okAction) {
+                                                                      //                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
+                                                                      //                                                                                                                  object:nil
+                                                                      //                                                                                                                userInfo:nil];
+                                                                      [self.navigationController popViewControllerAnimated:YES];
+                                                                  }]];
+                [self presentViewController:alertController animated:YES completion:nil];
+            }
+        }
         
         
-//        if(successCounter == 4) {
-//            NSLog(@"SUBMISSION SUCCESSFUL!!");
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                [SVProgressHUD dismiss];
-//            });
-//            if (self.loadDataFlag == [NSNumber numberWithBool:YES]) {       //if this draft is loaded and submitted,now delete!
-////                [self removeDraftAfterSubmission];
-//            }
-//            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Uploaded", nil)
-//                                                                                      message:@"Registration successful!"
-//                                                                               preferredStyle:UIAlertControllerStyleAlert];
-//            
-//            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-//                                                                style:UIAlertActionStyleDefault
-//                                                              handler:^(UIAlertAction * okAction) {
-//                                                                  [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
-//                                                                                                                      object:nil
-//                                                                                                                    userInfo:nil];
-//                                                                  [self.navigationController popViewControllerAnimated:YES];
-//                                                              }]];
-//            [self presentViewController:alertController animated:YES completion:nil];
-//        }
-//        
         
     };
 }
 
 - (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"******UNSUCCESSFUL SUBMISSION******!!");
+        NSLog(@"<<< SUBMISSION FAILED >>>");
+        
+        NSDictionary *retryDict = [_pushPopTaskArray firstObject];
+        
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
-        failCounter++;
-        if (failCounter==1) {
-            //            [hud hideAnimated:YES];     //stop showing the progressindicator
-            [SVProgressHUD dismiss];
-            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
-                                                                                      message:@"Form failed to upload!"
-                                                                               preferredStyle:UIAlertControllerStyleAlert];
-            
-            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-                                                                style:UIAlertActionStyleDefault
-                                                              handler:^(UIAlertAction * okAction) {
-                                                                  //do nothing for now
-                                                              }]];
-            [self presentViewController:alertController animated:YES completion:nil];
-            
-        }
+        
+        
+        NSLog(@"\n\nRETRYING...");
+        
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postDataGivenSectionAndFieldName:retryDict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
         
     };
 }

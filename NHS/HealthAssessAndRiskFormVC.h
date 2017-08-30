@@ -12,11 +12,13 @@
 @interface HealthAssessAndRiskFormVC : XLFormViewController
 
 @property (strong, nonatomic) NSNumber* formID;
+@property (strong, nonatomic) NSDictionary *fullScreeningForm;
 
 
 
 
 // Public Methods
 - (void) setFormID:(NSNumber *)formID;
+- (void) setFullScreeningForm:(NSDictionary *)fullScreeningForm;
 
 @end

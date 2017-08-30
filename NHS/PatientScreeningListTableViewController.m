@@ -16,7 +16,6 @@
 #import "GenericTableViewCell.h"
 #import "ScreeningSelectProfileTableVC.h"
 
-#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
 //disable this if fetch data from server
 //#define DISABLE_SERVER_DATA_FETCH         //to use generated fake patient data
@@ -135,6 +134,8 @@ typedef enum residentDataSource {
 - (void) viewWillAppear:(BOOL)animated {
     self.navigationItem.title = @"List of Screened Residents";
     [super viewWillAppear:animated];
+    
+    [self refreshConnectionAndTable];
     
 }
 
@@ -275,20 +276,19 @@ typedef enum residentDataSource {
     NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kName];
     NSString *residentNric = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kNRIC];
     NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kLastUpdateTs];
+    NSNumber *preRegCompleted = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kPreregCompleted];
     
     cell.nameLabel.text = residentName;
     cell.NRICLabel.text = residentNric;
     cell.dateLabel.text = lastUpdatedTS;
+    if ([preRegCompleted isEqual:@1])
+        cell.regLabel.hidden = NO;
+    else
+        cell.regLabel.hidden = YES;
     
-    cell.regLabel.hidden = YES;
     cell.verticalLine.hidden = YES;
     cell.yearLabel.hidden = YES;
     
-    if ([residentName isEqualToString:@"MICHELLE BUCHANAN"]) {
-        cell.regLabel.hidden = NO;
-        cell.verticalLine.hidden = NO;
-        cell.yearLabel.hidden = NO;
-    }
     
     return cell;
 }

@@ -14,7 +14,6 @@
 #import "XLForm.h"
 #import "AppConstants.h"
 
-#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
 typedef enum typeOfFollowUp {
     houseVisit,

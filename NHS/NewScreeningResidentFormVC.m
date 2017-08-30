@@ -17,7 +17,7 @@
 //XLForms stuffs
 #import "XLForm.h"
 
-#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
+
 #define RESI_PART_SECTION @"resi_particulars"
 
 

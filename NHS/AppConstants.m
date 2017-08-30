@@ -63,7 +63,7 @@ NSString *const kLangOthers = @"lang_others";
 NSString *const kLangOthersText  = @"lang_others_text";
 
 NSString *const kMaritalStatus = @"marital_status";
-NSString *const kHousingOwnedRented = @"housing_owned_rented";
+NSString *const kHousingType = @"housing_type";
 NSString *const kHousingNumRooms = @"housing_num_rooms";
 NSString *const kHighestEduLevel = @"highest_edu_level";
 
@@ -156,7 +156,14 @@ NSString *const kFeelFall= @"feel_fall";
 NSString *const kCognitiveImpair= @"cognitive_impairment";
 
 
-#pragma mark - Health Assessment and Risk Stratisfaction
+#pragma mark - Health Assessment and Risk Stratification
+
+NSString *const kHasInformed= @"has_informed";
+NSString *const kCheckedBlood= @"checked_blood";
+NSString *const kCheckedBp= @"checked_bp";
+NSString *const kSeeingDocRegularly= @"seeing_doc_regularly";
+NSString *const kCurrentlyPrescribed= @"currently_prescribed";
+NSString *const kTakingRegularly= @"taking_regularly";
 
 NSString *const kDMHasInformed= @"dm_has_informed";
 NSString *const kDMCheckedBlood= @"dm_checked_blood";
@@ -498,16 +505,16 @@ NSString *const kReqFollowupGDA = @"require_followup";
 
 #pragma mark - Health Education
 
-/* Pre-education Knowledge Quiz */
-NSString *const kEdu1 = @"edu_01";
-NSString *const kEdu2 = @"edu_02";
-NSString *const kEdu3 = @"edu_03";
-NSString *const kEdu4 = @"edu_04";
-NSString *const kEdu5 = @"edu_05";
-NSString *const kEdu6 = @"edu_06";
-NSString *const kEdu7 = @"edu_07";
-NSString *const kEdu8 = @"edu_08";
-NSString *const kEdu9 = @"edu_09";
+/* General education field for submission */
+NSString *const kEdu1 = @"edu_1";
+NSString *const kEdu2 = @"edu_2";
+NSString *const kEdu3 = @"edu_3";
+NSString *const kEdu4 = @"edu_4";
+NSString *const kEdu5 = @"edu_5";
+NSString *const kEdu6 = @"edu_6";
+NSString *const kEdu7 = @"edu_7";
+NSString *const kEdu8 = @"edu_8";
+NSString *const kEdu9 = @"edu_9";
 NSString *const kEdu10 = @"edu_10";
 NSString *const kEdu11 = @"edu_11";
 NSString *const kEdu12 = @"edu_12";
@@ -526,10 +533,62 @@ NSString *const kEdu24 = @"edu_24";
 NSString *const kEdu25 = @"edu_25";
 NSString *const kPreEdScore = @"pre_ed_score";
 
+
+
+/* Pre-education Knowledge Quiz */
+NSString *const kPreEdu1 = @"pre_edu_01";
+NSString *const kPreEdu2 = @"pre_edu_02";
+NSString *const kPreEdu3 = @"pre_edu_03";
+NSString *const kPreEdu4 = @"pre_edu_04";
+NSString *const kPreEdu5 = @"pre_edu_05";
+NSString *const kPreEdu6 = @"pre_edu_06";
+NSString *const kPreEdu7 = @"pre_edu_07";
+NSString *const kPreEdu8 = @"pre_edu_08";
+NSString *const kPreEdu9 = @"pre_edu_09";
+NSString *const kPreEdu10 = @"pre_edu_10";
+NSString *const kPreEdu11 = @"pre_edu_11";
+NSString *const kPreEdu12 = @"pre_edu_12";
+NSString *const kPreEdu13 = @"pre_edu_13";
+NSString *const kPreEdu14 = @"pre_edu_14";
+NSString *const kPreEdu15 = @"pre_edu_15";
+NSString *const kPreEdu16 = @"pre_edu_16";
+NSString *const kPreEdu17 = @"pre_edu_17";
+NSString *const kPreEdu18 = @"pre_edu_18";
+NSString *const kPreEdu19 = @"pre_edu_19";
+NSString *const kPreEdu20 = @"pre_edu_20";
+NSString *const kPreEdu21 = @"pre_edu_21";
+NSString *const kPreEdu22 = @"pre_edu_22";
+NSString *const kPreEdu23 = @"pre_edu_23";
+NSString *const kPreEdu24 = @"pre_edu_24";
+NSString *const kPreEdu25 = @"pre_edu_25";
+
 /* Post-education Knowledge Quiz */
+NSString *const kPostEdu1 = @"post_edu_01";
+NSString *const kPostEdu2 = @"post_edu_02";
+NSString *const kPostEdu3 = @"post_edu_03";
+NSString *const kPostEdu4 = @"post_edu_04";
+NSString *const kPostEdu5 = @"post_edu_05";
+NSString *const kPostEdu6 = @"post_edu_06";
+NSString *const kPostEdu7 = @"post_edu_07";
+NSString *const kPostEdu8 = @"post_edu_08";
+NSString *const kPostEdu9 = @"post_edu_09";
+NSString *const kPostEdu10 = @"post_edu_10";
+NSString *const kPostEdu11 = @"post_edu_11";
+NSString *const kPostEdu12 = @"post_edu_12";
+NSString *const kPostEdu13 = @"post_edu_13";
+NSString *const kPostEdu14 = @"post_edu_14";
+NSString *const kPostEdu15 = @"post_edu_15";
+NSString *const kPostEdu16 = @"post_edu_16";
+NSString *const kPostEdu17 = @"post_edu_17";
+NSString *const kPostEdu18 = @"post_edu_18";
+NSString *const kPostEdu19 = @"post_edu_19";
+NSString *const kPostEdu20 = @"post_edu_20";
+NSString *const kPostEdu21 = @"post_edu_21";
+NSString *const kPostEdu22 = @"post_edu_22";
+NSString *const kPostEdu23 = @"post_edu_23";
+NSString *const kPostEdu24 = @"post_edu_24";
+NSString *const kPostEdu25 = @"post_edu_25";
 NSString *const kPostEdScore = @"post_ed_score";
-
-
 
 
 

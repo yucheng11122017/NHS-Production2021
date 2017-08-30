@@ -10,9 +10,8 @@
 #import "ServerComm.h"
 #import "XLForm.h"
 #import "SVProgressHUD.h"
+#import "AppConstants.h"
 
-
-#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
 NSString *const qName = @"name";
 NSString *const qNRIC = @"nric";

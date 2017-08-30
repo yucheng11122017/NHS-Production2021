@@ -14,8 +14,6 @@
 #import "SVProgressHUD.h"
 
 
-#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
-
 
 typedef enum getDataState {
     inactive,
@@ -120,28 +118,36 @@ typedef enum getDataState {
     }
     
     if (indexPath.section == 0) {
-        [cell.textLabel setText:@"Resident Particulars"];
+        NSNumber *preRegDone =[_residentDetails[kResiParticulars] objectForKey:kPreregCompleted];
+        [cell.textLabel setText:@"📶 Resident Particulars"];
+
+        if ([preRegDone isEqual:@0]) {
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        }
     } else {
         NSString *text = [_yearlyProfile objectAtIndex:indexPath.row];
+        [cell.textLabel setText:text];
+        NSNumber *preRegDone =[_residentDetails[kResiParticulars] objectForKey:kPreregCompleted];
         
-        NSString *str = [[_residentDetails objectForKey:kResiParticulars] objectForKey:kResidentId];
-        
-        BOOL newEntry = str? NO:YES;
-        
-        if([text containsString:@"2017"] && newEntry) {
-            [cell setUserInteractionEnabled:NO];
-            [cell.textLabel setTextColor:[UIColor grayColor]];
+        if ([text containsString:@"2017"]) {
+            if ([preRegDone isEqual:@0]) {
+                [cell setUserInteractionEnabled:NO];
+                [cell.textLabel setTextColor:[UIColor grayColor]];
+            } else {
+                [cell setUserInteractionEnabled:YES];
+                cell.textLabel.textColor = [UIColor blackColor];
+            }
         }
+        
         else if ([text containsString:@"2018"] || [text containsString:@"2019"]) {
             [cell setUserInteractionEnabled:NO];
             [cell.textLabel setTextColor:[UIColor grayColor]];
         }
-        [cell.textLabel setText:text];
         
         
     }
-    // Configure the cell...
-    
     return cell;
 }
 
@@ -215,8 +221,7 @@ typedef enum getDataState {
         
         [self saveCoreData];
         [SVProgressHUD dismiss];
-//        [SVProgressHUD setMaximumDismissTimeInterval:1.0];
-//        [SVProgressHUD showSuccessWithStatus:@"Done!"];
+        [self.tableView reloadData];
     };
 }
 

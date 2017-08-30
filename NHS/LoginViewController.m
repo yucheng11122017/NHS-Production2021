@@ -8,11 +8,11 @@
 
 #import "LoginViewController.h"
 #import "HomeViewController.h"
+#import "AppConstants.h"
 #import "AFNetworking.h"
 #import <CommonCrypto/CommonDigest.h>
 #import "SVProgressHUD.h"
 
-#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 #define ERROR_MSG_DELAY 5.0f
 
 #define FULLNAME_TEXTFIELD_TAG 1

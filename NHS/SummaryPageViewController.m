@@ -19,7 +19,6 @@
 #define remarksLabelHeight 20
 
 
-#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
 @interface SummaryPageViewController () {
 

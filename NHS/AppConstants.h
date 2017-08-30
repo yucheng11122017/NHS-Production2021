@@ -10,12 +10,17 @@
 
 @interface AppConstants : NSObject
 
+
+#define REMOTE_HOST_NAME @"www.apple.com"
+#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
+
 #define DEFAULT_FONT_SIZE 15
 #define DEFAULT_FONT_NAME @"AppleSDGothicNeo-Regular"
 #define DEFAULT_ROW_HEIGHT_FOR_SECTIONS 70.0
 
 #pragma mark - Section Names for Submission
 
+#define SECTION_RESI_PART                       @"resi_particulars"
 #define SECTION_MODE_OF_SCREENING               @"mode_of_screening"
 #define SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT    @"phlebotomy_eligibility_assmt"
 #define SECTION_PHLEBOTOMY                      @"phlebotomy"
@@ -107,7 +112,7 @@ extern NSString *const kLangOthers;
 extern NSString *const kLangOthersText;
 
 extern NSString *const kMaritalStatus;
-extern NSString *const kHousingOwnedRented;
+extern NSString *const kHousingType;
 extern NSString *const kHousingNumRooms;
 extern NSString *const kHighestEduLevel;
 
@@ -123,6 +128,7 @@ extern NSString *const kIsFinal;
 
 extern NSString *const kNeighbourhood;
 extern NSString *const kRemarks;
+extern NSString *const kPreregCompleted;
 
 #pragma mark - SearchBar constants
 extern NSString *const ViewControllerTitleKey;
@@ -193,6 +199,13 @@ extern NSString *const kFeelFall;
 extern NSString *const kCognitiveImpair;
 
 #pragma mark - Health Assessment and Risk Stratisfaction
+
+extern NSString *const kHasInformed;
+extern NSString *const kCheckedBlood;
+extern NSString *const kCheckedBp;
+extern NSString *const kSeeingDocRegularly;
+extern NSString *const kCurrentlyPrescribed;
+extern NSString *const kTakingRegularly;
 
 extern NSString *const kDMHasInformed;
 extern NSString *const kDMCheckedBlood;
@@ -533,7 +546,7 @@ extern NSString *const kReqFollowupGDA;
 #pragma mark - Health Education
 
 
-/* Pre-education Knowledge Quiz */
+/* General education field for submission */
 extern NSString *const kEdu1;
 extern NSString *const kEdu2;
 extern NSString *const kEdu3;
@@ -561,10 +574,63 @@ extern NSString *const kEdu24;
 extern NSString *const kEdu25;
 extern NSString *const kPreEdScore;
 
+
+
+
+
+/* Pre-education Knowledge Quiz */
+extern NSString *const kPreEdu1;
+extern NSString *const kPreEdu2;
+extern NSString *const kPreEdu3;
+extern NSString *const kPreEdu4;
+extern NSString *const kPreEdu5;
+extern NSString *const kPreEdu6;
+extern NSString *const kPreEdu7;
+extern NSString *const kPreEdu8;
+extern NSString *const kPreEdu9;
+extern NSString *const kPreEdu10;
+extern NSString *const kPreEdu11;
+extern NSString *const kPreEdu12;
+extern NSString *const kPreEdu13;
+extern NSString *const kPreEdu14;
+extern NSString *const kPreEdu15;
+extern NSString *const kPreEdu16;
+extern NSString *const kPreEdu17;
+extern NSString *const kPreEdu18;
+extern NSString *const kPreEdu19;
+extern NSString *const kPreEdu20;
+extern NSString *const kPreEdu21;
+extern NSString *const kPreEdu22;
+extern NSString *const kPreEdu23;
+extern NSString *const kPreEdu24;
+extern NSString *const kPreEdu25;
+
 /* Post-education Knowledge Quiz */
-
+extern NSString *const kPostEdu1;
+extern NSString *const kPostEdu2;
+extern NSString *const kPostEdu3;
+extern NSString *const kPostEdu4;
+extern NSString *const kPostEdu5;
+extern NSString *const kPostEdu6;
+extern NSString *const kPostEdu7;
+extern NSString *const kPostEdu8;
+extern NSString *const kPostEdu9;
+extern NSString *const kPostEdu10;
+extern NSString *const kPostEdu11;
+extern NSString *const kPostEdu12;
+extern NSString *const kPostEdu13;
+extern NSString *const kPostEdu14;
+extern NSString *const kPostEdu15;
+extern NSString *const kPostEdu16;
+extern NSString *const kPostEdu17;
+extern NSString *const kPostEdu18;
+extern NSString *const kPostEdu19;
+extern NSString *const kPostEdu20;
+extern NSString *const kPostEdu21;
+extern NSString *const kPostEdu22;
+extern NSString *const kPostEdu23;
+extern NSString *const kPostEdu24;
+extern NSString *const kPostEdu25;
 extern NSString *const kPostEdScore;
-
-
 
 @end

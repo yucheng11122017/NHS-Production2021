@@ -16,7 +16,7 @@
 #import "SVProgressHUD.h"
 #import "GenericTableViewCell.h"
 
-#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
+
 
 
 typedef enum getDataState {

@@ -19,7 +19,6 @@
 //XLForms stuffs
 #import "XLForm.h"
 
-#define ERROR_INFO @"com.alamofire.serialization.response.error.data"
 
 typedef enum rowTypes {
     Text,
@@ -65,7 +64,6 @@ NSString *const kQuestionFifteen = @"q15";
 NSString *const kMultiADL = @"multi_adl";
 
 @interface ScreeningFormViewController () {
-    NetworkStatus status;
     NSString *gender;
     NSArray *spoken_lang_value;
     XLFormRowDescriptor *preEdScoreRow, *postEdScoreRow, *showPostEdSectionBtnRow;
@@ -79,7 +77,13 @@ NSString *const kMultiADL = @"multi_adl";
     BOOL sporean, age5069 ,noMammo2Yrs, hasChas, wantMammo;
     BOOL age2569, noPapSmear3Yrs, hadSex, wantPapSmear;
     BOOL age65, feelFall, scaredFall, fallen12Mths;
+    BOOL internetDCed;
 }
+
+@property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
+@property (nonatomic) Reachability *hostReachability;
+@property (nonatomic) Reachability *internetReachability;
+
 
 @end
 
@@ -97,6 +101,17 @@ NSString *const kMultiADL = @"multi_adl";
               stringForKey:kGender];
     neighbourhood = [[NSUserDefaults standardUserDefaults]
               stringForKey:kNeighbourhood];
+    
+    _pushPopTaskArray = [[NSMutableArray alloc] init];
+    
+    internetDCed = false;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
+    
+    self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
+    [self.hostReachability startNotifier];
+    [self updateInterfaceWithReachability:self.hostReachability];
+    
     
     
     //must init first before [super viewDidLoad]
@@ -146,6 +161,8 @@ NSString *const kMultiADL = @"multi_adl";
 - (void) viewWillDisappear:(BOOL)animated {
 //    [self saveEntriesIntoDictionary];
     [KAStatusBar dismiss];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kReachabilityChangedNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"updateFullScreeningForm"
                                                         object:nil
@@ -1884,157 +1901,186 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
+    NSDictionary *preEduDict = [_fullScreeningForm objectForKey:SECTION_PRE_HEALTH_EDU];
+    NSDictionary *postEduDict = [_fullScreeningForm objectForKey:SECTION_POST_HEALTH_EDU];
+    
+    
     preEdSection = [XLFormSectionDescriptor formSectionWithTitle:@"Pre-education Knowledge Quiz"];
     [formDescriptor addFormSection:preEdSection];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu1 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"1. A person always knows when they have heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu1 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"1. A person always knows when they have heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu1]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu2 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"2. If you have a family history of heart disease, you are at risk for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu2 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"2. If you have a family history of heart disease, you are at risk for developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu2]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu3 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"3. The older a person is, the greater their risk of having heart disease "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu3 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"3. The older a person is, the greater their risk of having heart disease "];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu3]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu4 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"4. Smoking is a risk factor for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu4 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"4. Smoking is a risk factor for heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu4]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu5 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"5. A person who stops smoking will lower their risk of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu5 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"5. A person who stops smoking will lower their risk of developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu5]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu6 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"6. High blood pressure is a risk factor for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu6 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"6. High blood pressure is a risk factor for heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu6]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu7 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"7. Keeping blood pressure under control will reduce a person’s risk for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu7 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"7. Keeping blood pressure under control will reduce a person’s risk for developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu7]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu8 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"8. High cholesterol is a risk factor for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu8 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"8. High cholesterol is a risk factor for developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu8]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu9 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"9. Eating fatty foods does not affect blood cholesterol levels"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu9 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"9. Eating fatty foods does not affect blood cholesterol levels"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu9]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu10 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"10. If your ‘good’ cholesterol (HDL) is high you are at risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu10 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"10. If your ‘good’ cholesterol (HDL) is high you are at risk for heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu10]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu11 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"11. If your ‘bad’ cholesterol (LDL) is high you are at risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu11 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"11. If your ‘bad’ cholesterol (LDL) is high you are at risk for heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu11]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu12 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"12. Being overweight increases a person’s risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu12 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"12. Being overweight increases a person’s risk for heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu12]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu13 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"13. Regular physical activity will lower a person’s chance of getting heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu13 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"13. Regular physical activity will lower a person’s chance of getting heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu13]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu14 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"14. Only exercising at a gym or in an exercise class will lower a person’s chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu14 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"14. Only exercising at a gym or in an exercise class will lower a person’s chance of developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu14]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu15 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"15. Walking is considered exercise that will help lower a person’s chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu15 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"15. Walking is considered exercise that will help lower a person’s chance of developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu15]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu16 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"16. Diabetes is a risk factor for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu16 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"16. Diabetes is a risk factor for developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu16]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu17 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"17. High blood sugar puts a strain on the heart"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu17 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"17. High blood sugar puts a strain on the heart"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu17]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu18 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"18. If your blood sugar is high over several months it can cause your cholesterol level to go up and increase your risk of heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu18 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"18. If your blood sugar is high over several months it can cause your cholesterol level to go up and increase your risk of heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu18]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu19 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"19. A person who has diabetes can reduce their risk of developing heart disease if they keep their blood sugar levels under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu19 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"19. A person who has diabetes can reduce their risk of developing heart disease if they keep their blood sugar levels under control"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu19]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu20 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"20. People with diabetes rarely have high cholesterol"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu20 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"20. People with diabetes rarely have high cholesterol"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu20]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu21 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"21. If a person has diabetes, keeping their cholesterol under control will help to lower their chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu21 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"21. If a person has diabetes, keeping their cholesterol under control will help to lower their chance of developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu21]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu22 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"22. People with diabetes tend to have low HDL (good) cholesterol"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu22 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"22. People with diabetes tend to have low HDL (good) cholesterol"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu22]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu23 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"23. A person who has diabetes can reduce their risk of developing heart disease if they keep their blood pressure under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu23 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"23. A person who has diabetes can reduce their risk of developing heart disease if they keep their blood pressure under control"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu23]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu24 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"24. A person who has diabetes can reduce their risk of developing heart disease if they keep their weight under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu24 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"24. A person who has diabetes can reduce their risk of developing heart disease if they keep their weight under control"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu24]];
     [preEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"25. Men with diabetes have a higher risk of heart disease than women with diabetes "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdu25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"25. Men with diabetes have a higher risk of heart disease than women with diabetes "];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (preEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:preEduDict[kEdu25]];
     [preEdSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"preEdScoreButton" rowType:XLFormRowDescriptorTypeButton title:@"Calculate Pre-education Score"];
@@ -2047,6 +2093,7 @@ NSString *const kMultiADL = @"multi_adl";
     preEdScoreRow.noValueDisplayText = @"-/-";
     preEdScoreRow.disabled = @YES;
     [self setDefaultFontWithRow:preEdScoreRow];
+    if (preEduDict != (id)[NSNull null]) preEdScoreRow.value = preEduDict[kPreEdScore];
     [preEdSection addFormRow:preEdScoreRow];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -2061,154 +2108,179 @@ NSString *const kMultiADL = @"multi_adl";
     postEdSection = [XLFormSectionDescriptor formSectionWithTitle:@"Post-Education Knowledge Quiz"];
     [formDescriptor addFormSection:postEdSection];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu1 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person always knows when they have heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu1 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person always knows when they have heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu1]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu2 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If you have a family history of heart disease, you are at risk for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu2 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If you have a family history of heart disease, you are at risk for developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu2]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu3 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"The older a person is, the greater their risk of having heart disease "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu3 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"The older a person is, the greater their risk of having heart disease "];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu3]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu4 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Smoking is a risk factor for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu4 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Smoking is a risk factor for heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu4]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu5 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who stops smoking will lower their risk of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu5 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who stops smoking will lower their risk of developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu5]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu6 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"High blood pressure is a risk factor for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu6 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"High blood pressure is a risk factor for heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu6]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu7 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Keeping blood pressure under control will reduce a person’s risk for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu7 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Keeping blood pressure under control will reduce a person’s risk for developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu7]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu8 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"High cholesterol is a risk factor for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu8 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"High cholesterol is a risk factor for developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu8]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu9 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Eating fatty foods does not affect blood cholesterol levels"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu9 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Eating fatty foods does not affect blood cholesterol levels"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu9]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu10 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If your ‘good’ cholesterol (HDL) is high you are at risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu10 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If your ‘good’ cholesterol (HDL) is high you are at risk for heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu10]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu11 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If your ‘bad’ cholesterol (LDL) is high you are at risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu11 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If your ‘bad’ cholesterol (LDL) is high you are at risk for heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu11]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu12 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Being overweight increases a person’s risk for heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu12 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Being overweight increases a person’s risk for heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu12]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu13 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Regular physical activity will lower a person’s chance of getting heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu13 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Regular physical activity will lower a person’s chance of getting heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu13]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu14 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Only exercising at a gym or in an exercise class will lower a person’s chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu14 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Only exercising at a gym or in an exercise class will lower a person’s chance of developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu14]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu15 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Walking is considered exercise that will help lower a person’s chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu15 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Walking is considered exercise that will help lower a person’s chance of developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu15]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu16 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Diabetes is a risk factor for developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu16 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Diabetes is a risk factor for developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu16]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu17 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"High blood sugar puts a strain on the heart"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu17 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"High blood sugar puts a strain on the heart"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu17]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu18 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If your blood sugar is high over several months it can cause your cholesterol level to go up and increase your risk of heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu18 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If your blood sugar is high over several months it can cause your cholesterol level to go up and increase your risk of heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu18]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu19 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood sugar levels under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu19 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood sugar levels under control"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu19]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu20 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"People with diabetes rarely have high cholesterol"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu20 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"People with diabetes rarely have high cholesterol"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu20]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu21 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If a person has diabetes, keeping their cholesterol under control will help to lower their chance of developing heart disease"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu21 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"If a person has diabetes, keeping their cholesterol under control will help to lower their chance of developing heart disease"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu21]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu22 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"People with diabetes tend to have low HDL (good) cholesterol"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu22 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"People with diabetes tend to have low HDL (good) cholesterol"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu22]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu23 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood pressure under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu23 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their blood pressure under control"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu23]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu24 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their weight under control"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu24 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"A person who has diabetes can reduce their risk of developing heart disease if they keep their weight under control"];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu24]];
     [postEdSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEdu25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Men with diabetes have a higher risk of heart disease than women with diabetes "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdu25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Men with diabetes have a higher risk of heart disease than women with diabetes "];
     row.selectorOptions = @[@"True", @"False"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    if (postEduDict != (id)[NSNull null]) row.value = [self getTFfromOneZero:postEduDict[kEdu25]];
     [postEdSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"postEdScoreButton" rowType:XLFormRowDescriptorTypeButton title:@"Calculate Post-education Score"];
@@ -2216,11 +2288,12 @@ NSString *const kMultiADL = @"multi_adl";
     row.required = NO;
     [postEdSection addFormRow:row];
     
-    postEdScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdScore rowType:XLFormRowDescriptorTypeInteger title:@"Post-education Score"];
+    postEdScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdScore rowType:XLFormRowDescriptorTypeInteger title:@"Post-education Score"];
     postEdScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     postEdScoreRow.noValueDisplayText = @"-/-";
     postEdScoreRow.disabled = @YES;
     [self setDefaultFontWithRow:postEdScoreRow];
+    if (postEduDict != (id)[NSNull null]) postEdScoreRow.value = postEduDict[kPostEdScore];
     [postEdSection addFormRow:postEdScoreRow];
     
     
@@ -2314,6 +2387,13 @@ NSString *const kMultiADL = @"multi_adl";
 -(void)formRowDescriptorValueHasChanged:(XLFormRowDescriptor *)rowDescriptor oldValue:(id)oldValue newValue:(id)newValue
 {
     [super formRowDescriptorValueHasChanged:rowDescriptor oldValue:oldValue newValue:newValue];
+    NSString* ansFromTF;
+    if (newValue != (id)[NSNull null] && [newValue isKindOfClass:[NSString class]]) {
+        if ([newValue isEqualToString:@"True"])
+            ansFromTF = @"1";
+        else if ([newValue isEqualToString:@"False"])
+            ansFromTF = @"0";
+    }
     
     /* Mode of Screening */
     
@@ -2401,8 +2481,115 @@ NSString *const kMultiADL = @"multi_adl";
         [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ELIGIBLE andFieldName:kCognitiveImpair andNewContent:newValue];
     }
     
+    /* Pre-Health Education */
+    else if ([rowDescriptor.tag isEqualToString:kPreEdu1]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu1 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu2]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu2 andNewContent:ansFromTF];
+    }else if ([rowDescriptor.tag isEqualToString:kPreEdu3]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu3 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu4]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu4 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu5]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu5 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu6]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu6 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu7]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu7 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu8]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu8 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu9]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu9 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu10]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu10 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu11]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu11 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu12]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu12 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu13]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu13 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu14]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu14 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu15]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu15 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu16]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu16 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu17]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu17 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu18]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu18 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu19]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu19 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu20]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu20 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu21]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu21 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu22]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu22 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu23]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu23 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu24]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu24 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdu25]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu25 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPreEdScore]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kPreEdScore andNewContent:newValue];
+    }
     
-    
+    /* Post-Health Education */
+    else if ([rowDescriptor.tag isEqualToString:kPostEdu1]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu1 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu2]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu2 andNewContent:ansFromTF];
+    }else if ([rowDescriptor.tag isEqualToString:kPostEdu3]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu3 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu4]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu4 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu5]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu5 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu6]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu6 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu7]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu7 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu8]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu8 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu9]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu9 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu10]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu10 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu11]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu11 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu12]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu12 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu13]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu13 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu14]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu14 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu15]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu15 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu16]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu16 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu17]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu17 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu18]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu18 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu19]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu19 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu20]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu20 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu21]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu21 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu22]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu22 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu23]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu23 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu24]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu24 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdu25]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu25 andNewContent:ansFromTF];
+    } else if ([rowDescriptor.tag isEqualToString:kPostEdScore]) {
+        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kPostEdScore andNewContent:newValue];
+    }
 }
 
 -(void)endEditing:(XLFormRowDescriptor *)rowDescriptor {    //works great for textField and textView
@@ -2591,65 +2778,111 @@ NSString *const kMultiADL = @"multi_adl";
 - (void) calculateScore: (XLFormRowDescriptor *)sender {
     
     NSDictionary *dict = [self.form formValues];
-    int score, eachAns, i;
+    int score, eachAns;
     NSString *ans;
     
-    score = i = 0;
-
-    NSDictionary *correctAnswers = @{kEdu1:@"False",//1
-                                     kEdu2:@"True", //2
-                                     kEdu3:@"True", //3
-                                     kEdu4: @"True", //4
-                                     kEdu5: @"True", //5
-                                     kEdu6: @"True", //6
-                                     kEdu7: @"True", //7
-                                     kEdu8: @"True", //8
-                                     kEdu9:@"False",//9
-                                     kEdu10:@"False",//10
-                                     kEdu11:@"True", //11
-                                     kEdu12:@"True", //12
-                                     kEdu13:@"True", //13
-                                     kEdu14:@"False",//14
-                                     kEdu15:@"True", //15
-                                     kEdu16:@"True", //16
-                                     kEdu17:@"True", //17
-                                     kEdu18:@"True", //18
-                                     kEdu19:@"True", //19
-                                     kEdu20:@"False",//20
-                                     kEdu21:@"True", //21
-                                     kEdu22:@"True", //22
-                                     kEdu23:@"True", //23
-                                     kEdu24:@"True", //24
-                                     kEdu25:@"False" //25
-                                     };
+    score = 0;
     
-    for (NSString *key in dict) {
-        if (![key isEqualToString:kPreEdScore] && ![key isEqualToString:kPostEdScore] && ![key isEqualToString:@"preEdScoreButton"] && ![key isEqualToString:@"postEdScoreButton"]) {
-            //prevent null cases
-            if (dict[key] != [NSNull null]) {//only take non-null values;
-                ans = dict[key];
-            
-                if ([ans isEqualToString:correctAnswers[key]]) {
-                    eachAns = 1;
-                } else
-                    eachAns = 0;
-                
-                score = score + eachAns;
-                ans = @"";
+    if ([sender.title rangeOfString:@"Pre-education"].location != NSNotFound) { // if it's pre-education button
+        NSDictionary *correctPreAnswers = @{kPreEdu1:@"False",//1
+                                            kPreEdu2:@"True", //2
+                                            kPreEdu3:@"True", //3
+                                            kPreEdu4: @"True", //4
+                                            kPreEdu5: @"True", //5
+                                            kPreEdu6: @"True", //6
+                                            kPreEdu7: @"True", //7
+                                            kPreEdu8: @"True", //8
+                                            kPreEdu9:@"False",//9
+                                            kPreEdu10:@"False",//10
+                                            kPreEdu11:@"True", //11
+                                            kPreEdu12:@"True", //12
+                                            kPreEdu13:@"True", //13
+                                            kPreEdu14:@"False",//14
+                                            kPreEdu15:@"True", //15
+                                            kPreEdu16:@"True", //16
+                                            kPreEdu17:@"True", //17
+                                            kPreEdu18:@"True", //18
+                                            kPreEdu19:@"True", //19
+                                            kPreEdu20:@"False",//20
+                                            kPreEdu21:@"True", //21
+                                            kPreEdu22:@"True", //22
+                                            kPreEdu23:@"True", //23
+                                            kPreEdu24:@"True", //24
+                                            kPreEdu25:@"False" //25
+                                            };
+        
+        for (NSString *key in dict) {
+            if (![key isEqualToString:kPreEdScore] && ![key isEqualToString:kPostEdScore] && ![key isEqualToString:@"preEdScoreButton"] && ![key isEqualToString:@"postEdScoreButton"]) {
+                //prevent null cases
+                if (dict[key] != [NSNull null]) {//only take non-null values;
+                    ans = dict[key];
+                    
+                    if ([ans isEqualToString:correctPreAnswers[key]]) {
+                        eachAns = 1;
+                    } else
+                        eachAns = 0;
+                    
+                    score = score + eachAns;
+                    ans = @"";
+                }
             }
         }
-    }
-    i=0;
-    if ([sender.title rangeOfString:@"Pre-education"].location != NSNotFound) { // if it's pre-education button
         
         preEdScoreRow.value = [NSString stringWithFormat:@"%d", score];
         [self reloadFormRow:preEdScoreRow];
         [showPostEdSectionBtnRow setHidden:@NO];
         [self reloadFormRow:showPostEdSectionBtnRow];
     } else {
+        
+        NSDictionary *correctPostAnswers = @{kPostEdu1:@"False",//1
+                                             kPostEdu2:@"True", //2
+                                             kPostEdu3:@"True", //3
+                                             kPostEdu4: @"True", //4
+                                             kPostEdu5: @"True", //5
+                                             kPostEdu6: @"True", //6
+                                             kPostEdu7: @"True", //7
+                                             kPostEdu8: @"True", //8
+                                             kPostEdu9:@"False",//9
+                                             kPostEdu10:@"False",//10
+                                             kPostEdu11:@"True", //11
+                                             kPostEdu12:@"True", //12
+                                             kPostEdu13:@"True", //13
+                                             kPostEdu14:@"False",//14
+                                             kPostEdu15:@"True", //15
+                                             kPostEdu16:@"True", //16
+                                             kPostEdu17:@"True", //17
+                                             kPostEdu18:@"True", //18
+                                             kPostEdu19:@"True", //19
+                                             kPostEdu20:@"False",//20
+                                             kPostEdu21:@"True", //21
+                                             kPostEdu22:@"True", //22
+                                             kPostEdu23:@"True", //23
+                                             kPostEdu24:@"True", //24
+                                             kPostEdu25:@"False" //25
+                                             };
+        
+        
+        for (NSString *key in dict) {
+            if (![key isEqualToString:kPreEdScore] && ![key isEqualToString:kPostEdScore] && ![key isEqualToString:@"preEdScoreButton"] && ![key isEqualToString:@"postEdScoreButton"]) {
+                //prevent null cases
+                if (dict[key] != [NSNull null]) {//only take non-null values;
+                    ans = dict[key];
+                    
+                    if ([ans isEqualToString:correctPostAnswers[key]]) {
+                        eachAns = 1;
+                    } else
+                        eachAns = 0;
+                    
+                    score = score + eachAns;
+                    ans = @"";
+                }
+            }
+        }
+        
         postEdScoreRow.value = [NSString stringWithFormat:@"%d", score];
         [self reloadFormRow:postEdScoreRow];
     }
+
     [self deselectFormRow:sender];
     [sender setHidden:@YES];    //make it hidden, no need anymore.
     
@@ -2758,6 +2991,9 @@ NSString *const kMultiADL = @"multi_adl";
 - (NSArray *) getScreeningTimeArrayFromDict:(NSDictionary *) dictionary andOptions:(NSArray *) options {
     NSMutableArray *screeningTimeArray = [[NSMutableArray alloc] init];
     
+    if (dictionary == (id)[NSNull null])    //don't continue if null
+        return @[];
+    
     if ([dictionary objectForKey:kTime_8_10] != (id) [NSNull null]) {
         if([[dictionary objectForKey:kTime_8_10] isEqual:@1])
             [screeningTimeArray addObject:[options objectAtIndex:0]];
@@ -2810,18 +3046,7 @@ NSString *const kMultiADL = @"multi_adl";
             }
         }
     }
-//    
-//    for (int i=0; i < [optionChosen count]; i++) {
-//        if ([optionChosen[i] isEqualToString:@"8am-10pm"]) {
-//            [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kTime_8_10 andNewContent:@"1"];
-//        } else if ([optionChosen[i] isEqualToString:@"10am-12pm"]) {
-//            [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kTime_10_12 andNewContent:@"1"];
-//        }else if ([optionChosen[i] isEqualToString:@"2pm-4pm"]) {
-//            [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kTime_12_2 andNewContent:@"1"];
-//        }else {
-//            [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kTime_2_4 andNewContent:@"1"];
-//        }
-//    }
+
 }
 
 - (NSString *) getFieldNameFromApptTime: (NSString *) apptTime {
@@ -2831,26 +3056,74 @@ NSString *const kMultiADL = @"multi_adl";
     else return kTime_2_4;
 }
 
-#pragma mark - Download Server API
-- (void) processConnectionStatus {
-    if(status == NotReachable)
-    {
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"No Internet!", nil)
-                                                                                  message:@"You're not connected to Internet."
-                                                                           preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * okAction){
-                                                              //                                                              [self.refreshControl endRefreshing];
-                                                          }]];
-        [self presentViewController:alertController animated:YES completion:nil];
+- (NSString *) getTFfromOneZero: (id) value {
+    if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"1"]) {
+            return @"True";
+        } else {
+            return @"False";
+        }
+    } else if ([value isKindOfClass:[NSNumber class]]) {
+        if ([value isEqual:@1]) {
+            return @"True";
+        } else {
+            return @"False";
+        }
     }
-    else if (status == ReachableViaWiFi || status == ReachableViaWWAN) {
+    return @"";
+}
+
+#pragma mark - Reachability
+/*!
+ * Called by Reachability whenever status changes.
+ */
+- (void) reachabilityChanged:(NSNotification *)note
+{
+    Reachability* curReach = [note object];
+    NSParameterAssert([curReach isKindOfClass:[Reachability class]]);
+    [self updateInterfaceWithReachability:curReach];
+}
+
+- (void)updateInterfaceWithReachability:(Reachability *)reachability
+{
+    if (reachability == self.hostReachability)
+    {
+        NetworkStatus netStatus = [reachability currentReachabilityStatus];
         
+        switch (netStatus) {
+            case NotReachable: {
+                internetDCed = true;
+                NSLog(@"Can't connect to server!");
+                [self.form setDisabled:YES];
+                [self.tableView reloadData];
+                [self.tableView endEditing:YES];
+                [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                [SVProgressHUD showErrorWithStatus:@"No Internet!"];
+                
+                
+                break;
+            }
+            case ReachableViaWiFi:
+            case ReachableViaWWAN:
+                NSLog(@"Connected to server!");
+                [self.form setDisabled:NO];
+                [self.tableView reloadData];
+
+                
+                if (internetDCed) { //previously disconnected
+                    [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+                    [SVProgressHUD showSuccessWithStatus:@"Back Online!"];
+                    internetDCed = false;
+                }
+                break;
+                
+            default:
+                break;
+        }
     }
     
 }
+
 
 
 #pragma mark - Post data to server methods
@@ -2872,6 +3145,8 @@ NSString *const kMultiADL = @"multi_adl";
         [KAStatusBar showWithStatus:@"Syncing..." andBarColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:0 alpha:1.0]];
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
         
+        [_pushPopTaskArray addObject:dict];
+        
         ServerComm *client = [ServerComm sharedServerCommInstance];
         [client postDataGivenSectionAndFieldName:dict
                                    progressBlock:[self progressBlock]
@@ -2891,7 +3166,8 @@ NSString *const kMultiADL = @"multi_adl";
 - (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         NSLog(@"%@", responseObject);
-        
+
+        [_pushPopTaskArray removeObjectAtIndex:0];
         
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
         [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
@@ -2901,21 +3177,34 @@ NSString *const kMultiADL = @"multi_adl";
 
 - (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"******UNSUCCESSFUL SUBMISSION******!!");
+        
+        NSLog(@"<<< SUBMISSION FAILED >>>");
+        
+        NSDictionary *retryDict = [_pushPopTaskArray firstObject];
+        
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
 
-        [SVProgressHUD dismiss];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
-                                                                                  message:@"Form failed to upload!"
-                                                                           preferredStyle:UIAlertControllerStyleAlert];
         
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * okAction) {
-                                                              //do nothing for now
-                                                          }]];
-        [self presentViewController:alertController animated:YES completion:nil];
+        NSLog(@"\n\nRETRYING...");
+        
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postDataGivenSectionAndFieldName:retryDict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
+        
+        
+//        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Upload Fail", nil)
+//                                                                                  message:@"Form failed to upload!"
+//                                                                           preferredStyle:UIAlertControllerStyleAlert];
+//        
+//        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+//                                                            style:UIAlertActionStyleDefault
+//                                                          handler:^(UIAlertAction * okAction) {
+//                                                              //do nothing for now
+//                                                          }]];
+//        [self presentViewController:alertController animated:YES completion:nil];
 
         
     };

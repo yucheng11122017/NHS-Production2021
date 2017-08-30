@@ -8,6 +8,8 @@
 
 #import "HealthAssessAndRiskFormVC.h"
 #import "ServerComm.h"
+#import "Reachability.h"
+#import "KAStatusBar.h"
 #import "SVProgressHUD.h"
 #import "AppConstants.h"
 #import "ScreeningSectionTableViewController.h"
@@ -31,20 +33,33 @@ NSString *const kQ15 = @"q15";
 
 
 
-@interface HealthAssessAndRiskFormVC () 
+@interface HealthAssessAndRiskFormVC () {
+    BOOL internetDCed;
+    BOOL firstDataFetch;
+}
 
-
+@property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
+@property (nonatomic) Reachability *hostReachability;
+@property (nonatomic) Reachability *internetReachability;
+@property (strong, nonatomic) NSNumber *residentID;
 
 @end
 
 @implementation HealthAssessAndRiskFormVC
 
 - (void)viewDidLoad {
+
+    internetDCed = false;
+    _pushPopTaskArray = [[NSMutableArray alloc] init];
+    _residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId]; //need this for fetching data
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
+    
+    self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
+    [self.hostReachability startNotifier];
+    [self updateInterfaceWithReachability:self.hostReachability];
     
     XLFormViewController *form;
-    
-
-    
     //must init first before [super viewDidLoad]
     int formNumber = [_formID intValue];
     switch (formNumber) {
@@ -61,14 +76,14 @@ NSString *const kQ15 = @"q15";
             form = [self initGeriatricDepreAssess];
             break;
         case 4:
-            form = [self initRiskStratifaction];
-            NSLog(@"You're at the right place!");
+            form = [self initRiskStratification];
             break;
         default:
             break;
     }
     [self.form setAddAsteriskToRequiredRowsTitle:NO];
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
+
     
     [super viewDidLoad];
     // Do any additional setup after loading the view.
@@ -83,9 +98,7 @@ NSString *const kQ15 = @"q15";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@""];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
-    //    NSDictionary *diabetesDict = [self.fullScreeningForm objectForKey:@"diabetes"];
-    
-    formDescriptor.assignFirstResponderOnShow = YES;
+    NSDictionary *diabetesDict = [self.fullScreeningForm objectForKey:SECTION_DIABETES];
     
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical History: Diabetes Mellitus"];
@@ -94,19 +107,19 @@ NSString *const kQ15 = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ1
                                                 rowType:XLFormRowDescriptorTypeInfo
                                                   title:@"1) (a) Has a western-trained doctor ever told you that you have diabetes? *"];
-    [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
     XLFormRowDescriptor *hasInformedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     hasInformedRow.selectorOptions = @[@"YES", @"NO"];
     
-    //value
-    //    if (![[diabetesDict objectForKey:@"has_informed"] isEqualToString:@""]) {
-    //        hasInformedRow.value = [[diabetesDict objectForKey:@"has_informed"] isEqualToString:@"1"]? @"YES":@"NO";
-    //    }
-    //
     hasInformedRow.required = YES;
+    
+    if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kHasInformed] != (id)[NSNull null]) {
+        hasInformedRow.value = [self getYesNoFromOneZero:diabetesDict[kHasInformed]];
+    }
+    
     [section addFormRow:hasInformedRow];
     
     XLFormRowDescriptor *hasCheckedBloodQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ2
@@ -118,17 +131,12 @@ NSString *const kQ15 = @"q15";
     [section addFormRow:hasCheckedBloodQRow];
     
     XLFormRowDescriptor *hasCheckedBloodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMCheckedBlood rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
-    hasCheckedBloodRow.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"No"],
-                                           [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Yes, 2 yrs ago"],
-                                           [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Yes, 3 yrs ago"],
-                                           [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Yes < 1 yr ago"]];
+    hasCheckedBloodRow.selectorOptions = @[@"No",@"Yes, 2 yrs ago",@"Yes, 3 yrs ago",@"Yes < 1 yr ago"];
     hasCheckedBloodRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformedRow];
     
-    //value
-    //    NSArray *options = hasCheckedBloodRow.selectorOptions;
-    //    if (![[diabetesDict objectForKey:@"checked_blood"]isEqualToString:@""]) {
-    //        hasCheckedBloodRow.value = [options objectAtIndex:[[diabetesDict objectForKey:@"checked_blood"] integerValue]];
-    //    }
+    if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kCheckedBlood] != (id)[NSNull null]) {
+        hasCheckedBloodRow.value = diabetesDict[kCheckedBlood];
+    }
     [section addFormRow:hasCheckedBloodRow];
     
     
@@ -143,11 +151,9 @@ NSString *const kQ15 = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDMSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
     
-    //value
-    //    if (![[diabetesDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@""]) {
-    //        row.value = [[diabetesDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
-    //    }
-    
+    if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kSeeingDocRegularly] != (id)[NSNull null]) {
+        row.value = [self getYesNoFromOneZero:diabetesDict[kSeeingDocRegularly]];
+    }
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
@@ -162,10 +168,9 @@ NSString *const kQ15 = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDMCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
     
-    //value
-    //    if (![[diabetesDict objectForKey:@"currently_prescribed"] isEqualToString:@""]) {
-    //        row.value = [[diabetesDict objectForKey:@"currently_prescribed"] isEqualToString:@"1"]? @"YES":@"NO";
-    //    }
+    if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kCurrentlyPrescribed] != (id)[NSNull null]) {
+        row.value = [self getYesNoFromOneZero:diabetesDict[kCurrentlyPrescribed]];
+    }
     
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
@@ -182,10 +187,9 @@ NSString *const kQ15 = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDMTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
     
-    //value
-    //    if (![[diabetesDict objectForKey:@"taking_regularly"] isEqualToString:@""]) {
-    //        row.value = [[diabetesDict objectForKey:@"taking_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
-    //    }
+    if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kTakingRegularly] != (id)[NSNull null]) {
+        row.value = [self getYesNoFromOneZero:diabetesDict[kTakingRegularly]];
+    }
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
@@ -196,7 +200,8 @@ NSString *const kQ15 = @"q15";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@""];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
-    //    NSDictionary *diabetesDict = [self.fullScreeningForm objectForKey:@"diabetes"];
+    
+    NSDictionary *hyperlipidDict = [self.fullScreeningForm objectForKey:SECTION_HYPERLIPIDEMIA];
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
@@ -216,10 +221,9 @@ NSString *const kQ15 = @"q15";
     hasInformed.selectorOptions = @[@"YES", @"NO"];
     hasInformed.required = YES;
     
-    //value
-    //    if (![[hyperlipidDict objectForKey:@"has_informed"] isEqualToString:@""]) {
-    //        hasInformed.value = [[hyperlipidDict objectForKey:@"has_informed"] isEqualToString:@"1"]? @"YES":@"NO";
-    //    }
+    if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kHasInformed] != (id)[NSNull null]) {
+        hasInformed.value = [self getYesNoFromOneZero:hyperlipidDict[kHasInformed]];
+    }
     
     [section addFormRow:hasInformed];
     
@@ -230,20 +234,20 @@ NSString *const kQ15 = @"q15";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
     [section addFormRow:row];
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidCheckedBlood
                                                 rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                   title:@""];
-    row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:@"No"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:@"Yes"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:@"Yes, 3 yrs ago"],
-                            [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Yes, < 1 yr ago"]];
+    row.selectorOptions = @[@"No",
+                            @"Yes, 2 yrs ago",
+                            @"Yes, 3 yrs ago",
+                            @"Yes < 1 yr ago"];
+
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
     
-    //value
-    //    NSArray *options = row.selectorOptions;
-    //    if (![[hyperlipidDict objectForKey:@"checked_blood"]isEqualToString:@""]) {
-    //        row.value = [options objectAtIndex:[[hyperlipidDict objectForKey:@"checked_blood"] integerValue]];
-    //    }
+    if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kCheckedBlood] != (id)[NSNull null]) {
+        row.value = hyperlipidDict[kCheckedBlood];
+    }
     
     [section addFormRow:row];
     
@@ -255,13 +259,13 @@ NSString *const kQ15 = @"q15";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
     [section addFormRow:row];
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     row.selectorOptions = @[@"YES", @"NO"];
     
-    //value
-    //    if (![[hyperlipidDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@""]) {
-    //        row.value = [[hyperlipidDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
-    //    }
+    if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kSeeingDocRegularly] != (id)[NSNull null]) {
+        row.value = [self getYesNoFromOneZero:hyperlipidDict[kSeeingDocRegularly]];
+    }
     
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
     [section addFormRow:row];
@@ -279,10 +283,9 @@ NSString *const kQ15 = @"q15";
     prescribed.selectorOptions = @[@"YES", @"NO"];
     prescribed.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
     
-    //value
-    //    if (![[hyperlipidDict objectForKey:@"currently_prescribed"] isEqualToString:@""]) {
-    //        prescribed.value = [[hyperlipidDict objectForKey:@"currently_prescribed"] isEqualToString:@"1"]? @"YES":@"NO";
-    //    }
+    if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kCurrentlyPrescribed] != (id)[NSNull null]) {
+        prescribed.value = [self getYesNoFromOneZero:hyperlipidDict[kCurrentlyPrescribed]];
+    }
     
     [section addFormRow:prescribed];
     
@@ -299,10 +302,10 @@ NSString *const kQ15 = @"q15";
     [self setDefaultFontWithRow:row];
     takeRegularlyRow.selectorOptions = @[@"YES", @"NO"];
     
-    //value
-    //    if (![[hyperlipidDict objectForKey:@"taking_regularly"] isEqualToString:@""]) {
-    //        takeRegularlyRow.value = [[hyperlipidDict objectForKey:@"taking_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
-    //    }
+    if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kTakingRegularly] != (id)[NSNull null]) {
+        takeRegularlyRow.value = [self getYesNoFromOneZero:hyperlipidDict[kTakingRegularly]];
+    }
+    
     takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
     
     [section addFormRow:takeRegularlyRow];
@@ -341,7 +344,8 @@ NSString *const kQ15 = @"q15";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@""];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
-//    NSDictionary *hypertensionDict = [self.fullScreeningForm objectForKey:@"hypertension"];
+    
+    NSDictionary *hypertensionDict = [self.fullScreeningForm objectForKey:SECTION_HYPERTENSION];
     
     // Hypertension - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical History: Hypertension"];
@@ -359,10 +363,9 @@ NSString *const kQ15 = @"q15";
     hasInformed_HT.selectorOptions = @[@"YES", @"NO"];
     hasInformed_HT.required = YES;
 
-    //value
-//    if (![[hypertensionDict objectForKey:@"has_informed"] isEqualToString:@""]) {
-//        hasInformed_HT.value = [[hypertensionDict objectForKey:@"has_informed"] isEqualToString:@"1"]? @"YES":@"NO";
-//    }
+    if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kHasInformed] != (id)[NSNull null]) {
+        hasInformed_HT.value = [self getYesNoFromOneZero:hypertensionDict[kHasInformed]];
+    }
 
     [section addFormRow:hasInformed_HT];
 
@@ -378,11 +381,9 @@ NSString *const kQ15 = @"q15";
     [self setDefaultFontWithRow:checkedBP];
     checkedBP.selectorOptions = @[@"YES", @"NO"];
 
-    //value
-//    if (![[hypertensionDict objectForKey:@"checked_bp"] isEqualToString:@""]) {
-//        checkedBP.value = [[hypertensionDict objectForKey:@"checked_bp"] isEqualToString:@"1"]? @"YES":@"NO";
-//    }
-//    checkedBP.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed_HT];
+    if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kCheckedBp] != (id)[NSNull null]) {
+        checkedBP.value = [self getYesNoFromOneZero:hypertensionDict[kCheckedBp]];
+    }
     [section addFormRow:checkedBP];
 
 
@@ -397,9 +398,9 @@ NSString *const kQ15 = @"q15";
     seeDocRegularlyRow.selectorOptions = @[@"YES", @"NO"];
 
     //value
-//    if (![[hypertensionDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@""]) {
-//        seeDocRegularlyRow.value = [[hypertensionDict objectForKey:@"seeing_doc_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
-//    }
+    if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kSeeingDocRegularly] != (id)[NSNull null]) {
+        seeDocRegularlyRow.value = [self getYesNoFromOneZero:hypertensionDict[kSeeingDocRegularly]];
+    }
 
     seeDocRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
     [section addFormRow:seeDocRegularlyRow];
@@ -419,9 +420,10 @@ NSString *const kQ15 = @"q15";
     prescribedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
 
     //value
-//    if (![[hypertensionDict objectForKey:@"currently_prescribed"] isEqualToString:@""]) {
-//        prescribedRow.value = [[hypertensionDict objectForKey:@"currently_prescribed"] isEqualToString:@"1"]? @"YES":@"NO";
-//    }
+    if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kHTCurrentlyPrescribed] != (id)[NSNull null]) {
+        prescribedRow.value = [self getYesNoFromOneZero:hypertensionDict[kCurrentlyPrescribed]];
+    }
+
 
     [section addFormRow:prescribedRow];
 
@@ -439,9 +441,9 @@ NSString *const kQ15 = @"q15";
     takeRegularlyRow.selectorOptions = @[@"YES", @"NO"];
 
     //value
-//    if (![[hypertensionDict objectForKey:@"taking_regularly"] isEqualToString:@""]) {
-//        takeRegularlyRow.value = [[hypertensionDict objectForKey:@"taking_regularly"] isEqualToString:@"1"]? @"YES":@"NO";
-//    }
+    if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kHTTakingRegularly] != (id)[NSNull null]) {
+        takeRegularlyRow.value = [self getYesNoFromOneZero:hypertensionDict[kTakingRegularly]];
+    }
 
     takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
     [section addFormRow:takeRegularlyRow];
@@ -460,17 +462,6 @@ NSString *const kQ15 = @"q15";
         }
     };
 
-//    prescribedRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        if (oldValue != newValue) {
-//            if ([newValue isEqualToString:@"YES"]) {
-//                takeRegularlyQRow.hidden = @(0);
-//                takeRegularlyRow.hidden = @(0);
-//            } else {
-//                takeRegularlyQRow.hidden = @(1);
-//                takeRegularlyRow.hidden = @(1);
-//            }
-//        }
-//    };
 
     return [super initWithForm:formDescriptor];
 }
@@ -483,26 +474,41 @@ NSString *const kQ15 = @"q15";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Geriatric Depression Assessment"];
     [formDescriptor addFormSection:section];
     
+    NSDictionary *geriaDepreAssmtDict = [self.fullScreeningForm objectForKey:SECTION_DEPRESSION];
+    
+    
     XLFormRowDescriptor* phqQ1Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ1
                                                 rowType:XLFormRowDescriptorTypeStepCounter
-                                                  title:@"Score for PHQ-2 question 1"];
+                                                  title:@"PHQ-2 question 1 Score"];
     [self setDefaultFontWithRow:phqQ1Row];
     phqQ1Row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [phqQ1Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
     [phqQ1Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
     [phqQ1Row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
     [phqQ1Row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
-    [section addFormRow:phqQ1Row];
     
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ1] != (id)[NSNull null]) {
+        phqQ1Row.value = geriaDepreAssmtDict[kPhqQ1];
+    }
+    
+    [section addFormRow:phqQ1Row];
+
     XLFormRowDescriptor* phqQ2Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ2
                                                 rowType:XLFormRowDescriptorTypeStepCounter
-                                                  title:@"Score for PHQ-2 question 2"];
+                                                  title:@"PHQ-2 question 2 Score"];
     [self setDefaultFontWithRow:phqQ2Row];
     phqQ2Row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [phqQ2Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
     [phqQ2Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
     [phqQ2Row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
     [phqQ2Row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
+    
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ2] != (id)[NSNull null]) {
+        phqQ2Row.value = geriaDepreAssmtDict[kPhqQ2];
+    }
+    
     [section addFormRow:phqQ2Row];
 
     XLFormRowDescriptor* phq9ScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhq9Score
@@ -511,6 +517,12 @@ NSString *const kQ15 = @"q15";
     [self setDefaultFontWithRow:phq9ScoreRow];
     phq9ScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     phq9ScoreRow.disabled = @(1);
+    
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhq9Score] != (id)[NSNull null]) {
+        phq9ScoreRow.value = geriaDepreAssmtDict[kPhq9Score];
+    }
+    
     [section addFormRow:phq9ScoreRow];
     
     phqQ1Row.onChangeBlock= ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
@@ -542,12 +554,18 @@ NSString *const kQ15 = @"q15";
                                                   title:@"Does resident require further follow up?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kFollowUpReq] != (id)[NSNull null]) {
+        row.value = geriaDepreAssmtDict[kFollowUpReq];
+    }
     [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
 }
 
--(id) initRiskStratifaction {
+-(id) initRiskStratification {
+    
     
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@""];
     XLFormSectionDescriptor * section;
@@ -555,13 +573,21 @@ NSString *const kQ15 = @"q15";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Risk Stratification"];
     [formDescriptor addFormSection:section];
     
+    NSDictionary *riskStratDict = [self.fullScreeningForm objectForKey:SECTION_RISK_STRATIFICATION];
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabeticFriend
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                   title:@"Do you have a first degree relative with diabetes mellitus? *"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.selectorOptions = @[@"Yes", @"No"];
+    row.selectorOptions = @[@"YES", @"NO"];
     row.required = YES;
+    
+    //value
+    if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kDiabeticFriend] != (id)[NSNull null]) {
+        row.value = [self getYesNoFromOneZero:riskStratDict[kDiabeticFriend]];
+    }
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDelivered4kgOrGestational
@@ -569,8 +595,14 @@ NSString *const kQ15 = @"q15";
                                                   title:@"Have you delivered a baby 4 kg or more; or were previously diagnosed with gestational diabetes mellitus? *"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.selectorOptions = @[@"Yes", @"No"];
+    row.selectorOptions = @[@"YES", @"NO"];
     row.required = YES;
+    
+    //value
+    if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kDelivered4kgOrGestational] != (id)[NSNull null]) {
+        row.value = [self getYesNoFromOneZero:riskStratDict[kDelivered4kgOrGestational]];
+    }
+    
     [section addFormRow:row];
 //    
 //    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCardioHistory
@@ -587,13 +619,262 @@ NSString *const kQ15 = @"q15";
                                                   title:@"Do you smoke? *"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.selectorOptions = @[@"Yes", @"No"];
+    row.selectorOptions = @[@"YES", @"NO"];
     row.required = YES;
+    
+    //value
+    if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kSmoke] != (id)[NSNull null]) {
+        row.value = [self getYesNoFromOneZero:riskStratDict[kSmoke]];
+    }
+    
     [section addFormRow:row];
 
     return [super initWithForm:formDescriptor];
 }
 
+
+#pragma mark - XLFormDescriptorDelegate
+
+-(void)formRowDescriptorValueHasChanged:(XLFormRowDescriptor *)rowDescriptor oldValue:(id)oldValue newValue:(id)newValue
+{
+    [super formRowDescriptorValueHasChanged:rowDescriptor oldValue:oldValue newValue:newValue];
+    NSString* ansFromYesNo;
+    if (newValue != (id)[NSNull null] && [newValue isKindOfClass:[NSString class]]) {
+        if ([newValue isEqualToString:@"YES"])
+            ansFromYesNo = @"1";
+        else if ([newValue isEqualToString:@"NO"])
+            ansFromYesNo = @"0";
+    }
+    
+    /* Diabetes Mellitus */
+    
+    if ([rowDescriptor.tag isEqualToString:kDMHasInformed]) {
+        [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kHasInformed andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kDMCheckedBlood]) {
+        [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kCheckedBlood andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kDMSeeingDocRegularly]) {
+        [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kSeeingDocRegularly andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kDMCurrentlyPrescribed]) {
+        [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kCurrentlyPrescribed andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kDMTakingRegularly]) {
+        [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kTakingRegularly andNewContent:ansFromYesNo];
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kLipidHasInformed]) {
+        [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kHasInformed andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kLipidCheckedBlood]) {
+        [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kCheckedBlood andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kLipidSeeingDocRegularly]) {
+        [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kSeeingDocRegularly andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kLipidCurrentlyPrescribed]) {
+        [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kCurrentlyPrescribed andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kLipidTakingRegularly]) {
+        [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kTakingRegularly andNewContent:ansFromYesNo];
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kHTHasInformed]) {
+        [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kHasInformed andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kHTCheckedBp]) {
+        [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kCheckedBp andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kHTSeeingDocRegularly]) {
+        [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kSeeingDocRegularly andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kHTCurrentlyPrescribed]) {
+        [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kCurrentlyPrescribed andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kHTTakingRegularly]) {
+        [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kTakingRegularly andNewContent:ansFromYesNo];
+    }
+    
+    /* Geriatric Dementia Assessment */
+    else if ([rowDescriptor.tag isEqualToString:kPhqQ1]) {
+        [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhqQ1 andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kPhqQ2]) {
+        [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhqQ2 andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kPhq9Score]) {
+        [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhq9Score andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kFollowUpReq]) {
+        [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kFollowUpReq andNewContent:newValue];
+    }
+    
+    
+    /* Risk Stratification */
+    else if ([rowDescriptor.tag isEqualToString:kDiabeticFriend]) {
+        [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kDiabeticFriend andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kDelivered4kgOrGestational]) {
+        [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kDelivered4kgOrGestational andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kSmoke]) {
+        [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kSmoke andNewContent:ansFromYesNo];
+    }
+    
+    
+}
+
+-(void)endEditing:(XLFormRowDescriptor *)rowDescriptor {    //works great for textField and textView
+    
+    //Check for validation first!
+    NSArray * validationErrors = [self formValidationErrors];
+    if (validationErrors.count > 0) {
+        
+        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            
+            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+            
+            if ([validationStatus.rowDescriptor isEqual:rowDescriptor]) {
+                UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+                cell.backgroundColor = [UIColor orangeColor];
+                [UIView animateWithDuration:0.3 animations:^{
+                    cell.backgroundColor = [UIColor whiteColor];
+                }];
+                [self showFormValidationError:[validationErrors objectAtIndex:idx]];    //only show error if it's this specific row
+                return;
+            }
+        }];
+    }
+    
+//    /* Phlebotomy */
+//    if ([rowDescriptor.tag isEqualToString:kFastingBloodGlucose]) {
+//        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY andFieldName:kFastingBloodGlucose andNewContent:rowDescriptor.value];
+//    }
+}
+
+    
+#pragma mark - Reachability
+/*!
+ * Called by Reachability whenever status changes.
+ */
+- (void) reachabilityChanged:(NSNotification *)note
+{
+    Reachability* curReach = [note object];
+    NSParameterAssert([curReach isKindOfClass:[Reachability class]]);
+    [self updateInterfaceWithReachability:curReach];
+}
+
+- (void)updateInterfaceWithReachability:(Reachability *)reachability
+{
+    if (reachability == self.hostReachability)
+    {
+        NetworkStatus netStatus = [reachability currentReachabilityStatus];
+        
+        switch (netStatus) {
+            case NotReachable: {
+                internetDCed = true;
+                NSLog(@"Can't connect to server!");
+                [self.form setDisabled:YES];
+                [self.tableView reloadData];
+                [self.tableView endEditing:YES];
+                [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                [SVProgressHUD showErrorWithStatus:@"No Internet!"];
+                
+                
+                break;
+            }
+            case ReachableViaWiFi:
+            case ReachableViaWWAN:
+                NSLog(@"Connected to server!");
+                [self.form setDisabled:NO];
+                [self.tableView reloadData];
+                
+                if (internetDCed) { //previously disconnected
+                    [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+                    [SVProgressHUD showSuccessWithStatus:@"Back Online!"];
+                    internetDCed = false;
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
+    
+}
+
+
+#pragma mark - Post data to server methods
+
+- (void) postSingleFieldWithSection:(NSString *) section andFieldName: (NSString *) fieldName andNewContent: (NSString *) content {
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSNumber *resident_id = [defaults objectForKey:kResidentId];
+    
+    if ((content != (id)[NSNull null]) && (content != nil)) {   //make sure don't insert nil or null value to a dictionary
+        
+        NSDictionary *dict = @{kResidentId:resident_id,
+                               kSectionName:section,
+                               kFieldName:fieldName,
+                               kNewContent:content
+                               };
+        
+        NSLog(@"Uploading %@ for $%@$ field", content, fieldName);
+        [KAStatusBar showWithStatus:@"Syncing..." andBarColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:0 alpha:1.0]];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        
+        [_pushPopTaskArray addObject:dict];
+        
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postDataGivenSectionAndFieldName:dict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
+    }
+}
+
+#pragma mark - Blocks
+
+- (void (^)(NSProgress *downloadProgress))progressBlock {
+    return ^(NSProgress *downloadProgress) {
+        
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"%@", responseObject);
+        
+        [_pushPopTaskArray removeObjectAtIndex:0];
+        
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+        [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+        
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        
+        NSLog(@"<<< SUBMISSION FAILED >>>");
+        
+        NSDictionary *retryDict = [_pushPopTaskArray firstObject];
+        
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+        
+        
+        NSLog(@"\n\nRETRYING...");
+        
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postDataGivenSectionAndFieldName:retryDict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
+    
+    };
+}
+
+- (NSString *) getYesNoFromOneZero: (id) value {
+    if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"1"])
+            return @"YES";
+        else if ([value isEqualToString:@"0"])
+            return @"NO";
+        
+    } else if ([value isKindOfClass:[NSNumber class]]) {
+        if ([value isEqual:@1])
+            return @"YES";
+        else if ([value isEqual:@0])
+            return @"NO";
+        
+    }
+    return @"";
+}
 
 #pragma mark - UIFont methods
 - (void) setDefaultFontWithRow: (XLFormRowDescriptor *) row {
@@ -608,46 +889,7 @@ NSString *const kQ15 = @"q15";
                                 fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     return [UIFont fontWithDescriptor:fontD size:0];
 }
-//
-//- (void) saveDiabetesMellitus {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *diabetes_dict = [[self.fullScreeningForm objectForKey:@"diabetes"] mutableCopy];
-//
-//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesHasInformed] forKey:@"has_informed"];
-//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kDiabetesCheckedBlood] forKey:@"checked_blood"];
-//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
-//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesCurrentlyPrescribed] forKey:@"currently_prescribed"];
-//    [diabetes_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kDiabetesTakingRegularly] forKey:@"taking_regularly"];
-//
-//    [self.fullScreeningForm setObject:diabetes_dict forKey:@"diabetes"];
-//}
-//
-//- (void) saveHyperlipidemia {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *hyperlipid_dict = [[self.fullScreeningForm objectForKey:@"hyperlipid"] mutableCopy];
-//    
-//    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidHasInformed] forKey:@"has_informed"];
-//    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kLipidCheckedBlood] forKey:@"checked_blood"];
-//    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
-//    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidCurrentlyPrescribed] forKey:@"currently_prescribed"];
-//    [hyperlipid_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kLipidTakingRegularly] forKey:@"taking_regularly"];
-//    
-//    [self.fullScreeningForm setObject:hyperlipid_dict forKey:@"hyperlipid"];
-//}
-//
-//- (void) saveHypertension {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *hypertension_dict = [[self.fullScreeningForm objectForKey:@"hypertension"] mutableCopy];
-//
-//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTHasInformed] forKey:@"has_informed"];
-//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTCheckedBP] forKey:@"checked_bp"];
-//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTSeeingDocRegularly] forKey:@"seeing_doc_regularly"];
-//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTCurrentlyPrescribed] forKey:@"currently_prescribed"];
-//    [hypertension_dict setObject:[self getStringWithDictionary:fields rowType:YesNo formDescriptorWithTag:kHTTakingRegularly] forKey:@"taking_regularly"];
-//
-//    [self.fullScreeningForm setObject:hypertension_dict forKey:@"hypertension"];
-//}
-/*
+
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -655,6 +897,6 @@ NSString *const kQ15 = @"q15";
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
 }
-*/
+
 
 @end
