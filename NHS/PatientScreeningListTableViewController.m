@@ -894,6 +894,7 @@ typedef enum residentDataSource {
 - (void) saveCoreData {
 
     NSDictionary *particularsDict =[_retrievedResidentData objectForKey:kResiParticulars];
+    NSDictionary *profilingDict =[_retrievedResidentData objectForKey:SECTION_PROFILING_SOCIOECON];
 
         // Calculate age
     NSMutableString *str = [particularsDict[kBirthDate] mutableCopy];
@@ -910,6 +911,12 @@ typedef enum residentDataSource {
     [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kScreenLocation] forKey:kNeighbourhood];
     [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kName] forKey:kName];
     [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kNRIC] forKey:kNRIC];
+    
+    if (profilingDict != (id)[NSNull null] && profilingDict[kEmployStat] != (id) [NSNull null])
+        [[NSUserDefaults standardUserDefaults] setObject:profilingDict[kEmployStat] forKey:kEmployStat];
+    if (profilingDict != (id)[NSNull null] && profilingDict[kAvgMthHouseIncome] != (id) [NSNull null])
+        [[NSUserDefaults standardUserDefaults] setObject:profilingDict[kAvgMthHouseIncome] forKey:kAvgMthHouseIncome];
+    
     
     
     // For demographics

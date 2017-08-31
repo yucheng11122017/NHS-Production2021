@@ -68,10 +68,10 @@
     XLFormRowDescriptor * row;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Resident Particulars:"];
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Info:"];
     [formDescriptor addFormSection:section];
     
-    section.footerTitle = [NSString stringWithFormat:@"Name: %@\nNRIC: %@\nCitizenship: %@\n", [defaults objectForKey:kName], [defaults objectForKey:kNRIC], [defaults objectForKey:kCitizenship]];
+    section.footerTitle = [NSString stringWithFormat:@"Name: %@\nEmployment Status: %@\nAvg Monthly Household Income: $%@\n", [defaults objectForKey:kName], [defaults objectForKey:kEmployStat], [defaults objectForKey:kAvgMthHouseIncome]];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];

@@ -585,6 +585,8 @@ typedef enum sectionRowNumber {
         self.fullScreeningForm = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
         NSLog(@"%@", self.fullScreeningForm); //replace the existing one
         
+        [self saveCoreData];
+        
         [SVProgressHUD dismiss];
     };
 }
@@ -607,6 +609,43 @@ typedef enum sectionRowNumber {
                                                           }]];
         [self presentViewController:alertController animated:YES completion:nil];
     };
+}
+
+
+
+- (void) saveCoreData {
+    
+    NSDictionary *particularsDict =[_fullScreeningForm objectForKey:SECTION_RESI_PART];
+    NSDictionary *profilingDict =[_fullScreeningForm objectForKey:SECTION_PROFILING_SOCIOECON];
+    
+    // Calculate age
+    NSMutableString *str = [particularsDict[kBirthDate] mutableCopy];
+    NSString *yearOfBirth = [str substringWithRange:NSMakeRange(0, 4)];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy"];
+    NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
+    NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
+    
+    
+    //    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kGender] forKey:kGender];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:age] forKey:kResidentAge];
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kResidentId] forKey:kResidentId];
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kScreenLocation] forKey:kNeighbourhood];
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kName] forKey:kName];
+    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kNRIC] forKey:kNRIC];
+    
+    // For Current Socioecon Situation
+    if (profilingDict != (id)[NSNull null] && profilingDict[kEmployStat] != (id) [NSNull null])
+        [[NSUserDefaults standardUserDefaults] setObject:profilingDict[kEmployStat] forKey:kEmployStat];
+    if (profilingDict != (id)[NSNull null] && profilingDict[kAvgMthHouseIncome] != (id) [NSNull null])
+        [[NSUserDefaults standardUserDefaults] setObject:profilingDict[kAvgMthHouseIncome] forKey:kAvgMthHouseIncome];
+    
+    // For demographics
+    if (particularsDict[kCitizenship] != (id) [NSNull null])        //check for null first
+        [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kCitizenship] forKey:kCitizenship];
+    if (particularsDict[kReligion] != (id) [NSNull null])
+        [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kReligion] forKey:kReligion];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 
