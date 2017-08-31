@@ -43,7 +43,7 @@
 #define SECTION_PSYCH_WELL_BEING                @"psych_well_being"
 #define SECTION_SW_ADD_SERVICES                 @"sw_add_services"
 #define SECTION_SOC_WORK_SUMMARY                @"soc_work_summary"
-#define SECTION_CLINICAL RESULTS                @"clinical_results"
+#define SECTION_CLINICAL_RESULTS                @"clinical_results"
 #define SECTION_SNELLEN_TEST                    @"snellen_test"
 #define SECTION_ADD_SERVICES                    @"add_services"
 #define SECTION_DOC_CONSULT                     @"doc_consult"
@@ -230,10 +230,16 @@ extern NSString *const kPhqQ2;
 extern NSString *const kPhq9Score;
 extern NSString *const kFollowUpReq;
 
+/* Risk Stratification */
 extern NSString *const kDiabeticFriend;
 extern NSString *const kDelivered4kgOrGestational;
-extern NSString *const kCardioHistory;
+extern NSString *const kHeartAttack;
+extern NSString *const kStroke;
+extern NSString *const kAneurysm;
+extern NSString *const kKidneyDisease;
 extern NSString *const kSmoke;
+extern NSString *const kSmokeYes;
+extern NSString *const kSmokeNo;
 
 
 #pragma mark - Social Work
@@ -357,6 +363,7 @@ extern NSString *const kBmi;
 extern NSString *const kWaistCircum;
 extern NSString *const kHipCircum;
 extern NSString *const kWaistHipRatio;
+extern NSString *const kIsDiabetic;
 extern NSString *const kCbg;
 extern NSString *const kBp2Sys;
 extern NSString *const kBp2Dias;

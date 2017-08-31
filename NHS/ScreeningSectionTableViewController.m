@@ -97,7 +97,7 @@ typedef enum sectionRowNumber {
     }
 #endif
     
-    self.rowTitles = @[@"📶 Phlebotomy", @"📶 Mode of Screening",@"📶 Profiling", @"📶 Health Assessment & Risk Stratification", @"Social Work", @"Triage", @"Snellen Eye Test", @"Additional Services", @"Doctor's Consultation", @"Basic Dental Check-up", @"SERI Advanced Eye Screening", @"Fall Risk Assessment", @"Geriatric Dementia Asssesment", @"📶 Health Education"];
+    self.rowTitles = @[@"📶 Phlebotomy", @"📶 Mode of Screening",@"📶 Profiling", @"📶 Health Assessment & Risk Stratification", @"Social Work", @"📶 Triage", @"Snellen Eye Test", @"Additional Services", @"📶 Doctor's Consultation", @"📶 Basic Dental Check-up", @"SERI Advanced Eye Screening", @"Fall Risk Assessment", @"Geriatric Dementia Asssesment", @"📶 Health Education"];
     
      self.clearsSelectionOnViewWillAppear = YES;
     

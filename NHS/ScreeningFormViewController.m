@@ -1285,7 +1285,7 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Triage"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
-//    NSDictionary *clinicalResultsDict = [[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"clinical_results"];
+    NSDictionary *triageDict = [self.fullScreeningForm objectForKey:SECTION_CLINICAL_RESULTS];
 //    NSArray *bpRecordsArray = [[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"bp_record"];
 //
 //    if ([_formType integerValue] == ViewScreenedScreeningForm) {
@@ -1302,44 +1302,50 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormRowDescriptor *systolic_1;
     systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Sys rowType:XLFormRowDescriptorTypeDecimal title:@"BP 1 (Systolic)"];
     systolic_1.required = YES;
-//    systolic_1.value = [[bpRecordsArray objectAtIndex:1] objectForKey:@"systolic_bp"];
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp1Sys] != (id)[NSNull null]) systolic_1.value = triageDict[kBp1Sys];
+    
     [self setDefaultFontWithRow:systolic_1];
     [section addFormRow:systolic_1];
     
     XLFormRowDescriptor *diastolic_1;
     diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Dias rowType:XLFormRowDescriptorTypeDecimal title:@"BP 1 (Diastolic)"];
     diastolic_1.required = YES;
-//    diastolic_1.value = [[bpRecordsArray objectAtIndex:1] objectForKey:@"diastolic_bp"];
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp1Dias] != (id)[NSNull null]) diastolic_1.value = triageDict[kBp1Dias];
+    
     [self setDefaultFontWithRow:diastolic_1];
     [section addFormRow:diastolic_1];
     
     XLFormRowDescriptor *height;
     height = [XLFormRowDescriptor formRowDescriptorWithTag:kHeightCm rowType:XLFormRowDescriptorTypeDecimal title:@"Height (cm)"];
     height.required = YES;
-//    height.value = [clinicalResultsDict objectForKey:@"height_cm"];
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kHeightCm] != (id)[NSNull null]) height.value = triageDict[kHeightCm];
+
+    
     [self setDefaultFontWithRow:height];
     [section addFormRow:height];
     
     XLFormRowDescriptor *weight;
     weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeightKg rowType:XLFormRowDescriptorTypeDecimal title:@"Weight (kg)"];
     weight.required = YES;
-//    weight.value = [clinicalResultsDict objectForKey:@"weight_kg"];
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kWeightKg] != (id)[NSNull null]) weight.value = triageDict[kWeightKg];
+    
     [self setDefaultFontWithRow:weight];
     [section addFormRow:weight];
     
     XLFormRowDescriptor *bmi;
     bmi = [XLFormRowDescriptor formRowDescriptorWithTag:kBmi rowType:XLFormRowDescriptorTypeText title:@"BMI"];
-//    bmi.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kHeight, kWeight]];
-    //Initial value only
-//    if ([clinicalResultsDict objectForKey:@"bmi"] != [NSNull null]) {
-//        if (![[clinicalResultsDict objectForKey:@"bmi"] isEqualToString:@""]) {
-//            bmi.value = [clinicalResultsDict objectForKey:@"bmi"];
-//        } else {
-//            if (!isnan([weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2))) {  //check for not nan first!
-//                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
-//            }
-//        }
-//    }
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBmi] != (id)[NSNull null]) bmi.value = triageDict[kBmi];
+    
     bmi.disabled = @(1);
     [self setDefaultFontWithRow:bmi];
     [section addFormRow:bmi];
@@ -1348,6 +1354,7 @@ NSString *const kMultiADL = @"multi_adl";
         if (oldValue != newValue) {
             if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
                 bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:bmi.value];
                 [self updateFormRow:bmi];
             }
         }
@@ -1356,6 +1363,7 @@ NSString *const kMultiADL = @"multi_adl";
         if (oldValue != newValue) {
             if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
                 bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:bmi.value];
                 [self updateFormRow:bmi];
             }
         }
@@ -1364,14 +1372,20 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormRowDescriptor *waist;
     waist = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistCircum rowType:XLFormRowDescriptorTypeDecimal title:@"Waist Circumference (cm)"];
     waist.required = YES;
-//    waist.value = [clinicalResultsDict objectForKey:@"waist_circum"];
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kWaistCircum] != (id)[NSNull null]) waist.value = triageDict[kWaistCircum];
+    
     [self setDefaultFontWithRow:waist];
     [section addFormRow:waist];
     
     XLFormRowDescriptor *hip;
     hip = [XLFormRowDescriptor formRowDescriptorWithTag:kHipCircum rowType:XLFormRowDescriptorTypeDecimal title:@"Hip Circumference (cm)"];
     hip.required = YES;
-//    hip.value = [clinicalResultsDict objectForKey:@"hip_circum"];
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kHipCircum] != (id)[NSNull null]) hip.value = triageDict[kHipCircum];
+    
     [self setDefaultFontWithRow:hip];
     [section addFormRow:hip];
     
@@ -1379,11 +1393,10 @@ NSString *const kMultiADL = @"multi_adl";
     waistHipRatio = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistHipRatio rowType:XLFormRowDescriptorTypeText title:@"Waist : Hip Ratio"];
     waistHipRatio.required = YES;
     [self setDefaultFontWithRow:waistHipRatio];
-//    waistHipRatio.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kWaistCircum, kHipCircum]];
-    //Initial value
-//    if(![[clinicalResultsDict objectForKey:@"waist_hip_ratio"] isEqualToString:@""]) {
-//        waistHipRatio.value = [clinicalResultsDict objectForKey:@"waist_hip_ratio"];
-//    }
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kWaistHipRatio] != (id)[NSNull null]) waistHipRatio.value = triageDict[kWaistHipRatio];
+    
     waistHipRatio.disabled = @(1);
     [section addFormRow:waistHipRatio];
     
@@ -1391,6 +1404,7 @@ NSString *const kMultiADL = @"multi_adl";
         if (oldValue != newValue) {
             if ([waist.value integerValue] != 0 && [hip.value integerValue] != 0) {
                 waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
+                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kWaistHipRatio andNewContent:waistHipRatio.value];
                 [self updateFormRow:waistHipRatio];
             }
         }
@@ -1399,34 +1413,49 @@ NSString *const kMultiADL = @"multi_adl";
         if (oldValue != newValue) {
             if ([waist.value integerValue] != 0 && [hip.value integerValue] != 0) {
                 waistHipRatio.value = [NSString stringWithFormat:@"%.2f", [waist.value doubleValue] / [hip.value doubleValue]];
+                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kWaistHipRatio andNewContent:waistHipRatio.value];
                 [self updateFormRow:waistHipRatio];
             }
         }
     };
     
-    XLFormRowDescriptor *diabeticRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"diabetic" rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is resident diabetic?"];
+    XLFormRowDescriptor *diabeticRow = [XLFormRowDescriptor formRowDescriptorWithTag:kIsDiabetic rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is resident diabetic?"];
     diabeticRow.selectorOptions = @[@"Yes", @"No"];
     diabeticRow.required = YES;
     [self setDefaultFontWithRow:diabeticRow];
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kIsDiabetic] != (id)[NSNull null]) diabeticRow.value = [self getYesNofromOneZero:triageDict[kIsDiabetic]];
+    
     [section addFormRow:diabeticRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeDecimal title:@"CBG (mmol/L)"];
     row.required = NO;
     row.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", diabeticRow];
     [self setDefaultFontWithRow:row];
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kCbg] != (id)[NSNull null]) row.value = triageDict[kCbg];
+    
     [section addFormRow:row];
     
     XLFormRowDescriptor *systolic_2;
     systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Sys rowType:XLFormRowDescriptorTypeDecimal title:@"BP 2 (Systolic)"];
     systolic_2.required = YES;
-//    systolic_2.value = [[bpRecordsArray objectAtIndex:2] objectForKey:@"systolic_bp"];
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp2Sys] != (id)[NSNull null]) systolic_2.value = triageDict[kBp2Sys];
+    
     [self setDefaultFontWithRow:systolic_2];
     [section addFormRow:systolic_2];
     
     XLFormRowDescriptor *diastolic_2;
     diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Dias rowType:XLFormRowDescriptorTypeDecimal title:@"BP 2 (Diastolic)"];
     diastolic_2.required = YES;
-//    diastolic_2.value = [[bpRecordsArray objectAtIndex:2] objectForKey:@"diastolic_bp"];
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp2Dias] != (id)[NSNull null]) diastolic_2.value = triageDict[kBp2Dias];
+    
     [self setDefaultFontWithRow:diastolic_2];
     [section addFormRow:diastolic_2];
     
@@ -1434,7 +1463,10 @@ NSString *const kMultiADL = @"multi_adl";
     systolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Sys rowType:XLFormRowDescriptorTypeDecimal title:@"BP 3 (Systolic)"];
     systolic_3.required = NO;
     [systolic_3.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
-//    row.value = [[bpRecordsArray objectAtIndex:3] objectForKey:@"systolic_bp"];
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp3Sys] != (id)[NSNull null]) systolic_3.value = triageDict[kBp3Sys];
+    
     [self setDefaultFontWithRow:systolic_3];
     [section addFormRow:systolic_3];
     
@@ -1442,24 +1474,29 @@ NSString *const kMultiADL = @"multi_adl";
     diastolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Dias rowType:XLFormRowDescriptorTypeDecimal title:@"BP 3 (Diastolic)"];
     [diastolic_3.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
     diastolic_3.required = NO;
-//    row.value = [[bpRecordsArray objectAtIndex:3] objectForKey:@"diastolic_bp"];
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp3Dias] != (id)[NSNull null]) diastolic_3.value = triageDict[kBp3Dias];
+    
     [self setDefaultFontWithRow:diastolic_3];
     [section addFormRow:diastolic_3];
     
     XLFormRowDescriptor *systolic_avg;
     systolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgSys rowType:XLFormRowDescriptorTypeText title:@"Average BP (Systolic)"];
     systolic_avg.required = YES;
-//    if (![[[bpRecordsArray objectAtIndex:0] objectForKey:@"systolic_bp"] isEqualToString:@""]) {
-//        systolic_avg.value = [[bpRecordsArray objectAtIndex:0] objectForKey:@"systolic_bp"];
-//    }
-//    systolic_avg.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kBpSystolic, kBpSystolic2]];
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgSys] != (id)[NSNull null]) systolic_avg.value = triageDict[kBp12AvgSys];
+    
     systolic_avg.disabled = @(1);   //permanent
     [self setDefaultFontWithRow:systolic_avg];
+    
     [section addFormRow:systolic_avg];
     
     systolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
             systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:systolic_avg.value];
             [self updateFormRow:systolic_avg];
         }
         
@@ -1472,6 +1509,7 @@ NSString *const kMultiADL = @"multi_adl";
             } else { 
                 systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
             }
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:systolic_avg.value];
             [self updateFormRow:systolic_avg];
         }
         
@@ -1484,6 +1522,7 @@ NSString *const kMultiADL = @"multi_adl";
             } else {
                 systolic_avg.value = @(([systolic_1.value integerValue]+ [systolic_2.value integerValue])/2);
             }
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:systolic_avg.value];
             [self updateFormRow:systolic_avg];
         }
     };
@@ -1491,9 +1530,10 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormRowDescriptor *diastolic_avg;
     diastolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgDias rowType:XLFormRowDescriptorTypeText title:@"Average BP (Diastolic)"];
     diastolic_avg.required = YES;
-//    if (![[[bpRecordsArray objectAtIndex:0] objectForKey:@"diastolic_bp"] isEqualToString:@""]) {
-//        diastolic_avg.value = [[bpRecordsArray objectAtIndex:0] objectForKey:@"diastolic_bp"];
-//    }
+
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgDias] != (id)[NSNull null]) diastolic_avg.value = triageDict[kBp12AvgDias];
+    
     [self setDefaultFontWithRow:diastolic_avg];
     diastolic_avg.disabled = @(1);
     [section addFormRow:diastolic_avg];
@@ -1503,6 +1543,7 @@ NSString *const kMultiADL = @"multi_adl";
     diastolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
             diastolic_avg.value = @(([diastolic_1.value integerValue]+ [diastolic_2.value integerValue])/2);
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
             [self updateFormRow:diastolic_avg];
         }
     };
@@ -1514,6 +1555,7 @@ NSString *const kMultiADL = @"multi_adl";
             } else {
                 diastolic_avg.value = @(([diastolic_1.value integerValue]+ [diastolic_2.value integerValue])/2);
             }
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
             [self updateFormRow:diastolic_avg];
         }
     };
@@ -1525,6 +1567,7 @@ NSString *const kMultiADL = @"multi_adl";
             } else {
                 diastolic_avg.value = @(([diastolic_1.value integerValue]+ [diastolic_2.value integerValue])/2);
             }
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
             [self updateFormRow:diastolic_avg];
         }
     };
@@ -1700,14 +1743,11 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Referral for Doctor Consult"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
-//    NSDictionary *refForDocConsultDict = [self.fullScreeningForm objectForKey:@"consult_record"];
+    NSDictionary *refForDocConsultDict = [self.fullScreeningForm objectForKey:SECTION_DOC_CONSULT];
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@"NOTE"];
-//    section.footerTitle = @"If it is appropriate to refer the resident doctor consult:\n- If resident is mobile, accompany him/her to the consultation booths at HQ\n- If resident is not mobile, call Ops to send a doctor to the resident's flat\n- Please refer for consult immediately. Teams that wait till they are done with all other units on their list often find that upon return to a previously-covered unit, the resident has gone out";
-//    [formDescriptor addFormSection:section];
-//    
+
 
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Doctor's Notes"];
     [formDescriptor addFormSection:section];
@@ -1715,7 +1755,10 @@ NSString *const kMultiADL = @"multi_adl";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocNotes
                                                 rowType:XLFormRowDescriptorTypeTextView];
     [row.cellConfigAtConfigure setObject:@"Type your notes here..." forKey:@"textView.placeholder"];
-//    row.value = [refForDocConsultDict objectForKey:kDocNotes];
+
+    //value
+    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocNotes] != (id)[NSNull null]) row.value = refForDocConsultDict[kDocNotes];
+    
     [section addFormRow:row];
 
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -1725,13 +1768,20 @@ NSString *const kMultiADL = @"multi_adl";
                                                 rowType:XLFormRowDescriptorTypeName title:@"Name of Doctor"];
     [self setDefaultFontWithRow:row];
     row.required = NO;
-//    row.value = [refForDocConsultDict objectForKey:kDocName];
+
+    //value
+    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocName] != (id)[NSNull null]) row.value = refForDocConsultDict[kDocName];
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocReferred rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred by doctor?"];
     row.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:row];
     row.required = NO;
+    
+    //value
+    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocReferred] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:refForDocConsultDict[kDocReferred]];
+    
     [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
@@ -1742,6 +1792,8 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
+    NSDictionary *dentalCheckDict = [_fullScreeningForm objectForKey:SECTION_BASIC_DENTAL];
+    
     formDescriptor.assignFirstResponderOnShow = YES;
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -1750,6 +1802,10 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormRowDescriptor *dentalUndergoneRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDentalUndergone rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone dental check-up?"];
     dentalUndergoneRow.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:dentalUndergoneRow];
+    
+    //value
+    if (dentalCheckDict != (id)[NSNull null] && [dentalCheckDict objectForKey:kDentalUndergone] != (id)[NSNull null]) dentalUndergoneRow.value = [self getYesNofromOneZero:dentalCheckDict[kDentalUndergone]];
+    
     [section addFormRow:dentalUndergoneRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentistReferred
@@ -1757,6 +1813,10 @@ NSString *const kMultiADL = @"multi_adl";
     row.selectorOptions = @[@"Yes", @"No"];
     row.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", dentalUndergoneRow];
     [self setDefaultFontWithRow:row];
+    
+    //value
+    if (dentalCheckDict != (id)[NSNull null] && [dentalCheckDict objectForKey:kDentistReferred] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:dentalCheckDict[kDentistReferred]];
+    
     [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
@@ -2391,12 +2451,19 @@ NSString *const kMultiADL = @"multi_adl";
 -(void)formRowDescriptorValueHasChanged:(XLFormRowDescriptor *)rowDescriptor oldValue:(id)oldValue newValue:(id)newValue
 {
     [super formRowDescriptorValueHasChanged:rowDescriptor oldValue:oldValue newValue:newValue];
-    NSString* ansFromTF;
+    NSString* ansFromTF, *ansFromYesNo;
     if (newValue != (id)[NSNull null] && [newValue isKindOfClass:[NSString class]]) {
         if ([newValue isEqualToString:@"True"])
             ansFromTF = @"1";
         else if ([newValue isEqualToString:@"False"])
             ansFromTF = @"0";
+    }
+    
+    if (newValue != (id)[NSNull null] && [newValue isKindOfClass:[NSString class]]) {
+        if ([newValue isEqualToString:@"Yes"])
+            ansFromYesNo = @"1";
+        else if ([newValue isEqualToString:@"No"])
+            ansFromYesNo = @"0";
     }
     
     /* Mode of Screening */
@@ -2594,6 +2661,25 @@ NSString *const kMultiADL = @"multi_adl";
     } else if ([rowDescriptor.tag isEqualToString:kPostEdScore]) {
         [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kPostEdScore andNewContent:newValue];
     }
+    
+    /* Triage */
+    else if ([rowDescriptor.tag isEqualToString:kIsDiabetic]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kIsDiabetic andNewContent:ansFromYesNo];
+    }
+    
+    /* Doctor's Consult */
+    else if ([rowDescriptor.tag isEqualToString:kDocReferred]) {
+        [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDocReferred andNewContent:ansFromYesNo];
+    }
+    
+    /* Basic Dental Check-up */
+    else if ([rowDescriptor.tag isEqualToString:kDentalUndergone]) {
+        [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kDentalUndergone andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kDentistReferred]) {
+        [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kDentistReferred andNewContent:ansFromYesNo];
+    }
+    
+    
 }
 
 -(void)endEditing:(XLFormRowDescriptor *)rowDescriptor {    //works great for textField and textView
@@ -2641,9 +2727,47 @@ NSString *const kMultiADL = @"multi_adl";
     } else if ([rowDescriptor.tag isEqualToString:kAvgMthHouseIncome]) {
         [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kAvgMthHouseIncome andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kNumPplInHouse]) {
-        
-        
         [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kNumPplInHouse andNewContent:rowDescriptor.value];
+    }
+    
+    /* Triage */
+    else if ([rowDescriptor.tag isEqualToString:kBp1Sys]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp1Sys andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kBp1Dias]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp1Dias andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kHeightCm]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kHeightCm andNewContent:rowDescriptor.value];
+    }else if ([rowDescriptor.tag isEqualToString:kWeightKg]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kWeightKg andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kBmi]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kWaistCircum]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kWaistCircum andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kHipCircum]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kHipCircum andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kWaistHipRatio]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kWaistHipRatio andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kCbg]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kCbg andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kBp2Sys]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp2Sys andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kBp2Dias]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp2Dias andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kBp12AvgSys]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kBp12AvgDias]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kBp3Sys]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp3Sys andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kBp3Dias]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp3Dias andNewContent:rowDescriptor.value];
+    }
+    
+    /* Doctor's Consult */
+    else if ([rowDescriptor.tag isEqualToString:kDocNotes]) {
+        [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDocNotes andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kDocName]) {
+        [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDocName andNewContent:rowDescriptor.value];
     }
     
 }
@@ -3072,6 +3196,23 @@ NSString *const kMultiADL = @"multi_adl";
             return @"True";
         } else {
             return @"False";
+        }
+    }
+    return @"";
+}
+
+- (NSString *) getYesNofromOneZero: (id) value {
+    if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"1"]) {
+            return @"Yes";
+        } else {
+            return @"No";
+        }
+    } else if ([value isKindOfClass:[NSNumber class]]) {
+        if ([value isEqual:@1]) {
+            return @"Yes";
+        } else {
+            return @"No";
         }
     }
     return @"";

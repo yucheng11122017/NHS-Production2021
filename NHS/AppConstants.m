@@ -188,10 +188,17 @@ NSString *const kPhqQ2 = @"phq_q2";
 NSString *const kPhq9Score = @"phq9_score";
 NSString *const kFollowUpReq = @"follow_up_req";
 
+
+/* Risk Stratification */
 NSString *const kDiabeticFriend = @"diabetic_friend";
 NSString *const kDelivered4kgOrGestational = @"delivered4kg_or_gestational";
-NSString *const kCardioHistory = @"cardio_history";
+NSString *const kHeartAttack = @"heart_attack";
+NSString *const kStroke = @"stroke";
+NSString *const kAneurysm = @"aneurysm";
+NSString *const kKidneyDisease = @"kidney_disease";
 NSString *const kSmoke = @"smoke";
+NSString *const kSmokeYes = @"smoke_yes";
+NSString *const kSmokeNo = @"smoke_no";
 
 
 #pragma mark - Social Work
@@ -316,6 +323,7 @@ NSString *const kBmi = @"bmi";
 NSString *const kWaistCircum = @"waist_circum";
 NSString *const kHipCircum = @"hip_circum";
 NSString *const kWaistHipRatio = @"waist_hip_ratio";
+NSString *const kIsDiabetic = @"is_diabetic";
 NSString *const kCbg = @"cbg";
 NSString *const kBp2Sys = @"bp2_sys";
 NSString *const kBp2Dias = @"bp2_dias";

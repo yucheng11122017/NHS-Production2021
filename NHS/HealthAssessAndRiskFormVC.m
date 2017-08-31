@@ -604,16 +604,65 @@ NSString *const kQ15 = @"q15";
     }
     
     [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCardioHistory
-//                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-//                                                  title:@"Do you have a history of cardiovascular disease (heart/vascular problems e.g. angina, myocardial infarction, aneurysms)? *"];
-//    [self setDefaultFontWithRow:row];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    row.selectorOptions = @[@"Yes", @"No"];
-//    row.required = YES;
-//    [section addFormRow:row];
     
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHeartAttack
+                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                  title:@"Have you ever suffered from a \"heart attack\" or been told by your doctor that you have coronary heart disease (heart disease caused by narrowed blood vessels supplying the heart muscle)? *"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.required = YES;
+    
+    //value
+    if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kHeartAttack] != (id)[NSNull null]) {
+        row.value = [self getYesNoFromOneZero:riskStratDict[kHeartAttack]];
+    }
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kStroke
+                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                  title:@"Have you ever been diagnosed by your doctor to have a stroke? *"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.required = YES;
+    
+    //value
+    if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kStroke] != (id)[NSNull null]) {
+        row.value = [self getYesNoFromOneZero:riskStratDict[kStroke]];
+    }
+    
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAneurysm
+                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                  title:@"Has your doctor told you that the blood vessels to your limbs are diseased and have become narrower (peripheral artery disease) or that any other major blood vessels in your body have weakened walls that have “ballooned out” (aneurysm)? *"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.required = YES;
+    
+    //value
+    if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kAneurysm] != (id)[NSNull null]) {
+        row.value = [self getYesNoFromOneZero:riskStratDict[kAneurysm]];
+    }
+    
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKidneyDisease
+                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                  title:@"Has your doctor told you that the blood vessels to your limbs are diseased and have become narrower (peripheral artery disease) or that any other major blood vessels in your body have weakened walls that have “ballooned out” (aneurysm)? *"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.selectorOptions = @[@"YES", @"NO"];
+    row.required = YES;
+    
+    //value
+    if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kKidneyDisease] != (id)[NSNull null]) {
+        row.value = [self getYesNoFromOneZero:riskStratDict[kKidneyDisease]];
+    }
+    
+    [section addFormRow:row];
+
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmoke
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                   title:@"Do you smoke? *"];
@@ -625,6 +674,35 @@ NSString *const kQ15 = @"q15";
     //value
     if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kSmoke] != (id)[NSNull null]) {
         row.value = [self getYesNoFromOneZero:riskStratDict[kSmoke]];
+    }
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeYes
+                                                rowType:XLFormRowDescriptorTypeSelectorPush
+                                                  title:@"Choose one only"];
+    [self setDefaultFontWithRow:row];
+    row.selectorOptions = @[@"at least 1 cigarette (or equivalent) per day on average",
+                            @"less than 1 cigarette (or equivalent) per day on average"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    
+    //value
+    if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kSmokeYes] != (id)[NSNull null]) {
+        row.value = riskStratDict[kSmokeYes];
+    }
+    
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeNo
+                                                rowType:XLFormRowDescriptorTypeSelectorPush
+                                                  title:@"Choose one only"];
+    [self setDefaultFontWithRow:row];
+    row.selectorOptions = @[@"I have stopped smoking completely",
+                            @"I have never smoked before"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    
+    //value
+    if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kSmokeNo] != (id)[NSNull null]) {
+        row.value = riskStratDict[kSmokeNo];
     }
     
     [section addFormRow:row];
