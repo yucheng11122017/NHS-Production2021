@@ -206,7 +206,6 @@ NSString *const kQuestionFifteen = @"q15";
 - (id) initPhlebotomy {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Phlebotomy"];
     XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
     
     sporeanPr = age40 = false;
     
@@ -2661,8 +2660,6 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kDoesntOwnChasPioneer andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kLowHouseIncome]) {
         [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kLowHouseIncome andNewContent:newValue];
-//    } else if ([rowDescriptor.tag isEqualToString:kLowHomeValue]) {
-//        [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kLowHomeValue andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kWantChas]) {
         [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kWantChas andNewContent:newValue];
     }

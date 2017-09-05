@@ -17,7 +17,6 @@ abstract_target 'CocoaPods' do
   pod 'ACEDrawingView'
   pod 'FontAwesomeKit', '~> 2.2’
   pod 'KAStatusBar', '~> 0.1'
-#  pod 'LiquidFloatingActionButton', '~> 1.2'
   
 
   target 'NHS' do

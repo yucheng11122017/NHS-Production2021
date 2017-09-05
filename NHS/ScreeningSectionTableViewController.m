@@ -543,6 +543,8 @@ typedef enum sectionRowNumber {
         NSLog(@"%@", self.fullScreeningForm); //replace the existing one
         
         [self saveCoreData];
+        [self prepareAdditionalSvcs];
+        // save all the qualify stuffs for additional services
         
         @synchronized (self) {
             [self updateCellAccessory];
@@ -608,6 +610,141 @@ typedef enum sectionRowNumber {
     if (particularsDict[kReligion] != (id) [NSNull null])
         [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kReligion] forKey:kReligion];
     [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (void) prepareAdditionalSvcs {
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    /* CHAS */
+    NSDictionary *chasDict = [_fullScreeningForm objectForKey:SECTION_CHAS_PRELIM];
+    BOOL noChas=false, lowIncome=false, wantChas=false;
+    
+    if (chasDict != (id)[NSNull null]) {
+        
+        if (chasDict[kDoesntOwnChasPioneer] != (id)[NSNull null])
+            noChas = [chasDict[kDoesntOwnChasPioneer] boolValue];
+        if (chasDict[kLowHouseIncome] != (id)[NSNull null])
+            lowIncome = [chasDict[kLowHouseIncome] boolValue];
+        if (chasDict[kWantChas] != (id)[NSNull null])
+            wantChas = [chasDict[kWantChas] boolValue];
+        if (noChas && lowIncome && wantChas) {
+            [defaults setObject:@"1" forKey:kQualifyCHAS];
+        }
+    }
+    
+    
+    /* Colonoscopy */
+    NSDictionary *colonDict = [_fullScreeningForm objectForKey:SECTION_COLONOSCOPY_ELIGIBLE];
+    BOOL sporeanPr = false, age50 = false, relColorectCancer=false, colon3Yrs=false, wantColRef=false;
+    
+    if (colonDict != (id)[NSNull null]) {
+        if ([[defaults objectForKey:kCitizenship] isEqualToString:@"Singaporean"] || [[defaults objectForKey:kCitizenship] isEqualToString:@"PR"]) {
+            sporeanPr = true;
+        } else {
+            sporeanPr = false;
+        }
+        
+        if ([[defaults objectForKey:kResidentAge] intValue] > 49)
+            age50 = true;
+        else
+            age50 = false;
+        
+        if (colonDict[kRelWColorectCancer] != (id)[NSNull null])
+            relColorectCancer = [colonDict[kRelWColorectCancer] boolValue];
+        if (colonDict[kColonoscopy3yrs] != (id)[NSNull null])
+            colon3Yrs = [colonDict[kColonoscopy3yrs] boolValue];
+        if (colonDict[kWantColonoscopyRef] != (id)[NSNull null])
+            wantColRef = [colonDict[kWantColonoscopyRef] boolValue];
+        
+        if (sporeanPr && age50 && relColorectCancer && colon3Yrs && wantColRef)
+            [defaults setObject:@"1" forKey:kQualifyColonsc];
+    }
+    
+    /* FIT Kit */
+    //SporeanPr and age50 from above.
+    NSDictionary *fitDict = [_fullScreeningForm objectForKey:SECTION_FIT_ELIGIBLE];
+    BOOL fit12Mths=false, colon10Yrs=false, wantFitKit=false;
+    if (fitDict != (id)[NSNull null]) {
+        
+        if (fitDict[kFitLast12Mths] != (id)[NSNull null])
+            fit12Mths = [fitDict[kFitLast12Mths] boolValue];
+        if (fitDict[kColonoscopy10Yrs] != (id)[NSNull null])
+            colon10Yrs = [fitDict[kColonoscopy10Yrs] boolValue];
+        if (fitDict[kWantFitKit] != (id)[NSNull null])
+            wantFitKit = [fitDict[kWantFitKit] boolValue];
+        
+        if (sporeanPr && age50 && fit12Mths && colon10Yrs && wantFitKit)
+            [defaults setObject:@"1" forKey:kQualifyFIT];
+    }
+    
+    /* Mammogram */
+    NSDictionary *mammoDict = [_fullScreeningForm objectForKey:SECTION_MAMMOGRAM_ELIGIBLE];
+    BOOL sporean = false, age5069, noMammo2Yrs = false, hasChas = false, wantMammo;
+    
+    if (mammoDict != (id)[NSNull null]) {
+        if ([[defaults objectForKey:kCitizenship] isEqualToString:@"Singaporean"]) {
+            sporean = true;
+        } else {
+            sporean = false;
+        }
+        
+        if ([[defaults objectForKey:kResidentAge] intValue] >= 50 && [[defaults objectForKey:kResidentAge] intValue] <= 69)
+            age5069 = true;
+        else
+            age5069 = false;
+        
+        if (mammoDict[kMammo2Yrs] != (id)[NSNull null])
+            noMammo2Yrs = [mammoDict[kMammo2Yrs] boolValue];
+        if (mammoDict[kHasChas] != (id)[NSNull null])
+            hasChas = [mammoDict[kHasChas] boolValue];
+        if (mammoDict[kWantMammo] != (id)[NSNull null])
+            wantMammo = [mammoDict[kWantMammo] boolValue];
+        
+        if (sporean && age5069 && noMammo2Yrs && hasChas && kWantMammo)
+            [defaults setObject:@"1" forKey:kQualifyMammo];
+    
+    }
+    
+    
+    
+    /* Pap Smear */
+    NSDictionary *papSmearDict = [_fullScreeningForm objectForKey:SECTION_PAP_SMEAR_ELIGIBLE];
+    BOOL age2569, noPapSmear3Yrs = false, hadSex = false, wantPapSmear = false;
+    
+    if (papSmearDict != (id)[NSNull null]) {
+        if ([[defaults objectForKey:kResidentAge] intValue] >= 25 && [[defaults objectForKey:kResidentAge] intValue] <= 69)
+            age2569 = true;
+        else
+            age2569 = false;
+        
+        if (papSmearDict[kPap3Yrs] != (id)[NSNull null])
+            noPapSmear3Yrs = [papSmearDict[kPap3Yrs] boolValue];
+        
+        if (papSmearDict[kEngagedSex] != (id)[NSNull null])
+            hadSex = [papSmearDict[kEngagedSex] boolValue];
+                      
+        if (papSmearDict[kWantPap] != (id)[NSNull null])
+            wantPapSmear = [papSmearDict[kWantPap] boolValue];
+        
+        if (sporean && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear)
+            [defaults setObject:@"1" forKey:kQualifyPapSmear];
+
+    }
+    
+/*
+    
+    else if ([rowDescriptor.tag isEqualToString:kFallen12Mths]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kFallen12Mths andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kScaredFall]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kScaredFall andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kFeelFall]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kFeelFall andNewContent:newValue];
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kCognitiveImpair]) {
+        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ELIGIBLE andFieldName:kCognitiveImpair andNewContent:newValue];
+    }*/
+
 }
 
 - (void) updateCellAccessory {

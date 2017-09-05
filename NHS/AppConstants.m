@@ -208,8 +208,6 @@ NSString *const kSmokeNo = @"smoke_no";
 NSString *const kCopeFin = @"cope_fin";
 NSString *const kWhyNotCopeFin = @"why_not_cope_fin";
 NSString *const kMoreWhyNotCopeFin = @"more_why_not_cope_fin";
-//NSString *const kHasChas = @"has_chas";
-#warning  look into this
 NSString *const kHasPgp = @"has_pgp";
 NSString *const kHasMedisave = @"has_medisave";
 NSString *const kHasInsure = @"has_insure";
