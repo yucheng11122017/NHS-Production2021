@@ -132,6 +132,7 @@ NSString *const kQ15 = @"q15";
     
     XLFormRowDescriptor *hasCheckedBloodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMCheckedBlood rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
     hasCheckedBloodRow.selectorOptions = @[@"No",@"Yes, 2 yrs ago",@"Yes, 3 yrs ago",@"Yes < 1 yr ago"];
+    hasCheckedBloodRow.noValueDisplayText = @"Tap Here";
     hasCheckedBloodRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformedRow];
     
     if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kCheckedBlood] != (id)[NSNull null]) {
@@ -244,6 +245,7 @@ NSString *const kQ15 = @"q15";
                             @"Yes < 1 yr ago"];
 
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
+    row.noValueDisplayText = @"Tap Here";
     
     if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kCheckedBlood] != (id)[NSNull null]) {
         row.value = hyperlipidDict[kCheckedBlood];
@@ -511,6 +513,8 @@ NSString *const kQ15 = @"q15";
     
     [section addFormRow:phqQ2Row];
 
+    
+    
     XLFormRowDescriptor* phq9ScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhq9Score
                                                 rowType:XLFormRowDescriptorTypeNumber
                                                   title:@"Total score for PHQ-9"];
@@ -518,6 +522,11 @@ NSString *const kQ15 = @"q15";
     phq9ScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     phq9ScoreRow.disabled = @(1);
     
+    if (phqQ1Row.value != (id) [NSNull null] && phqQ2Row.value != (id)[NSNull null]) {
+        if ([phqQ1Row.value intValue] > 1 || [phqQ2Row.value intValue] >1) {
+            phq9ScoreRow.disabled = @(0);
+        }
+    }
     //value
     if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhq9Score] != (id)[NSNull null]) {
         phq9ScoreRow.value = geriaDepreAssmtDict[kPhq9Score];
@@ -525,27 +534,59 @@ NSString *const kQ15 = @"q15";
     
     [section addFormRow:phq9ScoreRow];
     
+    XLFormRowDescriptor* q10ResponseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ10Response
+                                                                              rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                                                title:@"Response to Question 10:"];
+    [self setDefaultFontWithRow:q10ResponseRow];
+    q10ResponseRow.selectorOptions = @[@"Not difficult at all", @"Somewhat difficult", @"Very difficult",@"Extremely difficult"];
+    q10ResponseRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    
+    q10ResponseRow.disabled = @(1);
+    if (phqQ1Row.value != (id) [NSNull null] && phqQ2Row.value != (id)[NSNull null]) {
+        if ([phqQ1Row.value intValue] > 1 || [phqQ2Row.value intValue] >1) {
+            q10ResponseRow.disabled = @(0);
+        }
+    }
+    
+    
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kQ10Response] != (id)[NSNull null]) {
+        q10ResponseRow.value = geriaDepreAssmtDict[kQ10Response];
+    }
+    
+    [section addFormRow:q10ResponseRow];
+    
     phqQ1Row.onChangeBlock= ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
-            if ([newValue intValue] > 1) phq9ScoreRow.disabled = @(0);
+            if ([newValue intValue] > 1)  {
+                phq9ScoreRow.disabled = @(0);
+                q10ResponseRow.disabled = @(0);
+            }
             else {
-                if ([phqQ2Row.value intValue] < 2) {
+                if ([phqQ2Row.value intValue] < 2) {    //only when both lower than 2, then disable field
                     phq9ScoreRow.disabled = @(1);
+                    q10ResponseRow.disabled = @(1);
                 }
             }
             [self reloadFormRow:phq9ScoreRow];
+            [self reloadFormRow:q10ResponseRow];
         }
     };
     
     phqQ2Row.onChangeBlock= ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
-            if ([newValue intValue] > 1) phq9ScoreRow.disabled = @(0);
+            if ([newValue intValue] > 1) {
+                phq9ScoreRow.disabled = @(0);
+                q10ResponseRow.disabled = @(0);
+            }
             else {
-                if ([phqQ1Row.value intValue] < 2) {
+                if ([phqQ1Row.value intValue] < 2) {    //only when both lower than 2, then disable field
                     phq9ScoreRow.disabled = @(1);
+                    q10ResponseRow.disabled = @(1);
                 }
             }
             [self reloadFormRow:phq9ScoreRow];
+            [self reloadFormRow:q10ResponseRow];
         }
     };
 
@@ -617,6 +658,7 @@ NSString *const kQ15 = @"q15";
     if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kHeartAttack] != (id)[NSNull null]) {
         row.value = [self getYesNoFromOneZero:riskStratDict[kHeartAttack]];
     }
+    [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kStroke
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
@@ -650,7 +692,7 @@ NSString *const kQ15 = @"q15";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKidneyDisease
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"Has your doctor told you that the blood vessels to your limbs are diseased and have become narrower (peripheral artery disease) or that any other major blood vessels in your body have weakened walls that have “ballooned out” (aneurysm)? *"];
+                                                  title:@"Have you ever been diagnosed by your doctor to have chronic kidney disease? *"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.selectorOptions = @[@"YES", @"NO"];
@@ -663,28 +705,28 @@ NSString *const kQ15 = @"q15";
     
     [section addFormRow:row];
 
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmoke
+    XLFormRowDescriptor *doYouSmokeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmoke
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                   title:@"Do you smoke? *"];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.selectorOptions = @[@"YES", @"NO"];
-    row.required = YES;
+    [self setDefaultFontWithRow:doYouSmokeRow];
+    doYouSmokeRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    doYouSmokeRow.selectorOptions = @[@"YES", @"NO"];
+    doYouSmokeRow.required = YES;
     
     //value
     if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kSmoke] != (id)[NSNull null]) {
-        row.value = [self getYesNoFromOneZero:riskStratDict[kSmoke]];
+        doYouSmokeRow.value = [self getYesNoFromOneZero:riskStratDict[kSmoke]];
     }
-    [section addFormRow:row];
+    [section addFormRow:doYouSmokeRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSmokeYes
                                                 rowType:XLFormRowDescriptorTypeSelectorPush
                                                   title:@"Choose one only"];
     [self setDefaultFontWithRow:row];
-    row.selectorOptions = @[@"at least 1 cigarette (or equivalent) per day on average",
-                            @"less than 1 cigarette (or equivalent) per day on average"];
+    row.selectorOptions = @[@"≥ 1 cigarette (or equivalent) per day on average",
+                            @"< 1 cigarette (or equivalent) per day on average"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", doYouSmokeRow];
     //value
     if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kSmokeYes] != (id)[NSNull null]) {
         row.value = riskStratDict[kSmokeYes];
@@ -699,6 +741,7 @@ NSString *const kQ15 = @"q15";
     row.selectorOptions = @[@"I have stopped smoking completely",
                             @"I have never smoked before"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", doYouSmokeRow];
     
     //value
     if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kSmokeNo] != (id)[NSNull null]) {
@@ -769,6 +812,8 @@ NSString *const kQ15 = @"q15";
         [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhqQ2 andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kPhq9Score]) {
         [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhq9Score andNewContent:newValue];
+    }  else if ([rowDescriptor.tag isEqualToString:kQ10Response]) {
+            [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kQ10Response andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kFollowUpReq]) {
         [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kFollowUpReq andNewContent:newValue];
     }

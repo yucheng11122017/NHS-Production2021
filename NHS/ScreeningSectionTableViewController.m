@@ -97,9 +97,10 @@ typedef enum sectionRowNumber {
     }
 #endif
     
-    self.rowTitles = @[@"📶 Phlebotomy", @"📶 Mode of Screening",@"📶 Profiling", @"📶 Health Assessment & Risk Stratification", @"Social Work", @"📶 Triage", @"Snellen Eye Test", @"Additional Services", @"📶 Doctor's Consultation", @"📶 Basic Dental Check-up", @"SERI Advanced Eye Screening", @"Fall Risk Assessment", @"Geriatric Dementia Asssesment", @"📶 Health Education"];
+    self.rowTitles = @[@"📶 Phlebotomy", @"📶 Mode of Screening",@"📶 Profiling", @"📶 Health Assessment & Risk Stratification", @"Social Work", @"📶 Triage", @"📶 Snellen Eye Test", @"Additional Services", @"📶 Doctor's Consultation", @"📶 Basic Dental Check-up", @"SERI Advanced Eye Screening", @"Fall Risk Assessment", @"Geriatric Dementia Asssesment", @"📶 Health Education"];
     
      self.clearsSelectionOnViewWillAppear = YES;
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0, nil];
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
@@ -110,35 +111,16 @@ typedef enum sectionRowNumber {
                                              selector:@selector(updateFullScreeningForm:)
                                                  name:@"updateFullScreeningForm"
                                                object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updateCompletionCheck:)
-                                                 name:@"updateCompletionCheck"
-                                               object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self
+//                                             selector:@selector(updateCompletionCheck:)
+//                                                 name:@"updateCompletionCheck"
+//                                               object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateFormType:)
                                                  name:@"formEditedNotification"
                                                object:nil];
     
     
-    NSArray *keys = [self.fullScreeningForm allKeys];
-    NSString *key;
-    for (key in keys) {
-        if ([key isEqualToString:@"completion_check"]) {
-            self.completionCheck = [[NSMutableArray alloc] initWithArray:[self.fullScreeningForm objectForKey:@"completion_check"]];
-            break;
-        }
-    }
-    //if initialised previously, won't do it again
-    if (!self.completionCheck) {
-        self.completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,nil];
-    }
-    int count = 0;
-    for (int i=0;i<[self.completionCheck count];i++) {
-        count = count + [[self.completionCheck objectAtIndex:i] intValue];
-    }
-    if (count == [self.completionCheck count]) {
-        readyToSubmit = true;
-    }
     
     [super viewDidLoad];
 }
@@ -173,13 +155,17 @@ typedef enum sectionRowNumber {
         }
     
         cell.textLabel.text = [self.rowTitles objectAtIndex:indexPath.row];
-        //     [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
-        if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
-            cell.accessoryType = UITableViewCellAccessoryCheckmark;
-        } else {
-            cell.accessoryType = UITableViewCellAccessoryNone;
-        }
+        [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
         
+        // Put in the ticks if necessary
+        if (indexPath.row < [self.completionCheck count]) {
+            if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            } else {
+                cell.accessoryType = UITableViewCellAccessoryNone;
+            }
+        }
+    
         if ((indexPath.row >= SeriAdvancedEyeScreening) && (indexPath.row <= GeriatricDementiaAssess)) {   //between 10 to 12
             if (indexPath.row == SeriAdvancedEyeScreening) {  //SERI
                 //Enable SERI
@@ -358,33 +344,8 @@ typedef enum sectionRowNumber {
 
 #pragma mark - NSNotification Methods
 - (void) updateFullScreeningForm: (NSNotification *) notification {
-//    self.fullScreeningForm = [notification.userInfo mutableCopy];
-//    NSLog(@"%@", self.fullScreeningForm);
-//    
-//    if ([self.fullScreeningForm objectForKey:@"resi_particulars"] != [NSNull null]) {   //not null
-//        if (![[[self.fullScreeningForm objectForKey:@"resi_particulars"] objectForKey:@"nric"] isEqualToString:@""]) {  //not empty
-//            if (formType != ViewScreenedScreeningForm) {
-//                [self autoSave];
-//            }
-//        }
-//    }
-    
-    [self getAllDataForOneResident];
-}
 
-- (void) updateCompletionCheck: (NSNotification *) notification {
-    NSLog(@"%@", notification.userInfo);
-    int section = [[notification.userInfo objectForKey:@"section"] intValue];
-    NSNumber *value = [notification.userInfo objectForKey:@"value"];
-    [self.completionCheck replaceObjectAtIndex:section withObject:value];
-    int count=0;
-    for (int i=0;i<[self.completionCheck count];i++) {
-        count = count + [[self.completionCheck objectAtIndex:i] intValue];
-    }
-    if (count == [self.completionCheck count]) {
-        readyToSubmit = true;
-    }
-    [self.tableView reloadData];
+    [self getAllDataForOneResident];
 }
 
 - (void) updateFormType: (NSNotification *) notification {
@@ -394,9 +355,7 @@ typedef enum sectionRowNumber {
 #pragma mark Save,Load & Delete Methods
 
 - (void) autoSave {
-    //save completionCheck into fullScreeningForm
-    [self.fullScreeningForm setObject:self.completionCheck forKey:@"completion_check"];
-//    int count;
+    
 
     NSString *nric = [[[self.fullScreeningForm objectForKey:@"resi_particulars"] objectForKey:kNRIC] stringByAppendingString:@"_"];
     
@@ -424,8 +383,6 @@ typedef enum sectionRowNumber {
 }
 
 - (void) saveDraft {
-    //save completionCheck into fullScreeningForm
-    [self.fullScreeningForm setObject:self.completionCheck forKey:@"completion_check"];
     
     // get current date/time
     NSDate *today = [NSDate date];
@@ -587,6 +544,11 @@ typedef enum sectionRowNumber {
         
         [self saveCoreData];
         
+        @synchronized (self) {
+            [self updateCellAccessory];
+            [self.tableView reloadData];    //put in the ticks
+        }
+        
         [SVProgressHUD dismiss];
     };
 }
@@ -648,8 +610,82 @@ typedef enum sectionRowNumber {
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+- (void) updateCellAccessory {
+    
+    if ([_completionCheck count] < 1) {
+        _completionCheck = [[NSMutableArray alloc] init];
+    } else {
+        [_completionCheck removeAllObjects];
+    }
+    
+    NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
+    NSArray *lookupTable = @[kCheckPhleb, kCheckScreenMode, kCheckProfiling,@"health_assmt_risk_strat",@"check_social_work", kCheckTriage, kCheckSnellen, kCheckAdd, kCheckDocConsult, kCheckDental, @"check_overall_seri", kCheckFall,kCheckDementia, kCheckEd];
+    
+    if (checksDict != nil && checksDict != (id)[NSNull null]) {
+        for (int i=0; i<[lookupTable count]; i++) {
+            
+            if (i == HealthAssessment_RiskStratification) {
+                [_completionCheck addObject:[self checkAllHealthAssmtRiskStratSections:checksDict]];
+            } else if (i == SocialWork) {
+                [_completionCheck addObject:[self checkAllSocialWorkSections:checksDict]];
+            } else if (i== SeriAdvancedEyeScreening) {
+                [_completionCheck addObject:[self checkAllSeriSections:checksDict]];
+            } else {
+                NSString *key = lookupTable[i];
+                
+                NSNumber *doneNum = [checksDict objectForKey:key];
+                [_completionCheck addObject:doneNum];
+            }
+            
+        }
+    }
+    
+}
+
+- (NSNumber *) checkAllHealthAssmtRiskStratSections:(NSDictionary *) checksDict {
+    int count=0;
+    for (NSString *key in [checksDict allKeys]) {   //check through all 5 sub-sections
+#warning Dementia Assessment might not be applicable to all persons!
+        if ([key isEqualToString:kCheckDiabetes] || [key isEqualToString:kCheckHypertension] || [key isEqualToString:kCheckHyperlipidemia] || [key isEqualToString:kCheckDementia] || [key isEqualToString:kCheckRiskStrat]) {
+            if ([[checksDict objectForKey:key] isEqual:@1])
+                count++;
+            else
+                return @0;
+        }
+    }
+    if (count == 5) return @1;
+    else return @0;
+}
 
 
+- (NSNumber *) checkAllSeriSections:(NSDictionary *) checksDict {
+    int count=0;
+    for (NSString *key in [checksDict allKeys]) {
+#warning SERI might not be applicable to all persons!
+        if ([key containsString:@"seri"]) {
+            if ([[checksDict objectForKey:key] isEqual:@1])
+                count++;
+            else
+                return @0;  //as long as there's one SERI subsection not done, return @0
+        }
+    }
+    if (count == 7) return @1;
+    else return @0;
+}
+
+- (NSNumber *) checkAllSocialWorkSections:(NSDictionary *) checksDict {
+    int count=0;
+    for (NSString *key in [checksDict allKeys]) {   //check through all 7 sub-sections
+        if ([key isEqualToString:kCheckGeno] || [key isEqualToString:kCheckSocioEco] || [key isEqualToString:kCheckCurrentPhyStatus] || [key isEqualToString:kCheckSocialSupport] || [key isEqualToString:kCheckPsychWellbeing] || [key isEqualToString:kCheckSwAddServices] || [key isEqualToString:kCheckSwAddServices]) {
+            if ([[checksDict objectForKey:key] isEqual:@1])
+                count++;
+            else
+                return @0;
+        } 
+    }
+    if (count == 7) return @1;
+    else return @0;
+}
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation

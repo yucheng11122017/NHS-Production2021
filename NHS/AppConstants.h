@@ -59,6 +59,7 @@
 #define SECTION_GERIATRIC_DEMENTIA_ASSMT        @"geriatric_dementia_assmt"
 #define SECTION_PRE_HEALTH_EDU                  @"pre_health_edu"
 #define SECTION_POST_HEALTH_EDU                 @"post_health_edu"
+#define SECTION_CHECKS                          @"checks"
 
 
 #pragma mark - UserDefaults
@@ -228,6 +229,7 @@ extern NSString *const kHTTakingRegularly;
 extern NSString *const kPhqQ1;
 extern NSString *const kPhqQ2;
 extern NSString *const kPhq9Score;
+extern NSString *const kQ10Response;
 extern NSString *const kFollowUpReq;
 
 /* Risk Stratification */
@@ -639,5 +641,37 @@ extern NSString *const kPostEdu23;
 extern NSString *const kPostEdu24;
 extern NSString *const kPostEdu25;
 extern NSString *const kPostEdScore;
+
+#pragma mark - Check Variables
+extern NSString *const kCheckPhleb;
+extern NSString *const kCheckScreenMode;
+extern NSString *const kCheckProfiling;
+extern NSString *const kCheckDiabetes;
+extern NSString *const kCheckHyperlipidemia;
+extern NSString *const kCheckHypertension;
+extern NSString *const kCheckDepression;
+extern NSString *const kCheckRiskStrat;
+extern NSString *const kCheckGeno;
+extern NSString *const kCheckSocioEco;
+extern NSString *const kCheckCurrentPhyStatus;
+extern NSString *const kCheckSocialSupport;
+extern NSString *const kCheckPsychWellbeing;
+extern NSString *const kCheckSwAddServices;
+extern NSString *const kCheckSocWorkSummary;
+extern NSString *const kCheckTriage;
+extern NSString *const kCheckSnellen;
+extern NSString *const kCheckAdd;
+extern NSString *const kCheckDocConsult;
+extern NSString *const kCheckDental;
+extern NSString *const kCheckSeriMedHist;
+extern NSString *const kCheckSeriVa;
+extern NSString *const kCheckSeriAutorefractor;
+extern NSString *const kCheckSeriIop;
+extern NSString *const kCheckSeriAhe;
+extern NSString *const kCheckSeriPhe;
+extern NSString *const kCheckSeriDiag;
+extern NSString *const kCheckFall;
+extern NSString *const kCheckDementia;
+extern NSString *const kCheckEd;
 
 @end

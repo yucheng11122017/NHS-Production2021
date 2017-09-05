@@ -166,7 +166,7 @@
         return;
     } else {
         NSDictionary *fields = [self.form formValues];
-        NSString *name, *nric, *gender, *birthDate, *screenLocation;
+        NSString *name, *nric, *gender, *birthDate;
         
         if ([fields objectForKey:kGender] != [NSNull null]) {
             if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
@@ -177,7 +177,10 @@
                 //            [resi_particulars setObject:@"F" forKey:kGender];
             }
         }
-        name = fields[kName];
+        NSString *CAPSed = [fields[kName] uppercaseString];
+        name = CAPSed;
+        
+//        name = fields[kName];
         nric = fields[kNRIC];
         
         birthDate = [self getDateStringFromFormValue:fields andRowTag:kBirthDate];

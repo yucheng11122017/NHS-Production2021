@@ -9,7 +9,7 @@
 #import <XLForm/XLForm.h>
 #import "XLFormViewController.h"
 
-@interface SocialWorkFormVC : XLFormViewController
+@interface SocialWorkFormVC : XLFormViewController <XLFormDescriptorDelegate>
 
 
 @property (strong, nonatomic) NSNumber* formNo;

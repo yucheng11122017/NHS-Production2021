@@ -33,13 +33,23 @@ typedef enum rowTypes {
     YesNoNA
 } rowTypes;
 
-typedef enum typeOfForm {
-    NewScreeningForm,
-    PreRegisteredScreeningForm,
-    LoadedDraftScreeningForm,
-    ViewScreenedScreeningForm
-} typeOfForm;
 
+typedef enum formName {
+    Phleb,
+    ModeOfScreening,
+    Profiling,
+    Unused3,
+    Unused4,
+    Triage,
+    SnellenEyeTest,
+    AddSvcs,
+    RefForDocConsult,
+    DentalCheck,
+    Unused10,
+    FallRiskAssmt,
+    DementiaAssmt,
+    HealthEdu
+} formName;
 
 
 NSString *const kQuestionOne = @"q1";
@@ -58,11 +68,6 @@ NSString *const kQuestionThirteen = @"q13";
 NSString *const kQuestionFourteen = @"q14";
 NSString *const kQuestionFifteen = @"q15";
 
-//Demographics
-
-//Current Physical Issues
-NSString *const kMultiADL = @"multi_adl";
-
 @interface ScreeningFormViewController () {
     NSString *gender;
     NSArray *spoken_lang_value;
@@ -78,6 +83,7 @@ NSString *const kMultiADL = @"multi_adl";
     BOOL age2569, noPapSmear3Yrs, hadSex, wantPapSmear;
     BOOL age65, feelFall, scaredFall, fallen12Mths;
     BOOL internetDCed;
+    BOOL isFormFinalized;
 }
 
 @property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
@@ -91,6 +97,7 @@ NSString *const kMultiADL = @"multi_adl";
 
 - (void)viewDidLoad {
     
+    isFormFinalized = false;    //by default
     XLFormViewController *form;
 
     citizenship = [[NSUserDefaults standardUserDefaults]
@@ -111,8 +118,6 @@ NSString *const kMultiADL = @"multi_adl";
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
     [self.hostReachability startNotifier];
     [self updateInterfaceWithReachability:self.hostReachability];
-    
-    
     
     //must init first before [super viewDidLoad]
     switch([self.sectionID integerValue]) {
@@ -145,15 +150,22 @@ NSString *const kMultiADL = @"multi_adl";
     
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
     
-//    self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
-//    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:@selector(returnBtnPressed:)];
-//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Validate" style:UIBarButtonItemStyleDone target:self action:@selector(validateBtnPressed:)];
-//    if ([_formType integerValue] == ViewScreenedScreeningForm) {
-//        self.navigationItem.rightBarButtonItem.title = @"Edit";
-//        [self.form setDisabled:YES];
-//    }
+    
+    if (isFormFinalized) {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
+        [self.form setDisabled:YES];
+        [self.tableView endEditing:YES];    //to really disable the table
+        [self.tableView reloadData];
+    }
+    else {
+        [self.form setDisabled:NO];
+        [self.tableView reloadData];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Finalize" style:UIBarButtonItemStyleDone target:self action:@selector(finalizeBtnPressed:)];
+    }
     
     [super viewDidLoad];
+    
+    
     
     // Do any additional setup after loading the view.
 }
@@ -200,6 +212,14 @@ NSString *const kMultiADL = @"multi_adl";
     
     NSDictionary *phlebotomyEligibDict = _fullScreeningForm[SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT];
     NSDictionary *phlebotomyDict = _fullScreeningForm[SECTION_PHLEBOTOMY];
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckPhleb];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
     
     // Phlebotomy Eligibility Assessment - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Phlebotomy Eligibility Assessment"];
@@ -238,7 +258,6 @@ NSString *const kMultiADL = @"multi_adl";
         chronicCond = [chronicCondRow.value boolValue];
     }
     [self setDefaultFontWithRow:chronicCondRow];
-    chronicCondRow.required = YES;
     chronicCondRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:chronicCondRow];
     
@@ -250,7 +269,6 @@ NSString *const kMultiADL = @"multi_adl";
         wantFreeBtRow.value = phlebotomyEligibDict[kWantFreeBt];
         wantFreeBt = [wantFreeBtRow.value boolValue];
     }
-    wantFreeBtRow.required = YES;
     wantFreeBtRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:wantFreeBtRow];
     
@@ -392,6 +410,15 @@ NSString *const kMultiADL = @"multi_adl";
     NSDictionary *modeOfScreening = _fullScreeningForm[SECTION_MODE_OF_SCREENING];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *qualifyPhleb = [defaults objectForKey:kQualifyPhleb];
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckScreenMode];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+
     
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -487,13 +514,21 @@ NSString *const kMultiADL = @"multi_adl";
     NSDictionary *fallRiskEligib = _fullScreeningForm[SECTION_FALL_RISK_ELIGIBLE];
     NSDictionary *geriaDementAssmtDict = _fullScreeningForm[SECTION_GERIATRIC_DEMENTIA_ELIGIBLE];
     
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckProfiling];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kProfilingConsent rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Consent to disclosure of information"];
-//    if (profilingDict != (id)[NSNull null] && [profilingDict objectForKey:kProfilingConsent] != (id)[NSNull null]) row.value = profilingDict[kProfilingConsent];
-#warning no values for now...
+    if (profilingDict != (id)[NSNull null] && [profilingDict objectForKey:kProfilingConsent] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:profilingDict[kProfilingConsent]];
     row.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -529,7 +564,7 @@ NSString *const kMultiADL = @"multi_adl";
     [section addFormRow:otherEmployRow];
     
     XLFormRowDescriptor *noDiscloseIncomeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiscloseIncome rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident does not want to disclose income"];
-    if (profilingDict != (id)[NSNull null] && [profilingDict objectForKey:kDiscloseIncome] != (id)[NSNull null]) noDiscloseIncomeRow.value = profilingDict[kProfilingConsent];
+    if (profilingDict != (id)[NSNull null] && [profilingDict objectForKey:kDiscloseIncome] != (id)[NSNull null]) noDiscloseIncomeRow.value = profilingDict[kDiscloseIncome];
     [self setDefaultFontWithRow:noDiscloseIncomeRow];
 //    noDiscloseIncomeRow.selectorOptions = @[@"Yes", @"No"];
     noDiscloseIncomeRow.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -1067,11 +1102,11 @@ NSString *const kMultiADL = @"multi_adl";
     row.required = NO;
     row.disabled = @(1);
     if (([age integerValue] >= 25) && ([age integerValue] < 70)) {
-        age5069 = YES;
+        age2569 = YES;
         row.value = @1;
     }
     else {
-        age5069 = NO;
+        age2569 = NO;
         row.value = @0;
         [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyPapSmear];
     }
@@ -1093,7 +1128,7 @@ NSString *const kMultiADL = @"multi_adl";
             } else {
                 noPapSmear3Yrs = FALSE;
             }
-            if (sporean && age5069 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+            if (sporean && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
@@ -1117,7 +1152,7 @@ NSString *const kMultiADL = @"multi_adl";
             } else {
                 hadSex = FALSE;
             }
-            if (sporean && age5069 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+            if (sporean && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
@@ -1141,7 +1176,7 @@ NSString *const kMultiADL = @"multi_adl";
             } else {
                 wantPapSmear = FALSE;
             }
-            if (sporean && age5069 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+            if (sporean && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
@@ -1286,11 +1321,15 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     NSDictionary *triageDict = [self.fullScreeningForm objectForKey:SECTION_CLINICAL_RESULTS];
-//    NSArray *bpRecordsArray = [[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"bp_record"];
-//
-//    if ([_formType integerValue] == ViewScreenedScreeningForm) {
-//        [formDescriptor setDisabled:YES];
-//    }
+
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckTriage];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
     
     
     formDescriptor.assignFirstResponderOnShow = YES;
@@ -1582,11 +1621,17 @@ NSString *const kMultiADL = @"multi_adl";
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Snellen Eye Test"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
+    
+    NSDictionary *snellenTestDict = _fullScreeningForm[SECTION_SNELLEN_TEST];
  
-    //
-    //    if ([_formType integerValue] == ViewScreenedScreeningForm) {
-    //        [formDescriptor setDisabled:YES];
-    //    }
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckSnellen];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
     
     
     formDescriptor.assignFirstResponderOnShow = YES;
@@ -1597,32 +1642,100 @@ NSString *const kMultiADL = @"multi_adl";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kRightEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"Right Eye: "];
     row.required = YES;
-    row.selectorOptions = @[@"6/6", @"6/9", @"6/12", @"6/18", @"6/24", @"6/36", @"6/60"];
+    row.selectorOptions = @[@"6/6",
+                            @"6/9-2",
+                            @"6/9-1",
+                            @"6/9",
+                            @"6/9+1",
+                            @"6/9+2",
+                            @"6/12-2",
+                            @"6/12-1",
+                            @"6/12",
+                            @"6/12+1",
+                            @"6/12+2",
+                            @"6/18-2",
+                            @"6/18-1",
+                            @"6/18",
+                            @"6/18+1",
+                            @"6/18-2",
+                            @"6/24-2",
+                            @"6/24-1",
+                            @"6/24",
+                            @"6/24+1",
+                            @"6/24+2",
+                            @"6/36-2",
+                            @"6/36-1",
+                            @"6/36",
+                            @"6/36+1",
+                            @"6/36+2",
+                            @"6/60",
+                            @"6/60+1",
+                            @"6/60+2"];
     [self setDefaultFontWithRow:row];
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kRightEye] != (id)[NSNull null]) row.value = snellenTestDict[kRightEye];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kLeftEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"Left Eye: "];
     row.required = YES;
-    row.selectorOptions = @[@"6/6", @"6/9", @"6/12", @"6/18", @"6/24", @"6/36", @"6/60"];
+    row.selectorOptions = @[@"6/6",
+                            @"6/9-2",
+                            @"6/9-1",
+                            @"6/9",
+                            @"6/9+1",
+                            @"6/9+2",
+                            @"6/12-2",
+                            @"6/12-1",
+                            @"6/12",
+                            @"6/12+1",
+                            @"6/12+2",
+                            @"6/18-2",
+                            @"6/18-1", 
+                            @"6/18",
+                            @"6/18+1",
+                            @"6/18-2",
+                            @"6/24-2",
+                            @"6/24-1",
+                            @"6/24",
+                            @"6/24+1",
+                            @"6/24+2",
+                            @"6/36-2",
+                            @"6/36-1",
+                            @"6/36",
+                            @"6/36+1",
+                            @"6/36+2",
+                            @"6/60",
+                            @"6/60+1",
+                            @"6/60+2"];
     [self setDefaultFontWithRow:row];
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kRightEye] != (id)[NSNull null]) row.value = snellenTestDict[kLeftEye];
     [section addFormRow:row];
     
     XLFormRowDescriptor *six12Row = [XLFormRowDescriptor formRowDescriptorWithTag:kSix12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does either eye (or both) have vision poorer than 6/12?"];
     six12Row.required = YES;
     six12Row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:six12Row];
+    
+    //value
+    if (snellenTestDict != (id)[NSNull null]) six12Row.value = snellenTestDict[kSix12];
+    
     [section addFormRow:six12Row];
     
     XLFormRowDescriptor *tunnelRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTunnel rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident have genuine visual complaints (e.g. floaters, tunnel vision, bright spots etc.)?"];
     tunnelRow.required = YES;
     tunnelRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:tunnelRow];
+    
+    //value
+    if (snellenTestDict != (id)[NSNull null]) tunnelRow.value = snellenTestDict[kTunnel];
     [section addFormRow:tunnelRow];
     
     XLFormRowDescriptor *visitEye12Mths = [XLFormRowDescriptor formRowDescriptorWithTag:kVisitEye12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident has not visited eye specialist in 12 months"];
     visitEye12Mths.required = YES;
     visitEye12Mths.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:visitEye12Mths];
+    
+    //value
+    if (snellenTestDict != (id)[NSNull null]) visitEye12Mths.value = snellenTestDict[kVisitEye12Mths];
     [section addFormRow:visitEye12Mths];
     
 
@@ -1968,6 +2081,15 @@ NSString *const kMultiADL = @"multi_adl";
     NSDictionary *preEduDict = [_fullScreeningForm objectForKey:SECTION_PRE_HEALTH_EDU];
     NSDictionary *postEduDict = [_fullScreeningForm objectForKey:SECTION_POST_HEALTH_EDU];
     
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckEd];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+
     
     preEdSection = [XLFormSectionDescriptor formSectionWithTitle:@"Pre-education Knowledge Quiz"];
     [formDescriptor addFormSection:preEdSection];
@@ -2373,76 +2495,113 @@ NSString *const kMultiADL = @"multi_adl";
 //}
 
 
--(void)validateBtnPressed:(UIBarButtonItem * __unused)button
+-(void)editBtnPressed:(UIBarButtonItem * __unused)button
 {
     if ([self.form isDisabled]) {
         [self.form setDisabled:NO];     //enable the form
         [self.tableView reloadData];
-        self.navigationItem.rightBarButtonItem.title = @"Validate";
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"formEditedNotification"
-                                                            object:nil
-                                                          userInfo:nil];
-    } else {
-        NSLog(@"%@", [self.form formValues]);
+        self.navigationItem.rightBarButtonItem = nil;
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Finalize" style:UIBarButtonItemStyleDone target:self action:@selector(finalizeBtnPressed:)];
         
-        NSArray * validationErrors = [self formValidationErrors];
-        if (validationErrors.count > 0){
-            [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
-                UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
-                cell.backgroundColor = [UIColor orangeColor];
-                [UIView animateWithDuration:0.3 animations:^{
-                    cell.backgroundColor = [UIColor whiteColor];
-                }];
-            }];
-            [self showFormValidationError:[validationErrors firstObject]];
-            
-            return;
-        } else {
-            //        UIAlertController *alertController;
-            //        UIAlertAction *okAction;
-            //
-            //        alertController = [UIAlertController alertControllerWithTitle:@"Validation success"
-            //                                                              message:@"All required fields are not empty."
-            //                                                       preferredStyle:UIAlertControllerStyleActionSheet];
-            //        alertController.view.backgroundColor = [UIColor greenColor];
-            //        okAction = [UIAlertAction actionWithTitle:@"OK"
-            //                                                 style:UIAlertActionStyleDefault
-            //                                               handler:^(UIAlertAction *action) {
-            //                                                   // do destructive stuff here
-            //                                               }];
-            //
-            //        // note: you can control the order buttons are shown, unlike UIActionSheet
-            //        [alertController addAction:okAction];
-            //        [alertController setModalPresentationStyle:UIModalPresentationPopover];
-            //        [self presentViewController:alertController animated:YES completion:nil];
-//            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-//            
-//            // Set the custom view mode to show any view.
-//            hud.mode = MBProgressHUDModeCustomView;
-//            // Set an image view with a checkmark.
-//            UIImage *image = [[UIImage imageNamed:@"ThumbsUp"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-//            hud.customView = [[UIImageView alloc] initWithImage:image];
-//            // Looks a bit nicer if we make it square.
-//            hud.square = YES;
-//            
-//            hud.backgroundColor = [UIColor clearColor];
-//            // Optional label text.
-//            hud.label.text = NSLocalizedString(@"Good!", @"HUD done title");
-//            [hud hideAnimated:YES afterDelay:1.f];
-            [SVProgressHUD setMinimumDismissTimeInterval:1.0f];
-            [SVProgressHUD showImage:[[UIImage imageNamed:@"ThumbsUp"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] status:@"Good!"];
-            
-            
+        NSString *fieldName;
+        
+        switch ([self.sectionID intValue]) {
+            case Phleb: fieldName = kCheckPhleb;
+                break;
+            case ModeOfScreening: fieldName = kCheckScreenMode;
+                break;
+            case Profiling: fieldName = kCheckProfiling;
+                break;
+            case Triage: fieldName = kCheckTriage;
+                break;
+            case SnellenEyeTest: fieldName = kCheckSnellen;
+                break;
+            case AddSvcs: fieldName = kCheckAdd;
+                break;
+            case RefForDocConsult: fieldName = kCheckDocConsult;
+                break;
+            case DentalCheck: fieldName = kCheckDental;
+                break;
+            case FallRiskAssmt: fieldName = kCheckFall;
+                break;
+            case DementiaAssmt: fieldName = kCheckDementia;
+                break;
+            case HealthEdu: fieldName = kCheckEd;
+                break;
+            default:
+                break;
+                
         }
-        //    [self.tableView endEditing:YES];
-        //    hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
         
-        // Set the label text.
-        //    hud.label.text = NSLocalizedString(@"Uploading...", @"HUD loading title");
-        //    [self submitPersonalInfo:[self preparePersonalInfoDict]];
+        [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"0"]; //un-finalize it
+        
+        
+        
     }
+
+}
+
+- (void) finalizeBtnPressed: (UIBarButtonItem * __unused) button {
+
+    NSLog(@"%@", [self.form formValues]);
     
+    NSArray * validationErrors = [self formValidationErrors];
+    if (validationErrors.count > 0){
+        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+            cell.backgroundColor = [UIColor orangeColor];
+            [UIView animateWithDuration:0.3 animations:^{
+                cell.backgroundColor = [UIColor whiteColor];
+            }];
+        }];
+        [self showFormValidationError:[validationErrors firstObject]];
+        
+        return;
+    } else {
+        NSString *fieldName;
+        
+        switch ([self.sectionID intValue]) {
+            case Phleb: fieldName = kCheckPhleb;
+                break;
+            case ModeOfScreening: fieldName = kCheckScreenMode;
+                break;
+            case Profiling: fieldName = kCheckProfiling;
+                break;
+            case Triage: fieldName = kCheckTriage;
+                break;
+            case SnellenEyeTest: fieldName = kCheckSnellen;
+                break;
+            case AddSvcs: fieldName = kCheckAdd;
+                break;
+            case RefForDocConsult: fieldName = kCheckDocConsult;
+                break;
+            case DentalCheck: fieldName = kCheckDental;
+                break;
+            case FallRiskAssmt: fieldName = kCheckFall;
+                break;
+            case DementiaAssmt: fieldName = kCheckDementia;
+                break;
+            case HealthEdu: fieldName = kCheckEd;
+                break;
+            default:
+                break;
+        }
+        
+        [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"1"];
+        [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+        [SVProgressHUD showSuccessWithStatus:@"Completed!"];
+        
+        self.navigationItem.rightBarButtonItem = nil;
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
+        [self.form setDisabled:YES];
+        [self.tableView endEditing:YES];    //to really disable the table
+        [self.tableView reloadData];
+        
+        
+    }
+
+
 }
 
 
@@ -2491,7 +2650,7 @@ NSString *const kMultiADL = @"multi_adl";
     
     /* Profiling */
     else if ([rowDescriptor.tag isEqualToString:kProfilingConsent]) {
-        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kProfilingConsent andNewContent:newValue];
+        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kProfilingConsent andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kEmployStat]) {
         [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kEmployStat andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kDiscloseIncome]) {
@@ -2667,6 +2826,19 @@ NSString *const kMultiADL = @"multi_adl";
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kIsDiabetic andNewContent:ansFromYesNo];
     }
     
+    /* Snellen Eye Test */
+    else if ([rowDescriptor.tag isEqualToString:kRightEye]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kRightEye andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kLeftEye]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kLeftEye andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kSix12]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kSix12 andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kTunnel]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kTunnel andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kVisitEye12Mths]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kVisitEye12Mths andNewContent:newValue];
+    }
+    
     /* Doctor's Consult */
     else if ([rowDescriptor.tag isEqualToString:kDocReferred]) {
         [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDocReferred andNewContent:ansFromYesNo];
@@ -2772,124 +2944,6 @@ NSString *const kMultiADL = @"multi_adl";
     
 }
 
-#pragma mark - Save Dictionary methods
-
-
-//
-//- (void) saveClinicalResults {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *clinical_results = [[[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"clinical_results"] mutableCopy];
-//    NSMutableArray *bp_record = [[[self.fullScreeningForm objectForKey:@"clinical_results"] objectForKey:@"bp_record"] mutableCopy];
-//    NSMutableDictionary *individualBpRecord;
-//    
-//    //resident_id here
-//    [clinical_results setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kHeight] forKey:@"height_cm"];
-//    [clinical_results setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kWeight] forKey:@"weight_kg"];
-//    [clinical_results setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kBMI] forKey:@"bmi"];
-//    [clinical_results setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kWaistCircum] forKey:kWaistCircum];
-//    [clinical_results setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kHipCircum] forKey:kHipCircum];
-//    [clinical_results setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kWaistHipRatio] forKey:kWaistHipRatio];
-//    [clinical_results setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCbg] forKey:kCbg];
-//    //also timestamp is here..
-//    
-//    
-//    individualBpRecord = [[bp_record objectAtIndex:0] mutableCopy];
-//    //resident_id
-//    [individualBpRecord setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kBpSystolicAvg] forKey:@"systolic_bp"];
-//    [individualBpRecord setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kBpDiastolicAvg] forKey:@"diastolic_bp"];
-//    [individualBpRecord setObject:@"0" forKey:@"order_num"];
-//    [individualBpRecord setObject:@"1" forKey:@"is_avg"];
-//    //also timestamp is here..
-//    [bp_record replaceObjectAtIndex:0 withObject:individualBpRecord];
-//     
-//    individualBpRecord = [[bp_record objectAtIndex:1] mutableCopy];
-//    //resident_id
-//    [individualBpRecord setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kBpSystolic] forKey:@"systolic_bp"];
-//    [individualBpRecord setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kBpDiastolic] forKey:@"diastolic_bp"];
-//    [individualBpRecord setObject:@"1"forKey:@"order_num"];
-//    [individualBpRecord setObject:@"0" forKey:@"is_avg"];
-//    //also timestamp is here..
-//    [bp_record replaceObjectAtIndex:1 withObject:individualBpRecord];
-//      
-//    individualBpRecord = [[bp_record objectAtIndex:2] mutableCopy];
-//    //resident_id
-//    [individualBpRecord setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kBpSystolic2] forKey:@"systolic_bp"];
-//    [individualBpRecord setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kBpDiastolic2] forKey:@"diastolic_bp"];
-//    [individualBpRecord setObject:@"2" forKey:@"order_num"];
-//    [individualBpRecord setObject:@"0" forKey:@"is_avg"];
-//    //is_avg is missing
-//    //also timestamp is here...
-//    [bp_record replaceObjectAtIndex:2 withObject:individualBpRecord];
-//       
-//    individualBpRecord = [[bp_record objectAtIndex:3] mutableCopy];
-//    //resident_id
-//    [individualBpRecord setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kBpSystolic3] forKey:@"systolic_bp"];
-//    [individualBpRecord setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kBpDiastolic3] forKey:@"diastolic_bp"];
-//    [individualBpRecord setObject:@"3" forKey:@"order_num"];
-//    [individualBpRecord setObject:@"0" forKey:@"is_avg"];
-//    //also timestamp is here..
-//    [bp_record replaceObjectAtIndex:3 withObject:individualBpRecord];
-//    
-//    NSMutableDictionary *temp = [@{@"clinical_results":clinical_results} mutableCopy];  //just to make it mutable
-//    
-//    [self.fullScreeningForm setObject:temp forKey:@"clinical_results"];
-//    [[self.fullScreeningForm objectForKey:@"clinical_results"] setObject:bp_record forKey:@"bp_record"];
-//    
-//}
-
-
-//
-//- (void) saveCurrentPhysicalIssues {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *currPhyIssues_dict = [[self.fullScreeningForm objectForKey:@"adls"] mutableCopy];
-//    
-//    if ([fields objectForKey:kMultiADL] != (id) [NSNull null]) {    //check for null first, if not crash may happen
-//        //Clear all first
-//        [currPhyIssues_dict setObject:@"0" forKey:@"bathe"];
-//        [currPhyIssues_dict setObject:@"0" forKey:@"dress"];
-//        [currPhyIssues_dict setObject:@"0" forKey:@"eat"];
-//        [currPhyIssues_dict setObject:@"0" forKey:@"hygiene"];
-//        [currPhyIssues_dict setObject:@"0" forKey:@"toileting"];
-//        [currPhyIssues_dict setObject:@"0" forKey:@"walk"];
-//        
-//        if ([[fields objectForKey:kMultiADL] count]!=0) {
-//            NSArray *adlArray = [fields objectForKey:kMultiADL];
-//            for (int i=0; i<[adlArray count]; i++) {
-//                if([[[adlArray objectAtIndex:i] formValue] isEqual:@(0)]) [currPhyIssues_dict setObject:@"1" forKey:@"bathe"];
-//                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(1)]) [currPhyIssues_dict setObject:@"1" forKey:@"dress"];
-//                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(2)]) [currPhyIssues_dict setObject:@"1" forKey:@"eat"];
-//                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(3)]) [currPhyIssues_dict setObject:@"1" forKey:@"hygiene"];
-//                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(4)]) [currPhyIssues_dict setObject:@"1" forKey:@"toileting"];
-//                else if([[[adlArray objectAtIndex:i] formValue] isEqual:@(5)]) [currPhyIssues_dict setObject:@"1" forKey:@"walk"];
-//            }
-//        }
-//    }
-//    
-//    [self.fullScreeningForm setObject:currPhyIssues_dict forKey:@"adls"];
-//}
-//
-//
-//- (void) saveRefForDoctorConsult {
-//    NSDictionary *fields = [self.form formValues];
-//    NSMutableDictionary *refForDoctorConsult_dict = [[self.fullScreeningForm objectForKey:@"consult_record"] mutableCopy];
-//
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDocConsult] forKey:kDocConsult];
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDocRef] forKey:kDocRef];
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kSeri] forKey:kSeri];
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kSeriRef] forKey:kSeriRef];
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDental] forKey:kDental];
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kDentalRef] forKey:kDentalRef];
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kMammoRef] forKey:kMammoRef];
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kFitKit] forKey:kFitKit];
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kPapSmearRef] forKey:kPapSmearRef];
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kPhleb] forKey:kPhleb];
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:Switch formDescriptorWithTag:kRefNA] forKey:kRefNA];
-//    
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:TextView formDescriptorWithTag:kDocNotes] forKey:kDocNotes];
-//    [refForDoctorConsult_dict setObject:[self getStringWithDictionary:fields rowType:TextView formDescriptorWithTag:kDocName] forKey:kDocName];
-//    
-//    [self.fullScreeningForm setObject:refForDoctorConsult_dict forKey:@"consult_record"];
-//}
 #pragma mark - Other Methods
 - (void) checkForSeriEligibilityWithRow3: (XLFormRowDescriptor *) six12Row
                                                   andRow4: (XLFormRowDescriptor *) tunnelRow
@@ -3251,8 +3305,11 @@ NSString *const kMultiADL = @"multi_adl";
             case ReachableViaWiFi:
             case ReachableViaWWAN:
                 NSLog(@"Connected to server!");
-                [self.form setDisabled:NO];
-                [self.tableView reloadData];
+                
+                if (!isFormFinalized) {
+                    [self.form setDisabled:NO];
+                    [self.tableView reloadData];
+                }
 
                 
                 if (internetDCed) { //previously disconnected

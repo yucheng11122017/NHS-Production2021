@@ -8,6 +8,8 @@
 
 #import "SocialWorkFormVC.h"
 #import "ServerComm.h"
+#import "Reachability.h"
+#import "KAStatusBar.h"
 #import "SVProgressHUD.h"
 #import "AppConstants.h"
 #import "ScreeningSectionTableViewController.h"
@@ -15,7 +17,11 @@
 
 @interface SocialWorkFormVC () {
     XLFormRowDescriptor *relativesContactRow, *relativesEaseRow, *relativesCloseRow, *friendsContactRow, *friendsEaseRow, *friendsCloseRow, *socialScoreRow;
+    BOOL internetDCed;
 }
+
+@property (nonatomic) Reachability *hostReachability;
+@property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
 
 @end
 
@@ -150,7 +156,7 @@
     [formDescriptor addFormSection:finanAssistSection];
     finanAssistSection.hidden = @(1); //default hidden
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFinAssistName rowType:XLFormRowDescriptorTypeText title:@"Name"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFinAssistName rowType:XLFormRowDescriptorTypeText title:@"Description"];
     [self setDefaultFontWithRow:row];
     row.required = NO;
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
@@ -1266,6 +1272,159 @@
 //    [self.fullScreeningForm setObject:socialSuppAssessment_dict forKey:@"social_support"];
 //}
 
+#pragma mark - XLFormDescriptorDelegate
+
+-(void)formRowDescriptorValueHasChanged:(XLFormRowDescriptor *)rowDescriptor oldValue:(id)oldValue newValue:(id)newValue
+{
+
+    
+    
+}
+
+-(void)endEditing:(XLFormRowDescriptor *)rowDescriptor {    //works great for textField and textView
+    
+    
+}
+
+
+#pragma mark - Reachability
+/*!
+ * Called by Reachability whenever status changes.
+ */
+- (void) reachabilityChanged:(NSNotification *)note
+{
+    Reachability* curReach = [note object];
+    NSParameterAssert([curReach isKindOfClass:[Reachability class]]);
+    [self updateInterfaceWithReachability:curReach];
+}
+
+- (void)updateInterfaceWithReachability:(Reachability *)reachability
+{
+    if (reachability == self.hostReachability)
+    {
+        NetworkStatus netStatus = [reachability currentReachabilityStatus];
+        
+        switch (netStatus) {
+            case NotReachable: {
+                internetDCed = true;
+                NSLog(@"Can't connect to server!");
+                [self.form setDisabled:YES];
+                [self.tableView reloadData];
+                [self.tableView endEditing:YES];
+                [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                [SVProgressHUD showErrorWithStatus:@"No Internet!"];
+                
+                
+                break;
+            }
+            case ReachableViaWiFi:
+            case ReachableViaWWAN:
+                NSLog(@"Connected to server!");
+                [self.form setDisabled:NO];
+                [self.tableView reloadData];
+                
+                if (internetDCed) { //previously disconnected
+                    [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+                    [SVProgressHUD showSuccessWithStatus:@"Back Online!"];
+                    internetDCed = false;
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
+    
+}
+
+
+#pragma mark - Post data to server methods
+
+- (void) postSingleFieldWithSection:(NSString *) section andFieldName: (NSString *) fieldName andNewContent: (NSString *) content {
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSNumber *resident_id = [defaults objectForKey:kResidentId];
+    
+    if ((content != (id)[NSNull null]) && (content != nil)) {   //make sure don't insert nil or null value to a dictionary
+        
+        NSDictionary *dict = @{kResidentId:resident_id,
+                               kSectionName:section,
+                               kFieldName:fieldName,
+                               kNewContent:content
+                               };
+        
+        NSLog(@"Uploading %@ for $%@$ field", content, fieldName);
+        [KAStatusBar showWithStatus:@"Syncing..." andBarColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:0 alpha:1.0]];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        
+        [_pushPopTaskArray addObject:dict];
+        
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postDataGivenSectionAndFieldName:dict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
+    }
+}
+
+#pragma mark - Blocks
+
+- (void (^)(NSProgress *downloadProgress))progressBlock {
+    return ^(NSProgress *downloadProgress) {
+        
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"%@", responseObject);
+        
+        [_pushPopTaskArray removeObjectAtIndex:0];
+        
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+        [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+        
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        
+        NSLog(@"<<< SUBMISSION FAILED >>>");
+        
+        NSDictionary *retryDict = [_pushPopTaskArray firstObject];
+        
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+        
+        
+        NSLog(@"\n\nRETRYING...");
+        
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postDataGivenSectionAndFieldName:retryDict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
+        
+    };
+}
+
+- (NSString *) getYesNoFromOneZero: (id) value {
+    if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"1"])
+            return @"YES";
+        else if ([value isEqualToString:@"0"])
+            return @"NO";
+        
+    } else if ([value isKindOfClass:[NSNumber class]]) {
+        if ([value isEqual:@1])
+            return @"YES";
+        else if ([value isEqual:@0])
+            return @"NO";
+        
+    }
+    return @"";
+}
 
 
 #pragma mark - Button methods

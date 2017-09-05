@@ -186,6 +186,7 @@ NSString *const kHTTakingRegularly = @"ht_taking_regularly";
 NSString *const kPhqQ1 = @"phq_q1";
 NSString *const kPhqQ2 = @"phq_q2";
 NSString *const kPhq9Score = @"phq9_score";
+NSString *const kQ10Response = @"q10_response";
 NSString *const kFollowUpReq = @"follow_up_req";
 
 
@@ -597,6 +598,44 @@ NSString *const kPostEdu23 = @"post_edu_23";
 NSString *const kPostEdu24 = @"post_edu_24";
 NSString *const kPostEdu25 = @"post_edu_25";
 NSString *const kPostEdScore = @"post_ed_score";
+
+#pragma mark - Check Variables
+NSString *const kCheckPhleb = @"check_phleb";
+NSString *const kCheckScreenMode = @"check_screen_mode";
+NSString *const kCheckProfiling = @"check_profiling";
+NSString *const kCheckDiabetes = @"check_diabetes";
+NSString *const kCheckHyperlipidemia = @"check_hyperlipidemia";
+NSString *const kCheckHypertension = @"check_hypertension";
+NSString *const kCheckDepression = @"check_depression";
+NSString *const kCheckRiskStrat = @"check_risk_strat";
+NSString *const kCheckGeno = @"check_geno";
+NSString *const kCheckSocioEco = @"check_socioeco";
+NSString *const kCheckCurrentPhyStatus = @"check_current_phy_status";
+NSString *const kCheckSocialSupport = @"check_social_support";
+NSString *const kCheckPsychWellbeing = @"check_psych_well_being";
+NSString *const kCheckSwAddServices = @"check_sw_add_services";
+NSString *const kCheckSocWorkSummary = @"check_soc_work_summary";
+NSString *const kCheckTriage = @"check_triage";
+NSString *const kCheckSnellen = @"check_snellen";
+NSString *const kCheckAdd = @"check_add";
+NSString *const kCheckDocConsult = @"check_doc_consult";
+NSString *const kCheckDental = @"check_dental";
+NSString *const kCheckSeriMedHist = @"check_seri_med_hist";
+NSString *const kCheckSeriVa = @"check_seri_va";
+NSString *const kCheckSeriAutorefractor = @"check_seri_autofractor";
+NSString *const kCheckSeriIop = @"check_seri_iop";
+NSString *const kCheckSeriAhe = @"check_seri_ahe";
+NSString *const kCheckSeriPhe = @"check_seri_phe";
+NSString *const kCheckSeriDiag = @"check_seri_diag";
+NSString *const kCheckFall = @"check_fall";
+NSString *const kCheckDementia = @"check_dementia";
+NSString *const kCheckEd = @"check_ed";
+
+//TBC
+NSString *const kCheckHhie = @"check_hhie";
+NSString *const kCheckFuncHearing = @"check_func_hearing";
+
+
 
 
 

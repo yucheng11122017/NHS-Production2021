@@ -251,12 +251,10 @@ typedef enum rowTypes {
     spokenLangRow.required = YES;
 
     spokenLangRow.value = [self getSpokenLangArray:_residentParticularsDict];
-//        spokenLangRow.value = spoken_lang_value? spoken_lang_value:@[];
     [section addFormRow:spokenLangRow];
     
     spokenLangRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
-//            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
             if (newValue != nil && newValue != (id) [NSNull null]) {
                 if (oldValue != nil && oldValue != (id) [NSNull null]) {
                     NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
@@ -284,12 +282,12 @@ typedef enum rowTypes {
         }
     };
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLangOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLangOthersText rowType:XLFormRowDescriptorTypeText title:@"Others: "];
     row.required = NO;
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", spokenLangRow];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:row];
-    row.value = [_residentParticularsDict objectForKey:kLangOthers];
+    row.value = [_residentParticularsDict objectForKey:kLangOthersText];
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kMaritalStatus rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Marital Status"];
@@ -512,117 +510,6 @@ typedef enum rowTypes {
 }
 
 
-
-
-- (void) saveResidentParticulars {
-    NSDictionary *fields = [self.form formValues];
-    NSMutableDictionary *resi_particulars = [[NSMutableDictionary alloc]init];
-    NSString *name, *nric, *gender, *birthDate;
-
-    if ([fields objectForKey:kGender] != [NSNull null]) {
-        if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
-            [resi_particulars setObject:@"M" forKey:kGender];
-        } else if ([[fields objectForKey:kGender] isEqualToString:@"Female"]) {
-            [resi_particulars setObject:@"F" forKey:kGender];
-        }
-        gender = resi_particulars[kGender];
-    }
-    name = [self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kName];
-    [resi_particulars setObject:name forKey:kName];
-    nric = [self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kNRIC];
-    [resi_particulars setObject:nric forKey:kNRIC];
-    birthDate = [self getStringWithDictionary:fields rowType:Date formDescriptorWithTag:kBirthDate];
-    [resi_particulars setObject:birthDate forKey:kBirthDate];
-    
-    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kCitizenship] forKey:kCitizenship];
-    
-    if ([[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kReligion] isEqualToString:@"Others"]) {
-        [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kReligionOthers] forKey:kReligion];
-    } else
-        [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kReligion] forKey:kReligion];
-    
-    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kHpNumber] forKey:kHpNumber];
-    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kHouseNumber] forKey:kHouseNumber];
-    
-    [resi_particulars setObject:[self getEthnicityString:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kEthnicity]] forKey:kEthnicity];
-    [resi_particulars setObject:[self getMaritalStatusString:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kMaritalStatus]]forKey:kMaritalStatus];
-    [resi_particulars setObject:[self getHighestEduLvlString:[self getStringWithDictionary:fields rowType:SelectorActionSheet formDescriptorWithTag:kHighestEduLevel]] forKey:kHighestEduLevel];
-    
-    
-    NSString *address = [self getStringWithDictionary:fields rowType:SelectorArray formDescriptorWithTag:kAddress];
-
-    [resi_particulars setObject:[self getBlockFromAddress:address] forKey:kAddressBlock];
-    [resi_particulars setObject:[self getStreetFromAddress:address] forKey:kAddressStreet];
-
-    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kAddressUnitNum] forKey:kAddressUnitNum];
-    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Number formDescriptorWithTag:kAddressPostCode] forKey:kAddressPostCode];
-    
-    [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kAddressDuration] forKey:kAddressDuration];
-
-    //Init them to zero first
-    [resi_particulars setObject:@"0" forKey:kLangCanto];
-    [resi_particulars setObject:@"0" forKey:kLangEng];
-    [resi_particulars setObject:@"0" forKey:kLangHokkien];
-    [resi_particulars setObject:@"0" forKey:kLangHindi];
-    [resi_particulars setObject:@"0" forKey:kLangMalay];
-    [resi_particulars setObject:@"0" forKey:kLangMandarin];
-    [resi_particulars setObject:@"0" forKey:kLangTamil];
-    [resi_particulars setObject:@"0" forKey:kLangTeoChew];
-    [resi_particulars setObject:@"0" forKey:kLangOthers];
-
-    if ([[fields objectForKey:kSpokenLang] count]!=0) {
-        NSArray *spokenLangArray = [fields objectForKey:kSpokenLang];
-        for (int i=0; i<[spokenLangArray count]; i++) {
-
-            if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Cantonese"]) [resi_particulars setObject:@"1" forKey:kLangCanto];
-            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"English"]) [resi_particulars setObject:@"1" forKey:kLangEng];
-            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Hindi"]) [resi_particulars setObject:@"1" forKey:kLangHindi];
-            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Hokkien"]) [resi_particulars setObject:@"1" forKey:kLangHokkien];
-            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Malay"]) [resi_particulars setObject:@"1" forKey:kLangMalay];
-            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Mandarin"]) [resi_particulars setObject:@"1" forKey:kLangMandarin];
-            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Tamil"]) [resi_particulars setObject:@"1" forKey:kLangMandarin];
-            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Teochew"]) [resi_particulars setObject:@"1" forKey:kLangTeoChew];
-            else if([[spokenLangArray objectAtIndex:i] isEqualToString:@"Others"]) [resi_particulars setObject:@"1" forKey:kLangOthers];
-        }
-    }
-    
-    if ([[resi_particulars objectForKey:kLangOthers] isEqualToString:@"1"])
-        [resi_particulars setObject:[self getStringWithDictionary:fields rowType:Text formDescriptorWithTag:kLangOthersText] forKey:kLangOthersText];
-
-    NSString *room;
-    NSUInteger loc;
-    if (([fields objectForKey:kHousingType] != [NSNull null]) && ([fields objectForKey:kHousingType])) {
-        NSString *houseType = [fields objectForKey:kHousingType];
-        if ([houseType rangeOfString:@"Owned"].location != NSNotFound) {
-            [resi_particulars setObject:@"Owned" forKey:kHousingType];
-        } else if ([houseType rangeOfString:@"Rental"].location != NSNotFound) {
-            [resi_particulars setObject:@"Rented" forKey:kHousingType];
-        } else {
-            [resi_particulars setObject:@"Private" forKey:kHousingType];
-        }
-
-        loc = [houseType rangeOfString:@"-"].location;
-        room = [houseType substringWithRange:NSMakeRange(loc-1, 1)];
-        [resi_particulars setObject:room forKey:@"housing_num_rooms"];
-    }
-    
-    NSString *timeNow = [self getTimeNowInString];
-    
-    if (![[[NSUserDefaults standardUserDefaults] objectForKey:kResidentId] isKindOfClass:[NSNumber class]]) {   //only if no resident ID registered, then submit
-        NSLog(@"Registering new resident...");
-        NSDictionary *dict = @{kName:name,
-                               kNRIC:nric,
-                               kGender:gender,
-                               kBirthDate:birthDate,
-                               kTimestamp:timeNow};
-//        [self submitNewResidentEntry:dict];
-    }
-    NSLog(@"%@", resi_particulars);
-    [self postAllOtherFields:resi_particulars];
-    
-    
-}
-
 #pragma mark - Organize Dictionary Methods
 
 - (NSString *) getStringWithDictionary:(NSDictionary *)dict
@@ -727,7 +614,8 @@ typedef enum rowTypes {
         else return @"Others";
     } else {
         if ([string containsString:@"Eunos"]) return @"Eunos Crescent";
-        else return @"Upper Aljunied Lane";
+        else if ([string containsString:@"Aljunied"]) return @"Upper Aljunied Lane";
+        else return @"Others";
     }
 }
 
@@ -735,6 +623,10 @@ typedef enum rowTypes {
     if (_residentParticularsDict[kAddressStreet] != (id) [NSNull null]) {
         NSString *block = _residentParticularsDict[kAddressBlock];
         NSString *street = _residentParticularsDict[kAddressStreet];
+        
+        if ([street isEqualToString:@"Others"]) {
+            return @"Others";
+        }
         
         if ([neighbourhood isEqualToString:@"Kampong Glam"])
             return [NSString stringWithFormat:@"Blk %@ %@", block, street];
