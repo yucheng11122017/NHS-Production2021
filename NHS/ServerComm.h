@@ -13,7 +13,8 @@
 // singleton
 + (ServerComm *)sharedServerCommInstance;
 
-
+@property (strong,nonatomic) AFHTTPSessionManager *uploadManager;
+@property (strong, nonatomic) AFHTTPSessionManager *downloadManager;
 
 //#pragma mark Therapist Info methods
 //- (void)loginWithUserName:(NSString *)userName
@@ -34,11 +35,6 @@
       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
-- (void)getPatientDataWithPatientID:(NSNumber *) patientID
-                      progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
 - (void) deleteResidentWithResidentID: (NSNumber *) residentID
                        progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
                         successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
@@ -57,25 +53,7 @@
                             successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                             andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
-- (void)postSpokenLangWithDict:(NSDictionary *) spokenLangDict
-                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
-- (void)postContactInfoWithDict:(NSDictionary *) contactInfoDict
-                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void)postReqServWithDict:(NSDictionary *) reqServDict
-                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void)postOthersWithDict:(NSDictionary *) othersDict
-              progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-               successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-               andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
 
 #pragma mark - Screening API
@@ -88,165 +66,15 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
                                         successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                                         andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
-- (void) postNeighbourhoodWithDict: (NSDictionary *) dictionary
-                     progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
-- (void) postResidentParticularsWithDict: (NSDictionary *) dictionary
-                           progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                            successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                            andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+#pragma mark - Genogram stuffs
+-(NSString *)getretrievedGenogramImagePath;
 
-- (void) postClinicalResultsWithDict: (NSDictionary *) dictionary
-                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+-(void)retrieveGenogramImageForResident:(NSNumber *)residentID
+                               withNric:(NSString *)nric;
 
-- (void) postRiskFactorsWithDict: (NSDictionary *) dictionary
-                   progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                    successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                    andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postDiabetesWithDict: (NSDictionary *) dictionary
-                progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                 successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                 andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postHyperlipidWithDict: (NSDictionary *) dictionary
-                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postHypertensionWithDict: (NSDictionary *) dictionary
-                    progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                     successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                     andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postCancerWithDict: (NSDictionary *) dictionary
-              progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-               successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-               andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postOtherMedIssuesWithDict: (NSDictionary *) dictionary
-                      progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postPriCareSourceWithDict: (NSDictionary *) dictionary
-                     progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postMyHealthMyNeighbourhoodWithDict: (NSDictionary *) dictionary
-                               progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                                successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                                andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postDemographicsWithDict: (NSDictionary *) dictionary
-                    progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                     successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                     andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postCurrPhyIssuesWithDict: (NSDictionary *) dictionary
-                     progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postCurrSocioSituationWithDict: (NSDictionary *) dictionary
-                          progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                           successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                           andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postSociSuppAssessWithDict: (NSDictionary *) dictionary
-                      progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postRefForDocConsultWithDict: (NSDictionary *) dictionary
-                        progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                         successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                         andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postSubmitRemarksWithDict: (NSDictionary *) dictionary
-                     progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-
-#pragma mark - Blood Test API
-//- (void) getAllBloodTestResidents:(void (^)(NSProgress *downloadProgress))progressBlock
-//                     successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-//                     andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-//
-//- (void) getBloodTestWithResidentID: (NSNumber *) residentID
-//                      progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-//                       successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-//                       andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-//
-//- (void) postBloodTestResultWithDict: (NSDictionary *) dictionary
-//                       progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-//                        successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-//                        andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-#pragma mark - Follow Up API
-- (void) getAllFollowedUpResidents:(void (^)(NSProgress *downloadProgress))progressBlock
-                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) getFollowUpDetailsWithResidentID: (NSNumber *) residentID
-                            progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                             successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                             andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-#pragma mark Phone Calls
-- (void) postCallerInfoWithDict: (NSDictionary *) dictionary
-                  progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                   successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                   andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postCallMgmtPlanWithDict: (NSDictionary *) dictionary
-                    progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                     successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                     andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-#pragma mark House Visit
-- (void) postVolunteerInfoWithDict: (NSDictionary *) dictionary
-                     progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postClinicalWithDict: (NSDictionary *) dictionary
-                progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                 andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-
-- (void) postCbgWithDict: (NSDictionary *) dictionary
-           progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-             successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-            andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-
-- (void) postBpRecordWithArray: (NSArray *) array
-                progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                 andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postMedicalSocialIssuesWithDict: (NSDictionary *) dictionary
-                           progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                             successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                            andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-- (void) postMgmtPlanWithDict: (NSDictionary *) dictionary
-                progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                  successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                 andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
-
-#pragma mark Social Work
-- (void) postSocialWorkFollowUpWithDict: (NSDictionary *) dictionary
-                          progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
-                           successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
-                           andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
+-(void)saveGenogram:(UIImage *) genogram
+        forResident: (NSNumber *) residentID
+           withNric:(NSString *) nric;
 
 @end

@@ -9,6 +9,10 @@
 #import "DemographicsVC.h"
 #import "SVProgressHUD.h"
 #import "AppConstants.h"
+#import "ServerComm.h"
+
+
+#define GENOGRAM_LOADED_NOTIF @"Genogram image downloaded"
 
 
 @interface DemographicsVC () {
@@ -30,6 +34,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.genogramImage = [[UIImage alloc]init];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageExist:) name:GENOGRAM_LOADED_NOTIF object:nil];
+    
+#warning Check if imageFile exist in server, then do the following
+//
+//    shownOverlayView = true;
+//    NSUserDefaults *defaults =  [NSUserDefaults standardUserDefaults];
+//    [[ServerComm sharedServerCommInstance] retrieveGenogramImageForResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
+    
+#warning else setup the backgroundDimmingView
+    
     _imageView.hidden = YES;
     shownOverlayView = false;
     
@@ -39,8 +54,10 @@
         [self.view insertSubview:_containerView aboveSubview:_backgroundDimmingView];
     }
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showImage:) name:@"displayImage" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveImageAfterPicker:) name:@"displayImage" object:nil];
+//
     
+    //Setup InfoButton
     UIButton* infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     [infoButton addTarget:self action:@selector(infoButtonAction:) forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *modalButton = [[UIBarButtonItem alloc] initWithCustomView:infoButton];
@@ -73,7 +90,6 @@
                      }];
     } else {
         [self setupImageViewAndNavigationController];
-        [SVProgressHUD showSuccessWithStatus:@"Image imported!"];
     }
 
 }
@@ -214,9 +230,20 @@
     
 }
 #pragma mark - NSNotificationCenter
-- (void) showImage: (NSNotification *) notification {
-    _genogramImage = [notification.userInfo objectForKey:@"image"];
+- (void) imageExist: (NSNotification *) notification {
+    NSString *genogramImagePath = [[ServerComm sharedServerCommInstance] getretrievedGenogramImagePath];
+    _genogramImage = [UIImage imageWithContentsOfFile:genogramImagePath];
+    
+    [self setupImageViewAndNavigationController];
+}
 
+- (void) saveImageAfterPicker: (NSNotification *) notification {
+    _genogramImage = [notification.userInfo objectForKey:@"image"];
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    ServerComm *client = [ServerComm sharedServerCommInstance];
+    [client saveGenogram:_genogramImage forResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
     
 }
 /*

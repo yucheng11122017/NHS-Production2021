@@ -9,12 +9,22 @@
 #import "SocialWorkTableVC.h"
 #import "SocialWorkFormVC.h"
 #import "AppConstants.h"
+#import "Reachability.h"
+#import "SVProgressHUD.h"
+#import "ServerComm.h"
+#import "ScreeningDictionary.h"
 
 @interface SocialWorkTableVC () {
     NSNumber *selectedRow;
+    BOOL internetDCed;
 }
 
 @property (strong, nonatomic) NSArray *rowLabelsText;
+@property (nonatomic) Reachability *hostReachability;
+@property (nonatomic) Reachability *internetReachability;
+@property (strong, nonatomic) NSNumber *residentID;
+@property (strong, nonatomic) NSDictionary *fullScreeningForm;
+@property (strong, nonatomic) NSMutableArray *completionCheck;
 
 @end
 
@@ -23,18 +33,43 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [super viewDidLoad];
     [self.tableView setTableFooterView:[[UIView alloc] initWithFrame:CGRectZero]];
+    
+    _residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId]; //need this for fetching data
+    _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0, nil];
+    
+    self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
+    [self.hostReachability startNotifier];
+    [self updateInterfaceWithReachability:self.hostReachability];
+    
     
     
     self.navigationItem.title = @"Social Work";
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Demographics",@"Current Socioeconomic Situation",@"Current Physical Status", @"Social Support Assessment", @"Psychological Well-being", @"Additional Services", @"Summary",  nil];
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"📶 Demographics",@"📶 Current Socioeconomic Situation",@"Current Physical Status", @"Social Support Assessment", @"Psychological Well-being", @"Additional Services", @"Summary",  nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     
+    
+    @synchronized (self) {
+        [self updateCellAccessory];
+        [self.tableView reloadData];    //put in the ticks
+    }
+    
     [self.tableView reloadData];
 }
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self updateInterfaceWithReachability:self.hostReachability];
+    
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -87,39 +122,90 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+#pragma mark - Reachability
+/*!
+ * Called by Reachability whenever status changes.
+ */
+- (void) reachabilityChanged:(NSNotification *)note
+{
+    Reachability* curReach = [note object];
+    NSParameterAssert([curReach isKindOfClass:[Reachability class]]);
+    [self updateInterfaceWithReachability:curReach];
 }
-*/
 
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+- (void)updateInterfaceWithReachability:(Reachability *)reachability
+{
+    if (reachability == self.hostReachability)
+    {
+        NetworkStatus netStatus = [reachability currentReachabilityStatus];
+        
+        switch (netStatus) {
+            case NotReachable: {
+                internetDCed = true;
+                NSLog(@"Can't connect to server!");
+                
+                [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                [SVProgressHUD showErrorWithStatus:@"No Internet!"];
+                
+                
+                break;
+            }
+            case ReachableViaWiFi:
+            case ReachableViaWWAN:
+                NSLog(@"Connected to server!");
+                
+                
+                
+                if (internetDCed) { //previously disconnected
+                    [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+                    [SVProgressHUD showSuccessWithStatus:@"Back Online!"];
+                    internetDCed = false;
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
+    
 }
-*/
 
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
 
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
+- (void) updateCellAccessory {
+    if ([_completionCheck count] < 1) {
+        _completionCheck = [[NSMutableArray alloc] init];
+    } else {
+        [_completionCheck removeAllObjects];
+    }
+    
+    NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
+    NSArray *lookupTable = @[@"demographics", kCheckSocioEco, kCheckCurrentPhyStatus, kCheckSocialSupport, kCheckPsychWellbeing, kCheckSwAddServices, kCheckSocWorkSummary];
+    
+    if (checksDict != nil && checksDict != (id)[NSNull null]) {
+        for (int i=0; i<[lookupTable count]; i++) {
+            
+            NSString *key = lookupTable[i];
+            
+            NSNumber *doneNum = [checksDict objectForKey:key];
+            if ([doneNum isKindOfClass:[NSNumber class]]) {
+                [_completionCheck addObject:doneNum];   //just in case it's NULL for no reason
+            } else {
+                [_completionCheck addObject:@0];
+            }
+            
+        }
+    }
 }
-*/
+
+#pragma mark - NSNotification Methods
+
+- (void) reloadTable: (NSNotification *) notification {
+    _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
+    @synchronized (self) {
+        [self updateCellAccessory];
+        [self.tableView reloadData];    //put in the ticks
+    }
+}
 
 
 #pragma mark - Navigation

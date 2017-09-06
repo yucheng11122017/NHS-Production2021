@@ -14,6 +14,7 @@
 #import "AppConstants.h"
 #import "ScreeningSectionTableViewController.h"
 #import "math.h"
+#import "ScreeningDictionary.h"
 
 NSString *const kQ1 = @"q1";
 NSString *const kQ2 = @"q2";
@@ -32,10 +33,18 @@ NSString *const kQ14 = @"q14";
 NSString *const kQ15 = @"q15";
 
 
+typedef enum formName {
+    Diabetes,
+    Hyperlipidemia,
+    Hypertension,
+    GeriatricDepreAssmt,
+    RiskStratification
+} formName;
 
 @interface HealthAssessAndRiskFormVC () {
     BOOL internetDCed;
     BOOL firstDataFetch;
+    BOOL isFormFinalized;
 }
 
 @property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
@@ -52,6 +61,8 @@ NSString *const kQ15 = @"q15";
     internetDCed = false;
     _pushPopTaskArray = [[NSMutableArray alloc] init];
     _residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId]; //need this for fetching data
+    
+    _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
     
@@ -84,9 +95,26 @@ NSString *const kQ15 = @"q15";
     [self.form setAddAsteriskToRequiredRowsTitle:NO];
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
 
+    if (isFormFinalized) {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
+        [self.form setDisabled:YES];
+        [self.tableView endEditing:YES];    //to really disable the table
+        [self.tableView reloadData];
+    }
+    else {
+        [self.form setDisabled:NO];
+        [self.tableView reloadData];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Finalize" style:UIBarButtonItemStyleDone target:self action:@selector(finalizeBtnPressed:)];
+    }
     
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+}
+
+- (void) viewWillDisappear:(BOOL)animated {
+    [[ScreeningDictionary sharedInstance] fetchFromServer];
+    
+    [super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -99,6 +127,15 @@ NSString *const kQ15 = @"q15";
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     NSDictionary *diabetesDict = [self.fullScreeningForm objectForKey:SECTION_DIABETES];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckDiabetes];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
     
     // Basic Information - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical History: Diabetes Mellitus"];
@@ -203,6 +240,15 @@ NSString *const kQ15 = @"q15";
     XLFormRowDescriptor * row;
     
     NSDictionary *hyperlipidDict = [self.fullScreeningForm objectForKey:SECTION_HYPERLIPIDEMIA];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckHyperlipidemia];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
@@ -349,6 +395,15 @@ NSString *const kQ15 = @"q15";
     
     NSDictionary *hypertensionDict = [self.fullScreeningForm objectForKey:SECTION_HYPERTENSION];
     
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckHypertension];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
     // Hypertension - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical History: Hypertension"];
     [formDescriptor addFormSection:section];
@@ -477,6 +532,15 @@ NSString *const kQ15 = @"q15";
     [formDescriptor addFormSection:section];
     
     NSDictionary *geriaDepreAssmtDict = [self.fullScreeningForm objectForKey:SECTION_DEPRESSION];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckDepression];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
     
     
     XLFormRowDescriptor* phqQ1Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ1
@@ -615,6 +679,15 @@ NSString *const kQ15 = @"q15";
     [formDescriptor addFormSection:section];
     
     NSDictionary *riskStratDict = [self.fullScreeningForm objectForKey:SECTION_RISK_STRATIFICATION];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckRiskStrat];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabeticFriend
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
@@ -824,10 +897,21 @@ NSString *const kQ15 = @"q15";
         [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kDiabeticFriend andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kDelivered4kgOrGestational]) {
         [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kDelivered4kgOrGestational andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kHeartAttack]) {
+        [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kHeartAttack andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kStroke]) {
+        [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kStroke andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kAneurysm]) {
+        [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kAneurysm andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kKidneyDisease]) {
+        [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kKidneyDisease andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kSmoke]) {
         [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kSmoke andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kSmokeYes]) {
+        [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kSmokeYes andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kSmokeNo]) {
+        [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kSmokeNo andNewContent:rowDescriptor.value];
     }
-    
     
 }
 
@@ -893,8 +977,11 @@ NSString *const kQ15 = @"q15";
             case ReachableViaWiFi:
             case ReachableViaWWAN:
                 NSLog(@"Connected to server!");
-                [self.form setDisabled:NO];
-                [self.tableView reloadData];
+                if (!isFormFinalized) {
+                    [self.form setDisabled:NO];
+                    [self.tableView reloadData];
+                }
+                
                 
                 if (internetDCed) { //previously disconnected
                     [SVProgressHUD setMaximumDismissTimeInterval:1.0];
@@ -998,6 +1085,94 @@ NSString *const kQ15 = @"q15";
     }
     return @"";
 }
+
+
+#pragma mark - Buttons
+
+-(void)editBtnPressed:(UIBarButtonItem * __unused)button
+{
+    if ([self.form isDisabled]) {
+        [self.form setDisabled:NO];     //enable the form
+        [self.tableView reloadData];
+        self.navigationItem.rightBarButtonItem = nil;
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Finalize" style:UIBarButtonItemStyleDone target:self action:@selector(finalizeBtnPressed:)];
+        
+        NSString *fieldName;
+        
+        switch ([self.formID intValue]) {
+            case Diabetes: fieldName = kCheckDiabetes;
+                break;
+            case Hyperlipidemia: fieldName = kCheckHyperlipidemia;
+                break;
+            case Hypertension: fieldName = kCheckHypertension;
+                break;
+            case GeriatricDepreAssmt: fieldName = kCheckDepression;
+                break;
+            case RiskStratification: fieldName = kCheckRiskStrat;
+                break;
+            default:
+                break;
+        }
+        
+        [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"0"]; //un-finalize it
+        
+        
+        
+    }
+    
+}
+
+- (void) finalizeBtnPressed: (UIBarButtonItem * __unused) button {
+    
+    NSLog(@"%@", [self.form formValues]);
+    
+    NSArray * validationErrors = [self formValidationErrors];
+    if (validationErrors.count > 0){
+        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+            cell.backgroundColor = [UIColor orangeColor];
+            [UIView animateWithDuration:0.3 animations:^{
+                cell.backgroundColor = [UIColor whiteColor];
+            }];
+        }];
+        [self showFormValidationError:[validationErrors firstObject]];
+        
+        return;
+    } else {
+        NSString *fieldName;
+        
+        switch ([self.formID intValue]) {
+            case Diabetes: fieldName = kCheckDiabetes;
+                break;
+            case Hyperlipidemia: fieldName = kCheckHyperlipidemia;
+                break;
+            case Hypertension: fieldName = kCheckHypertension;
+                break;
+            case GeriatricDepreAssmt: fieldName = kCheckDepression;
+                break;
+            case RiskStratification: fieldName = kCheckRiskStrat;
+                break;
+            default:
+                break;
+        }
+        
+        [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"1"];
+        [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+        [SVProgressHUD showSuccessWithStatus:@"Completed!"];
+        
+        self.navigationItem.rightBarButtonItem = nil;
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
+        [self.form setDisabled:YES];
+        [self.tableView endEditing:YES];    //to really disable the table
+        [self.tableView reloadData];
+        
+        
+    }
+    
+    
+}
+
 
 #pragma mark - UIFont methods
 - (void) setDefaultFontWithRow: (XLFormRowDescriptor *) row {

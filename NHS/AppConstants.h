@@ -10,6 +10,8 @@
 
 @interface AppConstants : NSObject
 
+#define NOTIFICATION_RELOAD_TABLE @"notif_reload_table"
+
 
 #define REMOTE_HOST_NAME @"www.apple.com"
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
@@ -32,6 +34,7 @@
 #define SECTION_PAP_SMEAR_ELIGIBLE              @"pap_smear_eligible"
 #define SECTION_FALL_RISK_ELIGIBLE              @"fall_risk_eligible"
 #define SECTION_GERIATRIC_DEMENTIA_ELIGIBLE     @"geriatric_dementia_eligible"
+#define SECTION_GENOGRAM                        @"genograms"
 #define SECTION_DIABETES                        @"diabetes"
 #define SECTION_HYPERLIPIDEMIA                  @"hyperlipidemia"
 #define SECTION_HYPERTENSION                    @"hypertension"
@@ -65,7 +68,7 @@
 #pragma mark - UserDefaults
 
 extern NSString *const kResidentAge;
-extern NSString *const kNeedSERI;
+extern NSString *const kQualifySeri;
 extern NSString *const kQualifyCHAS;
 extern NSString *const kQualifyColonsc;
 extern NSString *const kQualifyMammo;
@@ -245,16 +248,25 @@ extern NSString *const kSmokeNo;
 
 
 #pragma mark - Social Work
+/* Demographics */
+extern NSString *const kFilename;
 
 #pragma mark Current Socioeconomic Situation
 extern NSString *const kCopeFin;
 extern NSString *const kWhyNotCopeFin;
+extern NSString *const kMediExp;
+extern NSString *const kHouseRent;
+extern NSString *const kDebts;
+extern NSString *const kDailyExpenses;
+extern NSString *const kOtherExpenses;
+
 extern NSString *const kMoreWhyNotCopeFin;
 extern NSString *const kHasChas;
 extern NSString *const kHasPgp;
 extern NSString *const kHasMedisave;
 extern NSString *const kHasInsure;
 extern NSString *const kHasCpfPayouts;
+
 extern NSString *const kCpfAmt;
 extern NSString *const kChasColor;
 extern NSString *const kReceivingFinAssist;

@@ -14,7 +14,7 @@
 #pragma mark - UserDefaults
 
 NSString *const kResidentAge = @"resident_age";
-NSString *const kNeedSERI = @"need_seri";
+NSString *const kQualifySeri = @"qualify_seri";
 NSString *const kQualifyCHAS = @"qualify_chas";
 NSString *const kQualifyColonsc = @"qualify_colonsc";
 NSString *const kQualifyMammo = @"qualify_mammo";
@@ -204,14 +204,26 @@ NSString *const kSmokeNo = @"smoke_no";
 
 #pragma mark - Social Work
 
+
+/* Demographics */
+NSString *const kFilename = @"file_name";
+
 /* Current Socioeconomic Situation */
 NSString *const kCopeFin = @"cope_fin";
-NSString *const kWhyNotCopeFin = @"why_not_cope_fin";
+
+NSString *const kWhyNotCopeFin = @"why_not_cope_fin";   //not submitted
+NSString *const kMediExp = @"medi_exp";
+NSString *const kHouseRent = @"house_rent";
+NSString *const kDebts = @"debts";
+NSString *const kDailyExpenses = @"daily_expenses";
+NSString *const kOtherExpenses = @"other_expenses";
+
 NSString *const kMoreWhyNotCopeFin = @"more_why_not_cope_fin";
 NSString *const kHasPgp = @"has_pgp";
 NSString *const kHasMedisave = @"has_medisave";
 NSString *const kHasInsure = @"has_insure";
 NSString *const kHasCpfPayouts = @"has_cpf_payouts";
+
 NSString *const kCpfAmt = @"cpf_amt";
 NSString *const kChasColor= @"chas_color";
 NSString *const kReceivingFinAssist = @"receiving_fin_assist";
@@ -344,7 +356,7 @@ NSString *const kVisitEye12Mths = @"visit_eye_12mths";
 #pragma mark - Additional Services
 
 NSString *const kAppliedChas = @"applied_chas";
-NSString *const kReferColonos = @"applied_colonos";
+NSString *const kReferColonos = @"refer_colonos";
 NSString *const kReceiveFit = @"receive_fit";
 NSString *const kReferMammo = @"refer_mammo";
 NSString *const kReferPapSmear = @"refer_pap_smear";
@@ -494,7 +506,7 @@ NSString *const kBalance = @"balance";
 NSString *const kGaitSpeed = @"gait_speed";
 NSString *const kChairStand = @"chair_stand";
 NSString *const kTotal = @"total";
-NSString *const kReqFollowupFRA = @"require_followup";
+NSString *const kReqFollowupFRA = @"req_followup";
 
 
 #pragma mark - Geriatric Dementia Assessment
@@ -507,7 +519,7 @@ NSString *const kReqFollowupFRA = @"require_followup";
 NSString *const kPsfuGDA = @"psfu";
 NSString *const kAmtScore = @"amt_score";
 NSString *const kEduStatus = @"edu_status";
-NSString *const kReqFollowupGDA = @"require_followup";
+NSString *const kReqFollowupGDA = @"req_followup";
 
 
 #pragma mark - Health Education

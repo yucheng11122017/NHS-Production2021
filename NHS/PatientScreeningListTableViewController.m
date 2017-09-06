@@ -15,6 +15,7 @@
 #import "ScreeningSectionTableViewController.h"
 #import "GenericTableViewCell.h"
 #import "ScreeningSelectProfileTableVC.h"
+#import "ScreeningDictionary.h"
 
 
 //disable this if fetch data from server
@@ -699,7 +700,7 @@ typedef enum residentDataSource {
     return ^(NSURLSessionDataTask *task, id responseObject){
         
         self.retrievedResidentData = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
-        NSLog(@"%@", self.retrievedResidentData);
+        [[ScreeningDictionary sharedInstance] setDictionary:self.retrievedResidentData];
         
         [self saveCoreData];
         [self performSegueWithIdentifier:@"showSelectProfileTableVC" sender:self];

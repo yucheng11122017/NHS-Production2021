@@ -12,6 +12,7 @@
 #import "ServerComm.h"
 #import "Reachability.h"
 #import "SVProgressHUD.h"
+#import "ScreeningDictionary.h"
 
 
 
@@ -188,80 +189,13 @@ typedef enum getDataState {
         [self presentViewController:alertController animated:YES completion:nil];
     }
     else if (status == ReachableViaWiFi || status == ReachableViaWWAN) {
-        if (_residentID != nil && _residentID != (id) [NSNull null])
-            [self getAllDataForOneResident];
+        if (_residentID != nil && _residentID != (id) [NSNull null]) {
+            //don't do anything
+            //            [[ScreeningDictionary sharedInstance] fetchFromServer];
+        }
+
     }
     
-}
-
-- (void)getAllDataForOneResident {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [SVProgressHUD showWithStatus:@"Downloading data..."];
-    
-    [client getSingleScreeningResidentDataWithResidentID:_residentID
-                                           progressBlock:[self progressBlock]
-                                            successBlock:[self downloadSingleResidentDataSuccessBlock]
-                                            andFailBlock:[self downloadErrorBlock]];
-}
-
-#pragma mark - Blocks
-
-- (void (^)(NSProgress *downloadProgress))progressBlock {
-    return ^(NSProgress *downloadProgress) {
-        //        NSLog(@"Patients GET Request Started. In Progress.");
-    };
-}
-
-- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSingleResidentDataSuccessBlock {
-    return ^(NSURLSessionDataTask *task, id responseObject){
-        
-        self.residentDetails = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
-        NSLog(@"%@", self.residentDetails); //replace the existing one
-        _residentParticulars = self.residentDetails[kResiParticulars];  //update the residentParticulars
-        
-        [self saveCoreData];
-        [SVProgressHUD dismiss];
-        [self.tableView reloadData];
-    };
-}
-
-- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
-    return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"Patients data fetch was unsuccessful!");
-        fetchDataState = failed;
-        [self.tableView reloadData];
-        [self.refreshControl endRefreshing];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error", nil)
-                                                                                  message:@"Can't fetch data from server!"
-                                                                           preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * okAction) {
-                                                              [self.tableView reloadData];
-                                                          }]];
-        [self presentViewController:alertController animated:YES completion:nil];
-    };
-}
-
-- (void (^)(NSURLSessionDataTask *task, NSError *error))downloadErrorBlock {
-    return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"******UNSUCCESSFUL DOWNLOAD******!!");
-        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
-        NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
-        NSLog(@"error: %@", errorString);
-        [SVProgressHUD dismiss];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Download Fail", nil)
-                                                                                  message:@"Download form failed!"
-                                                                           preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * okAction) {
-                                                              [self.tableView reloadData];
-                                                          }]];
-        [self presentViewController:alertController animated:YES completion:nil];
-    };
 }
 
 #pragma mark - Save Core Data

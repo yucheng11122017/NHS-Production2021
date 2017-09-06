@@ -8,10 +8,7 @@
 
 #import "HomeViewController.h"
 #import "LoginViewController.h"
-#import "PatientPreRegTableViewController.h"
 #import "PatientScreeningListTableViewController.h"
-#import "FollowUpListTableViewController.h"
-#import "BTListTableViewController.h"
 
 #import "HTPressableButton.h"
 #import "UIColor+HTColor.h"

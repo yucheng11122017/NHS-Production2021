@@ -12,7 +12,7 @@
 #import "SVProgressHUD.h"
 #import "ServerComm.h"
 #import "HealthAssessAndRiskFormVC.h"
-
+#import "ScreeningDictionary.h"
 
 @interface MedicalHistoryTableVC () {
     NSNumber *selectedRow;
@@ -25,6 +25,7 @@
 @property (nonatomic) Reachability *internetReachability;
 @property (strong, nonatomic) NSNumber *residentID;
 @property (strong, nonatomic) NSDictionary *fullScreeningForm;
+@property (strong, nonatomic) NSMutableArray *completionCheck;
 
 @end
 
@@ -37,7 +38,9 @@
     
     _residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId]; //need this for fetching data
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0, nil];
     
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
     [self.hostReachability startNotifier];
@@ -50,7 +53,12 @@
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     
-    [self.tableView reloadData];
+    _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
+    
+    @synchronized (self) {
+        [self updateCellAccessory];
+        [self.tableView reloadData];    //put in the ticks
+    }
     
         // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -99,7 +107,15 @@
     NSString *text = [_rowLabelsText objectAtIndex:indexPath.row];
     
     [cell.textLabel setText:text];
-    // Configure the cell...
+    
+    // Put in the ticks if necessary
+    if (indexPath.row < [self.completionCheck count]) {
+        if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        }
+    }
     
 
     return cell;
@@ -112,40 +128,6 @@
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
-
-/*
- // Override to support conditional editing of the table view.
- - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
- // Return NO if you do not want the specified item to be editable.
- return YES;
- }
- */
-
-/*
- // Override to support editing the table view.
- - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
- if (editingStyle == UITableViewCellEditingStyleDelete) {
- // Delete the row from the data source
- [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
- } else if (editingStyle == UITableViewCellEditingStyleInsert) {
- // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
- }
- }
- */
-
-/*
- // Override to support rearranging the table view.
- - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
- }
- */
-
-/*
- // Override to support conditional rearranging of the table view.
- - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
- // Return NO if you do not want the item to be re-orderable.
- return YES;
- }
- */
 
 #pragma mark - Reachability
 /*!
@@ -179,7 +161,7 @@
             case ReachableViaWWAN:
                 NSLog(@"Connected to server!");
                 
-                [self getAllDataForOneResident];
+//                [self getAllDataForOneResident];
                 
                 if (internetDCed) { //previously disconnected
                     [SVProgressHUD setMaximumDismissTimeInterval:1.0];
@@ -196,54 +178,38 @@
 }
 
 
-- (void)getAllDataForOneResident {
-    ServerComm *client = [ServerComm sharedServerCommInstance];
-    [SVProgressHUD showWithStatus:@"Downloading data..."];
+- (void) updateCellAccessory {
+    if ([_completionCheck count] < 1) {
+        _completionCheck = [[NSMutableArray alloc] init];
+    } else {
+        [_completionCheck removeAllObjects];
+    }
     
-    [client getSingleScreeningResidentDataWithResidentID:_residentID
-                                           progressBlock:[self progressBlock]
-                                            successBlock:[self downloadSingleResidentDataSuccessBlock]
-                                            andFailBlock:[self downloadErrorBlock]];
+    NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
+    NSArray *lookupTable = @[kCheckDiabetes, kCheckHyperlipidemia, kCheckHypertension];
+    
+    if (checksDict != nil && checksDict != (id)[NSNull null]) {
+        for (int i=0; i<[lookupTable count]; i++) {
+            
+            NSString *key = lookupTable[i];
+            
+            NSNumber *doneNum = [checksDict objectForKey:key];
+            [_completionCheck addObject:doneNum];
+        
+        }
+    }
 }
 
+#pragma mark - NSNotification Methods
 
-#pragma mark - Blocks
-
-- (void (^)(NSProgress *downloadProgress))progressBlock {
-    return ^(NSProgress *downloadProgress) {
-        
-    };
+- (void) reloadTable: (NSNotification *) notification {
+    _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
+    @synchronized (self) {
+        [self updateCellAccessory];
+        [self.tableView reloadData];    //put in the ticks
+    }
 }
 
-- (void (^)(NSURLSessionDataTask *task, NSError *error))downloadErrorBlock {
-    return ^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"******UNSUCCESSFUL DOWNLOAD******!!");
-        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
-        NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
-        NSLog(@"error: %@", errorString);
-        [SVProgressHUD dismiss];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Download Fail", nil)
-                                                                                  message:@"Download form failed!"
-                                                                           preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * okAction) {
-                                                              [self.tableView reloadData];
-                                                          }]];
-        [self presentViewController:alertController animated:YES completion:nil];
-    };
-}
-
-- (void (^)(NSURLSessionDataTask *task, id responseObject))downloadSingleResidentDataSuccessBlock {
-    return ^(NSURLSessionDataTask *task, id responseObject){
-        
-        self.fullScreeningForm = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
-        NSLog(@"%@", self.fullScreeningForm);
-        
-        [SVProgressHUD dismiss];
-    };
-}
 
 
  #pragma mark - Navigation
@@ -255,11 +221,6 @@
                                                withObject:selectedRow];
      }
      
-     // Go straight to HealthRisk FormVC
-     if ([segue.destinationViewController respondsToSelector:@selector(setFullScreeningForm:)]) {    //view submitted form
-         [segue.destinationViewController performSelector:@selector(setFullScreeningForm:)
-                                               withObject:_fullScreeningForm];
-     }
  
  }
 

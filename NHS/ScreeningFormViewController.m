@@ -7,7 +7,6 @@
 //
 
 #import "ScreeningFormViewController.h"
-#import "PreRegFormViewController.h"
 #import "ServerComm.h"
 #import "Reachability.h"
 #import "SVProgressHUD.h"
@@ -15,6 +14,7 @@
 #import "AppConstants.h"
 #import "ScreeningSectionTableViewController.h"
 #import "math.h"
+#import "ScreeningDictionary.h"
 
 //XLForms stuffs
 #import "XLForm.h"
@@ -89,6 +89,7 @@ NSString *const kQuestionFifteen = @"q15";
 @property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
 @property (nonatomic) Reachability *hostReachability;
 @property (nonatomic) Reachability *internetReachability;
+@property (strong, nonatomic) NSMutableDictionary *fullScreeningForm;
 
 
 @end
@@ -110,6 +111,7 @@ NSString *const kQuestionFifteen = @"q15";
               stringForKey:kNeighbourhood];
     
     _pushPopTaskArray = [[NSMutableArray alloc] init];
+    _fullScreeningForm = [[NSMutableDictionary alloc] initWithDictionary:[[[ScreeningDictionary sharedInstance] dictionary] mutableCopy]];
     
     internetDCed = false;
     
@@ -175,10 +177,8 @@ NSString *const kQuestionFifteen = @"q15";
     [KAStatusBar dismiss];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kReachabilityChangedNotification object:nil];
+    [[ScreeningDictionary sharedInstance] fetchFromServer];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateFullScreeningForm"
-                                                        object:nil
-                                                      userInfo:nil];
     NSMutableDictionary *completionCheckUserInfo = [[NSMutableDictionary alloc] init];
     [completionCheckUserInfo setObject:self.sectionID forKey:@"section"];
     //Do a quick validation!
@@ -1706,7 +1706,7 @@ NSString *const kQuestionFifteen = @"q15";
                             @"6/60+1",
                             @"6/60+2"];
     [self setDefaultFontWithRow:row];
-    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kRightEye] != (id)[NSNull null]) row.value = snellenTestDict[kLeftEye];
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kLeftEye] != (id)[NSNull null]) row.value = snellenTestDict[kLeftEye];
     [section addFormRow:row];
     
     XLFormRowDescriptor *six12Row = [XLFormRowDescriptor formRowDescriptorWithTag:kSix12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does either eye (or both) have vision poorer than 6/12?"];
@@ -1715,7 +1715,7 @@ NSString *const kQuestionFifteen = @"q15";
     [self setDefaultFontWithRow:six12Row];
     
     //value
-    if (snellenTestDict != (id)[NSNull null]) six12Row.value = snellenTestDict[kSix12];
+     if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kSix12] != (id)[NSNull null]) six12Row.value = snellenTestDict[kSix12];
     
     [section addFormRow:six12Row];
     
@@ -1725,7 +1725,7 @@ NSString *const kQuestionFifteen = @"q15";
     [self setDefaultFontWithRow:tunnelRow];
     
     //value
-    if (snellenTestDict != (id)[NSNull null]) tunnelRow.value = snellenTestDict[kTunnel];
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kTunnel] != (id)[NSNull null]) tunnelRow.value = snellenTestDict[kTunnel];
     [section addFormRow:tunnelRow];
     
     XLFormRowDescriptor *visitEye12Mths = [XLFormRowDescriptor formRowDescriptorWithTag:kVisitEye12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident has not visited eye specialist in 12 months"];
@@ -1734,9 +1734,8 @@ NSString *const kQuestionFifteen = @"q15";
     [self setDefaultFontWithRow:visitEye12Mths];
     
     //value
-    if (snellenTestDict != (id)[NSNull null]) visitEye12Mths.value = snellenTestDict[kVisitEye12Mths];
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kVisitEye12Mths] != (id)[NSNull null]) visitEye12Mths.value = snellenTestDict[kVisitEye12Mths];
     [section addFormRow:visitEye12Mths];
-    
 
     [self checkForSeriEligibilityWithRow3:six12Row andRow4:tunnelRow andRow5:visitEye12Mths];
     
@@ -1762,15 +1761,22 @@ NSString *const kQuestionFifteen = @"q15";
     
 }
 
-
-
-
-
 -(id) initAdditionalSvcs {
     
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Additional Services"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
+    
+    NSDictionary *addSvcsDict = _fullScreeningForm[SECTION_ADD_SERVICES];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckAdd];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"CHAS"];
     [formDescriptor addFormSection:section];
@@ -1785,6 +1791,10 @@ NSString *const kQuestionFifteen = @"q15";
         row.disabled = @NO;
     else
         row.disabled = @YES;
+    
+    //value
+    if (addSvcsDict != (id)[NSNull null] && [addSvcsDict objectForKey:kAppliedChas] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:addSvcsDict[kAppliedChas]];
+    
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Colonoscopy"];
@@ -1800,6 +1810,10 @@ NSString *const kQuestionFifteen = @"q15";
         row.disabled = @NO;
     else
         row.disabled = @YES;
+    
+    //value
+    if (addSvcsDict != (id)[NSNull null] && [addSvcsDict objectForKey:kReferColonos] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:addSvcsDict[kReferColonos]];
+    
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"FIT"];
@@ -1815,6 +1829,9 @@ NSString *const kQuestionFifteen = @"q15";
         row.disabled = @NO;
     else
         row.disabled = @YES;
+    
+    //value
+    if (addSvcsDict != (id)[NSNull null] && [addSvcsDict objectForKey:kReceiveFit] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:addSvcsDict[kReceiveFit]];
     [section addFormRow:row];
 
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Mammogram"];
@@ -1830,6 +1847,10 @@ NSString *const kQuestionFifteen = @"q15";
         row.disabled = @NO;
     else
         row.disabled = @YES;
+    
+    //value
+    if (addSvcsDict != (id)[NSNull null] && [addSvcsDict objectForKey:kReferMammo] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:addSvcsDict[kReferMammo]];
+    
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"PAP Smear"];
@@ -1845,6 +1866,10 @@ NSString *const kQuestionFifteen = @"q15";
         row.disabled = @NO;
     else
         row.disabled = @YES;
+    
+    //value
+    if (addSvcsDict != (id)[NSNull null] && [addSvcsDict objectForKey:kReferPapSmear] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:addSvcsDict[kReferPapSmear]];
+    
     [section addFormRow:row];
     
     
@@ -1856,6 +1881,15 @@ NSString *const kQuestionFifteen = @"q15";
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     NSDictionary *refForDocConsultDict = [self.fullScreeningForm objectForKey:SECTION_DOC_CONSULT];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckDocConsult];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
@@ -1905,6 +1939,15 @@ NSString *const kQuestionFifteen = @"q15";
     XLFormRowDescriptor * row;
     
     NSDictionary *dentalCheckDict = [_fullScreeningForm objectForKey:SECTION_BASIC_DENTAL];
+
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckDental];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
@@ -1939,6 +1982,18 @@ NSString *const kQuestionFifteen = @"q15";
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
+    NSDictionary *fallRiskDict = _fullScreeningForm[SECTION_FALL_RISK_ASSMT];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckFall];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    
     formDescriptor.assignFirstResponderOnShow = YES;
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -1946,6 +2001,10 @@ NSString *const kQuestionFifteen = @"q15";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kPsfuFRA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"To be completed during PSFU"];
     [self setDefaultFontWithRow:row];
+    
+    //value
+    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kPsfuFRA] != (id)[NSNull null]) row.value = fallRiskDict[kPsfuFRA];
+    
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -1958,24 +2017,36 @@ NSString *const kQuestionFifteen = @"q15";
     [balanceRow.cellConfigAtConfigure setObject:@(0) forKey:@"stepControl.minimumValue"];
     [balanceRow.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
     [self setDefaultFontWithRow:balanceRow];
+    
+    //value
+    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kBalance] != (id)[NSNull null]) balanceRow.value = fallRiskDict[kBalance];
+    
     [section addFormRow:balanceRow];
     
-    XLFormRowDescriptor *GaitSpeedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBalance
+    XLFormRowDescriptor *GaitSpeedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGaitSpeed
                                                 rowType:XLFormRowDescriptorTypeStepCounter title:@"Gait Speed Test"];
     GaitSpeedRow.value = @(0);
     [GaitSpeedRow.cellConfigAtConfigure setObject:@(4) forKey:@"stepControl.maximumValue"];
     [GaitSpeedRow.cellConfigAtConfigure setObject:@(0) forKey:@"stepControl.minimumValue"];
     [GaitSpeedRow.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
     [self setDefaultFontWithRow:GaitSpeedRow];
+    
+    //value
+    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kGaitSpeed] != (id)[NSNull null]) GaitSpeedRow.value = fallRiskDict[kGaitSpeed];
+    
     [section addFormRow:GaitSpeedRow];
     
-    XLFormRowDescriptor *chairStandRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBalance
+    XLFormRowDescriptor *chairStandRow = [XLFormRowDescriptor formRowDescriptorWithTag:kChairStand
                                                 rowType:XLFormRowDescriptorTypeStepCounter title:@"Chair Stand Test"];
     chairStandRow.value = @(0);
     [chairStandRow.cellConfigAtConfigure setObject:@(4) forKey:@"stepControl.maximumValue"];
     [chairStandRow.cellConfigAtConfigure setObject:@(0) forKey:@"stepControl.minimumValue"];
     [chairStandRow.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
     [self setDefaultFontWithRow:chairStandRow];
+    
+    //value
+    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kChairStand] != (id)[NSNull null]) chairStandRow.value = fallRiskDict[kChairStand];
+    
     [section addFormRow:chairStandRow];
     
     XLFormRowDescriptor *totalRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTotal rowType:XLFormRowDescriptorTypeInfo title:@"Total Score for SPPB"];
@@ -2005,12 +2076,18 @@ NSString *const kQuestionFifteen = @"q15";
         }
     };
     
+    //value
+    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kTotal] != (id)[NSNull null]) totalRow.value = fallRiskDict[kTotal];
+    
     [section addFormRow:totalRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqFollowupFRA
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred for further follow-up?"];
     row.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:row];
+    
+    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kReqFollowupFRA] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:fallRiskDict[kReqFollowupFRA]];
+    
     [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
@@ -2021,6 +2098,17 @@ NSString *const kQuestionFifteen = @"q15";
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
+    NSDictionary *dementiaDict = _fullScreeningForm[SECTION_GERIATRIC_DEMENTIA_ASSMT];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckDementia];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
     formDescriptor.assignFirstResponderOnShow = YES;
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -2028,6 +2116,9 @@ NSString *const kQuestionFifteen = @"q15";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kPsfuFRA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"To be completed during PSFU"];
     [self setDefaultFontWithRow:row];
+    
+    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kPsfuFRA] != (id)[NSNull null]) row.value = dementiaDict[kPsfuFRA];
+    
     [section addFormRow:row];
     
     
@@ -2049,6 +2140,9 @@ NSString *const kQuestionFifteen = @"q15";
             }
         }
     };
+    
+    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kAmtScore] != (id)[NSNull null]) row.value = dementiaDict[kAmtScore];
+    
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -2057,12 +2151,18 @@ NSString *const kQuestionFifteen = @"q15";
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEduStatus rowType:XLFormRowDescriptorTypeSelectorPush title:@"Resident's education status"];
     row.selectorOptions = @[@"1 year", @"2 years", @"3 years", @"4 years", @"5 years", @"6 years", @"more than 6 years", @"No formal education"];
     [self setDefaultFontWithRow:row];
+    
+    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kEduStatus] != (id)[NSNull null]) row.value = dementiaDict[kEduStatus];
+    
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqFollowupGDA rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred for further follow-up?"];
     row.selectorOptions = @[@"Yes", @"No"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
+    
+    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kReqFollowupGDA] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:dementiaDict[kReqFollowupGDA]];
+    
     [section addFormRow:row];
     
     
@@ -2487,12 +2587,8 @@ NSString *const kQuestionFifteen = @"q15";
     
     return [super initWithForm:formDescriptor];
 }
-#pragma mark - Buttons
-//-(void)returnBtnPressed:(id)sender
-//{
-//    [self.navigationController popViewControllerAnimated:YES];
-//}
 
+#pragma mark - Buttons
 
 -(void)editBtnPressed:(UIBarButtonItem * __unused)button
 {
@@ -2708,6 +2804,76 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ELIGIBLE andFieldName:kCognitiveImpair andNewContent:newValue];
     }
     
+    
+    /* Triage */
+    else if ([rowDescriptor.tag isEqualToString:kIsDiabetic]) {
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kIsDiabetic andNewContent:ansFromYesNo];
+    }
+    
+    /* Snellen Eye Test */
+    else if ([rowDescriptor.tag isEqualToString:kRightEye]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kRightEye andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kLeftEye]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kLeftEye andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kSix12]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kSix12 andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kTunnel]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kTunnel andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kVisitEye12Mths]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kVisitEye12Mths andNewContent:newValue];
+    }
+    
+    /* Additional Services */
+    else if ([rowDescriptor.tag isEqualToString:kAppliedChas]) {
+        [self postSingleFieldWithSection:SECTION_ADD_SERVICES andFieldName:kAppliedChas andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kReferColonos]) {
+        [self postSingleFieldWithSection:SECTION_ADD_SERVICES andFieldName:kReferColonos andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kReceiveFit]) {
+        [self postSingleFieldWithSection:SECTION_ADD_SERVICES andFieldName:kReceiveFit andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kReferMammo]) {
+        [self postSingleFieldWithSection:SECTION_ADD_SERVICES andFieldName:kReferMammo andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kReferPapSmear]) {
+        [self postSingleFieldWithSection:SECTION_ADD_SERVICES andFieldName:kReferPapSmear andNewContent:ansFromYesNo];
+    }
+    
+    /* Doctor's Consult */
+    else if ([rowDescriptor.tag isEqualToString:kDocReferred]) {
+        [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDocReferred andNewContent:ansFromYesNo];
+    }
+    
+    /* Basic Dental Check-up */
+    else if ([rowDescriptor.tag isEqualToString:kDentalUndergone]) {
+        [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kDentalUndergone andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kDentistReferred]) {
+        [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kDentistReferred andNewContent:ansFromYesNo];
+    }
+    
+    /* Fall Risk Assessment */
+    else if ([rowDescriptor.tag isEqualToString:kPsfuFRA]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kPsfuFRA andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kBalance]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kBalance andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kGaitSpeed]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kGaitSpeed andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kChairStand]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kChairStand andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kReqFollowupFRA]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kReqFollowupFRA andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kTotal]) {
+        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kTotal andNewContent:rowDescriptor.value];
+    }
+    
+    
+    /* Geriatric Dementia Assessment */
+    else if ([rowDescriptor.tag isEqualToString:kPsfuGDA]) {
+        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kPsfuGDA andNewContent:rowDescriptor.value];
+    }     else if ([rowDescriptor.tag isEqualToString:kEduStatus]) {
+        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kEduStatus andNewContent:rowDescriptor.value];
+    }     else if ([rowDescriptor.tag isEqualToString:kReqFollowupGDA]) {
+        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kReqFollowupGDA andNewContent:ansFromYesNo];
+    }
+    
+    
     /* Pre-Health Education */
     else if ([rowDescriptor.tag isEqualToString:kPreEdu1]) {
         [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu1 andNewContent:ansFromTF];
@@ -2818,35 +2984,6 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kPostEdScore andNewContent:newValue];
     }
     
-    /* Triage */
-    else if ([rowDescriptor.tag isEqualToString:kIsDiabetic]) {
-        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kIsDiabetic andNewContent:ansFromYesNo];
-    }
-    
-    /* Snellen Eye Test */
-    else if ([rowDescriptor.tag isEqualToString:kRightEye]) {
-        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kRightEye andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kLeftEye]) {
-        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kLeftEye andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kSix12]) {
-        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kSix12 andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kTunnel]) {
-        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kTunnel andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kVisitEye12Mths]) {
-        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kVisitEye12Mths andNewContent:newValue];
-    }
-    
-    /* Doctor's Consult */
-    else if ([rowDescriptor.tag isEqualToString:kDocReferred]) {
-        [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDocReferred andNewContent:ansFromYesNo];
-    }
-    
-    /* Basic Dental Check-up */
-    else if ([rowDescriptor.tag isEqualToString:kDentalUndergone]) {
-        [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kDentalUndergone andNewContent:ansFromYesNo];
-    } else if ([rowDescriptor.tag isEqualToString:kDentistReferred]) {
-        [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kDentistReferred andNewContent:ansFromYesNo];
-    }
     
     
 }
@@ -2939,6 +3076,12 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDocName andNewContent:rowDescriptor.value];
     }
     
+    /* Geriatric Dementia Assessment */
+    else if ([rowDescriptor.tag isEqualToString:kAmtScore]) {
+        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kAmtScore andNewContent:rowDescriptor.value];
+    }
+    
+    
 }
 
 #pragma mark - Other Methods
@@ -2948,9 +3091,9 @@ NSString *const kQuestionFifteen = @"q15";
     
     if (([six12Row.value isEqual:@1] || ([tunnelRow.value isEqual:@(1)])) && ([visitEye12MthsRow.value isEqual:@(1)])) { // (3 OR 4) AND 5
         NSLog(@"SERI Enabled!");
-        [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kNeedSERI];
+        [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifySeri];
     } else {
-        [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kNeedSERI];
+        [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifySeri];
     }
 }
 

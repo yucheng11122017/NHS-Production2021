@@ -14,11 +14,10 @@
 @property (strong, nonatomic) NSNumber* sectionID;
 @property (strong, nonatomic) NSNumber* formType;
 @property (strong, nonatomic) NSDictionary *preRegParticularsDict;
-@property (strong, nonatomic) NSMutableDictionary *fullScreeningForm;
+
 
 - (void) setSectionID:(NSNumber *)sectionID;
 - (void) setFormType:(NSNumber *)formType;
-- (void) setFullScreeningForm: (NSMutableDictionary *) dictionary;
 
 
 @end
