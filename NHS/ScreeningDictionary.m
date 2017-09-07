@@ -143,7 +143,7 @@
             lowIncome = [chasDict[kLowHouseIncome] boolValue];
         if (chasDict[kWantChas] != (id)[NSNull null])
             wantChas = [chasDict[kWantChas] boolValue];
-        if (noChas && lowIncome && wantChas) {
+        if (noChas && lowIncome && wantChas && [[defaults objectForKey:kCitizenship] isEqualToString:@"Singaporean"]) { //7th Sept - added new criteria to be a Singaporaen for CHAS
             [defaults setObject:@"1" forKey:kQualifyCHAS];
         }
     }

@@ -634,7 +634,23 @@ NSString *const kQuestionFifteen = @"q15";
     section = [XLFormSectionDescriptor formSectionWithTitle:@"CHAS Preliminary Eligibility Assessment"];
     [formDescriptor addFormSection:section];
 
-    XLFormRowDescriptor *chasNoChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDoesntOwnChasPioneer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does not currently own a CHAS card (blue/orange) or pioneer generation card"];
+    XLFormRowDescriptor *sporeanRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSporean rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean"];
+    [self setDefaultFontWithRow:sporeanRow];
+    sporeanRow.required = NO;
+    sporeanRow.disabled = @(1);
+    if ([citizenship isEqualToString:@"Singaporean"]) {
+        sporeanRow.value = @1;
+        sporean = YES;
+    }
+    else {
+        sporeanRow.value = @0;
+        sporean = NO;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyCHAS];
+    }
+    [section addFormRow:sporeanRow];
+    
+    
+    XLFormRowDescriptor *chasNoChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDoesntOwnChasPioneer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does not currently own a CHAS card (blue/orange) OR \nCurrently owns a CHAS card which expires in ≤ 3 months"];
     if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kDoesntOwnChasPioneer] != (id)[NSNull null]) chasNoChasRow.value = chasPrelimDict[kDoesntOwnChasPioneer];
     [self setDefaultFontWithRow:chasNoChasRow];
     chasNoChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -648,7 +664,7 @@ NSString *const kQuestionFifteen = @"q15";
             } else {
                 noChas = FALSE;
             }
-            if (noChas && lowIncome && wantChas) {
+            if (sporean && noChas && lowIncome && wantChas) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyCHAS];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyCHAS];
@@ -671,7 +687,7 @@ NSString *const kQuestionFifteen = @"q15";
             } else {
                 lowIncome = FALSE;
             }
-            if (noChas && lowIncome && wantChas) {
+            if (sporean && noChas && lowIncome && wantChas) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyCHAS];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyCHAS];
@@ -694,7 +710,7 @@ NSString *const kQuestionFifteen = @"q15";
             } else {
                 wantChas = FALSE;
             }
-            if (noChas && lowIncome && wantChas) {
+            if (sporean && noChas && lowIncome && wantChas) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyCHAS];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyCHAS];
@@ -767,7 +783,11 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:age50Row];
     
     XLFormRowDescriptor *relColCancerRow = [XLFormRowDescriptor formRowDescriptorWithTag:kRelWColorectCancer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"First degree relative with colorectal cancer?"];
-    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kRelWColorectCancer] != (id)[NSNull null]) relColCancerRow.value = colonscoEligibDict[kRelWColorectCancer];
+    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kRelWColorectCancer] != (id)[NSNull null]) {
+        relColCancerRow.value = colonscoEligibDict[kRelWColorectCancer];
+        relColorectCancer = [relColCancerRow.value boolValue];
+    }
+    
     [self setDefaultFontWithRow:relColCancerRow];
     relColCancerRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     relColCancerRow.required = NO;
@@ -775,14 +795,22 @@ NSString *const kQuestionFifteen = @"q15";
     
     
     XLFormRowDescriptor *colon3yrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy3yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 3 years?"];
-    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kColonoscopy3yrs] != (id)[NSNull null]) colon3yrsRow.value = colonscoEligibDict[kColonoscopy3yrs];
+    
+    //value
+    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kColonoscopy3yrs] != (id)[NSNull null]) {
+        colon3yrsRow.value = colonscoEligibDict[kColonoscopy3yrs];
+        colon3Yrs = [colon3yrsRow.value boolValue];
+    }
     [self setDefaultFontWithRow:colon3yrsRow];
     colon3yrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     colon3yrsRow.required = NO;
     [section addFormRow:colon3yrsRow];
     
     XLFormRowDescriptor *wantColonRefRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantColonoscopyRef rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a referral for free colonoscopy?"];
-    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kWantColonoscopyRef] != (id)[NSNull null]) wantColonRefRow.value = colonscoEligibDict[kWantColonoscopyRef];
+    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kWantColonoscopyRef] != (id)[NSNull null]) {
+        wantColonRefRow.value = colonscoEligibDict[kWantColonoscopyRef];
+        wantColRef = [wantColonRefRow.value boolValue];
+    }
     [self setDefaultFontWithRow:wantColonRefRow];
     wantColonRefRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     wantColonRefRow.required = NO;
@@ -892,6 +920,15 @@ NSString *const kQuestionFifteen = @"q15";
             
         }
     };
+    
+    // for the initial setting
+    if (sporeanPr && age50 && relColorectCancer && colon3Yrs && wantColRef) {
+        disableFIT = true;
+        fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
+        colonoscopy10YrsRow.disabled = [NSNumber numberWithBool:disableFIT];
+        wantFitKitRow.disabled = [NSNumber numberWithBool:disableFIT];
+    }
+    
     
     relColCancerRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if (oldValue != newValue) {
