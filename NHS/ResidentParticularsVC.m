@@ -14,6 +14,7 @@
 #import "AppConstants.h"
 #import "ScreeningSectionTableViewController.h"
 #import "math.h"
+#import "ScreeningDictionary.h"
 
 //XLForms stuffs
 #import "XLForm.h"
@@ -105,7 +106,7 @@ typedef enum rowTypes {
 - (void) viewWillDisappear:(BOOL)animated {
     
     self.navigationController.navigationBar.topItem.title = @"Integrated Profile";
-
+    [[ScreeningDictionary sharedInstance] fetchFromServer];
     
     
     [super viewWillDisappear:animated];
@@ -865,9 +866,9 @@ typedef enum rowTypes {
                 [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
                                                                     style:UIAlertActionStyleDefault
                                                                   handler:^(UIAlertAction * okAction) {
-                                                                      //                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshPreRegPatientTable"
-                                                                      //                                                                                                                  object:nil
-                                                                      //                                                                                                                userInfo:nil];
+                                                                      [[NSNotificationCenter defaultCenter] postNotificationName:@"enableProfileEntry"
+                                                                                                                          object:nil
+                                                                                                                        userInfo:nil];
                                                                       [self.navigationController popViewControllerAnimated:YES];
                                                                   }]];
                 [self presentViewController:alertController animated:YES completion:nil];

@@ -49,7 +49,7 @@
     
     
     self.navigationItem.title = @"Social Work";
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"📶 Demographics",@"📶 Current Socioeconomic Situation",@"Current Physical Status", @"Social Support Assessment", @"Psychological Well-being", @"Additional Services", @"Summary",  nil];
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Demographics",@"Current Socioeconomic Situation",@"Current Physical Status", @"Social Support Assessment", @"Psychological Well-being", @"Additional Services", @"Summary",  nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -103,7 +103,15 @@
     NSString *text = [_rowLabelsText objectAtIndex:indexPath.row];
     
     [cell.textLabel setText:text];
-    // Configure the cell...
+    
+    // Put in the ticks if necessary
+    if (indexPath.row < [self.completionCheck count]) {
+        if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        }
+    }
     
     return cell;
 }
@@ -179,7 +187,7 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[@"demographics", kCheckSocioEco, kCheckCurrentPhyStatus, kCheckSocialSupport, kCheckPsychWellbeing, kCheckSwAddServices, kCheckSocWorkSummary];
+    NSArray *lookupTable = @[kCheckGeno, kCheckSocioEco, kCheckCurrentPhyStatus, kCheckSocialSupport, kCheckPsychWellbeing, kCheckSwAddServices, kCheckSocWorkSummary];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {

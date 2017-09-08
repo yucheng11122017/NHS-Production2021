@@ -57,7 +57,7 @@
 #define SECTION_SERI_IOP                        @"seri_iop"
 #define SECTION_SERI_AHE                        @"seri_ahe"
 #define SECTION_SERI_PHE                        @"seri_phe"
-#define SECTION_SERI_DAG                        @"seri_dag"
+#define SECTION_SERI_DIAG                       @"seri_diag"
 #define SECTION_FALL_RISK_ASSMT                 @"fall_risk_assmt"
 #define SECTION_GERIATRIC_DEMENTIA_ASSMT        @"geriatric_dementia_assmt"
 #define SECTION_PRE_HEALTH_EDU                  @"pre_health_edu"
@@ -323,7 +323,7 @@ extern NSString *const kRc;
 extern NSString *const kRo;
 extern NSString *const kSo;
 extern NSString *const kOth;
-extern NSString *const kNa;
+extern NSString *const kNa;     //no longer used
 extern NSString *const kDontKnow;
 extern NSString *const kDontLike;
 extern NSString *const kMobilityIssues;
@@ -434,7 +434,7 @@ extern NSString *const kVaLogmarOs;
 extern NSString *const kPinSnellenOd;
 extern NSString *const kPinLogmarOd;
 extern NSString *const kPinSnellenOs;
-extern NSString *const  kPinLogmarOs;
+extern NSString *const kPinLogmarOs;
 extern NSString *const kNearLogmarOd;
 extern NSString *const kNearNxOd;
 extern NSString *const kNearLogmarOs;
@@ -653,6 +653,7 @@ extern NSString *const kPostEdu23;
 extern NSString *const kPostEdu24;
 extern NSString *const kPostEdu25;
 extern NSString *const kPostEdScore;
+extern NSString *const kDateEd;
 
 #pragma mark - Check Variables
 extern NSString *const kCheckPhleb;

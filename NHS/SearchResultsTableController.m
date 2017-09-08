@@ -8,6 +8,7 @@
 
 #import "SearchResultsTableController.h"
 #import "GenericTableViewCell.h"
+#import "AppConstants.h"
 
 @interface SearchResultsTableController ()
 
@@ -44,6 +45,24 @@
     cell.nameLabel.text = [patientDetails objectForKey:@"resident_name"];
     cell.NRICLabel.text = [patientDetails objectForKey:@"nric"];
     cell.dateLabel.text = [patientDetails objectForKey:@"last_updated_ts"];
+    NSNumber *preRegCompleted = [patientDetails objectForKey:kPreregCompleted];
+    NSString *serialId = [patientDetails objectForKey:@"nhs_serial_id"];
+    
+    if ([preRegCompleted isEqual:@1])
+        cell.regLabel.hidden = NO;
+    else
+        cell.regLabel.hidden = YES;
+    
+    //default hidden
+    cell.verticalLine.hidden = YES;
+    cell.yearLabel.hidden = YES;
+    
+    if (serialId != (id) [NSNull null]) {
+        if ([serialId isKindOfClass:[NSString class]]  && ![serialId isEqualToString:@""]) {  //as long as have value
+            cell.verticalLine.hidden = NO;
+            cell.yearLabel.hidden = NO;
+        }
+    }
     
     // build the price and year string
     // use NSNumberFormatter to get the currency format out of this NSNumber (product.introPrice)

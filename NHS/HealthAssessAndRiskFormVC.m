@@ -431,13 +431,13 @@ typedef enum formName {
                                                   title:@"Have you checked your BP in the last 1 year?"];
     [self setDefaultFontWithRow:checkedBPQRow];
     checkedBPQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    checkedBPQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed_HT];
+    checkedBPQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed_HT];
     [section addFormRow:checkedBPQRow];
 
     XLFormRowDescriptor *checkedBP = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCheckedBp rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     [self setDefaultFontWithRow:checkedBP];
     checkedBP.selectorOptions = @[@"YES", @"NO"];
-
+    checkedBP.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed_HT];
     if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kCheckedBp] != (id)[NSNull null]) {
         checkedBP.value = [self getYesNoFromOneZero:hypertensionDict[kCheckedBp]];
     }
@@ -449,7 +449,7 @@ typedef enum formName {
                                                   title:@"Are you seeing your doctor regularly for your high BP?"];
     [self setDefaultFontWithRow:seeDocRegularlyQRow];
     seeDocRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    seeDocRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
+    seeDocRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
     [section addFormRow:seeDocRegularlyQRow];
     XLFormRowDescriptor *seeDocRegularlyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHTSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     seeDocRegularlyRow.selectorOptions = @[@"YES", @"NO"];
@@ -459,7 +459,7 @@ typedef enum formName {
         seeDocRegularlyRow.value = [self getYesNoFromOneZero:hypertensionDict[kSeeingDocRegularly]];
     }
 
-    seeDocRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
+    seeDocRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
     [section addFormRow:seeDocRegularlyRow];
 
 
@@ -468,13 +468,13 @@ typedef enum formName {
                                                   title:@"Are you curently prescribed medication for your high BP?"];
     [self setDefaultFontWithRow:prescribedQRow];
     prescribedQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    prescribedQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
+    prescribedQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
     [section addFormRow:prescribedQRow];
 
     XLFormRowDescriptor *prescribedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     [self setDefaultFontWithRow:prescribedRow];
     prescribedRow.selectorOptions = @[@"YES", @"NO"];
-    prescribedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
+    prescribedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
 
     //value
     if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kHTCurrentlyPrescribed] != (id)[NSNull null]) {
@@ -489,7 +489,7 @@ typedef enum formName {
                                                   title:@"Are you taking your BP medication regularly?"];
     [self setDefaultFontWithRow:takeRegularlyQRow];
     takeRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
+    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
     [section addFormRow:takeRegularlyQRow];
 
     // Segmented Control
@@ -502,22 +502,22 @@ typedef enum formName {
         takeRegularlyRow.value = [self getYesNoFromOneZero:hypertensionDict[kTakingRegularly]];
     }
 
-    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", checkedBP];
+    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
     [section addFormRow:takeRegularlyRow];
 
-    checkedBP.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([newValue isEqualToString:@"NO"]) {
-                takeRegularlyQRow.hidden = @(1);
-                takeRegularlyRow.hidden = @(1);
-            } else {
-//                if ([prescribedRow.value isEqualToString:@"YES"]) {
-                    takeRegularlyQRow.hidden = @(0);
-                    takeRegularlyRow.hidden = @(0);
-//                }
-            }
-        }
-    };
+//    checkedBP.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+//        if (oldValue != newValue) {
+//            if ([newValue isEqualToString:@"NO"]) {
+//                takeRegularlyQRow.hidden = @(1);
+//                takeRegularlyRow.hidden = @(1);
+//            } else {
+////                if ([prescribedRow.value isEqualToString:@"YES"]) {
+//                    takeRegularlyQRow.hidden = @(0);
+//                    takeRegularlyRow.hidden = @(0);
+////                }
+//            }
+//        }
+//    };
 
 
     return [super initWithForm:formDescriptor];

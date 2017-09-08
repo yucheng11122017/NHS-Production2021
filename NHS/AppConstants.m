@@ -608,6 +608,7 @@ NSString *const kPostEdu23 = @"post_edu_23";
 NSString *const kPostEdu24 = @"post_edu_24";
 NSString *const kPostEdu25 = @"post_edu_25";
 NSString *const kPostEdScore = @"post_ed_score";
+NSString *const kDateEd = @"date_ed";
 
 #pragma mark - Check Variables
 NSString *const kCheckPhleb = @"check_phleb";
@@ -632,7 +633,7 @@ NSString *const kCheckDocConsult = @"check_doc_consult";
 NSString *const kCheckDental = @"check_dental";
 NSString *const kCheckSeriMedHist = @"check_seri_med_hist";
 NSString *const kCheckSeriVa = @"check_seri_va";
-NSString *const kCheckSeriAutorefractor = @"check_seri_autofractor";
+NSString *const kCheckSeriAutorefractor = @"check_seri_autorefractor";
 NSString *const kCheckSeriIop = @"check_seri_iop";
 NSString *const kCheckSeriAhe = @"check_seri_ahe";
 NSString *const kCheckSeriPhe = @"check_seri_phe";

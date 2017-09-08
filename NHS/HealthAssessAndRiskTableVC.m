@@ -49,7 +49,7 @@
                         stringForKey:kResidentAge];
     
     self.navigationItem.title = @"Health Assessment and Risk Stratisfaction";
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"📶 Medical History",@"📶 Geriatric Depression Assessment",@"📶 Risk Stratification", nil];
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Medical History",@"Geriatric Depression Assessment",@"Risk Stratification", nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -72,6 +72,14 @@
     
     [self updateInterfaceWithReachability:self.hostReachability];
 }
+
+- (void) viewWillDisappear:(BOOL)animated {
+    [[ScreeningDictionary sharedInstance] fetchFromServer];
+    
+    [super viewWillDisappear:animated];
+}
+
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

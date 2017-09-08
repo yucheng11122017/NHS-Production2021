@@ -10,6 +10,8 @@
 #import "SVProgressHUD.h"
 #import "AppConstants.h"
 #import "ServerComm.h"
+#import "ScreeningDictionary.h"
+#import "KAStatusBar.h"
 
 
 #define GENOGRAM_LOADED_NOTIF @"Genogram image downloaded"
@@ -17,6 +19,8 @@
 
 @interface DemographicsVC () {
     BOOL shownOverlayView;
+    BOOL genogramExist;
+    BOOL isFormFinalized;
 }
 
 
@@ -25,6 +29,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (strong, nonatomic) UIImage* genogramImage;
 @property (strong, nonatomic) UIView *infoBox;
+@property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
 
 
 @end
@@ -33,30 +38,62 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    isFormFinalized = false;
+    
     self.genogramImage = [[UIImage alloc]init];
+    self.pushPopTaskArray = [[NSMutableArray alloc] init];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageExist:) name:GENOGRAM_LOADED_NOTIF object:nil];
     
-#warning Check if imageFile exist in server, then do the following
-//
-//    shownOverlayView = true;
-//    NSUserDefaults *defaults =  [NSUserDefaults standardUserDefaults];
-//    [[ServerComm sharedServerCommInstance] retrieveGenogramImageForResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
+    genogramExist = false;
     
-#warning else setup the backgroundDimmingView
+    NSDictionary *fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
     
-    _imageView.hidden = YES;
-    shownOverlayView = false;
+    NSDictionary *checkDict = fullScreeningForm[SECTION_CHECKS];
     
-    if(!self.backgroundDimmingView){
-        self.backgroundDimmingView = [self buildBackgroundDimmingView];
-        [self.view addSubview:self.backgroundDimmingView];
-        [self.view insertSubview:_containerView aboveSubview:_backgroundDimmingView];
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckGeno];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
     }
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveImageAfterPicker:) name:@"displayImage" object:nil];
-//
+
+    if ([fullScreeningForm objectForKey:SECTION_GENOGRAM] != nil && [fullScreeningForm objectForKey:SECTION_GENOGRAM] != (id)[NSNull null]) {   //genogram dictionary exists
+        NSDictionary *genogramDict = [fullScreeningForm objectForKey:SECTION_GENOGRAM];
+        if ([genogramDict objectForKey:kFilename] != nil && [genogramDict objectForKey:kFilename] != (id)[NSNull null]) {
+            genogramExist = true;
+        }
+    }
     
+    if (genogramExist) {
+        shownOverlayView = true;
+        [self.containerView removeFromSuperview];   //don't show containerView at all!
+        NSUserDefaults *defaults =  [NSUserDefaults standardUserDefaults];
+        [[ServerComm sharedServerCommInstance] retrieveGenogramImageForResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
+    } else {
+    
+        _imageView.hidden = YES;
+        shownOverlayView = false;
+        
+        if(!self.backgroundDimmingView){
+            self.backgroundDimmingView = [self buildBackgroundDimmingView];
+            [self.view addSubview:self.backgroundDimmingView];
+            [self.view insertSubview:_containerView aboveSubview:_backgroundDimmingView];
+        }
+        
+        
+    }
+    
+    if (isFormFinalized) {
+        
+    }
+    else {
+        
+    }
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveImageAfterPicker:) name:@"displayImage" object:nil];
     //Setup InfoButton
     UIButton* infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     [infoButton addTarget:self action:@selector(infoButtonAction:) forControlEvents:UIControlEventTouchUpInside];
@@ -89,18 +126,26 @@
                          }
                      }];
     } else {
-        [self setupImageViewAndNavigationController];
+        if (!genogramExist) // this will be done after fetching the image for genogram exist case
+            [self setupImageViewAndNavigationController];
     }
 
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
+    
+    [KAStatusBar dismiss];
+    [[ScreeningDictionary sharedInstance] fetchFromServer];
     
     if (self.isMovingFromParentViewController ) {
         self.navigationController.hidesBarsOnTap = NO;  //go back to default
     }
+    
+    [super viewWillDisappear:animated];
+    
+    
 }
+
 
 - (BOOL)prefersStatusBarHidden {return YES;}
 
@@ -244,7 +289,102 @@
     
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client saveGenogram:_genogramImage forResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
+    [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:kCheckGeno andNewContent:@"1"];    //post this for completion too.
     
+}
+
+#pragma mark - Buttons
+
+-(void)editBtnPressed:(UIBarButtonItem * __unused)button
+{
+
+//    self.navigationItem.rightBarButtonItem = nil;
+//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Finalize" style:UIBarButtonItemStyleDone target:self action:@selector(finalizeBtnPressed:)];
+    
+    [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:kCheckGeno andNewContent:@"0"]; //un-finalize it
+}
+
+- (void) finalizeBtnPressed: (UIBarButtonItem * __unused) button {
+    
+    
+    [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:kCheckGeno andNewContent:@"1"];
+    [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+    [SVProgressHUD showSuccessWithStatus:@"Completed!"];
+    
+//    self.navigationItem.rightBarButtonItem = nil;
+//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
+}
+
+
+#pragma mark - Post data to server methods
+
+- (void) postSingleFieldWithSection:(NSString *) section andFieldName: (NSString *) fieldName andNewContent: (NSString *) content {
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSNumber *resident_id = [defaults objectForKey:kResidentId];
+    
+    if ((content != (id)[NSNull null]) && (content != nil)) {   //make sure don't insert nil or null value to a dictionary
+        
+        NSDictionary *dict = @{kResidentId:resident_id,
+                               kSectionName:section,
+                               kFieldName:fieldName,
+                               kNewContent:content
+                               };
+        
+        NSLog(@"Uploading %@ for $%@$ field", content, fieldName);
+        [KAStatusBar showWithStatus:@"Syncing..." andBarColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:0 alpha:1.0]];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        
+        [_pushPopTaskArray addObject:dict];
+        
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postDataGivenSectionAndFieldName:dict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
+    }
+}
+
+#pragma mark - Blocks
+
+- (void (^)(NSProgress *downloadProgress))progressBlock {
+    return ^(NSProgress *downloadProgress) {
+        
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"%@", responseObject);
+        
+        [_pushPopTaskArray removeObjectAtIndex:0];
+        
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+        [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+        
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        
+        NSLog(@"<<< SUBMISSION FAILED >>>");
+        
+        NSDictionary *retryDict = [_pushPopTaskArray firstObject];
+        
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+        
+        
+        NSLog(@"\n\nRETRYING...");
+        
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postDataGivenSectionAndFieldName:retryDict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
+        
+    };
 }
 /*
 #pragma mark - Navigation

@@ -48,7 +48,7 @@
     
     
     self.navigationItem.title = @"Medical History";
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"📶 Diabetes Mellitus",@"📶 Hyperlipidemia",@"📶 Hypertension", nil];
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Diabetes Mellitus",@"Hyperlipidemia",@"Hypertension", nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -73,6 +73,7 @@
     [self updateInterfaceWithReachability:self.hostReachability];
     
 }
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

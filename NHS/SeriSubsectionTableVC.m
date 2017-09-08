@@ -9,12 +9,18 @@
 #import "SeriSubsectionTableVC.h"
 #import "SeriFormVC.h"
 #import "AppConstants.h"
+#import  "Reachability.h"
+#import "SVProgressHUD.h"
+#import "ScreeningDictionary.h"
 
 @interface SeriSubsectionTableVC () {
     NSNumber *selectedRow;
     NSArray *rowTitleArray;
+    BOOL internetDCed;
 }
-
+@property (nonatomic) Reachability *hostReachability;
+@property (strong, nonatomic) NSMutableArray *completionCheck;
+@property (strong, nonatomic) NSDictionary *fullScreeningForm;
 @end
 
 @implementation SeriSubsectionTableVC
@@ -22,12 +28,21 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
+    
     rowTitleArray = [[NSArray alloc] initWithObjects:@"Medical History", @"Visual Acuity", @"Autorefractor", @"Intra-Ocular Pressure", @"Anterior Health Examination", @"Posterior Health Examination", @"Diagnosis and Follow-up", nil];
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0, nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     
-    [self.tableView reloadData];
+    @synchronized (self) {
+        [self updateCellAccessory];
+        [self.tableView reloadData];    //put in the ticks
+    }
     
 }
 
@@ -63,7 +78,15 @@
     NSString *text = [rowTitleArray objectAtIndex:indexPath.row];
     
     [cell.textLabel setText:text];
-    // Configure the cell...
+    
+    // Put in the ticks if necessary
+    if (indexPath.row < [self.completionCheck count]) {
+        if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        }
+    }
     
     return cell;
 }
@@ -77,50 +100,85 @@
 }
 
 
-/*
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
+#pragma mark - Reachability
+/*!
+ * Called by Reachability whenever status changes.
+ */
+- (void) reachabilityChanged:(NSNotification *)note
+{
+    Reachability* curReach = [note object];
+    NSParameterAssert([curReach isKindOfClass:[Reachability class]]);
+    [self updateInterfaceWithReachability:curReach];
+}
+
+- (void)updateInterfaceWithReachability:(Reachability *)reachability
+{
+    if (reachability == self.hostReachability)
+    {
+        NetworkStatus netStatus = [reachability currentReachabilityStatus];
+        
+        switch (netStatus) {
+            case NotReachable: {
+                internetDCed = true;
+                NSLog(@"Can't connect to server!");
+                
+                [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                [SVProgressHUD showErrorWithStatus:@"No Internet!"];
+                
+                
+                break;
+            }
+            case ReachableViaWiFi:
+            case ReachableViaWWAN:
+                NSLog(@"Connected to server!");
+                
+                //                [self getAllDataForOneResident];
+                
+                if (internetDCed) { //previously disconnected
+                    [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+                    [SVProgressHUD showSuccessWithStatus:@"Back Online!"];
+                    internetDCed = false;
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
     
-    // Configure the cell...
+}
+
+- (void) updateCellAccessory {
+    if ([_completionCheck count] < 1) {
+        _completionCheck = [[NSMutableArray alloc] init];
+    } else {
+        [_completionCheck removeAllObjects];
+    }
     
-    return cell;
+    NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
+    NSArray *lookupTable = @[kCheckSeriMedHist, kCheckSeriVa, kCheckSeriAutorefractor, kCheckSeriIop, kCheckSeriAhe, kCheckSeriPhe, kCheckSeriDiag];
+    
+    if (checksDict != nil && checksDict != (id)[NSNull null]) {
+        for (int i=0; i<[lookupTable count]; i++) {
+            
+            NSString *key = lookupTable[i];
+            
+            NSNumber *doneNum = [checksDict objectForKey:key];
+            [_completionCheck addObject:doneNum];
+            
+        }
+    }
 }
-*/
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+#pragma mark - NSNotification Methods
+
+- (void) reloadTable: (NSNotification *) notification {
+    _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
+    @synchronized (self) {
+        [self updateCellAccessory];
+        [self.tableView reloadData];    //put in the ticks
+    }
 }
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
 #pragma mark - Navigation
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

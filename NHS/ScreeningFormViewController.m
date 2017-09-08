@@ -546,12 +546,12 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:employmentRow];
     
     XLFormRowDescriptor *unemployReasonsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployReasons rowType:XLFormRowDescriptorTypeTextView title:@""];
-    if (profilingDict != (id)[NSNull null]) unemployReasonsRow.value = profilingDict[kEmployReasons];
+    if (profilingDict != (id)[NSNull null] && profilingDict[kEmployReasons] != (id)[NSNull null]) unemployReasonsRow.value = profilingDict[kEmployReasons];
     [self setDefaultFontWithRow:unemployReasonsRow];
     unemployReasonsRow.required = NO;
     unemployReasonsRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Unemployed'", employmentRow];
     [unemployReasonsRow.cellConfigAtConfigure setObject:@"Reasons for unemployment" forKey:@"textView.placeholder"];
-//    [unemployReasonsRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textView.textAlignment"];
+
     [section addFormRow:unemployReasonsRow];
     
     XLFormRowDescriptor *otherEmployRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployOthers rowType:XLFormRowDescriptorTypeText title:@"Other employment"];
@@ -574,7 +574,10 @@ NSString *const kQuestionFifteen = @"q15";
     [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *mthHouseIncome = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgMthHouseIncome rowType:XLFormRowDescriptorTypeDecimal title:@"Average monthly household income"];
-    if (profilingDict != (id)[NSNull null]) mthHouseIncome.value = profilingDict[kAvgMthHouseIncome];
+    //value
+    if (profilingDict != (id)[NSNull null] && profilingDict[kAvgMthHouseIncome] != (id)[NSNull null])
+        mthHouseIncome.value = profilingDict[kAvgMthHouseIncome];
+    
     [self setDefaultFontWithRow:mthHouseIncome];
     [mthHouseIncome.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [mthHouseIncome.cellConfigAtConfigure setObject:@"Enter here" forKey:@"textField.placeholder"];
@@ -586,7 +589,11 @@ NSString *const kQuestionFifteen = @"q15";
     [formDescriptor addFormSection:section];
 
     XLFormRowDescriptor *noOfPplInHouse = [XLFormRowDescriptor formRowDescriptorWithTag:kNumPplInHouse rowType:XLFormRowDescriptorTypeInteger title:@"No. of people in the household"];
-    if (profilingDict != (id)[NSNull null]) noOfPplInHouse.value = profilingDict[kNumPplInHouse];
+    
+    //value
+    if (profilingDict != (id)[NSNull null] && profilingDict[kNumPplInHouse] != (id) [NSNull null])
+        noOfPplInHouse.value = profilingDict[kNumPplInHouse];
+    
     [self setDefaultFontWithRow:noOfPplInHouse];
     [noOfPplInHouse.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     noOfPplInHouse.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -595,7 +602,11 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:noOfPplInHouse];
     
     XLFormRowDescriptor *avgIncomePerHead = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgIncomePerHead rowType:XLFormRowDescriptorTypeDecimal title:@"Average income per head"];   //auto-calculate
-    if (profilingDict != (id)[NSNull null]) avgIncomePerHead.value = profilingDict[avgIncomePerHead];
+    
+    //value
+    if (profilingDict != (id)[NSNull null] && profilingDict[avgIncomePerHead] != (id) [NSNull null])
+        avgIncomePerHead.value = profilingDict[avgIncomePerHead];
+    
     [self setDefaultFontWithRow:avgIncomePerHead];
     [avgIncomePerHead.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     avgIncomePerHead.required = NO;
@@ -1164,7 +1175,7 @@ NSString *const kQuestionFifteen = @"q15";
             } else {
                 noPapSmear3Yrs = FALSE;
             }
-            if (sporean && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+            if (sporeanPr && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
@@ -1188,7 +1199,7 @@ NSString *const kQuestionFifteen = @"q15";
             } else {
                 hadSex = FALSE;
             }
-            if (sporean && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+            if (sporeanPr && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
@@ -1212,7 +1223,7 @@ NSString *const kQuestionFifteen = @"q15";
             } else {
                 wantPapSmear = FALSE;
             }
-            if (sporean && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+            if (sporeanPr && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
                 [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
             } else {
                 [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
@@ -2618,6 +2629,20 @@ NSString *const kQuestionFifteen = @"q15";
     if (postEduDict != (id)[NSNull null]) postEdScoreRow.value = postEduDict[kPostEdScore];
     [postEdSection addFormRow:postEdScoreRow];
     
+    XLFormRowDescriptor *dateHealthEdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDateEd rowType:XLFormRowDescriptorTypeSelectorAlertView title:@"Completed on:"];
+    if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood] containsString:@"Eunos"]) {
+        dateHealthEdRow.selectorOptions = @[@"9 September", @"10 September"];
+    } else {
+        dateHealthEdRow.selectorOptions = @[@"7 October", @"8 October"];
+    }
+    dateHealthEdRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:dateHealthEdRow];
+    
+    //value
+    if (preEduDict != (id)[NSNull null])
+        dateHealthEdRow.value = preEduDict[kDateEd];
+    
+    [postEdSection addFormRow:dateHealthEdRow];
     
     
     [postEdSection setHidden:@YES]; //keep hidden first
@@ -2964,6 +2989,8 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu25 andNewContent:ansFromTF];
     } else if ([rowDescriptor.tag isEqualToString:kPreEdScore]) {
         [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kPreEdScore andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kDateEd]) {
+        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kDateEd andNewContent:newValue];
     }
     
     /* Post-Health Education */

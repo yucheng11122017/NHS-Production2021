@@ -52,7 +52,7 @@ typedef enum residentDataSource {
 @property (strong, nonatomic) NSArray *localSavedFilename;
 
 @property (strong, nonatomic) NSDictionary *sampleResidentDict;
-
+@property (nonatomic) Reachability *hostReachability;
 
 @end
 
@@ -67,11 +67,13 @@ typedef enum residentDataSource {
     NetworkStatus status;
     int fetchDataState;
     BOOL appTesting;
+    BOOL internetDCed;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    internetDCed = false;
     //For hiding credentials from Apple Testers
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     appTesting = [defaults boolForKey:@"AppleTesting"];
@@ -93,11 +95,16 @@ typedef enum residentDataSource {
                   forControlEvents:UIControlEventValueChanged];
     
     [self getLocalSavedData];
-    Reachability *reachability = [Reachability reachabilityForInternetConnection];
-    [reachability startNotifier];
+//    Reachability *reachability = [Reachability reachabilityForInternetConnection];
+//    [reachability startNotifier];
+//    
+//    status = [reachability currentReachabilityStatus];
+//    [self processConnectionStatus];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
     
-    status = [reachability currentReachabilityStatus];
-    [self processConnectionStatus];
+    self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
+    [self.hostReachability startNotifier];
+    [self updateInterfaceWithReachability:self.hostReachability];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(refreshScreeningResidentTable:)
@@ -148,9 +155,57 @@ typedef enum residentDataSource {
 - (void) refreshConnectionAndTable {
     status = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
     [self processConnectionStatus];
-    
+}
+
+
+#pragma mark - Reachability
+/*!
+ * Called by Reachability whenever status changes.
+ */
+- (void) reachabilityChanged:(NSNotification *)note
+{
+    Reachability* curReach = [note object];
+    NSParameterAssert([curReach isKindOfClass:[Reachability class]]);
+    [self updateInterfaceWithReachability:curReach];
+}
+
+- (void)updateInterfaceWithReachability:(Reachability *)reachability
+{
+    if (reachability == self.hostReachability)
+    {
+        NetworkStatus netStatus = [reachability currentReachabilityStatus];
+        
+        switch (netStatus) {
+            case NotReachable: {
+                internetDCed = true;
+                NSLog(@"Can't connect to server!");
+                [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                [SVProgressHUD showErrorWithStatus:@"No Internet!"];
+                
+                
+                break;
+            }
+            case ReachableViaWiFi:
+            case ReachableViaWWAN:
+                NSLog(@"Connected to server!");
+                
+                [self getAllScreeningResidents];
+                
+                if (internetDCed) { //previously disconnected
+                    [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+                    [SVProgressHUD showSuccessWithStatus:@"Back Online!"];
+                    internetDCed = false;
+                }
+                break;
+                
+            default:
+                break;
+        }
+    }
     
 }
+
+
 
 - (void) processConnectionStatus {
     if(status == NotReachable)
@@ -278,6 +333,7 @@ typedef enum residentDataSource {
     NSString *residentNric = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kNRIC];
     NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kLastUpdateTs];
     NSNumber *preRegCompleted = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kPreregCompleted];
+    NSString *serialId = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"nhs_serial_id"];
     
     cell.nameLabel.text = residentName;
     cell.NRICLabel.text = residentNric;
@@ -287,8 +343,20 @@ typedef enum residentDataSource {
     else
         cell.regLabel.hidden = YES;
     
+    //default hidden
     cell.verticalLine.hidden = YES;
     cell.yearLabel.hidden = YES;
+    
+    
+    if (serialId != (id) [NSNull null]) {
+        if ([serialId isKindOfClass:[NSString class]]  && ![serialId isEqualToString:@""]) {  //as long as have value
+            cell.verticalLine.hidden = NO;
+            cell.yearLabel.hidden = NO;
+        }
+    }
+    
+    
+    
     
     
     return cell;
@@ -355,23 +423,6 @@ typedef enum residentDataSource {
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableVmacproiew commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        if ([self.localSavedFilename count] > 0) {
-            if (indexPath.section == 0) {   //meaning, drafts
-                NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-                NSString *documentsDirectory = [paths objectAtIndex:0];
-                NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Screening"];
-                
-                NSFileManager *fileManager = [[NSFileManager alloc] init];
-                NSString *filePath = [folderPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@", [self.localSavedFilename objectAtIndex:indexPath.row]]];
-                [fileManager removeItemAtPath:filePath error:NULL];
-                UIAlertView *removeSuccessFulAlert=[[UIAlertView alloc]initWithTitle:@"Delete" message:@"Local Draft deleted!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                [removeSuccessFulAlert show];
-                [self getLocalSavedData];   //no need to reload online content
-                [self.tableView reloadData];
-                return;
-            }
-        }
-        
         // Delete the row from the data source
         NSDictionary *residentInfo = [self findResidentInfoFromSectionRow:indexPath];
         [self deleteResident:[residentInfo objectForKey:kResidentId]];
@@ -655,6 +706,7 @@ typedef enum residentDataSource {
     return ^(NSURLSessionDataTask *task, id responseObject){
         [self getAllScreeningResidents];
 
+        [SVProgressHUD setMaximumDismissTimeInterval:1.0];
         [SVProgressHUD showSuccessWithStatus:@"Entry Deleted!"];
         
     };
@@ -703,6 +755,8 @@ typedef enum residentDataSource {
         [[ScreeningDictionary sharedInstance] setDictionary:self.retrievedResidentData];
         
         [self saveCoreData];
+        [[ScreeningDictionary sharedInstance] prepareAdditionalSvcs];   //prepare all the qualifySections
+        
         [self performSegueWithIdentifier:@"showSelectProfileTableVC" sender:self];
     };
 }
@@ -917,8 +971,6 @@ typedef enum residentDataSource {
         [[NSUserDefaults standardUserDefaults] setObject:profilingDict[kEmployStat] forKey:kEmployStat];
     if (profilingDict != (id)[NSNull null] && profilingDict[kAvgMthHouseIncome] != (id) [NSNull null])
         [[NSUserDefaults standardUserDefaults] setObject:profilingDict[kAvgMthHouseIncome] forKey:kAvgMthHouseIncome];
-    
-    
     
     // For demographics
     if (particularsDict[kCitizenship] != (id) [NSNull null])        //check for null first

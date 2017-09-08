@@ -51,7 +51,8 @@ typedef enum getDataState {
     _residentParticulars = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"resi_particulars"]];;
     _residentID = _residentParticulars[kResidentId];
 
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshTable:) name:@"enableProfileEntry" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -120,7 +121,7 @@ typedef enum getDataState {
     
     if (indexPath.section == 0) {
         NSNumber *preRegDone =[_residentDetails[kResiParticulars] objectForKey:kPreregCompleted];
-        [cell.textLabel setText:@"📶 Resident Particulars"];
+        [cell.textLabel setText:@"👤 Resident Particulars"];
 
         if ([preRegDone isEqual:@0]) {
             cell.accessoryType = UITableViewCellAccessoryNone;
@@ -198,71 +199,20 @@ typedef enum getDataState {
     
 }
 
-#pragma mark - Save Core Data
-
-- (void) saveCoreData {
-    
-    NSDictionary *particularsDict =[_residentDetails objectForKey:kResiParticulars];
-    
-    // Calculate age
-    NSMutableString *str = [particularsDict[kBirthDate] mutableCopy];
-    NSString *yearOfBirth = [str substringWithRange:NSMakeRange(0, 4)];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy"];
-    NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
-    NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
-    
-    
-    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kGender] forKey:kGender];
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:age] forKey:kResidentAge];
-    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kResidentId] forKey:kResidentId];
-    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kName] forKey:kName];
-    [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kNRIC] forKey:kNRIC];
-    
-    
-    // For demographics
-    if (particularsDict[kCitizenship] != (id) [NSNull null])        //check for null first
-        [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kCitizenship] forKey:kCitizenship];
-    if (particularsDict[kReligion] != (id) [NSNull null])
-        [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kReligion] forKey:kReligion];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+#pragma mark - NSNotification
+- (void) refreshTable: (NSNotification *) notification {
+    [SVProgressHUD show];
+    [[ScreeningDictionary sharedInstance] fetchFromServer];
 }
 
-
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (void) reloadTable: (NSNotification *) notification {
+    _residentDetails = [[ScreeningDictionary sharedInstance] dictionary];
+    _residentParticulars = [_residentDetails objectForKey:@"resi_particulars"];
+    [self.tableView reloadData];    //put in the ticks
+    [SVProgressHUD dismiss];
+    
 }
-*/
 
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
 
 
 #pragma mark - Navigation

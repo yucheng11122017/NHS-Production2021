@@ -17,5 +17,6 @@
 - (void) fetchFromServer;
 - (void) updateDictionary;
 - (void) setDictionary:(NSDictionary *)dictionary;
+- (void) prepareAdditionalSvcs;
 
 @end
