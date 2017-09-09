@@ -44,9 +44,10 @@
 - (void)configureCell:(GenericTableViewCell *)cell forProduct:(NSDictionary *)patientDetails {
     cell.nameLabel.text = [patientDetails objectForKey:@"resident_name"];
     cell.NRICLabel.text = [patientDetails objectForKey:@"nric"];
-    cell.dateLabel.text = [patientDetails objectForKey:@"last_updated_ts"];
+//    cell.dateLabel.text = [patientDetails objectForKey:@"last_updated_ts"];
     NSNumber *preRegCompleted = [patientDetails objectForKey:kPreregCompleted];
     NSString *serialId = [patientDetails objectForKey:@"nhs_serial_id"];
+    cell.dateLabel.text = serialId;
     
     if ([preRegCompleted isEqual:@1])
         cell.regLabel.hidden = NO;

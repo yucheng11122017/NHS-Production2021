@@ -1689,7 +1689,8 @@ NSString *const kQuestionFifteen = @"q15";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kRightEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"Right Eye: "];
     row.required = YES;
-    row.selectorOptions = @[@"6/6",
+    row.selectorOptions = @[@"NA",
+                            @"6/6",
                             @"6/9-2",
                             @"6/9-1",
                             @"6/9",
@@ -1724,7 +1725,8 @@ NSString *const kQuestionFifteen = @"q15";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kLeftEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"Left Eye: "];
     row.required = YES;
-    row.selectorOptions = @[@"6/6",
+    row.selectorOptions = @[@"NA",
+                            @"6/6",
                             @"6/9-2",
                             @"6/9-1",
                             @"6/9",
@@ -1758,7 +1760,6 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:row];
     
     XLFormRowDescriptor *six12Row = [XLFormRowDescriptor formRowDescriptorWithTag:kSix12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does either eye (or both) have vision poorer than 6/12?"];
-    six12Row.required = YES;
     six12Row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:six12Row];
     
@@ -1768,7 +1769,6 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:six12Row];
     
     XLFormRowDescriptor *tunnelRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTunnel rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident have genuine visual complaints (e.g. floaters, tunnel vision, bright spots etc.)?"];
-    tunnelRow.required = YES;
     tunnelRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:tunnelRow];
     
@@ -1777,7 +1777,6 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:tunnelRow];
     
     XLFormRowDescriptor *visitEye12Mths = [XLFormRowDescriptor formRowDescriptorWithTag:kVisitEye12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident has not visited eye specialist in 12 months"];
-    visitEye12Mths.required = YES;
     visitEye12Mths.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:visitEye12Mths];
     

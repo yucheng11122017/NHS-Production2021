@@ -602,6 +602,12 @@ typedef enum formName {
     [caregivingSection addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregivingDescribe rowType:XLFormRowDescriptorTypeTextView title:@""];
+    
+    //value
+    if (socialSupportDict != (id)[NSNull null] && [socialSupportDict objectForKey:kCaregivingDescribe] != (id)[NSNull null]) {
+        row.value = [socialSupportDict objectForKey:kCaregivingDescribe];
+    }
+    
     [caregivingSection addFormRow:row];
     
     XLFormRowDescriptor *rcvCareAssistRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregivingAssist rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Would you like to receive caregiving assistance?"];
@@ -911,14 +917,15 @@ typedef enum formName {
     }
 
     
-    XLFormRowDescriptor *symptomPsychRow = [XLFormRowDescriptor formRowDescriptorWithTag:kIsPsychotic rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does the resident exhibit symptoms of psychotic disorders (i.e. bipolar disorder, schizophrenia)?"];
+    XLFormRowDescriptor *symptomPsychRow = [XLFormRowDescriptor formRowDescriptorWithTag:kIsPsychotic rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does the resident exhibit symptoms of psychotic disorders (i.e. bipolar disorder, schizophrenia)?"];
+    symptomPsychRow.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:symptomPsychRow];
     symptomPsychRow.required = YES;
     symptomPsychRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     
     //value
     if (psychWellbeingDict != (id)[NSNull null] && [psychWellbeingDict objectForKey:kIsPsychotic] != (id)[NSNull null]) {
-        symptomPsychRow.value = psychWellbeingDict[kIsPsychotic];
+        symptomPsychRow.value = [self getYesNofromOneZero:psychWellbeingDict[kIsPsychotic]];
     }
     
     [section addFormRow:symptomPsychRow];
@@ -926,10 +933,7 @@ typedef enum formName {
     XLFormRowDescriptor *psychRemarksRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPsychoticRemarks rowType:XLFormRowDescriptorTypeTextView title:@""];
     [psychRemarksRow.cellConfigAtConfigure setObject:@"Please elaborate more..." forKey:@"textView.placeholder"];
     
-    if ([symptomPsychRow.value isEqual:@1])
-        psychRemarksRow.hidden = @NO;
-    else
-        psychRemarksRow.hidden = @YES;
+    psychRemarksRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'",symptomPsychRow];
     
     //value
     if (psychWellbeingDict != (id)[NSNull null] && [psychWellbeingDict objectForKey:kPsychoticRemarks] != (id)[NSNull null]) {
@@ -938,26 +942,18 @@ typedef enum formName {
     
     [section addFormRow:psychRemarksRow];
     
-    symptomPsychRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (oldValue != newValue) {
-            if ([newValue  isEqual: @1]) {
-                psychRemarksRow.hidden = @NO;
-            } else
-                psychRemarksRow.hidden = @YES;
-        }
-    };
-    
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Suicidal Ideations"];
     [formDescriptor addFormSection:section];
     
-    XLFormRowDescriptor *suicideIdeasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSuicideIdeas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does the resident have/had suicide ideations?"];
+    XLFormRowDescriptor *suicideIdeasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSuicideIdeas rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does the resident have/had suicide ideations?"];
+    suicideIdeasRow.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:suicideIdeasRow];
     suicideIdeasRow.required = YES;
     suicideIdeasRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     
     //value
     if (psychWellbeingDict != (id)[NSNull null] && [psychWellbeingDict objectForKey:kSuicideIdeas] != (id)[NSNull null]) {
-        suicideIdeasRow.value = psychWellbeingDict[kSuicideIdeas];
+        suicideIdeasRow.value = [self getYesNofromOneZero:psychWellbeingDict[kSuicideIdeas]];
     }
     
     [section addFormRow:suicideIdeasRow];
@@ -965,10 +961,7 @@ typedef enum formName {
     XLFormRowDescriptor *suicideIdeasRemarksRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSuicideIdeasRemarks rowType:XLFormRowDescriptorTypeTextView title:@""];
     [suicideIdeasRemarksRow.cellConfigAtConfigure setObject:@"Please elaborate more..." forKey:@"textView.placeholder"];
     
-    if ([suicideIdeasRow.value isEqual:@1])
-        suicideIdeasRemarksRow.hidden = @NO;
-    else
-        suicideIdeasRemarksRow.hidden = @YES;
+    suicideIdeasRemarksRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'",suicideIdeasRow];
     
     //value
     if (psychWellbeingDict != (id)[NSNull null] && [psychWellbeingDict objectForKey:kSuicideIdeasRemarks] != (id)[NSNull null]) {
@@ -977,16 +970,7 @@ typedef enum formName {
     
     [section addFormRow:suicideIdeasRemarksRow];
     
-    suicideIdeasRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (oldValue != newValue) {
-            if ([newValue  isEqual: @1]) {
-                suicideIdeasRemarksRow.hidden = @NO;
-            } else
-                suicideIdeasRemarksRow.hidden = @YES;
-        }
-    };
-    
-    
+
     return [super initWithForm:formDescriptor];
     
 }
@@ -1010,19 +994,19 @@ typedef enum formName {
     }
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kBedbug rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Household is suspected/at risk of bedbug infection"];
-    [self setDefaultFontWithRow:row];
-    row.selectorOptions = @[@"Yes", @"No"];
-    row.required = YES;
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    XLFormRowDescriptor *gotBedbugIssueRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBedbug rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Household is suspected/at risk of bedbug infection"];
+    [self setDefaultFontWithRow:gotBedbugIssueRow];
+    gotBedbugIssueRow.selectorOptions = @[@"Yes", @"No"];
+    gotBedbugIssueRow.required = YES;
+    gotBedbugIssueRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     
     //value
     if (addSvcDict != (id)[NSNull null] && [addSvcDict objectForKey:kBedbug] != (id)[NSNull null]) {
-        row.value = [self getYesNofromOneZero:addSvcDict[kBedbug]];
+        gotBedbugIssueRow.value = [self getYesNofromOneZero:addSvcDict[kBedbug]];
     }
     
     
-    [section addFormRow:row];
+    [section addFormRow:gotBedbugIssueRow];
     
     XLFormRowDescriptor *bedbugProofRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_bedbug_symptom" rowType:XLFormRowDescriptorTypeMultipleSelector title:@"If yes, select from this checklist:"];
     [self setDefaultFontWithRow:bedbugProofRow];
@@ -1033,7 +1017,7 @@ typedef enum formName {
                                        @"Bedbug blood stains on furniture/floor",
                                        @"Others (specify in next field)"
                                        ];
-    bedbugProofRow.required = YES;
+    bedbugProofRow.required = NO;
     
     //value
     if (addSvcDict != (id)[NSNull null]) {
@@ -1053,19 +1037,32 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_service_required" rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Services required:"];
-    [self setDefaultFontWithRow:row];
-    row.selectorOptions = @[@"Bedbug eradication services",
+    XLFormRowDescriptor *bedbugServiceRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_service_required" rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Services required:"];
+    [self setDefaultFontWithRow:bedbugServiceRow];
+    bedbugServiceRow.selectorOptions = @[@"Bedbug eradication services",
                             @"Decluttering services"
                             ];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    bedbugServiceRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    bedbugProofRow.required = NO;
     
     //value
     if (addSvcDict != (id)[NSNull null]) {
-        row.value = [self getReqSvcsArray:addSvcDict];
+        bedbugServiceRow.value = [self getReqSvcsArray:addSvcDict];
     }
     
-    [section addFormRow:row];
+    [section addFormRow:bedbugServiceRow];
+    
+    gotBedbugIssueRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqualToString:@"Yes"]) {
+                bedbugProofRow.required = YES;
+                bedbugServiceRow.required = YES;
+            } else {
+                bedbugProofRow.required = NO;
+                bedbugServiceRow.required = NO;
+            }
+        }
+    };
     
     
     return [super initWithForm:formDescriptor];
@@ -1350,9 +1347,9 @@ typedef enum formName {
     
     //Psychological Well-being
     else if ([rowDescriptor.tag isEqualToString:kIsPsychotic]) {
-        [self postSingleFieldWithSection:SECTION_PSYCH_WELL_BEING andFieldName:kIsPsychotic andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_PSYCH_WELL_BEING andFieldName:kIsPsychotic andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kSuicideIdeas]) {
-        [self postSingleFieldWithSection:SECTION_PSYCH_WELL_BEING andFieldName:kSuicideIdeas andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_PSYCH_WELL_BEING andFieldName:kSuicideIdeas andNewContent:ansFromYesNo];
     }
     //Psychological Well-being
     else if ([rowDescriptor.tag isEqualToString:kBedbug]) {

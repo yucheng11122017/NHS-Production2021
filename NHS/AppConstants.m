@@ -380,6 +380,7 @@ NSString *const kDentistReferred = @"dentist_referred";
 NSString *const kChiefComp = @"chief_comp";
 NSString *const kOcuHist = @"ocu_hist";
 NSString *const kHealthHist = @"health_hist";
+NSString *const kMedHistComments = @"med_hist_comments";
 
 /* Visual Acuity */
 NSString *const kVaDone = @"va_done";

@@ -340,7 +340,7 @@ typedef enum rowTypes {
             NSString *room = [newValue substringWithRange:NSMakeRange(loc-1, 1)];
             
             
-            double delayInSeconds = 1.0;
+            double delayInSeconds = 0.5;    //no longer necessary
             dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
             dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
                 //code to be executed on the main queue after delay

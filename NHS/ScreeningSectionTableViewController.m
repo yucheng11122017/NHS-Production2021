@@ -51,6 +51,7 @@ typedef enum sectionRowNumber {
 @property (strong, nonatomic) NSArray *rowTitles;
 @property (strong, nonatomic) NSDictionary *fullScreeningForm;
 @property (strong, nonatomic) NSString *loadedFilepath;
+@property (strong, nonatomic) UIBarButtonItem *specialBtn;
 
 @end
 
@@ -77,7 +78,20 @@ typedef enum sectionRowNumber {
     
     if (alreadySubmitted) {
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
+    } else {
+        BOOL isComm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"isComm"] boolValue];
+        
+        if (isComm) {
+            UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 27, 27)];
+            [button addTarget:self action:@selector(forceEnableSubmit:) forControlEvents:UIControlEventTouchUpInside];
+            [button setImage:[UIImage imageNamed:@"spannar-icon"] forState:UIControlStateNormal];
+            [button setTintColor:[UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0]];
+            _specialBtn = [[UIBarButtonItem alloc] initWithCustomView:button];
+            _specialBtn.tintColor = self.view.tintColor;
+            [self.navigationItem setRightBarButtonItem:_specialBtn];
+        }
     }
+    
     
     
     formType = NewScreeningForm;    //default value
@@ -136,8 +150,6 @@ typedef enum sectionRowNumber {
     
     [super viewDidLoad];
 }
-
-
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -303,8 +315,10 @@ typedef enum sectionRowNumber {
     }
     else {   //Submit button
         [self setIsFinalInServer];
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
 }
+
 
 # pragma mark - Buttons
 
@@ -335,6 +349,17 @@ typedef enum sectionRowNumber {
     [self clearIsFinalInServer];
     self.navigationItem.rightBarButtonItem.enabled = NO;   //disable the Edit button
 }
+
+- (void)forceEnableSubmit:(UIBarButtonItem * __unused)button
+{
+    NSLog(@"Enabling Submit button");
+    readyToSubmit = true;
+    [self.tableView reloadData];
+    button.enabled = NO;
+    [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+    [SVProgressHUD showSuccessWithStatus:@"Submit enabled!"];
+}
+
 
 #pragma mark - NSNotification Methods
 
@@ -540,7 +565,7 @@ typedef enum sectionRowNumber {
         
         int count =0;
         
-        for (int i=0; i< [_completionCheck count]; i++) {
+        for (int i=0; i< [arr count]; i++) {
             NSNumber *value = [arr objectAtIndex:i];
             if ([value isEqual:@1]) count++;
         }

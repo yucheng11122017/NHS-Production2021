@@ -19,7 +19,7 @@
 #define USERNAME_TEXTFIELD_TAG 2
 #define PASSWORD_TEXTFIELD_TAG 3
 
-#define DEVELOPMENT_PHASE 1
+//#define DEVELOPMENT_PHASE 1
 
 @interface LoginViewController () {
     NSNumber *isComm;
@@ -57,6 +57,9 @@
     
     // scale the NHS logo properly
     self.nhsLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.fullNameField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+    self.fullNameField.autocorrectionType = UITextAutocorrectionTypeNo;
+    self.usernameField.autocorrectionType = UITextAutocorrectionTypeNo;
     
     // set textfield delegate - for responding to return button presses
     self.fullNameField.delegate = self;
@@ -70,8 +73,8 @@
     
 #ifdef DEVELOPMENT_PHASE
     self.fullNameField.text = @"Testing";
-    self.usernameField.text = @"nhs16user1";
-    self.passwordField.text = @"2016user1";
+    self.usernameField.text = @"nhs16comm1";
+    self.passwordField.text = @"2016comm1";
 #endif
     
     

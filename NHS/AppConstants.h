@@ -423,6 +423,7 @@ extern NSString *const kDentistReferred;
 extern NSString *const kChiefComp;
 extern NSString *const kOcuHist;
 extern NSString *const kHealthHist;
+extern NSString *const kMedHistComments;
 
 #pragma mark Visual Acuity
 extern NSString *const kVaDone;

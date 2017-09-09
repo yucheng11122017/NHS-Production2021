@@ -337,7 +337,10 @@ typedef enum residentDataSource {
     
     cell.nameLabel.text = residentName;
     cell.NRICLabel.text = residentNric;
-    cell.dateLabel.text = lastUpdatedTS;
+//    cell.dateLabel.text = lastUpdatedTS;
+    cell.dateLabel.text = serialId;
+    
+    
     if ([preRegCompleted isEqual:@1])
         cell.regLabel.hidden = NO;
     else
@@ -416,12 +419,18 @@ typedef enum residentDataSource {
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     // Return NO if you do not want the specified item to be editable.
-    return YES;
+    BOOL isComm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"isComm"] boolValue];
+    
+    if (isComm) {
+        return YES;
+    }
+    else
+        return NO;  // no deleting for volunteers!
 }
 
 
 // Override to support editing the table view.
-- (void)tableView:(UITableView *)tableVmacproiew commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
         NSDictionary *residentInfo = [self findResidentInfoFromSectionRow:indexPath];
@@ -941,8 +950,13 @@ typedef enum residentDataSource {
 }
 
 - (void) resetAllUserDefaults {
+    BOOL isComm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"isComm"] boolValue];
     NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
     [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+    
+    //don't erase this value
+    [[NSUserDefaults standardUserDefaults] setBool:isComm forKey:@"isComm"];
+    [[NSUserDefaults standardUserDefaults]synchronize];
     
 }
 

@@ -17,7 +17,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="59.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rKH-7I-tUl">
@@ -64,7 +64,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="✔︎2017" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fUh-br-m9k">
-                        <rect key="frame" x="58" y="35" width="46" height="21"/>
+                        <rect key="frame" x="58" y="35" width="61" height="21"/>
                         <fontDescription key="fontDescription" name="HelveticaNeue-CondensedBold" family="Helvetica Neue" pointSize="14"/>
                         <color key="textColor" red="0.25098040700000002" green="0.0" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
@@ -76,7 +76,7 @@
                     <constraint firstItem="fUh-br-m9k" firstAttribute="firstBaseline" secondItem="7Aa-nd-gfu" secondAttribute="firstBaseline" id="3zd-uf-Bet"/>
                     <constraint firstItem="TKv-uD-c4x" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="-1" id="6KA-dP-yu7"/>
                     <constraint firstItem="qph-3s-zPF" firstAttribute="leading" secondItem="7Aa-nd-gfu" secondAttribute="trailing" id="7QM-6u-zZA"/>
-                    <constraint firstItem="w2Z-kh-J4K" firstAttribute="leading" secondItem="fUh-br-m9k" secondAttribute="trailing" constant="33" id="7d5-Gd-GkL"/>
+                    <constraint firstItem="w2Z-kh-J4K" firstAttribute="leading" secondItem="fUh-br-m9k" secondAttribute="trailing" constant="18" id="7d5-Gd-GkL"/>
                     <constraint firstItem="rKH-7I-tUl" firstAttribute="trailing" secondItem="H2p-sc-9uM" secondAttribute="trailingMargin" constant="-68" id="FYd-lg-UZU"/>
                     <constraint firstAttribute="bottomMargin" secondItem="w2Z-kh-J4K" secondAttribute="bottom" constant="-4.5" id="GfH-L0-iEb"/>
                     <constraint firstItem="rKH-7I-tUl" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="7" id="WXf-SV-Umf"/>
