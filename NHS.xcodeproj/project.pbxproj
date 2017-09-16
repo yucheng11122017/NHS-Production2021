@@ -23,6 +23,7 @@
 		01D48ECE1F39CD2C002C3928 /* MedicalHistoryTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D48ECD1F39CD2C002C3928 /* MedicalHistoryTableVC.m */; };
 		01D48ED21F3A1839002C3928 /* SocialWorkTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D48ED11F3A1839002C3928 /* SocialWorkTableVC.m */; };
 		01D48ED51F3B5F40002C3928 /* SocialWorkFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D48ED41F3B5F40002C3928 /* SocialWorkFormVC.m */; };
+		01D7BCF11F6D38E2000FDDED /* DeviceInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 01D7BCF01F6D38E2000FDDED /* DeviceInfo.m */; };
 		01FF80C11F53AF62002C7ADD /* NewScreeningResidentFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01FF80C01F53AF62002C7ADD /* NewScreeningResidentFormVC.m */; };
 		0365AA69F5F64A154E302724 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8964BE86125ACEAAC6F8C79B /* AVFoundation.framework */; };
 		45E30D748D4D9DB15E36E079 /* Pods_CocoaPods_NHS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBF146E69B77C3775C935F8C /* Pods_CocoaPods_NHS.framework */; };
@@ -103,6 +104,8 @@
 		01D48ED11F3A1839002C3928 /* SocialWorkTableVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocialWorkTableVC.m; sourceTree = "<group>"; };
 		01D48ED31F3B5F40002C3928 /* SocialWorkFormVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocialWorkFormVC.h; sourceTree = "<group>"; };
 		01D48ED41F3B5F40002C3928 /* SocialWorkFormVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SocialWorkFormVC.m; sourceTree = "<group>"; };
+		01D7BCEF1F6D38E2000FDDED /* DeviceInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeviceInfo.h; path = Models/DeviceInfo.h; sourceTree = "<group>"; };
+		01D7BCF01F6D38E2000FDDED /* DeviceInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeviceInfo.m; path = Models/DeviceInfo.m; sourceTree = "<group>"; };
 		01FF80BF1F53AF62002C7ADD /* NewScreeningResidentFormVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewScreeningResidentFormVC.h; sourceTree = "<group>"; };
 		01FF80C01F53AF62002C7ADD /* NewScreeningResidentFormVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewScreeningResidentFormVC.m; sourceTree = "<group>"; };
 		15C05F16B9AA0D95A6AE2EAA /* Pods-CocoaPods-NHS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPods-NHS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPods-NHS/Pods-CocoaPods-NHS.debug.xcconfig"; sourceTree = "<group>"; };
@@ -232,21 +235,69 @@
 			name = "Social Work";
 			sourceTree = "<group>";
 		};
-		8E2527661D57600900ACEE92 /* Screening */ = {
+		01E622F61F6D2CC800E05FA8 /* Screening List */ = {
 			isa = PBXGroup;
 			children = (
 				E1EFB0911D433C3400510532 /* PatientScreeningListTableViewController.h */,
 				E1EFB0921D433C3400510532 /* PatientScreeningListTableViewController.m */,
+			);
+			name = "Screening List";
+			sourceTree = "<group>";
+		};
+		01E622F71F6D2CD500E05FA8 /* New Resident VC */ = {
+			isa = PBXGroup;
+			children = (
 				01FF80BF1F53AF62002C7ADD /* NewScreeningResidentFormVC.h */,
 				01FF80C01F53AF62002C7ADD /* NewScreeningResidentFormVC.m */,
+			);
+			name = "New Resident VC";
+			sourceTree = "<group>";
+		};
+		01E622F81F6D2CE600E05FA8 /* Select Profile VC */ = {
+			isa = PBXGroup;
+			children = (
 				01D48EBF1F3327B5002C3928 /* ScreeningSelectProfileTableVC.h */,
 				01D48EC01F3327B5002C3928 /* ScreeningSelectProfileTableVC.m */,
+			);
+			name = "Select Profile VC";
+			sourceTree = "<group>";
+		};
+		01E622F91F6D2CF700E05FA8 /* Resident Particulars VC */ = {
+			isa = PBXGroup;
+			children = (
 				01D48EC21F346C36002C3928 /* ResidentParticularsVC.h */,
 				01D48EC31F346C36002C3928 /* ResidentParticularsVC.m */,
+			);
+			name = "Resident Particulars VC";
+			sourceTree = "<group>";
+		};
+		01E622FA1F6D2D0200E05FA8 /* Screening Section VC */ = {
+			isa = PBXGroup;
+			children = (
 				8EC56F851D60C16300938C2A /* ScreeningSectionTableViewController.h */,
 				8EC56F861D60C16300938C2A /* ScreeningSectionTableViewController.m */,
+			);
+			name = "Screening Section VC";
+			sourceTree = "<group>";
+		};
+		01E622FB1F6D2D0A00E05FA8 /* Screening Form VC */ = {
+			isa = PBXGroup;
+			children = (
 				8EC56F7F1D60B88D00938C2A /* ScreeningFormViewController.h */,
 				8EC56F801D60B88D00938C2A /* ScreeningFormViewController.m */,
+			);
+			name = "Screening Form VC";
+			sourceTree = "<group>";
+		};
+		8E2527661D57600900ACEE92 /* Screening */ = {
+			isa = PBXGroup;
+			children = (
+				01E622F61F6D2CC800E05FA8 /* Screening List */,
+				01E622F71F6D2CD500E05FA8 /* New Resident VC */,
+				01E622F81F6D2CE600E05FA8 /* Select Profile VC */,
+				01E622F91F6D2CF700E05FA8 /* Resident Particulars VC */,
+				01E622FA1F6D2D0200E05FA8 /* Screening Section VC */,
+				01E622FB1F6D2D0A00E05FA8 /* Screening Form VC */,
 				01D48EC81F39CB37002C3928 /* Health Assessment & Risk Stratification */,
 				01D48ECF1F3A1812002C3928 /* Social Work */,
 				015F68271F4A7EF3000B6D5E /* SERI Eye Screening */,
@@ -382,6 +433,8 @@
 				E13B8F0A1D66F62900C3A81D /* UIScrollViewWithTouchesBegan.m */,
 				016A27F41F5FDB8F0074C36A /* SearchResultsTableController.h */,
 				016A27F51F5FDB8F0074C36A /* SearchResultsTableController.m */,
+				01D7BCEF1F6D38E2000FDDED /* DeviceInfo.h */,
+				01D7BCF01F6D38E2000FDDED /* DeviceInfo.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -458,7 +511,7 @@
 		E120E3FB1D431E9A002DBC7E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = NUS;
 				TargetAttributes = {
 					E120E4021D431E9A002DBC7E = {
@@ -698,6 +751,7 @@
 				E1A4F0DF1D66BC5A00EE9BBB /* LoginViewController.m in Sources */,
 				015831401DB4D2F80049F16C /* GenericTableViewCell.m in Sources */,
 				01D48ECE1F39CD2C002C3928 /* MedicalHistoryTableVC.m in Sources */,
+				01D7BCF11F6D38E2000FDDED /* DeviceInfo.m in Sources */,
 				8EC56F871D60C16300938C2A /* ScreeningSectionTableViewController.m in Sources */,
 				01087AE41F6041700046838E /* ScreeningDictionary.m in Sources */,
 				01B893FB1F3DADF900201995 /* DemographicsVC.m in Sources */,
@@ -773,14 +827,20 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -820,14 +880,20 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;

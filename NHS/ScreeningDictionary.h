@@ -15,7 +15,6 @@
 @property (strong, nonatomic) NSDictionary *dictionary;
 
 - (void) fetchFromServer;
-- (void) updateDictionary;
 - (void) setDictionary:(NSDictionary *)dictionary;
 - (void) prepareAdditionalSvcs;
 

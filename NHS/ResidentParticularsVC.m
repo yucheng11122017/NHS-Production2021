@@ -100,7 +100,7 @@ typedef enum rowTypes {
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    self.navigationController.navigationBar.topItem.title = @"";
+    self.navigationController.navigationBar.topItem.title = @"Resident Particulars";
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
@@ -169,10 +169,11 @@ typedef enum rowTypes {
     
     dobRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBirthDate rowType:XLFormRowDescriptorTypeDateInline title:@"DOB"];
     dobRow.required = YES;
-    
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"YYYY-MM-dd";
+
     if ([_residentParticularsDict count] > 0) {
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"YYYY-MM-dd";
+        dateFormatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];  //otherwise 1st Jan will not be able to be read.
         NSDate *date = [dateFormatter dateFromString:_residentParticularsDict[kBirthDate]];
         dobRow.value = date;
     }
@@ -596,13 +597,14 @@ typedef enum rowTypes {
 - (NSString *) getBlockFromAddress: (NSString *) string {
     
     NSMutableString *subString;
+    NSString* result;
     if ([neighbourhood isEqualToString:@"Kampong Glam"]) {
         subString = [[string substringWithRange:NSMakeRange(0, 6)] mutableCopy];
-        [subString stringByReplacingOccurrencesOfString:@"Blk" withString:@""];
+        result = [subString stringByReplacingOccurrencesOfString:@"Blk " withString:@""];
     } else
-        subString = [[string substringWithRange:NSMakeRange(0, 2)] mutableCopy];
+        result = [string substringWithRange:NSMakeRange(0, 2)];
     
-    int blkNo = [subString intValue];   //to remove whitespace
+    int blkNo = [result intValue];   //to remove whitespace
     return [NSString stringWithFormat:@"%d", blkNo];
 }
 

@@ -331,7 +331,7 @@ typedef enum residentDataSource {
     NSArray *residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
     NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kName];
     NSString *residentNric = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kNRIC];
-    NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kLastUpdateTs];
+//    NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kLastUpdateTs];
     NSNumber *preRegCompleted = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kPreregCompleted];
     NSString *serialId = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"nhs_serial_id"];
     

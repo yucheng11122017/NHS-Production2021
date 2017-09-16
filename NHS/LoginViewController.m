@@ -12,6 +12,7 @@
 #import "AFNetworking.h"
 #import <CommonCrypto/CommonDigest.h>
 #import "SVProgressHUD.h"
+#import "DeviceInfo.h"
 
 #define ERROR_MSG_DELAY 5.0f
 
@@ -19,7 +20,7 @@
 #define USERNAME_TEXTFIELD_TAG 2
 #define PASSWORD_TEXTFIELD_TAG 3
 
-//#define DEVELOPMENT_PHASE 1
+#define DEVELOPMENT_PHASE 1
 
 @interface LoginViewController () {
     NSNumber *isComm;
@@ -33,6 +34,8 @@
 @property(strong, nonatomic) IBOutlet UITextField *passwordField;
 @property(strong, nonatomic) IBOutlet UILabel *errorMsgLabel;
 @property (weak, nonatomic) IBOutlet UILabel *versionLabel;
+@property (weak, nonatomic) IBOutlet UILabel *deviceInfoLabel;
+@property (weak, nonatomic) IBOutlet UILabel *deviceNameLabel;
 
 @property(strong, nonatomic) IBOutlet UIButton *loginButton;
 
@@ -57,6 +60,8 @@
     
     // scale the NHS logo properly
     self.nhsLogoImageView.contentMode = UIViewContentModeScaleAspectFit;
+    
+    // Some Type configurations for Full Name and Username field
     self.fullNameField.autocapitalizationType = UITextAutocapitalizationTypeWords;
     self.fullNameField.autocorrectionType = UITextAutocorrectionTypeNo;
     self.usernameField.autocorrectionType = UITextAutocorrectionTypeNo;
@@ -73,8 +78,8 @@
     
 #ifdef DEVELOPMENT_PHASE
     self.fullNameField.text = @"Testing";
-    self.usernameField.text = @"nhs16comm1";
-    self.passwordField.text = @"2016comm1";
+    self.usernameField.text = @"nhs16comm6";
+    self.passwordField.text = @"2016comm6";
 #endif
     
     
@@ -82,6 +87,16 @@
     NSString * build = [[NSBundle mainBundle] objectForInfoDictionaryKey: (NSString *)kCFBundleVersionKey];
     
     [self.versionLabel setText:[NSString stringWithFormat:@"Version: %@.%@", version, build]];
+    
+    NSString *deviceName = [[UIDevice currentDevice] name];
+    NSString *deviceType = [DeviceInfo deviceName];
+    
+    [self.deviceInfoLabel setText:[NSString stringWithFormat:@"Device: %@", deviceType]];
+    [self.deviceNameLabel setText:[NSString stringWithFormat:@"Device Name: %@",deviceName]];
+    
+    [self.deviceInfoLabel setHidden:YES];
+    [self.deviceNameLabel setHidden:YES];
+    
     
     // prepare scrollview if screen is too small to display all elements
     CGFloat height = [[UIScreen mainScreen] bounds].size.height;
@@ -98,6 +113,11 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    
+    [self.nhsLogoImageView setUserInteractionEnabled:YES];
+    UITapGestureRecognizer *twoFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleDeviceInfoHidden:)];
+    [twoFingerTap setNumberOfTouchesRequired:2];
+    [self.nhsLogoImageView addGestureRecognizer:twoFingerTap];
     
     // place cursor at username field and raise the keyboard
 //    [self.usernameField becomeFirstResponder];
@@ -296,6 +316,11 @@
     return output;
 }
 
+- (void) toggleDeviceInfoHidden:(id) sender {
+    [self.deviceInfoLabel setHidden:!self.deviceInfoLabel.hidden];  //toggle hidden
+    [self.deviceNameLabel setHidden:!self.deviceNameLabel.hidden];  //toggle hidden
+    NSLog(@"Show DeviceInfoLabel!");
+}
 
  #pragma mark - Navigation
  
