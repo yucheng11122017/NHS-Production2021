@@ -78,8 +78,8 @@
     
 #ifdef DEVELOPMENT_PHASE
     self.fullNameField.text = @"Testing";
-    self.usernameField.text = @"nhs16comm6";
-    self.passwordField.text = @"2016comm6";
+    self.usernameField.text = @"nhs17comm6";
+    self.passwordField.text = @"2017comm6";
 #endif
     
     

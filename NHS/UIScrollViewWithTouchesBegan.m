@@ -18,7 +18,7 @@
  }
  */
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    NSLog(@"touches began!");
+//    NSLog(@"touches began!");
     [self minimiseAllKeyboards];
 }
 
