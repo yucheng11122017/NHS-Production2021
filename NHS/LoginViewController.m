@@ -24,6 +24,8 @@
 
 @interface LoginViewController () {
     NSNumber *isComm;
+    NSString *deviceName;
+    NSString *deviceType;
 }
 
 @property(strong, nonatomic) IBOutlet UIScrollView *scrollViewBackground;
@@ -78,8 +80,8 @@
     
 #ifdef DEVELOPMENT_PHASE
     self.fullNameField.text = @"Testing";
-    self.usernameField.text = @"nhs17comm6";
-    self.passwordField.text = @"2017comm6";
+    self.usernameField.text = @"nhs16comm1";
+    self.passwordField.text = @"2016comm1";
 #endif
     
     
@@ -88,8 +90,8 @@
     
     [self.versionLabel setText:[NSString stringWithFormat:@"Version: %@.%@", version, build]];
     
-    NSString *deviceName = [[UIDevice currentDevice] name];
-    NSString *deviceType = [DeviceInfo deviceName];
+    deviceName = [[UIDevice currentDevice] name];
+    deviceType = [DeviceInfo deviceName];
     
     [self.deviceInfoLabel setText:[NSString stringWithFormat:@"Device: %@", deviceType]];
     [self.deviceNameLabel setText:[NSString stringWithFormat:@"Device Name: %@",deviceName]];
@@ -218,7 +220,7 @@
     // submit credentials
 //    NSString *url = @"https://nus-nhs.ml/volunteerLogin"; //for DEV
     NSString *url = @"https://nhs-som.nus.edu.sg/volunteerLoginName";
-    NSDictionary *dict = @{@"fullname": fullname, @"username" : username, @"passkey" : passkey };
+    NSDictionary *dict = @{@"fullname": fullname, @"username" : username, @"passkey" : passkey, @"device_type":deviceType, @"device_name":deviceName };
     NSDictionary *dataDict = @{ @"data" : dict };
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];

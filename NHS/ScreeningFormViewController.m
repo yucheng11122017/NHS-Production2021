@@ -397,6 +397,20 @@ NSString *const kQuestionFifteen = @"q15";
         }
     };
     
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Notes"];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *commentsRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"notes" rowType:XLFormRowDescriptorTypeTextView title:@""];
+    [commentsRow.cellConfigAtConfigure setObject:@"Notes..." forKey:@"textView.placeholder"];
+    commentsRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:commentsRow];
+    
+    //value
+    if (phlebotomyDict != (id)[NSNull null] && [phlebotomyDict objectForKey:@"notes"] != (id)[NSNull null])
+        commentsRow.value = phlebotomyDict[@"notes"];
+    
+    [section addFormRow:commentsRow];
+    
     return [super initWithForm:formDescriptor];
 }
 
@@ -1759,29 +1773,35 @@ NSString *const kQuestionFifteen = @"q15";
     if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kLeftEye] != (id)[NSNull null]) row.value = snellenTestDict[kLeftEye];
     [section addFormRow:row];
     
-    XLFormRowDescriptor *six12Row = [XLFormRowDescriptor formRowDescriptorWithTag:kSix12 rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does either eye (or both) have vision poorer than 6/12?"];
+    XLFormRowDescriptor *six12Row = [XLFormRowDescriptor formRowDescriptorWithTag:kSix12 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does either eye (or both) have vision poorer than 6/12?"];
+    six12Row.required = YES;
+    six12Row.selectorOptions = @[@"Yes", @"No"];
     six12Row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:six12Row];
     
     //value
-     if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kSix12] != (id)[NSNull null]) six12Row.value = snellenTestDict[kSix12];
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kSix12] != (id)[NSNull null]) six12Row.value = [self getYesNofromOneZero:snellenTestDict[kSix12]];
     
     [section addFormRow:six12Row];
     
-    XLFormRowDescriptor *tunnelRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTunnel rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident have genuine visual complaints (e.g. floaters, tunnel vision, bright spots etc.)?"];
+    XLFormRowDescriptor *tunnelRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTunnel rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does resident have genuine visual complaints (e.g. floaters, tunnel vision, bright spots etc.)?"];
+    tunnelRow.required = YES;
     tunnelRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    tunnelRow.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:tunnelRow];
     
     //value
-    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kTunnel] != (id)[NSNull null]) tunnelRow.value = snellenTestDict[kTunnel];
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kTunnel] != (id)[NSNull null]) tunnelRow.value = [self getYesNofromOneZero:snellenTestDict[kTunnel]];
     [section addFormRow:tunnelRow];
     
-    XLFormRowDescriptor *visitEye12Mths = [XLFormRowDescriptor formRowDescriptorWithTag:kVisitEye12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident has not visited eye specialist in 12 months"];
+    XLFormRowDescriptor *visitEye12Mths = [XLFormRowDescriptor formRowDescriptorWithTag:kVisitEye12Mths rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Resident has not visited eye specialist in 12 months"];
+    visitEye12Mths.required = YES;
     visitEye12Mths.cellConfig[@"textLabel.numberOfLines"] = @0;
+    visitEye12Mths.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:visitEye12Mths];
     
     //value
-    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kVisitEye12Mths] != (id)[NSNull null]) visitEye12Mths.value = snellenTestDict[kVisitEye12Mths];
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kVisitEye12Mths] != (id)[NSNull null]) visitEye12Mths.value = [self getYesNofromOneZero:snellenTestDict[kVisitEye12Mths]];
     [section addFormRow:visitEye12Mths];
 
     [self checkForSeriEligibilityWithRow3:six12Row andRow4:tunnelRow andRow5:visitEye12Mths];
@@ -2417,7 +2437,7 @@ NSString *const kQuestionFifteen = @"q15";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"preEdScoreButton" rowType:XLFormRowDescriptorTypeButton title:@"Calculate Pre-education Score"];
     row.action.formSelector = @selector(calculateScore:);
-    row.required = NO;
+    row.required = YES;
     [preEdSection addFormRow:row];
     
     preEdScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPreEdScore rowType:XLFormRowDescriptorTypeInteger title:@"Pre-education Score"];
@@ -2623,12 +2643,14 @@ NSString *const kQuestionFifteen = @"q15";
     postEdScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPostEdScore rowType:XLFormRowDescriptorTypeInteger title:@"Post-education Score"];
     postEdScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     postEdScoreRow.noValueDisplayText = @"-/-";
+    postEdScoreRow.required = YES;
     postEdScoreRow.disabled = @YES;
     [self setDefaultFontWithRow:postEdScoreRow];
     if (postEduDict != (id)[NSNull null]) postEdScoreRow.value = postEduDict[kPostEdScore];
     [postEdSection addFormRow:postEdScoreRow];
     
     XLFormRowDescriptor *dateHealthEdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDateEd rowType:XLFormRowDescriptorTypeSelectorAlertView title:@"Completed on:"];
+    dateHealthEdRow.required = YES;
     if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood] containsString:@"Eunos"]) {
         dateHealthEdRow.selectorOptions = @[@"9 September", @"10 September"];
     } else {
@@ -2877,11 +2899,11 @@ NSString *const kQuestionFifteen = @"q15";
     } else if ([rowDescriptor.tag isEqualToString:kLeftEye]) {
         [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kLeftEye andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kSix12]) {
-        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kSix12 andNewContent:newValue];
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kSix12 andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kTunnel]) {
-        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kTunnel andNewContent:newValue];
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kTunnel andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kVisitEye12Mths]) {
-        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kVisitEye12Mths andNewContent:newValue];
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kVisitEye12Mths andNewContent:ansFromYesNo];
     }
     
     /* Additional Services */
@@ -3152,10 +3174,11 @@ NSString *const kQuestionFifteen = @"q15";
                                                   andRow4: (XLFormRowDescriptor *) tunnelRow
                                                   andRow5: (XLFormRowDescriptor *) visitEye12MthsRow {
     
-    if (([six12Row.value isEqual:@1] || ([tunnelRow.value isEqual:@(1)])) && ([visitEye12MthsRow.value isEqual:@(1)])) { // (3 OR 4) AND 5
+    if (([six12Row.value isEqualToString:@"Yes"] && ([tunnelRow.value isEqualToString:@"Yes"])) && ([visitEye12MthsRow.value isEqualToString:@"Yes"])) { // (3 AND 4) AND 5
         NSLog(@"SERI Enabled!");
         [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifySeri];
     } else {
+        NSLog(@"SERI Disabled!");
         [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifySeri];
     }
 }

@@ -180,12 +180,12 @@ typedef enum rowTypes {
     [dobRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
     [section addFormRow:dobRow];
     
-    dobRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        
-        if (![oldValue isEqual:newValue]) { //otherwise this segment will crash
-            NSLog(@"%@", newValue);
-        }
-    };
+//    dobRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+//
+//        if (![oldValue isEqual:newValue]) { //otherwise this segment will crash
+//            NSLog(@"%@", newValue);
+//        }
+//    };
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCitizenship rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"Citizenship Status"];
     row.required = YES;
@@ -451,14 +451,14 @@ typedef enum rowTypes {
 // Currently only works for textFields
 -(void)endEditing:(XLFormRowDescriptor *)rowDescriptor {
     
-    if ([rowDescriptor.tag isEqualToString:kBirthDate] || [rowDescriptor.tag isEqualToString:kNRIC]) {
-        return;
-    }
-    else if ([rowDescriptor.tag isEqualToString:kName]) {
+//    if ([rowDescriptor.tag isEqualToString:kBirthDate] || [rowDescriptor.tag isEqualToString:kNRIC]) {    //even NRIC and BirthDate can be edited after registration
+//        return;
+//    }
+    if ([rowDescriptor.tag isEqualToString:kName]) {
         NSString *CAPSed = [rowDescriptor.value uppercaseString];
         rowDescriptor.value = CAPSed;
         [self reloadFormRow:rowDescriptor];
-        return;
+        
     } else if ([rowDescriptor.tag isEqualToString:kAddressOthers]) {
         NSString *CAPSed = [rowDescriptor.value uppercaseString];
         rowDescriptor.value = CAPSed;
@@ -485,10 +485,38 @@ typedef enum rowTypes {
         }];
     }
     
+    
     if (rowDescriptor.value != (id)[NSNull null] && rowDescriptor.value != nil) {
+        if (rowDescriptor.tag == kBirthDate) {
+            NSString *birthDate = [self getDateStringFromFormValue:rowDescriptor.value];
+            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:birthDate];
+            return;
+        }
+        
         [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
     }
 }
+
+-(void)formRowDescriptorValueHasChanged:(XLFormRowDescriptor *)rowDescriptor oldValue:(id)oldValue newValue:(id)newValue
+{
+    [super formRowDescriptorValueHasChanged:rowDescriptor oldValue:oldValue newValue:newValue];
+    NSString* ansFromGender;
+    
+    
+    if (newValue != (id)[NSNull null] && [newValue isKindOfClass:[NSString class]]) {
+        if ([newValue isEqualToString:@"Male"])
+            ansFromGender = @"M";
+        else if ([newValue isEqualToString:@"Female"])
+            ansFromGender = @"F";
+    }
+    
+    if ([rowDescriptor.tag isEqualToString:kGender]) {
+        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kGender andNewContent:newValue];
+    }
+}
+    
+    
+    
 
 #pragma mark -
 
@@ -579,6 +607,13 @@ typedef enum rowTypes {
     return returnValue;
 }
 
+- (NSString *) getDateStringFromFormValue: (NSDate *) date{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    
+    return [dateFormatter stringFromDate:date];
+}
+
 - (NSString *) getEthnicityString: (NSString *) number {
     NSArray *array = @[@"Chinese", @"Indian", @"Malay", @"Others"];
     return [array objectAtIndex:[number integerValue]];
@@ -641,19 +676,7 @@ typedef enum rowTypes {
 
 - (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
     NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
-    //    if ([[dictionary objectForKey:kLangCanto] isKindOfClass:[NSString class]]) {
-    //
-    //        if([[dictionary objectForKey:kLangCanto] isEqualToString:@"1"]) [spokenLangArray addObject:@"Cantonese"];
-    //        if([[dictionary objectForKey:kLangEng] isEqualToString:@"1"]) [spokenLangArray addObject:@"English"];
-    //        if([[dictionary objectForKey:kLangHindi] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hindi"];
-    //        if([[dictionary objectForKey:kLangHokkien] isEqualToString:@"1"]) [spokenLangArray addObject:@"Hokkien"];
-    //        if([[dictionary objectForKey:kLangMalay] isEqualToString:@"1"]) [spokenLangArray addObject:@"Malay"];
-    //        if([[dictionary objectForKey:kLangMandarin] isEqualToString:@"1"]) [spokenLangArray addObject:@"Mandarin"];
-    //        if([[dictionary objectForKey:kLangOthers] isEqualToString:@"1"]) [spokenLangArray addObject:@"Others"];
-    //        if([[dictionary objectForKey:kLangTamil] isEqualToString:@"1"]) [spokenLangArray addObject:@"Tamil"];
-    //        if([[dictionary objectForKey:kLangTeoChew] isEqualToString:@"1"]) [spokenLangArray addObject:@"Teochew"];
-    //    }
-    //    else if ([[dictionary objectForKey:kLangCanto] isKindOfClass:[NSNumber class]]) {
+
     if([[dictionary objectForKey:kLangCanto] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
     if([[dictionary objectForKey:kLangEng] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
     if([[dictionary objectForKey:kLangHindi] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
@@ -663,7 +686,6 @@ typedef enum rowTypes {
     if([[dictionary objectForKey:kLangOthers] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
     if([[dictionary objectForKey:kLangTamil] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
     if([[dictionary objectForKey:kLangTeoChew] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
-    //    }
     return spokenLangArray;
 }
 
