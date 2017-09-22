@@ -357,6 +357,7 @@ typedef enum sectionRowNumber {
     [self.tableView reloadData];
     button.enabled = NO;
     [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
     [SVProgressHUD showSuccessWithStatus:@"Submit enabled!"];
 }
 
@@ -482,6 +483,7 @@ typedef enum sectionRowNumber {
 - (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
     return ^(NSURLSessionDataTask *task, NSError *error) {
         
+        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         [SVProgressHUD showErrorWithStatus:@"Submit failed. Try Again."];
     };
 }

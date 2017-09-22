@@ -84,6 +84,7 @@ NSString *const kQuestionFifteen = @"q15";
     BOOL age65, feelFall, scaredFall, fallen12Mths;
     BOOL internetDCed;
     BOOL isFormFinalized;
+    BOOL tableDidEndEditing;
 }
 
 @property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
@@ -148,6 +149,7 @@ NSString *const kQuestionFifteen = @"q15";
             break;
     }
     
+    tableDidEndEditing = false;
     self.form.addAsteriskToRequiredRowsTitle = YES;
     
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
@@ -397,20 +399,6 @@ NSString *const kQuestionFifteen = @"q15";
         }
     };
     
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Notes"];
-    [formDescriptor addFormSection:section];
-    
-    XLFormRowDescriptor *commentsRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"notes" rowType:XLFormRowDescriptorTypeTextView title:@""];
-    [commentsRow.cellConfigAtConfigure setObject:@"Notes..." forKey:@"textView.placeholder"];
-    commentsRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [self setDefaultFontWithRow:commentsRow];
-    
-    //value
-    if (phlebotomyDict != (id)[NSNull null] && [phlebotomyDict objectForKey:@"notes"] != (id)[NSNull null])
-        commentsRow.value = phlebotomyDict[@"notes"];
-    
-    [section addFormRow:commentsRow];
-    
     return [super initWithForm:formDescriptor];
 }
 
@@ -501,6 +489,20 @@ NSString *const kQuestionFifteen = @"q15";
             [self reloadFormRow:phlebApptRow];
         }
     };
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Notes"];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *commentsRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"notes" rowType:XLFormRowDescriptorTypeTextView title:@""];
+    [commentsRow.cellConfigAtConfigure setObject:@"Notes..." forKey:@"textView.placeholder"];
+    commentsRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:commentsRow];
+    
+    //value
+    if (modeOfScreening != (id)[NSNull null] && [modeOfScreening objectForKey:@"notes"] != (id)[NSNull null])
+        commentsRow.value = modeOfScreening[@"notes"];
+    
+    [section addFormRow:commentsRow];
     
     return [super initWithForm:formDescriptor];
 }
@@ -1404,7 +1406,12 @@ NSString *const kQuestionFifteen = @"q15";
     systolic_1.required = YES;
     
     //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp1Sys] != (id)[NSNull null]) systolic_1.value = triageDict[kBp1Sys];
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp1Sys] != (id)[NSNull null]) {
+        systolic_1.value = triageDict[kBp1Sys];
+        [self updateAnswerColor:systolic_1];
+    }
+    
+    
     
     [self setDefaultFontWithRow:systolic_1];
     [section addFormRow:systolic_1];
@@ -1444,7 +1451,10 @@ NSString *const kQuestionFifteen = @"q15";
     bmi = [XLFormRowDescriptor formRowDescriptorWithTag:kBmi rowType:XLFormRowDescriptorTypeText title:@"BMI"];
 
     //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBmi] != (id)[NSNull null]) bmi.value = triageDict[kBmi];
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBmi] != (id)[NSNull null]) {
+        bmi.value = triageDict[kBmi];
+        [self updateAnswerColor:bmi];
+    }
     
     bmi.disabled = @(1);
     [self setDefaultFontWithRow:bmi];
@@ -1454,7 +1464,9 @@ NSString *const kQuestionFifteen = @"q15";
         if (oldValue != newValue) {
             if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
                 bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
-                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:bmi.value];
+                
+                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:[self removePostfixIfAny:bmi.value]];
+                [self updateAnswerColor:bmi];
                 [self updateFormRow:bmi];
             }
         }
@@ -1463,7 +1475,8 @@ NSString *const kQuestionFifteen = @"q15";
         if (oldValue != newValue) {
             if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
                 bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
-                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:bmi.value];
+                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:[self removePostfixIfAny:bmi.value]];
+                [self updateAnswerColor:bmi];
                 [self updateFormRow:bmi];
             }
         }
@@ -1535,7 +1548,10 @@ NSString *const kQuestionFifteen = @"q15";
     [self setDefaultFontWithRow:row];
     
     //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kCbg] != (id)[NSNull null]) row.value = triageDict[kCbg];
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kCbg] != (id)[NSNull null]) {
+        row.value = triageDict[kCbg];
+        [self updateAnswerColor:row];
+    }
     
     [section addFormRow:row];
     
@@ -1544,7 +1560,10 @@ NSString *const kQuestionFifteen = @"q15";
     systolic_2.required = YES;
 
     //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp2Sys] != (id)[NSNull null]) systolic_2.value = triageDict[kBp2Sys];
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp2Sys] != (id)[NSNull null]) {
+        systolic_2.value = triageDict[kBp2Sys];
+        [self updateAnswerColor:systolic_2];
+    }
     
     [self setDefaultFontWithRow:systolic_2];
     [section addFormRow:systolic_2];
@@ -1565,7 +1584,10 @@ NSString *const kQuestionFifteen = @"q15";
     [systolic_3.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
 
     //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp3Sys] != (id)[NSNull null]) systolic_3.value = triageDict[kBp3Sys];
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp3Sys] != (id)[NSNull null]) {
+        systolic_3.value = triageDict[kBp3Sys];
+        [self updateAnswerColor:systolic_3];
+    }
     
     [self setDefaultFontWithRow:systolic_3];
     [section addFormRow:systolic_3];
@@ -1586,7 +1608,10 @@ NSString *const kQuestionFifteen = @"q15";
     systolic_avg.required = YES;
     
     //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgSys] != (id)[NSNull null]) systolic_avg.value = triageDict[kBp12AvgSys];
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgSys] != (id)[NSNull null]) {
+        systolic_avg.value = triageDict[kBp12AvgSys];
+        [self updateAnswerColor:systolic_avg];
+    }
     
     systolic_avg.disabled = @(1);   //permanent
     [self setDefaultFontWithRow:systolic_avg];
@@ -1595,21 +1620,32 @@ NSString *const kQuestionFifteen = @"q15";
     
     systolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
-            systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
-            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:systolic_avg.value];
+            if (newValue != (id)[NSNull null] && systolic_2.value != (id)[NSNull null]) {
+                if ([newValue doubleValue] > 0 && [systolic_2.value doubleValue ]> 0) {     //both filled in
+                    systolic_avg.value = @(([newValue doubleValue]+ [systolic_2.value doubleValue])/2);
+                } else if ([newValue doubleValue] > 0)  //only Systolic_1
+                    systolic_avg.value = newValue;
+            } else if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) { //only Systolic_1
+                systolic_avg.value = newValue;
+            }
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:[self removePostfixIfAny:systolic_avg.value]];
+            [self updateAnswerColor:systolic_avg];
             [self updateFormRow:systolic_avg];
         }
-        
     };
     
     systolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
             if (systolic_3.value > 0) {
                 systolic_avg.value = @(([systolic_3.value doubleValue]+ [systolic_2.value doubleValue])/2); //if BP3 is keyed in, take BP 2 and BP 3 instead.
-            } else { 
-                systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
+            } else {
+                if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0)
+                    systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
+                else
+                    systolic_avg.value = systolic_1.value;
             }
-            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:systolic_avg.value];
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:[self removePostfixIfAny:systolic_avg.value]];
+            [self updateAnswerColor:systolic_avg];
             [self updateFormRow:systolic_avg];
         }
         
@@ -1618,11 +1654,12 @@ NSString *const kQuestionFifteen = @"q15";
     systolic_3.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
             if (newValue != (id)[NSNull null]) {
-                systolic_avg.value = @(([systolic_3.value integerValue]+ [systolic_2.value integerValue])/2); //if BP3 is keyed in, take BP 2 and BP 3 instead.
+                systolic_avg.value = @(([systolic_3.value doubleValue]+ [systolic_2.value doubleValue])/2); //if BP3 is keyed in, take BP 2 and BP 3 instead.
             } else {
-                systolic_avg.value = @(([systolic_1.value integerValue]+ [systolic_2.value integerValue])/2);
+                systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
             }
-            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:systolic_avg.value];
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:[self removePostfixIfAny:systolic_avg.value]];
+            [self updateAnswerColor:systolic_avg];
             [self updateFormRow:systolic_avg];
         }
     };
@@ -1638,11 +1675,18 @@ NSString *const kQuestionFifteen = @"q15";
     diastolic_avg.disabled = @(1);
     [section addFormRow:diastolic_avg];
     
-//    diastolic_avg.disabled = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"($%@.value == 0) OR ($%@.value == 0)", kBpDiastolic, kBpDiastolic2]];        //somehow must disable first ... @.@"
+
     
     diastolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
-            diastolic_avg.value = @(([diastolic_1.value integerValue]+ [diastolic_2.value integerValue])/2);
+            if (newValue != nil && diastolic_2.value != nil) {
+                if ([newValue doubleValue] > 0 && [diastolic_2.value doubleValue ]> 0) {     //both filled in
+                    diastolic_avg.value = @(([newValue doubleValue]+ [diastolic_2.value doubleValue])/2);
+                } else if ([newValue doubleValue] > 0)  //only Diastolic_1
+                    diastolic_avg.value = newValue;
+            } else if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) { //only Diastolic_1
+                diastolic_avg.value = newValue;
+            }
             [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
             [self updateFormRow:diastolic_avg];
         }
@@ -1651,21 +1695,25 @@ NSString *const kQuestionFifteen = @"q15";
     diastolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
             if (diastolic_3.value > 0) {
-                diastolic_avg.value = @(([diastolic_3.value integerValue]+ [diastolic_2.value integerValue])/2); //if BP3 is keyed in, take BP 2 and BP 3 instead.
+                diastolic_avg.value = @(([diastolic_3.value doubleValue]+ [diastolic_2.value doubleValue])/2); //if BP3 is keyed in, take BP 2 and BP 3 instead.
             } else {
-                diastolic_avg.value = @(([diastolic_1.value integerValue]+ [diastolic_2.value integerValue])/2);
+                if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0)
+                    diastolic_avg.value = @(([diastolic_1.value doubleValue]+ [diastolic_2.value doubleValue])/2);
+                else
+                    diastolic_avg.value = diastolic_1.value;
             }
             [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
             [self updateFormRow:diastolic_avg];
         }
+        
     };
     
     diastolic_3.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
             if (newValue != (id)[NSNull null]) {
-                diastolic_avg.value = @(([diastolic_3.value integerValue]+ [diastolic_2.value integerValue])/2); //if BP3 is keyed in, take BP 2 and BP 3 instead.
+                diastolic_avg.value = @(([diastolic_3.value doubleValue]+ [diastolic_2.value doubleValue])/2); //if BP3 is keyed in, take BP 2 and BP 3 instead.
             } else {
-                diastolic_avg.value = @(([diastolic_1.value integerValue]+ [diastolic_2.value integerValue])/2);
+                diastolic_avg.value = @(([diastolic_1.value doubleValue]+ [diastolic_2.value doubleValue])/2);
             }
             [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
             [self updateFormRow:diastolic_avg];
@@ -1854,10 +1902,14 @@ NSString *const kQuestionFifteen = @"q15";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     NSString *str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyCHAS];
     
-    if ([str isEqualToString:@"1"])
+    if ([str isEqualToString:@"1"]) {
         row.disabled = @NO;
-    else
+        row.required = YES;
+    }
+    else {
         row.disabled = @YES;
+        row.required = NO;
+    }
     
     //value
     if (addSvcsDict != (id)[NSNull null] && [addSvcsDict objectForKey:kAppliedChas] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:addSvcsDict[kAppliedChas]];
@@ -1873,10 +1925,14 @@ NSString *const kQuestionFifteen = @"q15";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyColonsc];
     
-    if ([str isEqualToString:@"1"])
+    if ([str isEqualToString:@"1"]) {
         row.disabled = @NO;
-    else
+        row.required = YES;
+    }
+    else {
         row.disabled = @YES;
+        row.required = NO;
+    }
     
     //value
     if (addSvcsDict != (id)[NSNull null] && [addSvcsDict objectForKey:kReferColonos] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:addSvcsDict[kReferColonos]];
@@ -1892,10 +1948,14 @@ NSString *const kQuestionFifteen = @"q15";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyFIT];
     
-    if ([str isEqualToString:@"1"])
+    if ([str isEqualToString:@"1"]) {
         row.disabled = @NO;
-    else
+        row.required = YES;
+    }
+    else {
         row.disabled = @YES;
+        row.required = NO;
+    }
     
     //value
     if (addSvcsDict != (id)[NSNull null] && [addSvcsDict objectForKey:kReceiveFit] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:addSvcsDict[kReceiveFit]];
@@ -1910,10 +1970,14 @@ NSString *const kQuestionFifteen = @"q15";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyMammo];
     
-    if ([str isEqualToString:@"1"])
+    if ([str isEqualToString:@"1"]) {
         row.disabled = @NO;
-    else
+        row.required = YES;
+    }
+    else {
         row.disabled = @YES;
+        row.required = NO;
+    }
     
     //value
     if (addSvcsDict != (id)[NSNull null] && [addSvcsDict objectForKey:kReferMammo] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:addSvcsDict[kReferMammo]];
@@ -1929,10 +1993,14 @@ NSString *const kQuestionFifteen = @"q15";
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyPapSmear];
     
-    if ([str isEqualToString:@"1"])
+    if ([str isEqualToString:@"1"]) {
         row.disabled = @NO;
-    else
+        row.required = YES;
+    }
+    else {
         row.disabled = @YES;
+        row.required = NO;
+    }
     
     //value
     if (addSvcsDict != (id)[NSNull null] && [addSvcsDict objectForKey:kReferPapSmear] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:addSvcsDict[kReferPapSmear]];
@@ -2768,6 +2836,7 @@ NSString *const kQuestionFifteen = @"q15";
         
         [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"1"];
         [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         [SVProgressHUD showSuccessWithStatus:@"Completed!"];
         
         self.navigationItem.rightBarButtonItem = nil;
@@ -3068,9 +3137,16 @@ NSString *const kQuestionFifteen = @"q15";
     } else if ([rowDescriptor.tag isEqualToString:kPostEdScore]) {
         [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kPostEdScore andNewContent:newValue];
     }
-    
-    
-    
+}
+
+-(void)beginEditing:(XLFormRowDescriptor *)rowDescriptor {
+    if ([rowDescriptor.tag containsString:@"sys"] || [rowDescriptor.tag isEqualToString:kCbg]) {
+        if (rowDescriptor.value > 0) {
+            double value = [rowDescriptor.value doubleValue];
+            rowDescriptor.value = [NSDecimalNumber numberWithDouble:value];
+            [self updateFormRow:rowDescriptor];
+        }
+    }
 }
 
 -(void)endEditing:(XLFormRowDescriptor *)rowDescriptor {    //works great for textField and textView
@@ -3094,6 +3170,8 @@ NSString *const kQuestionFifteen = @"q15";
             }
         }];
     }
+    
+    tableDidEndEditing = true;
 
     /* Phlebotomy */
     if ([rowDescriptor.tag isEqualToString:kFastingBloodGlucose]) {
@@ -3123,15 +3201,13 @@ NSString *const kQuestionFifteen = @"q15";
     
     /* Triage */
     else if ([rowDescriptor.tag isEqualToString:kBp1Sys]) {
-        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp1Sys andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp1Sys andNewContent:[self removePostfixIfAny:rowDescriptor.value]];
     } else if ([rowDescriptor.tag isEqualToString:kBp1Dias]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp1Dias andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kHeightCm]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kHeightCm andNewContent:rowDescriptor.value];
     }else if ([rowDescriptor.tag isEqualToString:kWeightKg]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kWeightKg andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kBmi]) {
-        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kWaistCircum]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kWaistCircum andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kHipCircum]) {
@@ -3139,20 +3215,17 @@ NSString *const kQuestionFifteen = @"q15";
     } else if ([rowDescriptor.tag isEqualToString:kWaistHipRatio]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kWaistHipRatio andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kCbg]) {
-        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kCbg andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kCbg andNewContent:[self removePostfixIfAny:rowDescriptor.value]];
     } else if ([rowDescriptor.tag isEqualToString:kBp2Sys]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp2Sys andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kBp2Dias]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp2Dias andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kBp12AvgSys]) {
-        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kBp12AvgDias]) {
-        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kBp3Sys]) {
-        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp3Sys andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp3Sys andNewContent:[self removePostfixIfAny:rowDescriptor.value]];
     } else if ([rowDescriptor.tag isEqualToString:kBp3Dias]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp3Dias andNewContent:rowDescriptor.value];
     }
+
     
     /* Doctor's Consult */
     else if ([rowDescriptor.tag isEqualToString:kDocNotes]) {
@@ -3166,6 +3239,7 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kAmtScore andNewContent:rowDescriptor.value];
     }
     
+    [self updateAnswerColor:rowDescriptor];
     
 }
 
@@ -3498,6 +3572,19 @@ NSString *const kQuestionFifteen = @"q15";
     return @"";
 }
 
+- (NSString *) removePostfixIfAny: (id) value {
+    if ([value isKindOfClass:[NSDecimalNumber class]]) {
+        return value;
+    } else if ([value isKindOfClass:[NSString class]]) {
+        if ([value containsString:@" ("]) {
+            NSUInteger i = [value rangeOfString:@" "].location - 1;
+            return [value substringToIndex:i];
+        }
+    }
+    
+    return value;
+}
+
 #pragma mark - Reachability
 /*!
  * Called by Reachability whenever status changes.
@@ -3523,6 +3610,7 @@ NSString *const kQuestionFifteen = @"q15";
                 [self.tableView reloadData];
                 [self.tableView endEditing:YES];
                 [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
                 [SVProgressHUD showErrorWithStatus:@"No Internet!"];
                 
                 
@@ -3540,6 +3628,7 @@ NSString *const kQuestionFifteen = @"q15";
                 
                 if (internetDCed) { //previously disconnected
                     [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+                    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
                     [SVProgressHUD showSuccessWithStatus:@"Back Online!"];
                     internetDCed = false;
                 }
@@ -3652,7 +3741,78 @@ NSString *const kQuestionFifteen = @"q15";
     return [UIFont fontWithDescriptor:fontD size:0];
 }
 
+- (void) updateAnswerColor:(XLFormRowDescriptor *) row {
+    
+    if (row.value == (id)[NSNull null] || row.value == nil) {
+        return;
+    }
+    
+    if ([row.tag containsString:@"sys"]) {
+        if ([row.value integerValue] >= 140) {
+            [row.cellConfig setObject:[UIColor redColor] forKey:@"textField.textColor"];
+            NSString *str = [NSString stringWithFormat:@"%@", row.value];
+            row.value = [str stringByAppendingString:@" (high)"];
+            
+            if ([row.value integerValue] >= 180) [self showWarningForParameter:@"BP Systolic"];
+            
+        } else if  ([row.value integerValue] >= 130) {
+            [row.cellConfig setObject:[UIColor orangeColor] forKey:@"textField.textColor"];
+            NSString *str = [NSString stringWithFormat:@"%@", row.value];
+            row.value = [str stringByAppendingString:@" (borderline high)"];
+        } else {
+            [row.cellConfig setObject:[UIColor blackColor] forKey:@"textField.textColor"];
+        }
+        [self updateFormRow:row];
+    }
+    
+    else if ([row.tag isEqualToString:kCbg]) {
+        if ([row.value doubleValue] >= 11.1) {
+            [row.cellConfig setObject:[UIColor redColor] forKey:@"textField.textColor"];
+            NSString *str = [NSString stringWithFormat:@"%@", row.value];
+            row.value = [str stringByAppendingString:@" (high)"];
+            
+            if ([row.value doubleValue] >= 15.0) [self showWarningForParameter:@"CBG"];
+        } else {
+            [row.cellConfig setObject:[UIColor blackColor] forKey:@"textField.textColor"];
+            
+            if ([row.value doubleValue] <= 2.5) [self showWarningForParameter:@"CBG"];
+        }
+        [self updateFormRow:row];
+    } else if ([row.tag isEqualToString:kBmi]) {
+        NSString *str = [NSString stringWithFormat:@"%@", row.value];
+        if ([row.value doubleValue] >= 27.5) {
+            [row.cellConfig setObject:[UIColor redColor] forKey:@"textField.textColor"];
+            row.value = [str stringByAppendingString:@" (obese)"];
+        } else if ([row.value doubleValue] > 23.0) {
+            [row.cellConfig setObject:[UIColor orangeColor] forKey:@"textField.textColor"];
+            row.value = [str stringByAppendingString:@" (overweight)"];
+        } else {
+            [row.cellConfig setObject:[UIColor blackColor] forKey:@"textField.textColor"];
+        }
+        [self updateFormRow:row];
+    }
+}
 
+
+#pragma mark - Warning
+- (void) showWarningForParameter: (NSString *) parameter {
+    
+    if (!tableDidEndEditing) return;
+    else {
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Warning", nil)
+                                                                                  message:[NSString stringWithFormat:@"The resident’s %@ falls within the emergency range. Please inform the safety IC / any nearby committee member immediately.", parameter]
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * okAction){
+                                                              //do nothing for now
+                                                              tableDidEndEditing = false;
+                                                              [self.tableView endEditing:YES];
+                                                          }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
 
 /*
  #pragma mark - Navigation

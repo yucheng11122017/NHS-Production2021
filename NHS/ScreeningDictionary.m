@@ -48,6 +48,7 @@
 
 - (void) fetchFromServer {
     ServerComm *client = [ServerComm sharedServerCommInstance];
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
     [SVProgressHUD showWithStatus:@"Downloading data..."];
     
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
@@ -87,6 +88,7 @@
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
         NSLog(@"error: %@", errorString);
+        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         [SVProgressHUD showErrorWithStatus:@"Download failed"];
     };
 }

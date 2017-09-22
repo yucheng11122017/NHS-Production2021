@@ -13,8 +13,10 @@
 #import "Reachability.h"
 #import "SVProgressHUD.h"
 #import "ScreeningDictionary.h"
+#import "ReportViewController.h"
 
-
+#define PDFREPORT_LOADED_NOTIF @"Pdf report downloaded"
+#define CELL_RIGHT_MARGIN_OFFSET 64
 
 typedef enum getDataState {
     inactive,
@@ -32,6 +34,8 @@ typedef enum getDataState {
 @property (strong, nonatomic) NSArray *yearlyProfile;
 @property (strong, nonatomic) NSDictionary *residentParticulars;
 @property (strong, nonatomic) NSNumber *residentID;
+@property (strong, nonatomic) NSString *reportFilePath;
+@property (strong, nonatomic) UIButton *reportButton;
 
 @end
 
@@ -53,6 +57,7 @@ typedef enum getDataState {
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshTable:) name:@"enableProfileEntry" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reportExist:) name:PDFREPORT_LOADED_NOTIF object:nil];
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -132,6 +137,7 @@ typedef enum getDataState {
         NSString *text = [_yearlyProfile objectAtIndex:indexPath.row];
         [cell.textLabel setText:text];
         NSNumber *preRegDone =[_residentDetails[kResiParticulars] objectForKey:kPreregCompleted];
+        NSNumber *serialNum = [[NSUserDefaults standardUserDefaults] objectForKey:kNhsSerialNum];
         
         if ([text containsString:@"2017"]) {
             if ([preRegDone isEqual:@0]) {
@@ -141,6 +147,27 @@ typedef enum getDataState {
                 [cell setUserInteractionEnabled:YES];
                 cell.textLabel.textColor = [UIColor blackColor];
             }
+            
+            if (serialNum != (id) [NSNull null]) {
+                if ([serialNum isKindOfClass:[NSNumber class]]) {  //as long as have value
+                    
+                    if (!_reportButton) {
+                        CGRect cellSize = cell.layer.frame;
+                        float cellWidth = cellSize.size.width;
+                        
+                        CGRect buttonRect = CGRectMake(cellWidth-CELL_RIGHT_MARGIN_OFFSET, 25, 65, 25);        //to fit for all type of deves
+                        _reportButton = [[UIButton alloc] init];
+                        _reportButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+                        _reportButton.frame = buttonRect;
+                        // set the button title here if it will always be the same
+                        [_reportButton setTitle:@"Report" forState:UIControlStateNormal];
+                        _reportButton.tag = 1;
+                        [_reportButton addTarget:self action:@selector(downloadReport:) forControlEvents:UIControlEventTouchUpInside];
+                        [cell.contentView addSubview:_reportButton];
+                    }
+                }
+            }
+            
         }
         
         else if ([text containsString:@"2018"] || [text containsString:@"2019"]) {
@@ -173,6 +200,27 @@ typedef enum getDataState {
     }
 }
 
+#pragma mark - Report Btn API
+- (void) downloadReport: (UIButton *) sender {
+    _reportFilePath = nil;  //don't keep the previously saved PDF file.
+    NSUserDefaults *defaults =  [NSUserDefaults standardUserDefaults];
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
+    [SVProgressHUD show];
+    [[ServerComm sharedServerCommInstance] retrievePdfReportForResident:[defaults objectForKey:kResidentId]];
+}
+
+- (void) reportExist: (NSNotification *) notification {
+    NSArray *keys = [notification.userInfo allKeys];
+    if ([keys containsObject:@"status"]) {
+        [SVProgressHUD setMinimumDismissTimeInterval:1.0];
+        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
+        [SVProgressHUD showErrorWithStatus:@"Report could not be downloaded!"];
+        return;
+    }
+    
+    _reportFilePath = [[ServerComm sharedServerCommInstance] getretrievedReportFilepath];
+    [self performSegueWithIdentifier:@"ProfileToWebViewSegue" sender:self];
+}
 
 #pragma mark - Server API
 - (void) processConnectionStatus {
@@ -201,6 +249,7 @@ typedef enum getDataState {
 
 #pragma mark - NSNotification
 - (void) refreshTable: (NSNotification *) notification {
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
     [SVProgressHUD show];
     [[ScreeningDictionary sharedInstance] fetchFromServer];
 }
@@ -210,7 +259,6 @@ typedef enum getDataState {
     _residentParticulars = [_residentDetails objectForKey:@"resi_particulars"];
     [self.tableView reloadData];    //put in the ticks
     [SVProgressHUD dismiss];
-    
 }
 
 
@@ -222,6 +270,10 @@ typedef enum getDataState {
     if ([segue.destinationViewController respondsToSelector:@selector(setResidentParticularsDict:)]) {
         [segue.destinationViewController performSelector:@selector(setResidentParticularsDict:)
                                               withObject:_residentParticulars];
+    }
+    if ([segue.destinationViewController respondsToSelector:@selector(setReportFilepath:)]) {
+        [segue.destinationViewController performSelector:@selector(setReportFilepath:)
+                                              withObject:_reportFilePath];
     }
 }
 

@@ -89,6 +89,9 @@ extern NSString *const kNewContent;
 extern NSString *const kScreenLocation;
 extern NSString *const kResiParticulars;
 
+// 1700
+extern NSString *const kNhsSerialId;
+
 #pragma mark - Resident Particulars
 
 extern NSString *const kName;
@@ -133,6 +136,7 @@ extern NSString *const kIsFinal;
 extern NSString *const kNeighbourhood;
 extern NSString *const kRemarks;
 extern NSString *const kPreregCompleted;
+extern NSString *const kNhsSerialNum;
 
 #pragma mark - SearchBar constants
 extern NSString *const ViewControllerTitleKey;

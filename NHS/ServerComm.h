@@ -81,4 +81,8 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
         forResident: (NSNumber *) residentID
            withNric:(NSString *) nric;
 
+#pragma mark - PDF Report
+- (NSString *) getretrievedReportFilepath;
+-(void)retrievePdfReportForResident:(NSNumber *) residentID;
+
 @end

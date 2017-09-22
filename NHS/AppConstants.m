@@ -49,6 +49,8 @@ NSString *const kReligionOthers = @"religion_others";
 NSString *const kHpNumber = @"hp_number";
 NSString *const kHouseNumber = @"house_number";
 NSString *const kEthnicity = @"ethnicity";
+// 1700
+NSString *const kNhsSerialId = @"nhs_serial_id";
 
 NSString *const kSpokenLang = @"spoken_lang";
 NSString *const kLangCanto = @"lang_canto";
@@ -80,6 +82,7 @@ NSString *const kIsFinal = @"is_final";
 NSString *const kNeighbourhood = @"neighbourhood";
 NSString *const kRemarks = @"remarks";
 NSString *const kPreregCompleted = @"prereg_completed";
+NSString *const kNhsSerialNum = @"nhs_serial_num";
 
 
 

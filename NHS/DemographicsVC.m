@@ -309,6 +309,7 @@
     
     [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:kCheckGeno andNewContent:@"1"];
     [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
     [SVProgressHUD showSuccessWithStatus:@"Completed!"];
     
 //    self.navigationItem.rightBarButtonItem = nil;

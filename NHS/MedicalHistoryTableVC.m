@@ -153,6 +153,7 @@
                 NSLog(@"Can't connect to server!");
                 
                 [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
                 [SVProgressHUD showErrorWithStatus:@"No Internet!"];
                 
                 
@@ -166,6 +167,7 @@
                 
                 if (internetDCed) { //previously disconnected
                     [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+                    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
                     [SVProgressHUD showSuccessWithStatus:@"Back Online!"];
                     internetDCed = false;
                 }

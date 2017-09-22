@@ -13,6 +13,7 @@
 		015F682A1F4A7F4E000B6D5E /* SeriSubsectionTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 015F68291F4A7F4E000B6D5E /* SeriSubsectionTableVC.m */; };
 		015F682D1F4A846B000B6D5E /* SeriFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 015F682C1F4A846B000B6D5E /* SeriFormVC.m */; };
 		016A27F61F5FDB8F0074C36A /* SearchResultsTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 016A27F51F5FDB8F0074C36A /* SearchResultsTableController.m */; };
+		018B23821F726C810046F9ED /* ReportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 018B23811F726C810046F9ED /* ReportViewController.m */; };
 		018C04271F3F4A1300582E82 /* NeighbourhoodSelectionVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 018C04261F3F4A1300582E82 /* NeighbourhoodSelectionVC.m */; };
 		01B893FB1F3DADF900201995 /* DemographicsVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B893FA1F3DADF900201995 /* DemographicsVC.m */; };
 		01B893FE1F3E05CC00201995 /* PageGuideVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B893FD1F3E05CC00201995 /* PageGuideVC.m */; };
@@ -84,6 +85,8 @@
 		015F682C1F4A846B000B6D5E /* SeriFormVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SeriFormVC.m; sourceTree = "<group>"; };
 		016A27F41F5FDB8F0074C36A /* SearchResultsTableController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchResultsTableController.h; sourceTree = "<group>"; };
 		016A27F51F5FDB8F0074C36A /* SearchResultsTableController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchResultsTableController.m; sourceTree = "<group>"; };
+		018B23801F726C810046F9ED /* ReportViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReportViewController.h; sourceTree = "<group>"; };
+		018B23811F726C810046F9ED /* ReportViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReportViewController.m; sourceTree = "<group>"; };
 		018C04251F3F4A1300582E82 /* NeighbourhoodSelectionVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NeighbourhoodSelectionVC.h; sourceTree = "<group>"; };
 		018C04261F3F4A1300582E82 /* NeighbourhoodSelectionVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NeighbourhoodSelectionVC.m; sourceTree = "<group>"; };
 		01B893F91F3DADF900201995 /* DemographicsVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemographicsVC.h; sourceTree = "<group>"; };
@@ -207,6 +210,15 @@
 			name = "SERI Eye Screening";
 			sourceTree = "<group>";
 		};
+		018B237F1F726C5F0046F9ED /* ReportViewController */ = {
+			isa = PBXGroup;
+			children = (
+				018B23801F726C810046F9ED /* ReportViewController.h */,
+				018B23811F726C810046F9ED /* ReportViewController.m */,
+			);
+			name = ReportViewController;
+			sourceTree = "<group>";
+		};
 		01D48EC81F39CB37002C3928 /* Health Assessment & Risk Stratification */ = {
 			isa = PBXGroup;
 			children = (
@@ -295,6 +307,7 @@
 				01E622F61F6D2CC800E05FA8 /* Screening List */,
 				01E622F71F6D2CD500E05FA8 /* New Resident VC */,
 				01E622F81F6D2CE600E05FA8 /* Select Profile VC */,
+				018B237F1F726C5F0046F9ED /* ReportViewController */,
 				01E622F91F6D2CF700E05FA8 /* Resident Particulars VC */,
 				01E622FA1F6D2D0200E05FA8 /* Screening Section VC */,
 				01E622FB1F6D2D0A00E05FA8 /* Screening Form VC */,
@@ -758,6 +771,7 @@
 				E1FCF9321D45B77F00478F7B /* ServerComm.m in Sources */,
 				8EC56F811D60B88D00938C2A /* ScreeningFormViewController.m in Sources */,
 				016A27F61F5FDB8F0074C36A /* SearchResultsTableController.m in Sources */,
+				018B23821F726C810046F9ED /* ReportViewController.m in Sources */,
 				01D48EC11F3327B5002C3928 /* ScreeningSelectProfileTableVC.m in Sources */,
 				015F682D1F4A846B000B6D5E /* SeriFormVC.m in Sources */,
 				E1A4F0DC1D61CB8A00EE9BBB /* Reachability.m in Sources */,

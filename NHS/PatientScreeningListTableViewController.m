@@ -180,6 +180,7 @@ typedef enum residentDataSource {
                 internetDCed = true;
                 NSLog(@"Can't connect to server!");
                 [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
                 [SVProgressHUD showErrorWithStatus:@"No Internet!"];
                 
                 
@@ -193,6 +194,7 @@ typedef enum residentDataSource {
                 
                 if (internetDCed) { //previously disconnected
                     [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+                    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
                     [SVProgressHUD showSuccessWithStatus:@"Back Online!"];
                     internetDCed = false;
                 }
@@ -333,7 +335,7 @@ typedef enum residentDataSource {
     NSString *residentNric = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kNRIC];
 //    NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kLastUpdateTs];
     NSNumber *preRegCompleted = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kPreregCompleted];
-    NSString *serialId = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:@"nhs_serial_id"];
+    NSString *serialId = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kNhsSerialId];
     
     cell.nameLabel.text = residentName;
     cell.NRICLabel.text = residentNric;
@@ -374,6 +376,7 @@ typedef enum residentDataSource {
     
     NSDictionary *selectedResident = Nil;
 
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
     [SVProgressHUD showWithStatus:@"Loading..."];
     
     [self resetAllUserDefaults];
@@ -679,7 +682,7 @@ typedef enum residentDataSource {
 - (void)getAllScreeningResidents {
     if (!appTesting) {
         ServerComm *client = [ServerComm sharedServerCommInstance];
-        [client getAllScreeningResidents:[self progressBlock]
+        [client getAllScreeningResidents:[self progressBlock]       //op_code 1700
                             successBlock:[self successBlock]
                             andFailBlock:[self errorBlock]];
     } else {
@@ -697,7 +700,7 @@ typedef enum residentDataSource {
 
 - (void)getAllDataForOneResident {
     ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client getSingleScreeningResidentDataWithResidentID:selectedResidentID
+    [client getSingleScreeningResidentDataWithResidentID:selectedResidentID     //op_code 1702
                           progressBlock:[self progressBlock]
                            successBlock:[self downloadSingleResidentDataSuccessBlock]
                            andFailBlock:[self downloadErrorBlock]];
@@ -716,6 +719,7 @@ typedef enum residentDataSource {
         [self getAllScreeningResidents];
 
         [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         [SVProgressHUD showSuccessWithStatus:@"Entry Deleted!"];
         
     };
@@ -964,7 +968,6 @@ typedef enum residentDataSource {
 
     NSDictionary *particularsDict =[_retrievedResidentData objectForKey:kResiParticulars];
     NSDictionary *profilingDict =[_retrievedResidentData objectForKey:SECTION_PROFILING_SOCIOECON];
-
         // Calculate age
     NSMutableString *str = [particularsDict[kBirthDate] mutableCopy];
     NSString *yearOfBirth = [str substringWithRange:NSMakeRange(0, 4)];
@@ -991,6 +994,10 @@ typedef enum residentDataSource {
         [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kCitizenship] forKey:kCitizenship];
     if (particularsDict[kReligion] != (id) [NSNull null])
         [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kReligion] forKey:kReligion];
+    
+    // For Report Availability
+    if (particularsDict[kNhsSerialNum] != (id) [NSNull null])
+        [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kNhsSerialNum] forKey:kNhsSerialNum];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

@@ -1229,6 +1229,7 @@ typedef enum formName {
     } else {
 
             [SVProgressHUD setMinimumDismissTimeInterval:1.0f];
+            [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
             [SVProgressHUD showImage:[[UIImage imageNamed:@"ThumbsUp"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] status:@"Good!"];
     }
     
@@ -1317,6 +1318,7 @@ typedef enum formName {
         
         [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"1"];
         [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         [SVProgressHUD showSuccessWithStatus:@"Completed!"];
         
         self.navigationItem.rightBarButtonItem = nil;
@@ -1606,6 +1608,7 @@ typedef enum formName {
                 [self.tableView reloadData];
                 [self.tableView endEditing:YES];
                 [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
                 [SVProgressHUD showErrorWithStatus:@"No Internet!"];
                 
                 
@@ -1623,6 +1626,7 @@ typedef enum formName {
                 
                 if (internetDCed) { //previously disconnected
                     [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+                    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
                     [SVProgressHUD showSuccessWithStatus:@"Back Online!"];
                     internetDCed = false;
                 }

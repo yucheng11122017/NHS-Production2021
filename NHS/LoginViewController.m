@@ -199,6 +199,7 @@
 }
 
 - (IBAction)loginButtonPressed:(id)sender {
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
     [SVProgressHUD showWithStatus:@"Logging in..."];
     
     NSString *username = self.usernameField.text;

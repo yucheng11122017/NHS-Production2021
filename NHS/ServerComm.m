@@ -13,10 +13,12 @@
 //#define baseURL @"https://nus-nhs.ml/"        //for Development
 #define baseURL @"https://nhs-som.nus.edu.sg/"
 #define GENOGRAM_LOADED_NOTIF @"Genogram image downloaded"
+#define PDFREPORT_LOADED_NOTIF @"Pdf report downloaded"
 
 @interface ServerComm ()
 
 @property (strong, nonatomic) NSString *retrievedGenogramImagePath;
+@property (strong, nonatomic) NSString *retrievedPdfReportFilepath;
 
 
 @end
@@ -302,16 +304,78 @@
                                                                          completionHandler:[self completionBlock]];
     [uploadTask resume];
 }
+
+#pragma mark - PDF File
+-(void)retrievePdfReportForResident:(NSNumber *) residentID {
+    
+    //setup input parameters
+    NSDictionary *input = @{kResidentId: residentID};
+    NSDictionary *data = @{@"data": input};
+    NSError *error;
+    
+    //prep download manager
+    self.downloadManager = [AFHTTPSessionManager manager];
+    self.uploadManager.responseSerializer.acceptableContentTypes = [NSSet setWithArray:@[@"text/html",@"application/json"]];
+    self.downloadManager.securityPolicy.allowInvalidCertificates = NO;
+    
+    //send req
+    AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
+    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://nhs-som.nus.edu.sg/1707" parameters:data error:&error];
+    
+    NSURLSessionDownloadTask *dwlTsk = [self.downloadManager downloadTaskWithRequest:req
+                                                                            progress:nil
+                                                                         destination:
+                                        ^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
+                                            NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory
+                                                                                                                  inDomain:NSUserDomainMask
+                                                                                                         appropriateForURL:nil
+                                                                                                                    create:NO
+                                                                                                                     error:nil];
+                                            return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+                                        }
+                                                                   completionHandler:
+                                        ^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
+                                            
+                                            [SVProgressHUD dismiss];
+                                            self.retrievedPdfReportFilepath = nil;  //remove the previous one first.
+                                            self.retrievedPdfReportFilepath = filePath.path;
+                                            if (error) {
+                                                NSLog(@"Error: %@", error);
+                                                [[NSNotificationCenter defaultCenter] postNotificationName:PDFREPORT_LOADED_NOTIF
+                                                                                                    object:self
+                                                                                                  userInfo:@{@"status":@"error"}];
+                                            } else {
+                                                //                                                NSLog(@"Success: %@ genodownloaded at: %@", response, [filePath absoluteString]);
+                                                
+                                                NSDictionary *userInfo = NSDictionaryOfVariableBindings(response, filePath);
+                                                
+                                                // send out notification!
+                                                [[NSNotificationCenter defaultCenter] postNotificationName:PDFREPORT_LOADED_NOTIF
+                                                                                                    object:self
+                                                                                                  userInfo:userInfo];
+                                            }
+                                        }];
+    
+    [dwlTsk resume];
+    
+}
+
+-(NSString *)getretrievedReportFilepath{
+    return [self.retrievedPdfReportFilepath copy];
+}
+
 #pragma mark - Blocks
 
 - (void (^)(NSProgress *uploadProgress))uploadProgressBlock {
     return ^(NSProgress *uploadProgress) {
+        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         [SVProgressHUD showProgress:uploadProgress.fractionCompleted status:@"Uploading..."];
     };
 }
 
 - (void (^)(NSProgress *downloadProgress))downloadProgressBlock {
     return ^(NSProgress *downloadProgress) {
+        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         [SVProgressHUD showProgress:downloadProgress.fractionCompleted status:@"Downloading Genogram..."];
     };
 }
@@ -321,9 +385,11 @@
     return ^(NSURLResponse *response, NSDictionary *responseObject, NSError *error) {
         if (error) {
             NSLog(@"Error: %@", error);
+            [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
             [SVProgressHUD showErrorWithStatus:@"Upload failed!"];
         } else {
             NSLog(@"Success: %@ %@", response, responseObject);
+            [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
             [SVProgressHUD showSuccessWithStatus:@"Upload successful!"];
         }
     };

@@ -150,7 +150,6 @@ typedef enum formName {
     
     XLFormRowDescriptor *hasInformedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
     hasInformedRow.selectorOptions = @[@"YES", @"NO"];
-    
     hasInformedRow.required = YES;
     
     if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kHasInformed] != (id)[NSNull null]) {
@@ -168,6 +167,7 @@ typedef enum formName {
     [section addFormRow:hasCheckedBloodQRow];
     
     XLFormRowDescriptor *hasCheckedBloodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMCheckedBlood rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
+    
     hasCheckedBloodRow.selectorOptions = @[@"No",@"Yes, 2 yrs ago",@"Yes, 3 yrs ago",@"Yes < 1 yr ago"];
     hasCheckedBloodRow.noValueDisplayText = @"Tap Here";
     hasCheckedBloodRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformedRow];
@@ -186,14 +186,15 @@ typedef enum formName {
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDMSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
+    XLFormRowDescriptor *seeDocRegularRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    seeDocRegularRow.selectorOptions = @[@"YES", @"NO"];
     
+    ;
     if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kSeeingDocRegularly] != (id)[NSNull null]) {
-        row.value = [self getYesNoFromOneZero:diabetesDict[kSeeingDocRegularly]];
+        seeDocRegularRow.value = [self getYesNoFromOneZero:diabetesDict[kSeeingDocRegularly]];
     }
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
-    [section addFormRow:row];
+    seeDocRegularRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
+    [section addFormRow:seeDocRegularRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ4
                                                 rowType:XLFormRowDescriptorTypeInfo
@@ -203,15 +204,16 @@ typedef enum formName {
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDMCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
+    XLFormRowDescriptor *currentPrescrRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    currentPrescrRow.selectorOptions = @[@"YES", @"NO"];
+    
     
     if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kCurrentlyPrescribed] != (id)[NSNull null]) {
-        row.value = [self getYesNoFromOneZero:diabetesDict[kCurrentlyPrescribed]];
+        currentPrescrRow.value = [self getYesNoFromOneZero:diabetesDict[kCurrentlyPrescribed]];
     }
     
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
-    [section addFormRow:row];
+    currentPrescrRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
+    [section addFormRow:currentPrescrRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ5
                                                 rowType:XLFormRowDescriptorTypeInfo
@@ -222,14 +224,39 @@ typedef enum formName {
     [section addFormRow:row];
     
     // Segmented Control
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDMTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
+    XLFormRowDescriptor *takingRegularRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    takingRegularRow.selectorOptions = @[@"YES", @"NO"];
+    
     
     if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kTakingRegularly] != (id)[NSNull null]) {
-        row.value = [self getYesNoFromOneZero:diabetesDict[kTakingRegularly]];
+        takingRegularRow.value = [self getYesNoFromOneZero:diabetesDict[kTakingRegularly]];
     }
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
-    [section addFormRow:row];
+    takingRegularRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
+    [section addFormRow:takingRegularRow];
+    
+    // For initial value
+    if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kHasInformed] != (id)[NSNull null]) {
+        if ([diabetesDict[kHasInformed] isEqualToNumber:@1]) {
+            seeDocRegularRow.required = YES;
+            currentPrescrRow.required = YES;
+            takingRegularRow.required = YES;
+        } else {
+            hasCheckedBloodRow.required = YES;
+        }
+    }
+    
+    //For detecting change
+    hasInformedRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqualToString:@"YES"]) {
+                seeDocRegularRow.required = YES;
+                currentPrescrRow.required = YES;
+                takingRegularRow.required = YES;
+            } else {
+                hasCheckedBloodRow.required = YES;
+            }
+        }
+    };
     
     return [super initWithForm:formDescriptor];
 }
@@ -282,22 +309,22 @@ typedef enum formName {
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidCheckedBlood
+    XLFormRowDescriptor *lipidCheckBloodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidCheckedBlood
                                                 rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                   title:@""];
-    row.selectorOptions = @[@"No",
+    lipidCheckBloodRow.selectorOptions = @[@"No",
                             @"Yes, 2 yrs ago",
                             @"Yes, 3 yrs ago",
                             @"Yes < 1 yr ago"];
 
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
-    row.noValueDisplayText = @"Tap Here";
+    lipidCheckBloodRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
+    lipidCheckBloodRow.noValueDisplayText = @"Tap Here";
     
     if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kCheckedBlood] != (id)[NSNull null]) {
-        row.value = hyperlipidDict[kCheckedBlood];
+        lipidCheckBloodRow.value = hyperlipidDict[kCheckedBlood];
     }
     
-    [section addFormRow:row];
+    [section addFormRow:lipidCheckBloodRow];
     
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ8
@@ -308,15 +335,15 @@ typedef enum formName {
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    row.selectorOptions = @[@"YES", @"NO"];
+    XLFormRowDescriptor *seeDocRegularRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    seeDocRegularRow.selectorOptions = @[@"YES", @"NO"];
     
     if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kSeeingDocRegularly] != (id)[NSNull null]) {
-        row.value = [self getYesNoFromOneZero:hyperlipidDict[kSeeingDocRegularly]];
+        seeDocRegularRow.value = [self getYesNoFromOneZero:hyperlipidDict[kSeeingDocRegularly]];
     }
     
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
-    [section addFormRow:row];
+    seeDocRegularRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    [section addFormRow:seeDocRegularRow];
     
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ9
@@ -327,22 +354,22 @@ typedef enum formName {
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
     [section addFormRow:row];
     
-    XLFormRowDescriptor *prescribed = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    prescribed.selectorOptions = @[@"YES", @"NO"];
-    prescribed.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    XLFormRowDescriptor *prescribedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    prescribedRow.selectorOptions = @[@"YES", @"NO"];
+    prescribedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
     
     if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kCurrentlyPrescribed] != (id)[NSNull null]) {
-        prescribed.value = [self getYesNoFromOneZero:hyperlipidDict[kCurrentlyPrescribed]];
+        prescribedRow.value = [self getYesNoFromOneZero:hyperlipidDict[kCurrentlyPrescribed]];
     }
     
-    [section addFormRow:prescribed];
+    [section addFormRow:prescribedRow];
     
     XLFormRowDescriptor *takeRegularlyQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ10
                                                                                    rowType:XLFormRowDescriptorTypeInfo
                                                                                      title:@"Are you taking your cholesterol medication regularly?"];
     [self setDefaultFontWithRow:takeRegularlyQRow];
     takeRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
+    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribedRow];
     [section addFormRow:takeRegularlyQRow];
     
     // Segmented Control
@@ -354,7 +381,7 @@ typedef enum formName {
         takeRegularlyRow.value = [self getYesNoFromOneZero:hyperlipidDict[kTakingRegularly]];
     }
     
-    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribed];
+    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribedRow];
     
     [section addFormRow:takeRegularlyRow];
     
@@ -362,28 +389,58 @@ typedef enum formName {
     hasInformed.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if (oldValue != newValue) {
             if ([newValue isEqualToString:@"NO"]) {
+                seeDocRegularRow.required = NO;
+                prescribedRow.required = NO;
+                lipidCheckBloodRow.required = YES;
+                
                 takeRegularlyQRow.hidden = @(1);
                 takeRegularlyRow.hidden = @(1);
+                takeRegularlyRow.required = NO;
             } else {
-                if ([prescribed.value isEqualToString:@"YES"]) {
+                seeDocRegularRow.required = YES;
+                prescribedRow.required = YES;
+                lipidCheckBloodRow.required = NO;
+                
+                if ([prescribedRow.value isEqualToString:@"YES"]) {
                     takeRegularlyQRow.hidden = @(0);
                     takeRegularlyRow.hidden = @(0);
+                    takeRegularlyRow.required = YES;
                 }
             }
         }
     };
     
-    prescribed.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+    if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kHasInformed] != (id)[NSNull null]) {
+        if ([hasInformed.value isEqualToString:@"YES"]) {
+            seeDocRegularRow.required = YES;
+            prescribedRow.required = YES;
+            lipidCheckBloodRow.required = NO;
+        } else {
+            seeDocRegularRow.required = NO;
+            prescribedRow.required = NO;
+            lipidCheckBloodRow.required = YES;
+        }
+    }
+    
+    prescribedRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if (oldValue != newValue) {
             if ([newValue isEqualToString:@"YES"]) {
                 takeRegularlyQRow.hidden = @(0);
                 takeRegularlyRow.hidden = @(0);
+                takeRegularlyRow.required = YES;
             } else {
                 takeRegularlyQRow.hidden = @(1);
                 takeRegularlyRow.hidden = @(1);
+                takeRegularlyRow.required = NO;
             }
         }
     };
+    
+    if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kCurrentlyPrescribed] != (id)[NSNull null]) {
+        if ([prescribedRow.value isEqualToString:@"YES"] && [hasInformed.value isEqualToString:@"YES"]) {
+            takeRegularlyRow.required = YES;
+        }
+    }
     return [super initWithForm:formDescriptor];
 }
 
@@ -505,6 +562,37 @@ typedef enum formName {
     takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
     [section addFormRow:takeRegularlyRow];
 
+    
+    hasInformed_HT.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqualToString:@"YES"]) {
+                seeDocRegularlyRow.required = YES;
+                prescribedRow.required = YES;
+                takeRegularlyRow.required = YES;
+                checkedBP.required = NO;
+            } else {
+                seeDocRegularlyRow.required = NO;
+                prescribedRow.required = NO;
+                takeRegularlyRow.required = NO;
+                checkedBP.required = YES;
+            }
+        }
+    };
+    
+    if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kHasInformed] != (id)[NSNull null]) {
+        if ([hasInformed_HT.value isEqualToString:@"YES"]) {
+            seeDocRegularlyRow.required = YES;
+            prescribedRow.required = YES;
+            takeRegularlyRow.required = YES;
+            checkedBP.required = NO;
+        } else {
+            seeDocRegularlyRow.required = NO;
+            prescribedRow.required = NO;
+            takeRegularlyRow.required = NO;
+            checkedBP.required = YES;
+        }
+    }
+    
 //    checkedBP.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
 //        if (oldValue != newValue) {
 //            if ([newValue isEqualToString:@"NO"]) {
@@ -969,6 +1057,7 @@ typedef enum formName {
                 [self.tableView reloadData];
                 [self.tableView endEditing:YES];
                 [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
                 [SVProgressHUD showErrorWithStatus:@"No Internet!"];
                 
                 
@@ -985,6 +1074,7 @@ typedef enum formName {
                 
                 if (internetDCed) { //previously disconnected
                     [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+                    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
                     [SVProgressHUD showSuccessWithStatus:@"Back Online!"];
                     internetDCed = false;
                 }
@@ -1159,6 +1249,7 @@ typedef enum formName {
         
         [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"1"];
         [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         [SVProgressHUD showSuccessWithStatus:@"Completed!"];
         
         self.navigationItem.rightBarButtonItem = nil;

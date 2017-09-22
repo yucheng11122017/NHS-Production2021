@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13189.4" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="VRC-uk-dfE">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="VRC-uk-dfE">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13165.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -484,6 +484,55 @@
             </objects>
             <point key="canvasLocation" x="-100" y="1759"/>
         </scene>
+        <!--Report View Controller-->
+        <scene sceneID="2fD-SF-NVi">
+            <objects>
+                <viewController id="jlk-VC-Zvy" customClass="ReportViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="dfP-Fm-Tzy"/>
+                        <viewControllerLayoutGuide type="bottom" id="6dP-2V-dxu"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="hz8-Dl-ImD">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dVw-lN-sbd">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="375" id="0TF-5f-PXT"/>
+                                    <constraint firstAttribute="height" constant="667" id="T8x-Xj-hxD"/>
+                                </constraints>
+                            </webView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="centerX" secondItem="hz8-Dl-ImD" secondAttribute="centerX" id="06A-Zc-DVq"/>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="leading" secondItem="hz8-Dl-ImD" secondAttribute="leading" id="3eQ-9D-Fpj"/>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="top" secondItem="hz8-Dl-ImD" secondAttribute="top" id="4Lg-x3-OoP"/>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="centerY" secondItem="hz8-Dl-ImD" secondAttribute="centerY" id="5wJ-bf-dF9"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="dVw-lN-sbd" secondAttribute="trailing" constant="-16" id="Bup-jd-Vo2"/>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="bottom" secondItem="hz8-Dl-ImD" secondAttribute="bottomMargin" id="FiS-e0-Jqd"/>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="bottom" secondItem="6dP-2V-dxu" secondAttribute="top" id="GBb-Sz-TJ6"/>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="leading" secondItem="hz8-Dl-ImD" secondAttribute="leadingMargin" constant="-16" id="Mk9-73-RZR"/>
+                            <constraint firstAttribute="bottom" secondItem="dVw-lN-sbd" secondAttribute="bottom" id="VcU-pg-Ror"/>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="top" secondItem="hz8-Dl-ImD" secondAttribute="top" id="bMh-b8-CEP"/>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="top" secondItem="hz8-Dl-ImD" secondAttribute="top" id="dWE-DM-d4K"/>
+                            <constraint firstAttribute="trailing" secondItem="dVw-lN-sbd" secondAttribute="trailing" id="fLz-IS-4aV"/>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="leading" secondItem="hz8-Dl-ImD" secondAttribute="leading" id="iFe-a7-zKv"/>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="leading" secondItem="hz8-Dl-ImD" secondAttribute="leading" id="k9a-oF-4wX"/>
+                            <constraint firstItem="dVw-lN-sbd" firstAttribute="top" secondItem="hz8-Dl-ImD" secondAttribute="topMargin" constant="-20" id="oXq-O5-EJj"/>
+                            <constraint firstItem="6dP-2V-dxu" firstAttribute="top" secondItem="dVw-lN-sbd" secondAttribute="bottom" id="zqE-lK-sZb"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="webView" destination="dVw-lN-sbd" id="ebE-YF-IiH"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Weg-4t-Ckr" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="778.39999999999998" y="1938.08095952024"/>
+        </scene>
         <!--Screening Select Profile TableVC-->
         <scene sceneID="zh3-dW-59f">
             <objects>
@@ -510,6 +559,7 @@
                     <connections>
                         <segue destination="nRG-LZ-Hpk" kind="show" identifier="LoadScreeningFormSegue" id="tZl-fx-nf1"/>
                         <segue destination="MP5-cc-QXX" kind="show" identifier="showResiPartiSegue" id="lyp-3O-0f2"/>
+                        <segue destination="jlk-VC-Zvy" kind="show" identifier="ProfileToWebViewSegue" id="Ixm-EY-2v5"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fbu-A9-JEn" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -895,7 +945,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sVr-bp-UvR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="782" y="2517"/>
+            <point key="canvasLocation" x="870" y="2639"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="EKo-Ke-sI8">

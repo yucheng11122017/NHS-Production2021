@@ -15,7 +15,7 @@ abstract_target 'CocoaPods' do
   pod 'SVProgressHUD', '~> 2.1'
   pod 'HTPressableButton', '~> 1.3'
   pod 'ACEDrawingView'
-  pod 'FontAwesomeKit', '~> 2.2’
+  pod 'FontAwesomeKit', '~> 2.2'
   pod 'KAStatusBar', '~> 0.1'
   
 
