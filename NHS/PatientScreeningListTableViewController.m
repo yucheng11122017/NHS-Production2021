@@ -436,9 +436,20 @@ typedef enum residentDataSource {
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
-        NSDictionary *residentInfo = [self findResidentInfoFromSectionRow:indexPath];
-        [self deleteResident:[residentInfo objectForKey:kResidentId]];
-        //        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade]; //no need this for now...
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Are you sure?", nil)
+                                                                                  message:@""
+                                                                           preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Yes", nil)
+                                                            style:UIAlertActionStyleDestructive
+                                                          handler:^(UIAlertAction * deleteDraftAction) {
+                                                              NSDictionary *residentInfo = [self findResidentInfoFromSectionRow:indexPath];
+                                                              [self deleteResident:[residentInfo objectForKey:kResidentId]];
+                                                          }]];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", nil)
+                                                            style:UIAlertActionStyleCancel
+                                                          handler:nil]];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
         
     }
     //  else if (editingStyle == UITableViewCellEditingStyleInsert) {

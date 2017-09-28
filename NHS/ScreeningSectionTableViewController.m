@@ -29,7 +29,7 @@ typedef enum sectionRowNumber {
     Phlebotomy,
     ModeOfScreening,
     Profiling,
-    HealthAssessment_RiskStratification,
+    GeriatricDepressionAssess,
     SocialWork,
     Triage,
     SnellenEyeTest,
@@ -46,6 +46,7 @@ typedef enum sectionRowNumber {
 
 @interface ScreeningSectionTableViewController () {
     NetworkStatus status;
+    NSNumber *age;
 }
 
 @property (strong, nonatomic) NSArray *rowTitles;
@@ -65,6 +66,9 @@ typedef enum sectionRowNumber {
     
     _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
     alreadySubmitted = false;
+    
+    age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
+                        stringForKey:kResidentAge];
     
     if ([_fullScreeningForm[SECTION_RESI_PART][kIsFinal] isEqual:@1])
         alreadySubmitted = true;
@@ -91,9 +95,7 @@ typedef enum sectionRowNumber {
             [self.navigationItem setRightBarButtonItem:_specialBtn];
         }
     }
-    
-    
-    
+
     formType = NewScreeningForm;    //default value
     
     readyToSubmit = false;
@@ -133,7 +135,7 @@ typedef enum sectionRowNumber {
     }
 #endif
     
-    self.rowTitles = @[@"Phlebotomy", @"Mode of Screening",@"Profiling", @"Health Assessment & Risk Stratification", @"Social Work", @"Triage", @"Snellen Eye Test", @"Additional Services", @"Doctor's Consultation", @"Basic Dental Check-up", @"SERI Advanced Eye Screening", @"Fall Risk Assessment", @"Geriatric Dementia Asssesment", @"Health Education"];
+    self.rowTitles = @[@"Phlebotomy", @"Mode of Screening",@"Profiling", @"Geriatric Depression Assessment", @"Social Work", @"Triage", @"Snellen Eye Test", @"Additional Services", @"Doctor's Consultation", @"Basic Dental Check-up", @"SERI Advanced Eye Screening", @"Fall Risk Assessment", @"Geriatric Dementia Asssesment", @"Health Education"];
     
      self.clearsSelectionOnViewWillAppear = YES;
     
@@ -187,6 +189,12 @@ typedef enum sectionRowNumber {
                 cell.accessoryType = UITableViewCellAccessoryCheckmark;
             } else {
                 cell.accessoryType = UITableViewCellAccessoryNone;
+            }
+        }
+        
+        if (indexPath.row == GeriatricDepressionAssess) {   //Geriatric Depression Assessment
+            if ([age intValue] <65) {
+                [cell.textLabel setTextColor:[UIColor grayColor]];
             }
         }
         
@@ -280,9 +288,12 @@ typedef enum sectionRowNumber {
     if (indexPath.section == 0) {
         selectedRow = [NSNumber numberWithInteger:indexPath.row];
         
-        if (indexPath.row == HealthAssessment_RiskStratification) {
-            [self performSegueWithIdentifier:@"sectionToHARSSegue" sender:self];
+        if (indexPath.row == Profiling) {
+            [self performSegueWithIdentifier:@"sectionToProfilingSegue" sender:self];
             return;
+        }
+        else if (indexPath.row == GeriatricDepressionAssess) {
+            selectedRow = [NSNumber numberWithInteger:GeriatricDepressionAssess];
         } else if (indexPath.row == SocialWork) {
             [self performSegueWithIdentifier:@"screenSectionToSocialWorkSegue" sender:self];
             return;
@@ -523,15 +534,16 @@ typedef enum sectionRowNumber {
         [_completionCheck removeAllObjects];
     }
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    //    NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckPhleb, kCheckScreenMode, kCheckProfiling,@"health_assmt_risk_strat",@"check_social_work", kCheckTriage, kCheckSnellen, kCheckAdd, kCheckDocConsult, kCheckDental, @"check_overall_seri", kCheckFall,kCheckDementia, kCheckEd];
+    
+    NSArray *lookupTable = @[kCheckPhleb, kCheckScreenMode, @"profiling_overall",kCheckDepression,@"check_social_work", kCheckTriage, kCheckSnellen, kCheckAdd, kCheckDocConsult, kCheckDental, @"check_overall_seri", kCheckFall,kCheckDementia, kCheckEd];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {
             
-            if (i == HealthAssessment_RiskStratification) {
-                [_completionCheck addObject:[self checkAllHealthAssmtRiskStratSections:checksDict]];
-            } else if (i == SocialWork) {
+            if (i == Profiling) {
+                [_completionCheck addObject:[self checkAllProfilingSections:checksDict]];
+            }
+            else if (i == SocialWork) {
                 [_completionCheck addObject:[self checkAllSocialWorkSections:checksDict]];
             } else if (i== SeriAdvancedEyeScreening) {
                 [_completionCheck addObject:[self checkAllSeriSections:checksDict]];
@@ -579,14 +591,14 @@ typedef enum sectionRowNumber {
     }
 }
 
-- (NSNumber *) checkAllHealthAssmtRiskStratSections:(NSDictionary *) checksDict {
+- (NSNumber *) checkAllProfilingSections:(NSDictionary *) checksDict {
     int count=0;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSInteger residentAge = [[defaults objectForKey:kResidentAge] integerValue];
     
     
     for (NSString *key in [checksDict allKeys]) {   //check through all 5 sub-sections
-        if ([key isEqualToString:kCheckDiabetes] || [key isEqualToString:kCheckHypertension] || [key isEqualToString:kCheckHyperlipidemia] || [key isEqualToString:kCheckDepression] || [key isEqualToString:kCheckRiskStrat]) {
+        if ([key isEqualToString:kCheckDiabetes] || [key isEqualToString:kCheckHypertension] || [key isEqualToString:kCheckHyperlipidemia] || [key isEqualToString:kCheckProfiling] || [key isEqualToString:kCheckRiskStrat]) {
             if ([[checksDict objectForKey:key] isEqual:@1])
                 count++;
         }

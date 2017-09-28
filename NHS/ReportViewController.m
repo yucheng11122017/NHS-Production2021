@@ -28,9 +28,9 @@
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    
     [self emptySandbox];
+    
+    [super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning {

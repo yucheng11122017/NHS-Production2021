@@ -13,7 +13,6 @@
 #import "Reachability.h"
 #import "SVProgressHUD.h"
 #import "ScreeningDictionary.h"
-#import "ReportViewController.h"
 
 #define PDFREPORT_LOADED_NOTIF @"Pdf report downloaded"
 #define CELL_RIGHT_MARGIN_OFFSET 64
@@ -28,13 +27,14 @@ typedef enum getDataState {
 @interface ScreeningSelectProfileTableVC () {
     NetworkStatus status;
     int fetchDataState;
+    BOOL enableReportButton;
 }
 
 
 @property (strong, nonatomic) NSArray *yearlyProfile;
 @property (strong, nonatomic) NSDictionary *residentParticulars;
 @property (strong, nonatomic) NSNumber *residentID;
-@property (strong, nonatomic) NSString *reportFilePath;
+//@property (strong, nonatomic) NSString *reportFilePath;
 @property (strong, nonatomic) UIButton *reportButton;
 
 @end
@@ -44,6 +44,7 @@ typedef enum getDataState {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    enableReportButton = false;
     self.navigationItem.title = @"Integrated Profile";
     _yearlyProfile = [[NSArray alloc] initWithObjects:@"2017",@"2018",@"2019", nil];
     
@@ -57,7 +58,7 @@ typedef enum getDataState {
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshTable:) name:@"enableProfileEntry" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reportExist:) name:PDFREPORT_LOADED_NOTIF object:nil];
+    
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -150,21 +151,23 @@ typedef enum getDataState {
             
             if (serialNum != (id) [NSNull null]) {
                 if ([serialNum isKindOfClass:[NSNumber class]]) {  //as long as have value
-                    
-                    if (!_reportButton) {
-                        CGRect cellSize = cell.layer.frame;
-                        float cellWidth = cellSize.size.width;
-                        
-                        CGRect buttonRect = CGRectMake(cellWidth-CELL_RIGHT_MARGIN_OFFSET, 25, 65, 25);        //to fit for all type of deves
-                        _reportButton = [[UIButton alloc] init];
-                        _reportButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-                        _reportButton.frame = buttonRect;
-                        // set the button title here if it will always be the same
-                        [_reportButton setTitle:@"Report" forState:UIControlStateNormal];
-                        _reportButton.tag = 1;
-                        [_reportButton addTarget:self action:@selector(downloadReport:) forControlEvents:UIControlEventTouchUpInside];
-                        [cell.contentView addSubview:_reportButton];
-                    }
+
+                    enableReportButton = true;
+                    // NO EXTRA BUTTON FOR NOW
+//                    if (!_reportButton) {
+//                        CGRect cellSize = cell.layer.frame;
+//                        float cellWidth = cellSize.size.width;
+//
+//                        CGRect buttonRect = CGRectMake(cellWidth-CELL_RIGHT_MARGIN_OFFSET, 25, 65, 25);        //to fit for all type of deves
+//                        _reportButton = [[UIButton alloc] init];
+//                        _reportButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+//                        _reportButton.frame = buttonRect;
+//                        // set the button title here if it will always be the same
+//                        [_reportButton setTitle:@"Report" forState:UIControlStateNormal];
+//                        _reportButton.tag = 1;
+//                        [_reportButton addTarget:self action:@selector(downloadReport:) forControlEvents:UIControlEventTouchUpInside];
+//                        [cell.contentView addSubview:_reportButton];
+//                    }
                 }
             }
             
@@ -195,31 +198,47 @@ typedef enum getDataState {
             [tableView deselectRowAtIndexPath:indexPath animated:YES];
             //do nothing
         } else {    //only for 2017 profile
-            [self performSegueWithIdentifier:@"LoadScreeningFormSegue" sender:self];
+            [self showPopUpBox];
         }
     }
 }
 
-#pragma mark - Report Btn API
-- (void) downloadReport: (UIButton *) sender {
-    _reportFilePath = nil;  //don't keep the previously saved PDF file.
-    NSUserDefaults *defaults =  [NSUserDefaults standardUserDefaults];
-    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
-    [SVProgressHUD show];
-    [[ServerComm sharedServerCommInstance] retrievePdfReportForResident:[defaults objectForKey:kResidentId]];
+- (void) showPopUpBox {
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"2017 Screening Profile", nil)
+                                                                              message:@""
+                                                                       preferredStyle:UIAlertControllerStyleAlert];
+    
+     UIAlertAction *formAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Screening Form", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * action) {
+                                                          [self performSegueWithIdentifier:@"LoadScreeningFormSegue" sender:self];
+                                                      }];
+    
+    UIAlertAction *reportAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Post Screening Follow-up", nil)
+                                                     style:UIAlertActionStyleDefault
+                                                   handler:^(UIAlertAction * _Nonnull action) {
+//                                                       [self downloadReport:nil];
+                                                       [self performSegueWithIdentifier:@"ProfileToFollowUpSegue" sender:self];
+                                                   }];
+    
+    reportAction.enabled = enableReportButton;
+    
+    [alertController addAction:formAction];
+    [alertController addAction:reportAction];
+    
+    
+    
+    [self presentViewController:alertController animated:YES completion:^{
+        UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
+        alertController.view.superview.userInteractionEnabled = YES;
+        [alertController.view.superview addGestureRecognizer:singleTap];    //tap elsewhere to close the alertView
+    }];
 }
 
-- (void) reportExist: (NSNotification *) notification {
-    NSArray *keys = [notification.userInfo allKeys];
-    if ([keys containsObject:@"status"]) {
-        [SVProgressHUD setMinimumDismissTimeInterval:1.0];
-        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
-        [SVProgressHUD showErrorWithStatus:@"Report could not be downloaded!"];
-        return;
-    }
+                                
+-(void)handleSingleTap:(UITapGestureRecognizer *)sender{
     
-    _reportFilePath = [[ServerComm sharedServerCommInstance] getretrievedReportFilepath];
-    [self performSegueWithIdentifier:@"ProfileToWebViewSegue" sender:self];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Server API
@@ -271,10 +290,7 @@ typedef enum getDataState {
         [segue.destinationViewController performSelector:@selector(setResidentParticularsDict:)
                                               withObject:_residentParticulars];
     }
-    if ([segue.destinationViewController respondsToSelector:@selector(setReportFilepath:)]) {
-        [segue.destinationViewController performSelector:@selector(setReportFilepath:)
-                                              withObject:_reportFilePath];
-    }
+    
 }
 
 

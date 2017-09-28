@@ -1,21 +1,21 @@
 //
-//  HealthAssessAndRiskTableVC.m
+//  ProfilingTableVC.m
 //  NHS
 //
-//  Created by Nicholas Wong on 8/8/17.
+//  Created by Nicholas Wong on 9/27/17.
 //  Copyright © 2017 NUS. All rights reserved.
 //
 
-#import "HealthAssessAndRiskTableVC.h"
+#import "ProfilingTableVC.h"
 #import "AppConstants.h"
 #import "Reachability.h"
 #import "SVProgressHUD.h"
 #import "ServerComm.h"
 #import "MedicalHistoryTableVC.h"
-#import "HealthAssessAndRiskFormVC.h"
+#import "ProfilingFormVC.h"
 #import "ScreeningDictionary.h"
 
-@interface HealthAssessAndRiskTableVC () {
+@interface ProfilingTableVC () {
     NSNumber *destinationFormID;
     NSNumber *age;
     BOOL internetDCed;
@@ -30,7 +30,7 @@
 
 @end
 
-@implementation HealthAssessAndRiskTableVC
+@implementation ProfilingTableVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -44,12 +44,12 @@
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
     [self.hostReachability startNotifier];
     [self updateInterfaceWithReachability:self.hostReachability];
-
+    
     age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
                         stringForKey:kResidentAge];
     
-    self.navigationItem.title = @"Health Assessment and Risk Stratisfaction";
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Medical History",@"Geriatric Depression Assessment",@"Risk Stratification", nil];
+    self.navigationItem.title = @"Profiling";
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Eligibility Assessments",@"Medical History",@"Risk Stratification", nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -88,7 +88,7 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-
+    
     return 1;
 }
 
@@ -114,12 +114,6 @@
     
     [cell.textLabel setText:text];
     
-    if (indexPath.row == 1) {   //Geriatric Depression Assessment
-        if ([age intValue] <65) {
-            [cell.textLabel setTextColor:[UIColor grayColor]];
-        }
-    }
-    
     // Put in the ticks if necessary
     if (indexPath.row < [self.completionCheck count]) {
         if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
@@ -128,29 +122,23 @@
             cell.accessoryType = UITableViewCellAccessoryNone;
         }
     }
-    
-    
     return cell;
 }
 
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.row == 0)
-        [self performSegueWithIdentifier:@"HARSToMedHistSegue" sender:self];
+    if (indexPath.row == 0) {   //Eligibility Assessments
+        [self performSegueWithIdentifier:@"ProfilingToFormSegue" sender:self];
+        destinationFormID = [NSNumber numberWithInteger:0];
+    }
+    else if (indexPath.row == 1)
+        [self performSegueWithIdentifier:@"ProfilingToMedHistSegue" sender:self];
     else {
-        if (indexPath.row == 1) {   //Geriatric Depression Assessment
-            if ([age intValue] <65) {
-                [tableView deselectRowAtIndexPath:indexPath animated:YES];
-                return; //do nothing
-            }
-        }
-        
         NSInteger targetRow = indexPath.row + 2;
         destinationFormID = [NSNumber numberWithInteger:targetRow];
-        [self performSegueWithIdentifier:@"HARSToFormSegue" sender:self];
+        [self performSegueWithIdentifier:@"ProfilingToFormSegue" sender:self];
     }
-    
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -215,7 +203,7 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[@"kCheckMedHistory", kCheckDepression, kCheckRiskStrat];
+    NSArray *lookupTable = @[kCheckProfiling,@"kCheckMedHistory", kCheckRiskStrat];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {
@@ -228,7 +216,7 @@
                 NSNumber *doneNum = [checksDict objectForKey:key];
                 [_completionCheck addObject:doneNum];
             }
-
+            
         }
     }
 }
@@ -261,7 +249,7 @@
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-
+    
     
     // Go straight to HealthRisk FormVC
     if ([segue.destinationViewController respondsToSelector:@selector(setFormID:)]) {    //view submitted form
@@ -272,3 +260,4 @@
 
 
 @end
+

@@ -107,7 +107,6 @@ NSString *const kHDL= @"hdl";
 NSString *const kCholesterolHdlRatio= @"cholesterol_hdl_ratio";
 NSString *const kTotCholesterol= @"total_cholesterol";
 
-
 #pragma mark - Mode of Screening
 
 NSString *const kScreenMode = @"screen_mode";
@@ -614,6 +613,35 @@ NSString *const kPostEdu25 = @"post_edu_25";
 NSString *const kPostEdScore = @"post_ed_score";
 NSString *const kDateEd = @"date_ed";
 
+/* Post-screening Knowledge Quiz */
+NSString *const kPostScreenEdu1 = @"post_screen_edu_01";
+NSString *const kPostScreenEdu2 = @"post_screen_edu_02";
+NSString *const kPostScreenEdu3 = @"post_screen_edu_03";
+NSString *const kPostScreenEdu4 = @"post_screen_edu_04";
+NSString *const kPostScreenEdu5 = @"post_screen_edu_05";
+NSString *const kPostScreenEdu6 = @"post_screen_edu_06";
+NSString *const kPostScreenEdu7 = @"post_screen_edu_07";
+NSString *const kPostScreenEdu8 = @"post_screen_edu_08";
+NSString *const kPostScreenEdu9 = @"post_screen_edu_09";
+NSString *const kPostScreenEdu10 = @"post_screen_edu_10";
+NSString *const kPostScreenEdu11 = @"post_screen_edu_11";
+NSString *const kPostScreenEdu12 = @"post_screen_edu_12";
+NSString *const kPostScreenEdu13 = @"post_screen_edu_13";
+NSString *const kPostScreenEdu14 = @"post_screen_edu_14";
+NSString *const kPostScreenEdu15 = @"post_screen_edu_15";
+NSString *const kPostScreenEdu16 = @"post_screen_edu_16";
+NSString *const kPostScreenEdu17 = @"post_screen_edu_17";
+NSString *const kPostScreenEdu18 = @"post_screen_edu_18";
+NSString *const kPostScreenEdu19 = @"post_screen_edu_19";
+NSString *const kPostScreenEdu20 = @"post_screen_edu_20";
+NSString *const kPostScreenEdu21 = @"post_screen_edu_21";
+NSString *const kPostScreenEdu22 = @"post_screen_edu_22";
+NSString *const kPostScreenEdu23 = @"post_screen_edu_23";
+NSString *const kPostScreenEdu24 = @"post_screen_edu_24";
+NSString *const kPostScreenEdu25 = @"post_screen_edu_25";
+
+NSString *const kPostScreenEdScore = @"post_screen_ed_score";
+
 #pragma mark - Check Variables
 NSString *const kCheckPhleb = @"check_phleb";
 NSString *const kCheckScreenMode = @"check_screen_mode";
@@ -645,6 +673,7 @@ NSString *const kCheckSeriDiag = @"check_seri_diag";
 NSString *const kCheckFall = @"check_fall";
 NSString *const kCheckDementia = @"check_dementia";
 NSString *const kCheckEd = @"check_ed";
+NSString *const kCheckEdPostScreen = @"check_ed_post_screen";
 
 //TBC
 NSString *const kCheckHhie = @"check_hhie";

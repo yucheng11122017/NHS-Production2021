@@ -63,6 +63,7 @@
 #define SECTION_PRE_HEALTH_EDU                  @"pre_health_edu"
 #define SECTION_POST_HEALTH_EDU                 @"post_health_edu"
 #define SECTION_CHECKS                          @"checks"
+#define SECTION_POST_HEALTH_SCREEN              @"post_health_screen"
 
 
 #pragma mark - UserDefaults
@@ -600,10 +601,6 @@ extern NSString *const kEdu24;
 extern NSString *const kEdu25;
 extern NSString *const kPreEdScore;
 
-
-
-
-
 /* Pre-education Knowledge Quiz */
 extern NSString *const kPreEdu1;
 extern NSString *const kPreEdu2;
@@ -660,6 +657,35 @@ extern NSString *const kPostEdu25;
 extern NSString *const kPostEdScore;
 extern NSString *const kDateEd;
 
+/* Post-screening Knowledge Quiz */
+extern NSString *const kPostScreenEdu1;
+extern NSString *const kPostScreenEdu2;
+extern NSString *const kPostScreenEdu3;
+extern NSString *const kPostScreenEdu4;
+extern NSString *const kPostScreenEdu5;
+extern NSString *const kPostScreenEdu6;
+extern NSString *const kPostScreenEdu7;
+extern NSString *const kPostScreenEdu8;
+extern NSString *const kPostScreenEdu9;
+extern NSString *const kPostScreenEdu10;
+extern NSString *const kPostScreenEdu11;
+extern NSString *const kPostScreenEdu12;
+extern NSString *const kPostScreenEdu13;
+extern NSString *const kPostScreenEdu14;
+extern NSString *const kPostScreenEdu15;
+extern NSString *const kPostScreenEdu16;
+extern NSString *const kPostScreenEdu17;
+extern NSString *const kPostScreenEdu18;
+extern NSString *const kPostScreenEdu19;
+extern NSString *const kPostScreenEdu20;
+extern NSString *const kPostScreenEdu21;
+extern NSString *const kPostScreenEdu22;
+extern NSString *const kPostScreenEdu23;
+extern NSString *const kPostScreenEdu24;
+extern NSString *const kPostScreenEdu25;
+
+extern NSString *const kPostScreenEdScore;
+
 #pragma mark - Check Variables
 extern NSString *const kCheckPhleb;
 extern NSString *const kCheckScreenMode;
@@ -691,5 +717,6 @@ extern NSString *const kCheckSeriDiag;
 extern NSString *const kCheckFall;
 extern NSString *const kCheckDementia;
 extern NSString *const kCheckEd;
+extern NSString *const kCheckEdPostScreen;
 
 @end

@@ -38,7 +38,7 @@ typedef enum formName {
     Phleb,
     ModeOfScreening,
     Profiling,
-    Unused3,
+    GeriatricDepressionAssess,
     Unused4,
     Triage,
     SnellenEyeTest,
@@ -78,9 +78,6 @@ NSString *const kQuestionFifteen = @"q15";
     BOOL noChas, lowIncome, wantChas;
     BOOL age40, chronicCond, wantFreeBt; //for phleb
     BOOL sporeanPr, age50, relColorectCancer, colon3Yrs, wantColRef, disableFIT;
-    BOOL fit12Mths, colonsc10Yrs, wantFitKit;
-    BOOL sporean, age5069 ,noMammo2Yrs, hasChas, wantMammo;
-    BOOL age2569, noPapSmear3Yrs, hadSex, wantPapSmear;
     BOOL age65, feelFall, scaredFall, fallen12Mths;
     BOOL internetDCed;
     BOOL isFormFinalized;
@@ -129,7 +126,9 @@ NSString *const kQuestionFifteen = @"q15";
             break;
         case 1: form = [self initModeOfScreening];
             break;
-        case 2: form = [self initProfiling];
+//        case 2: form = [self initProfiling];
+//            break;
+        case 3: form = [self initGeriaDepressAssess];
             break;
         case 5: form = [self initTriage];
             break;
@@ -273,11 +272,12 @@ NSString *const kQuestionFifteen = @"q15";
     wantFreeBtRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:wantFreeBtRow];
     
-    XLFormRowDescriptor *didPhlebRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDidPhleb rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Undergone Phlebotomy?"];
+    XLFormRowDescriptor *didPhlebRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDidPhleb rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone Phlebotomy?"];
     if (phlebotomyEligibDict != (id)[NSNull null] && [phlebotomyEligibDict objectForKey:kDidPhleb] != (id)[NSNull null])
-        didPhlebRow.value = phlebotomyEligibDict[kDidPhleb];
+        didPhlebRow.value = [self getYesNofromOneZero:phlebotomyEligibDict[kDidPhleb]];
     
     [self setDefaultFontWithRow:didPhlebRow];
+    didPhlebRow.selectorOptions = @[@"Yes", @"No"];
     didPhlebRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     didPhlebRow.disabled = [NSNumber numberWithBool:!(age40 && sporeanPr && chronicCond && kWantFreeBt)];
     [section addFormRow:didPhlebRow];
@@ -355,14 +355,23 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:cholesHdlRatioRow];
     
     //For initial condition
-    if ([didPhlebRow.value isEqual:@1]) {
-        glucoseRow.disabled = @0;
-        triglyRow.disabled = @0;
-        hdlRow.disabled = @0;
-        ldlRow.disabled = @0;
-        totCholesterolRow.disabled = @0;
-        cholesHdlRatioRow.disabled = @0;
-    } else {
+    if ([didPhlebRow.value isKindOfClass:[NSString class]]) {
+        if ([didPhlebRow.value isEqualToString:@"Yes"]) {
+            glucoseRow.disabled = @0;
+            triglyRow.disabled = @0;
+            hdlRow.disabled = @0;
+            ldlRow.disabled = @0;
+            totCholesterolRow.disabled = @0;
+            cholesHdlRatioRow.disabled = @0;
+        } else {
+            glucoseRow.disabled = @1;
+            triglyRow.disabled = @1;
+            hdlRow.disabled = @1;
+            ldlRow.disabled = @1;
+            totCholesterolRow.disabled = @1;
+            cholesHdlRatioRow.disabled = @1;
+        }
+    } else {    //not initiated yet.
         glucoseRow.disabled = @1;
         triglyRow.disabled = @1;
         hdlRow.disabled = @1;
@@ -374,20 +383,22 @@ NSString *const kQuestionFifteen = @"q15";
     // For when user make changes
     didPhlebRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                glucoseRow.disabled = @0;
-                triglyRow.disabled = @0;
-                hdlRow.disabled = @0;
-                ldlRow.disabled = @0;
-                totCholesterolRow.disabled = @0;
-                cholesHdlRatioRow.disabled = @0;
-            } else {
-                glucoseRow.disabled = @1;
-                triglyRow.disabled = @1;
-                hdlRow.disabled = @1;
-                ldlRow.disabled = @1;
-                totCholesterolRow.disabled = @1;
-                cholesHdlRatioRow.disabled = @1;
+            if ([newValue isKindOfClass:[NSString class]]) {
+                if ([newValue isEqualToString:@"Yes"]) {
+                    glucoseRow.disabled = @0;
+                    triglyRow.disabled = @0;
+                    hdlRow.disabled = @0;
+                    ldlRow.disabled = @0;
+                    totCholesterolRow.disabled = @0;
+                    cholesHdlRatioRow.disabled = @0;
+                } else {
+                    glucoseRow.disabled = @1;
+                    triglyRow.disabled = @1;
+                    hdlRow.disabled = @1;
+                    ldlRow.disabled = @1;
+                    totCholesterolRow.disabled = @1;
+                    cholesHdlRatioRow.disabled = @1;
+                }
             }
             
             [self reloadFormRow:glucoseRow];
@@ -509,871 +520,150 @@ NSString *const kQuestionFifteen = @"q15";
 
 
 
--(id) initProfiling {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Profiling"];
+
+- (id) initGeriaDepressAssess {
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@""];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
-
-    noChas = lowIncome = wantChas = false;
-    sporeanPr = age50 = relColorectCancer = colon3Yrs = wantColRef = disableFIT = false;
-    fit12Mths = colonsc10Yrs = wantFitKit = false;
-    age5069 = noMammo2Yrs = hasChas = wantMammo = false;
-    age2569 = noPapSmear3Yrs = hadSex = wantPapSmear = false;
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Geriatric Depression Assessment"];
+    [formDescriptor addFormSection:section];
     
-    NSDictionary *profilingDict = _fullScreeningForm[SECTION_PROFILING_SOCIOECON];
-    NSDictionary *chasPrelimDict = _fullScreeningForm[SECTION_CHAS_PRELIM];
-    NSDictionary *colonscoEligibDict = _fullScreeningForm[SECTION_COLONOSCOPY_ELIGIBLE];
-    NSDictionary *fitEligibDict = _fullScreeningForm[SECTION_FIT_ELIGIBLE];
-    NSDictionary *mammoEligibDict = _fullScreeningForm[SECTION_MAMMOGRAM_ELIGIBLE];
-    NSDictionary *papSmearEligibDict = _fullScreeningForm[SECTION_PAP_SMEAR_ELIGIBLE];
-    NSDictionary *fallRiskEligib = _fullScreeningForm[SECTION_FALL_RISK_ELIGIBLE];
-    NSDictionary *geriaDementAssmtDict = _fullScreeningForm[SECTION_GERIATRIC_DEMENTIA_ELIGIBLE];
+    NSDictionary *geriaDepreAssmtDict = [self.fullScreeningForm objectForKey:SECTION_DEPRESSION];
     
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
     
     if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckProfiling];
+        NSNumber *check = checkDict[kCheckDepression];
         if ([check isKindOfClass:[NSNumber class]]) {
             isFormFinalized = [check boolValue];
         }
     }
     
-    // Basic Information - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kProfilingConsent rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Consent to disclosure of information"];
-    if (profilingDict != (id)[NSNull null] && [profilingDict objectForKey:kProfilingConsent] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:profilingDict[kProfilingConsent]];
-    row.selectorOptions = @[@"Yes", @"No"];
+    XLFormRowDescriptor* phqQ1Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ1
+                                                                          rowType:XLFormRowDescriptorTypeStepCounter
+                                                                            title:@"PHQ-2 question 1 Score"];
+    [self setDefaultFontWithRow:phqQ1Row];
+    phqQ1Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [phqQ1Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
+    [phqQ1Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
+    [phqQ1Row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
+    [phqQ1Row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
+    
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ1] != (id)[NSNull null]) {
+        phqQ1Row.value = geriaDepreAssmtDict[kPhqQ1];
+    }
+    
+    [section addFormRow:phqQ1Row];
+    
+    XLFormRowDescriptor* phqQ2Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ2
+                                                                          rowType:XLFormRowDescriptorTypeStepCounter
+                                                                            title:@"PHQ-2 question 2 Score"];
+    [self setDefaultFontWithRow:phqQ2Row];
+    phqQ2Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [phqQ2Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
+    [phqQ2Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
+    [phqQ2Row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
+    [phqQ2Row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
+    
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ2] != (id)[NSNull null]) {
+        phqQ2Row.value = geriaDepreAssmtDict[kPhqQ2];
+    }
+    
+    [section addFormRow:phqQ2Row];
+    
+    
+    
+    XLFormRowDescriptor* phq9ScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhq9Score
+                                                                              rowType:XLFormRowDescriptorTypeNumber
+                                                                                title:@"Total score for PHQ-9"];
+    [self setDefaultFontWithRow:phq9ScoreRow];
+    phq9ScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    phq9ScoreRow.disabled = @(1);
+    
+    if (phqQ1Row.value != (id) [NSNull null] && phqQ2Row.value != (id)[NSNull null]) {
+        if ([phqQ1Row.value intValue] > 1 || [phqQ2Row.value intValue] >1) {
+            phq9ScoreRow.disabled = @(0);
+        }
+    }
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhq9Score] != (id)[NSNull null]) {
+        phq9ScoreRow.value = geriaDepreAssmtDict[kPhq9Score];
+    }
+    
+    [section addFormRow:phq9ScoreRow];
+    
+    XLFormRowDescriptor* q10ResponseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ10Response
+                                                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                                                  title:@"Response to Question 10:"];
+    [self setDefaultFontWithRow:q10ResponseRow];
+    q10ResponseRow.selectorOptions = @[@"Not difficult at all", @"Somewhat difficult", @"Very difficult",@"Extremely difficult"];
+    q10ResponseRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    
+    q10ResponseRow.disabled = @(1);
+    if (phqQ1Row.value != (id) [NSNull null] && phqQ2Row.value != (id)[NSNull null]) {
+        if ([phqQ1Row.value intValue] > 1 || [phqQ2Row.value intValue] >1) {
+            q10ResponseRow.disabled = @(0);
+        }
+    }
+    
+    
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kQ10Response] != (id)[NSNull null]) {
+        q10ResponseRow.value = geriaDepreAssmtDict[kQ10Response];
+    }
+    
+    [section addFormRow:q10ResponseRow];
+    
+    phqQ1Row.onChangeBlock= ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue intValue] > 1)  {
+                phq9ScoreRow.disabled = @(0);
+                q10ResponseRow.disabled = @(0);
+            }
+            else {
+                if ([phqQ2Row.value intValue] < 2) {    //only when both lower than 2, then disable field
+                    phq9ScoreRow.disabled = @(1);
+                    q10ResponseRow.disabled = @(1);
+                }
+            }
+            [self reloadFormRow:phq9ScoreRow];
+            [self reloadFormRow:q10ResponseRow];
+        }
+    };
+    
+    phqQ2Row.onChangeBlock= ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue intValue] > 1) {
+                phq9ScoreRow.disabled = @(0);
+                q10ResponseRow.disabled = @(0);
+            }
+            else {
+                if ([phqQ1Row.value intValue] < 2) {    //only when both lower than 2, then disable field
+                    phq9ScoreRow.disabled = @(1);
+                    q10ResponseRow.disabled = @(1);
+                }
+            }
+            [self reloadFormRow:phq9ScoreRow];
+            [self reloadFormRow:q10ResponseRow];
+        }
+    };
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpReq
+                                                rowType:XLFormRowDescriptorTypeBooleanSwitch
+                                                  title:@"Does resident require further follow up?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.required = YES;
-    [section addFormRow:row];
-    
-    // Resident's Socioeconomic status - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Resident's Socioeconomic Status"];
-    [formDescriptor addFormSection:section];
-    
-    XLFormRowDescriptor *employmentRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployStat rowType:XLFormRowDescriptorTypeSelectorPickerViewInline title:@"Employment status"];
-    if (profilingDict != (id)[NSNull null]) employmentRow.value = profilingDict[kEmployStat];
-    [self setDefaultFontWithRow:employmentRow];
-    employmentRow.required = NO;
-    employmentRow.selectorOptions = @[@"Retired", @"Housewife/Homemaker",@"Self-employed",@"Part-time employed",@"Full-time employed", @"Unemployed", @"Others"];
-    [section addFormRow:employmentRow];
-    
-    XLFormRowDescriptor *unemployReasonsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployReasons rowType:XLFormRowDescriptorTypeTextView title:@""];
-    if (profilingDict != (id)[NSNull null] && profilingDict[kEmployReasons] != (id)[NSNull null]) unemployReasonsRow.value = profilingDict[kEmployReasons];
-    [self setDefaultFontWithRow:unemployReasonsRow];
-    unemployReasonsRow.required = NO;
-    unemployReasonsRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Unemployed'", employmentRow];
-    [unemployReasonsRow.cellConfigAtConfigure setObject:@"Reasons for unemployment" forKey:@"textView.placeholder"];
-
-    [section addFormRow:unemployReasonsRow];
-    
-    XLFormRowDescriptor *otherEmployRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEmployOthers rowType:XLFormRowDescriptorTypeText title:@"Other employment"];
-    if (profilingDict != (id)[NSNull null]) otherEmployRow.value = profilingDict[kEmployOthers];
-    [self setDefaultFontWithRow:otherEmployRow];
-    otherEmployRow.required = NO;
-    otherEmployRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", employmentRow];
-    [otherEmployRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [section addFormRow:otherEmployRow];
-    
-    XLFormRowDescriptor *noDiscloseIncomeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiscloseIncome rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident does not want to disclose income"];
-    if (profilingDict != (id)[NSNull null] && [profilingDict objectForKey:kDiscloseIncome] != (id)[NSNull null]) noDiscloseIncomeRow.value = profilingDict[kDiscloseIncome];
-    [self setDefaultFontWithRow:noDiscloseIncomeRow];
-//    noDiscloseIncomeRow.selectorOptions = @[@"Yes", @"No"];
-    noDiscloseIncomeRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    noDiscloseIncomeRow.required = NO;
-    [section addFormRow:noDiscloseIncomeRow];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    XLFormRowDescriptor *mthHouseIncome = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgMthHouseIncome rowType:XLFormRowDescriptorTypeDecimal title:@"Average monthly household income"];
-    //value
-    if (profilingDict != (id)[NSNull null] && profilingDict[kAvgMthHouseIncome] != (id)[NSNull null])
-        mthHouseIncome.value = profilingDict[kAvgMthHouseIncome];
-    
-    [self setDefaultFontWithRow:mthHouseIncome];
-    [mthHouseIncome.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [mthHouseIncome.cellConfigAtConfigure setObject:@"Enter here" forKey:@"textField.placeholder"];
-    mthHouseIncome.cellConfig[@"textLabel.numberOfLines"] = @0;
-    mthHouseIncome.required = NO;
-    [section addFormRow:mthHouseIncome];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-
-    XLFormRowDescriptor *noOfPplInHouse = [XLFormRowDescriptor formRowDescriptorWithTag:kNumPplInHouse rowType:XLFormRowDescriptorTypeInteger title:@"No. of people in the household"];
     
     //value
-    if (profilingDict != (id)[NSNull null] && profilingDict[kNumPplInHouse] != (id) [NSNull null])
-        noOfPplInHouse.value = profilingDict[kNumPplInHouse];
-    
-    [self setDefaultFontWithRow:noOfPplInHouse];
-    [noOfPplInHouse.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    noOfPplInHouse.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [noOfPplInHouse addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Must be greater than 0" regex:@"^[1-9][0-9]*$"]];
-    noOfPplInHouse.required = NO;
-    [section addFormRow:noOfPplInHouse];
-    
-    XLFormRowDescriptor *avgIncomePerHead = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgIncomePerHead rowType:XLFormRowDescriptorTypeDecimal title:@"Average income per head"];   //auto-calculate
-    
-    //value
-    if (profilingDict != (id)[NSNull null] && profilingDict[avgIncomePerHead] != (id) [NSNull null])
-        avgIncomePerHead.value = profilingDict[avgIncomePerHead];
-    
-    [self setDefaultFontWithRow:avgIncomePerHead];
-    [avgIncomePerHead.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    avgIncomePerHead.required = NO;
-    
-    if (mthHouseIncome.value != (id) [NSNull null] && noOfPplInHouse.value != (id)[NSNull null]) {
-        if (!isnan([mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue])) {  //check for not nan first!
-            avgIncomePerHead.value = [NSString stringWithFormat:@"$ %.2f", [mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue]];
-        }
-    }
-    
-    avgIncomePerHead.disabled = @(1);
-    [section addFormRow:avgIncomePerHead];
-
-    mthHouseIncome.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if (mthHouseIncome.value == (id)[NSNull null] || noOfPplInHouse.value == (id)[NSNull null])
-                return; //don't bother continuing
-            if ([mthHouseIncome.value integerValue] != 0 && [noOfPplInHouse.value integerValue] != 0) {
-                avgIncomePerHead.value = [NSString stringWithFormat:@"$ %.2f", ([mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue])];
-                [self updateFormRow:avgIncomePerHead];
-            }
-        }
-    };
-    noOfPplInHouse.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if (mthHouseIncome.value == (id)[NSNull null] || noOfPplInHouse.value == (id)[NSNull null])
-                return; //don't bother continuing
-            if ([mthHouseIncome.value integerValue] != 0 && [noOfPplInHouse.value integerValue] != 0) {
-                avgIncomePerHead.value = [NSString stringWithFormat:@"$ %.2f", ([mthHouseIncome.value doubleValue] / [noOfPplInHouse.value doubleValue])];
-                [self updateFormRow:avgIncomePerHead];
-            }
-        }
-    };
-    
-    // CHAS Preliminary Eligibiliy Assessment - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"CHAS Preliminary Eligibility Assessment"];
-    [formDescriptor addFormSection:section];
-
-    XLFormRowDescriptor *sporeanRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSporean rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean"];
-    [self setDefaultFontWithRow:sporeanRow];
-    sporeanRow.required = NO;
-    sporeanRow.disabled = @(1);
-    if ([citizenship isEqualToString:@"Singaporean"]) {
-        sporeanRow.value = @1;
-        sporean = YES;
-    }
-    else {
-        sporeanRow.value = @0;
-        sporean = NO;
-        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyCHAS];
-    }
-    [section addFormRow:sporeanRow];
-    
-    
-    XLFormRowDescriptor *chasNoChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDoesntOwnChasPioneer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does not currently own a CHAS card (blue/orange) OR \nCurrently owns a CHAS card which expires in ≤ 3 months"];
-    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kDoesntOwnChasPioneer] != (id)[NSNull null]) chasNoChasRow.value = chasPrelimDict[kDoesntOwnChasPioneer];
-    [self setDefaultFontWithRow:chasNoChasRow];
-    chasNoChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    chasNoChasRow.required = NO;
-    [section addFormRow:chasNoChasRow];
-    
-    chasNoChasRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                noChas = TRUE;
-            } else {
-                noChas = FALSE;
-            }
-            if (sporean && noChas && lowIncome && wantChas) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyCHAS];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyCHAS];
-            }
-            
-        }
-    };
-    
-    XLFormRowDescriptor *lowHouseIncomeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLowHouseIncome rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"For households with income: Household monthly income per person is $1800 and below \nOR\nFor households with no income: Annual Value (AV) of home is $21,000 and below"];
-    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kLowHouseIncome] != (id)[NSNull null]) lowHouseIncomeRow.value = chasPrelimDict[kLowHouseIncome];
-    [self setDefaultFontWithRow:lowHouseIncomeRow];
-    lowHouseIncomeRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    lowHouseIncomeRow.required = NO;
-    [section addFormRow:lowHouseIncomeRow];
-    
-    lowHouseIncomeRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                lowIncome = TRUE;
-            } else {
-                lowIncome = FALSE;
-            }
-            if (sporean && noChas && lowIncome && wantChas) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyCHAS];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyCHAS];
-            }
-            
-        }
-    };
-    
-    XLFormRowDescriptor *wantChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want to apply for CHAS?"];
-    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kWantChas] != (id)[NSNull null]) wantChasRow.value = chasPrelimDict[kWantChas];
-    [self setDefaultFontWithRow:wantChasRow];
-    wantChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    wantChasRow.required = NO;
-    [section addFormRow:wantChasRow];
-    
-    wantChasRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                wantChas = TRUE;
-            } else {
-                wantChas = FALSE;
-            }
-            if (sporean && noChas && lowIncome && wantChas) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyCHAS];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyCHAS];
-            }
-            
-        }
-    };
-    
-    // Disable all income related questions if not willing to disclose income
-    noDiscloseIncomeRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([newValue isEqual:@(1)]) {
-                mthHouseIncome.disabled = @(1);
-                noOfPplInHouse.disabled = @(1);
-                avgIncomePerHead.disabled = @(1);
-                chasNoChasRow.disabled = @(1);
-                wantChasRow.disabled = @(1);
-                lowHouseIncomeRow.disabled = @(1);
-
-            } else {
-                mthHouseIncome.disabled = @(0);
-                noOfPplInHouse.disabled = @(0);
-                avgIncomePerHead.disabled = @(0);
-                chasNoChasRow.disabled = @(0);
-                wantChasRow.disabled = @(0);
-                lowHouseIncomeRow.disabled = @(0);
-            }
-            
-            [self reloadFormRow:mthHouseIncome];
-            [self reloadFormRow:noOfPplInHouse];
-            [self reloadFormRow:avgIncomePerHead];
-            [self reloadFormRow:chasNoChasRow];
-            [self reloadFormRow:wantChasRow];
-            [self reloadFormRow:lowHouseIncomeRow];
-        }
-    };
-
-    // Eligibility Assessment for Colonoscopy - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Colonoscopy"];
-    [formDescriptor addFormSection:section];
-    
-    XLFormRowDescriptor *sporeanPrRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
-    [self setDefaultFontWithRow:sporeanPrRow];
-    sporeanPrRow.required = NO;
-    sporeanPrRow.disabled = @(1);
-    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"]) {
-        sporeanPrRow.value = @1;
-        sporeanPr = YES;
-    }
-    else {
-        sporeanPrRow.value = @0;
-        sporeanPr = NO;
-        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
-    }
-    [section addFormRow:sporeanPrRow];
-    
-    XLFormRowDescriptor *age50Row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove50 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 50 and above"];
-    [self setDefaultFontWithRow:age50Row];
-    age50Row.required = NO;
-    age50Row.disabled = @(1);
-    if ([age integerValue] >= 50) {
-        age50Row.value = @1;
-        age50 = YES;
-    }
-    else {
-        age50Row.value = @0;
-        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
-        age50 = NO;
-    }
-    [section addFormRow:age50Row];
-    
-    XLFormRowDescriptor *relColCancerRow = [XLFormRowDescriptor formRowDescriptorWithTag:kRelWColorectCancer rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"First degree relative with colorectal cancer?"];
-    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kRelWColorectCancer] != (id)[NSNull null]) {
-        relColCancerRow.value = colonscoEligibDict[kRelWColorectCancer];
-        relColorectCancer = [relColCancerRow.value boolValue];
-    }
-    
-    [self setDefaultFontWithRow:relColCancerRow];
-    relColCancerRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    relColCancerRow.required = NO;
-    [section addFormRow:relColCancerRow];
-    
-    
-    XLFormRowDescriptor *colon3yrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy3yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 3 years?"];
-    
-    //value
-    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kColonoscopy3yrs] != (id)[NSNull null]) {
-        colon3yrsRow.value = colonscoEligibDict[kColonoscopy3yrs];
-        colon3Yrs = [colon3yrsRow.value boolValue];
-    }
-    [self setDefaultFontWithRow:colon3yrsRow];
-    colon3yrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    colon3yrsRow.required = NO;
-    [section addFormRow:colon3yrsRow];
-    
-    XLFormRowDescriptor *wantColonRefRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantColonoscopyRef rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a referral for free colonoscopy?"];
-    if (colonscoEligibDict != (id)[NSNull null] && [colonscoEligibDict objectForKey:kWantColonoscopyRef] != (id)[NSNull null]) {
-        wantColonRefRow.value = colonscoEligibDict[kWantColonoscopyRef];
-        wantColRef = [wantColonRefRow.value boolValue];
-    }
-    [self setDefaultFontWithRow:wantColonRefRow];
-    wantColonRefRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    wantColonRefRow.required = NO;
-    [section addFormRow:wantColonRefRow];
-    
-    // Eligibility Assessment for FIT - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for FIT"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    row.disabled = @(1);
-    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"]) {
-        sporeanPr = true;
-        row.value = @1;
-    }
-    else {
-        sporeanPr = false;
-        row.value = @0;
-        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyFIT];
-    }
-    
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove50 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 50 and above"];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    row.disabled = @(1);
-    if ([age integerValue] >= 50) {
-        age50 = true;
-        row.value = @1;
-    }
-    else {
-        age50 = false;
-        row.value = @0;
-        [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFIT];
-    }
-    
-    [section addFormRow:row];
-    
-    XLFormRowDescriptor *fitLast12MthsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFitLast12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done FIT in the last 12 months?"];
-    if (fitEligibDict != (id)[NSNull null] && [fitEligibDict objectForKey:kFitLast12Mths] != (id)[NSNull null]) fitLast12MthsRow.value = fitEligibDict[kFitLast12Mths];
-    [self setDefaultFontWithRow:fitLast12MthsRow];
-    fitLast12MthsRow.required = NO;
-    fitLast12MthsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    [section addFormRow:fitLast12MthsRow];
-    
-    fitLast12MthsRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                fit12Mths = TRUE;
-            } else {
-                fit12Mths = FALSE;
-            }
-            if (sporeanPr && age50 && fit12Mths && colonsc10Yrs && wantFitKit) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFIT];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFIT];
-            }
-            
-        }
-    };
-    
-    XLFormRowDescriptor *colonoscopy10YrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy10Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done colonoscopy in the past 10 years?"];
-    if (fitEligibDict != (id)[NSNull null] && [fitEligibDict objectForKey:kColonoscopy10Yrs] != (id)[NSNull null]) colonoscopy10YrsRow.value = fitEligibDict[kColonoscopy10Yrs];
-    [self setDefaultFontWithRow:colonoscopy10YrsRow];
-    colonoscopy10YrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    colonoscopy10YrsRow.required = NO;
-    [section addFormRow:colonoscopy10YrsRow];
-    
-    colonoscopy10YrsRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                colonsc10Yrs = TRUE;
-            } else {
-                colonsc10Yrs = FALSE;
-            }
-            if (sporeanPr && age50 && fit12Mths && colonsc10Yrs && wantFitKit) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFIT];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFIT];
-            }
-            
-        }
-    };
-    
-    XLFormRowDescriptor *wantFitKitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantFitKit rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free FIT kit?"];
-    if (fitEligibDict != (id)[NSNull null] && [fitEligibDict objectForKey:kWantFitKit] != (id)[NSNull null]) wantFitKitRow.value = fitEligibDict[kWantFitKit];
-    [self setDefaultFontWithRow:wantFitKitRow];
-    wantFitKitRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    wantFitKitRow.required = NO;
-    [section addFormRow:wantFitKitRow];
-    
-    wantFitKitRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                wantFitKit = TRUE;
-            } else {
-                wantFitKit = FALSE;
-            }
-            if (sporeanPr && age50 && fit12Mths && colonsc10Yrs && wantFitKit) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFIT];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFIT];
-            }
-            
-        }
-    };
-    
-    // for the initial setting
-    if (sporeanPr && age50 && relColorectCancer && colon3Yrs && wantColRef) {
-        disableFIT = true;
-        fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
-        colonoscopy10YrsRow.disabled = [NSNumber numberWithBool:disableFIT];
-        wantFitKitRow.disabled = [NSNumber numberWithBool:disableFIT];
-    }
-    
-    
-    relColCancerRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([newValue isEqual:@(1)])  relColorectCancer = true;
-            else relColorectCancer = false;
-        }
-        
-        if (sporeanPr && age50 && relColorectCancer && colon3Yrs && wantColRef) {
-            disableFIT = true;
-            [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyFIT];
-            [[NSUserDefaults standardUserDefaults]setObject:@"1" forKey:kQualifyColonsc];
-        }
-        else disableFIT = false;
-        fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
-        colonoscopy10YrsRow.disabled = [NSNumber numberWithBool:disableFIT];
-        wantFitKitRow.disabled = [NSNumber numberWithBool:disableFIT];
-        [self reloadFormRow:fitLast12MthsRow];
-        [self reloadFormRow:colonoscopy10YrsRow];
-        [self reloadFormRow:wantFitKitRow];
-        
-    };
-    
-    colon3yrsRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([newValue isEqual:@(1)]) colon3Yrs  = true;
-            else colon3Yrs = false;
-        }
-        
-        if (sporeanPr && age50 && relColorectCancer && colon3Yrs && wantColRef) {
-            disableFIT = true;
-            [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyFIT];
-            [[NSUserDefaults standardUserDefaults]setObject:@"1" forKey:kQualifyColonsc];
-        }
-        else disableFIT = false;
-        
-        fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
-        colonoscopy10YrsRow.disabled = [NSNumber numberWithBool:disableFIT];
-        wantFitKitRow.disabled = [NSNumber numberWithBool:disableFIT];
-        [self reloadFormRow:fitLast12MthsRow];
-        [self reloadFormRow:colonoscopy10YrsRow];
-        [self reloadFormRow:wantFitKitRow];
-
-    };
-    
-    wantColonRefRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([newValue isEqual:@(1)]) wantColRef  = true;
-            else wantColRef = false;
-        }
-        
-        if (sporeanPr && age50 && relColorectCancer && colon3Yrs && wantColRef) {
-            disableFIT = true;
-            [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyFIT];
-            [[NSUserDefaults standardUserDefaults]setObject:@"1" forKey:kQualifyColonsc];
-        }
-        else disableFIT = false;
-        fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
-        colonoscopy10YrsRow.disabled = [NSNumber numberWithBool:disableFIT];
-        wantFitKitRow.disabled = [NSNumber numberWithBool:disableFIT];
-        [self reloadFormRow:fitLast12MthsRow];
-        [self reloadFormRow:colonoscopy10YrsRow];
-        [self reloadFormRow:wantFitKitRow];
-
-    };
-    
-    
-    
-    
-    BOOL isMale;
-    if ([gender isEqualToString:@"M"]) {
-        isMale=true;
-        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
-        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyPapSmear];
-    }
-    else isMale = false;
-    
-    // Eligibility Assessment for Mammogram - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Mammogram"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean"];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    row.disabled = @(1);
-    if ([citizenship isEqualToString:@"Singaporean"]) {
-        sporean = YES;
-        row.value = @1;
-    }
-    else {
-        sporean = NO;
-        row.value = @0;
-        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
-    }
-    
-//    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeCheck rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 50 to 69"];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    row.disabled = @(1);
-    if (([age integerValue] >= 50) && ([age integerValue] < 70)) {
-        row.value = @1;
-        age5069 = YES;
-    }
-    else {
-        row.value = @0;
-        age5069 = NO;
-        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
-    }
-    
-//    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:row];
-    
-    XLFormRowDescriptor *mammo2YrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammo2Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done mammogram in the last 2 years?"];
-    if (mammoEligibDict != (id)[NSNull null] && [mammoEligibDict objectForKey:kMammo2Yrs] != (id)[NSNull null]) mammo2YrsRow.value = mammoEligibDict[kMammo2Yrs];
-    [self setDefaultFontWithRow:mammo2YrsRow];
-    mammo2YrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    mammo2YrsRow.required = NO;
-    mammo2YrsRow.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:mammo2YrsRow];
-    
-    mammo2YrsRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                noMammo2Yrs = TRUE;
-            } else {
-                noMammo2Yrs = FALSE;
-            }
-            if (sporean && age5069 && noMammo2Yrs && hasChas && wantMammo) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyMammo];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyMammo];
-            }
-                
-        }
-    };
-    
-    XLFormRowDescriptor *hasChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHasChas rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has a valid CHAS card (blue/orange)"];
-    if (mammoEligibDict != (id)[NSNull null] && [mammoEligibDict objectForKey:kHasChas] != (id)[NSNull null]) hasChasRow.value = mammoEligibDict[kHasChas];
-    [self setDefaultFontWithRow:hasChasRow];
-    hasChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    hasChasRow.required = NO;
-    hasChasRow.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:hasChasRow];
-    
-    hasChasRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                hasChas = TRUE;
-            } else {
-                hasChas = FALSE;
-            }
-            if (sporean && age5069 && noMammo2Yrs && hasChas && wantMammo) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyMammo];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyMammo];
-            }
-        }
-    };
-    
-    XLFormRowDescriptor *wantMammoRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantMammo rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free mammogram referral?"];
-    if (mammoEligibDict != (id)[NSNull null] && [mammoEligibDict objectForKey:kWantMammo] != (id)[NSNull null]) wantMammoRow.value = mammoEligibDict[kWantMammo];
-    [self setDefaultFontWithRow:wantMammoRow];
-    wantMammoRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    wantMammoRow.required = NO;
-    wantMammoRow.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:wantMammoRow];
-    
-    wantMammoRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                wantMammo = TRUE;
-            } else {
-                wantMammo = FALSE;
-            }
-            if (sporean && age5069 && noMammo2Yrs && hasChas && wantMammo) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyMammo];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyMammo];
-            }
-        }
-    };
-    
-    // Eligibility Assessment for pap smear - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility Assessment for Pap Smear"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Singaporean/PR"];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    row.disabled = @(1);
-    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"]) {
-        sporeanPr = YES;
-        row.value = @1;
-    }
-    else {
-        sporeanPr = NO;
-        row.value = @0;
-        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyPapSmear];
-    }
-//    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeCheck2 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 25 to 69"];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    row.disabled = @(1);
-    if (([age integerValue] >= 25) && ([age integerValue] < 70)) {
-        age2569 = YES;
-        row.value = @1;
-    }
-    else {
-        age2569 = NO;
-        row.value = @0;
-        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyPapSmear];
-    }
-//    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPap3Yrs rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done pap smear in the last 3 years?"];
-    if (papSmearEligibDict != (id)[NSNull null] && [papSmearEligibDict objectForKey:kPap3Yrs] != (id)[NSNull null]) row.value = papSmearEligibDict[kPap3Yrs];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:row];
-    
-    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                noPapSmear3Yrs = TRUE;
-            } else {
-                noPapSmear3Yrs = FALSE;
-            }
-            if (sporeanPr && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
-            }
-            
-        }
-    };
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEngagedSex rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has engaged in sexual intercourse before"];
-    if (papSmearEligibDict != (id)[NSNull null] && [papSmearEligibDict objectForKey:kEngagedSex] != (id)[NSNull null]) row.value = papSmearEligibDict[kEngagedSex];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:row];
-    
-    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                hadSex = TRUE;
-            } else {
-                hadSex = FALSE;
-            }
-            if (sporeanPr && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
-            }
-            
-        }
-    };
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kWantPap rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Does resident want a free pap smear referral?"];
-    if (papSmearEligibDict != (id)[NSNull null] && [papSmearEligibDict objectForKey:kWantPap] != (id)[NSNull null]) row.value = papSmearEligibDict[kWantPap];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
-    [section addFormRow:row];
-    
-    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                wantPapSmear = TRUE;
-            } else {
-                wantPapSmear = FALSE;
-            }
-            if (sporeanPr && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
-            }
-            
-        }
-    };
-
-    
-    // Eligibility for Fall Risk Assessment - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility for Fall Risk Assessment"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove65 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 65 and above?"];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    row.disabled = @(1);
-    if ([age integerValue] >= 65) {
-        row.value = @1;
-        age65 = YES;
-    }
-    else {
-        row.value = @0;
-        age65 = NO;
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kFollowUpReq] != (id)[NSNull null]) {
+        row.value = geriaDepreAssmtDict[kFollowUpReq];
     }
     [section addFormRow:row];
     
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFallen12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Have you fallen in the past 12 months?"];
-    if (fallRiskEligib != (id)[NSNull null] && [fallRiskEligib objectForKey:kFallen12Mths] != (id)[NSNull null]) row.value = fallRiskEligib[kFallen12Mths];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    [section addFormRow:row];
-    
-    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                fallen12Mths = TRUE;
-            } else {
-                fallen12Mths = FALSE;
-            }
-            if (age65 && (fallen12Mths || scaredFall || feelFall)) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFallAssess];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFallAssess];
-            }
-            
-        }
-    };
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kScaredFall rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Do you avoid going out because you are scared of falling?"];
-    if (fallRiskEligib != (id)[NSNull null] && [fallRiskEligib objectForKey:kScaredFall] != (id)[NSNull null]) row.value = fallRiskEligib[kScaredFall];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    [section addFormRow:row];
-    
-    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                scaredFall = TRUE;
-            } else {
-                scaredFall = FALSE;
-            }
-            if (age65 && (fallen12Mths || scaredFall || feelFall)) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFallAssess];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFallAssess];
-            }
-            
-        }
-    };
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFeelFall rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Do you feel like you are going to fall when getting up or walking?"];
-    if (fallRiskEligib != (id)[NSNull null] && [fallRiskEligib objectForKey:kFeelFall] != (id)[NSNull null]) row.value = fallRiskEligib[kFeelFall];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    [section addFormRow:row];
-    
-    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@1]) {
-                feelFall = TRUE;
-            } else {
-                feelFall = FALSE;
-            }
-            if (age65 && (fallen12Mths || scaredFall || feelFall)) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFallAssess];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFallAssess];
-            }
-            
-        }
-    };
-    
-    
-    // Eligibility for Geriatric dementia assessment - Section
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Eligibility for Geriatric dementia assessment"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeAbove65 rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Aged 65 and above?"];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    row.disabled = @(1);
-    if ([age integerValue] >= 65) {
-        age65 = true;
-        row.value = @1;
-    }
-    else {
-        row.value = @0;
-        age65 = false;
-    }
-    
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCognitiveImpair rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Resident shows signs of cognitive impairment(e.g. forgetfulness, carelessness, lack of awareness)"];
-    if (geriaDementAssmtDict != (id)[NSNull null] && [geriaDementAssmtDict objectForKey:kCognitiveImpair] != (id)[NSNull null]) row.value = geriaDementAssmtDict[kCognitiveImpair];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    row.required = NO;
-    [section addFormRow:row];
-    
-    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqual:@(1)] && age65) {
-                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyDementia];
-            } else {
-                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyDementia];
-            }
-        }
-    };
-
     return [super initWithForm:formDescriptor];
 }
 
@@ -1679,7 +969,7 @@ NSString *const kQuestionFifteen = @"q15";
     
     diastolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
-            if (newValue != nil && diastolic_2.value != nil) {
+            if (newValue != (id)[NSNull null] && diastolic_2.value != (id)[NSNull null]) {
                 if ([newValue doubleValue] > 0 && [diastolic_2.value doubleValue ]> 0) {     //both filled in
                     diastolic_avg.value = @(([newValue doubleValue]+ [diastolic_2.value doubleValue])/2);
                 } else if ([newValue doubleValue] > 0)  //only Diastolic_1
@@ -2102,12 +1392,33 @@ NSString *const kQuestionFifteen = @"q15";
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred by dentist?"];
     row.selectorOptions = @[@"Yes", @"No"];
     row.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", dentalUndergoneRow];
+    
+    if ([row.disabled isEqual:@YES]) {
+        row.required = NO;
+    } else {
+        row.required = YES;
+    }
+    
     [self setDefaultFontWithRow:row];
     
     //value
     if (dentalCheckDict != (id)[NSNull null] && [dentalCheckDict objectForKey:kDentistReferred] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:dentalCheckDict[kDentistReferred]];
     
     [section addFormRow:row];
+    
+    dentalUndergoneRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqualToString:@"Yes"]) {
+                row.disabled = @NO;
+                row.required = YES;
+            }
+            else {
+                row.disabled = @YES;
+                row.required = NO;
+            }
+            [self updateFormRow:row];
+        }
+    };
     
     return [super initWithForm:formDescriptor];
 }
@@ -2756,7 +2067,7 @@ NSString *const kQuestionFifteen = @"q15";
                 break;
             case ModeOfScreening: fieldName = kCheckScreenMode;
                 break;
-            case Profiling: fieldName = kCheckProfiling;
+            case GeriatricDepressionAssess: fieldName = kCheckDepression;
                 break;
             case Triage: fieldName = kCheckTriage;
                 break;
@@ -2780,9 +2091,6 @@ NSString *const kQuestionFifteen = @"q15";
         }
         
         [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"0"]; //un-finalize it
-        
-        
-        
     }
 
 }
@@ -2812,7 +2120,7 @@ NSString *const kQuestionFifteen = @"q15";
                 break;
             case ModeOfScreening: fieldName = kCheckScreenMode;
                 break;
-            case Profiling: fieldName = kCheckProfiling;
+            case GeriatricDepressionAssess: fieldName = kCheckDepression;
                 break;
             case Triage: fieldName = kCheckTriage;
                 break;
@@ -2894,68 +2202,18 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT andFieldName:kDidPhleb andNewContent:newValue];
     }
     
-    
-    /* Profiling */
-    else if ([rowDescriptor.tag isEqualToString:kProfilingConsent]) {
-        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kProfilingConsent andNewContent:ansFromYesNo];
-    } else if ([rowDescriptor.tag isEqualToString:kEmployStat]) {
-        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kEmployStat andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kDiscloseIncome]) {
-        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kDiscloseIncome andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kAvgIncomePerHead]) {
-        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kAvgIncomePerHead andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kDoesntOwnChasPioneer]) {
-        [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kDoesntOwnChasPioneer andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kLowHouseIncome]) {
-        [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kLowHouseIncome andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kWantChas]) {
-        [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kWantChas andNewContent:newValue];
+    /* Geriatric Dementia Assessment */
+    else if ([rowDescriptor.tag isEqualToString:kPhqQ1]) {
+        [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhqQ1 andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kPhqQ2]) {
+        [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhqQ2 andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kPhq9Score]) {
+        [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhq9Score andNewContent:newValue];
+    }  else if ([rowDescriptor.tag isEqualToString:kQ10Response]) {
+        [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kQ10Response andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kFollowUpReq]) {
+        [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kFollowUpReq andNewContent:newValue];
     }
-    
-    else if ([rowDescriptor.tag isEqualToString:kRelWColorectCancer]) {
-        [self postSingleFieldWithSection:SECTION_COLONOSCOPY_ELIGIBLE andFieldName:kRelWColorectCancer andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kColonoscopy3yrs]) {
-        [self postSingleFieldWithSection:SECTION_COLONOSCOPY_ELIGIBLE andFieldName:kColonoscopy3yrs andNewContent:newValue];
-    }else if ([rowDescriptor.tag isEqualToString:kWantColonoscopyRef]) {
-        [self postSingleFieldWithSection:SECTION_COLONOSCOPY_ELIGIBLE andFieldName:kWantColonoscopyRef andNewContent:newValue];
-    }
-    
-    else if ([rowDescriptor.tag isEqualToString:kFitLast12Mths]) {
-        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kFitLast12Mths andNewContent:newValue];
-    }else if ([rowDescriptor.tag isEqualToString:kColonoscopy10Yrs]) {
-        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kColonoscopy10Yrs andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kWantFitKit]) {
-        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kWantFitKit andNewContent:newValue];
-    }
-    
-    else if ([rowDescriptor.tag isEqualToString:kMammo2Yrs]) {
-        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_ELIGIBLE andFieldName:kMammo2Yrs andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kHasChas]) {
-        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_ELIGIBLE andFieldName:kHasChas andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kWantMammo]) {
-        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_ELIGIBLE andFieldName:kWantMammo andNewContent:newValue];
-    }
-    
-    else if ([rowDescriptor.tag isEqualToString:kPap3Yrs]) {
-        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kPap3Yrs andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kEngagedSex]) {
-        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kEngagedSex andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kWantPap]) {
-        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kWantPap andNewContent:newValue];
-    }
-    
-    else if ([rowDescriptor.tag isEqualToString:kFallen12Mths]) {
-        [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kFallen12Mths andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kScaredFall]) {
-        [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kScaredFall andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kFeelFall]) {
-        [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kFeelFall andNewContent:newValue];
-    }
-    
-    else if ([rowDescriptor.tag isEqualToString:kCognitiveImpair]) {
-        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ELIGIBLE andFieldName:kCognitiveImpair andNewContent:newValue];
-    }
-    
     
     /* Triage */
     else if ([rowDescriptor.tag isEqualToString:kIsDiabetic]) {
@@ -3799,7 +3057,7 @@ NSString *const kQuestionFifteen = @"q15";
     
     if (!tableDidEndEditing) return;
     else {
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Warning", nil)
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Take note", nil)
                                                                                   message:[NSString stringWithFormat:@"The resident’s %@ falls within the emergency range. Please inform the safety IC / any nearby committee member immediately.", parameter]
                                                                            preferredStyle:UIAlertControllerStyleAlert];
         

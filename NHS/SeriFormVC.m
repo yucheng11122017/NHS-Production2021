@@ -1169,6 +1169,7 @@ typedef enum formName {
     
     XLFormRowDescriptor *eyeSpecRefRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEyeSpecRef rowType:XLFormRowDescriptorTypeSelectorAlertView title:@"Referral to eye specialist:"];
     eyeSpecRefRow.selectorOptions = @[@"Urgent", @"Non-urgent"];
+    eyeSpecRefRow.noValueDisplayText = @"Tap here";
     eyeSpecRefRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:eyeSpecRefRow];
     eyeSpecRefRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Referral to eye-specialist'", followUpRow];
