@@ -12,6 +12,9 @@
 #import  "Reachability.h"
 #import "SVProgressHUD.h"
 #import "ScreeningDictionary.h"
+#import "SegmentedCell.h"
+#import "KAStatusBar.h"
+#import "ServerComm.h"
 
 @interface SeriSubsectionTableVC () {
     NSNumber *selectedRow;
@@ -21,6 +24,8 @@
 @property (nonatomic) Reachability *hostReachability;
 @property (strong, nonatomic) NSMutableArray *completionCheck;
 @property (strong, nonatomic) NSDictionary *fullScreeningForm;
+@property (strong, nonatomic) NSNumber *undergoneSeri;
+@property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
 @end
 
 @implementation SeriSubsectionTableVC
@@ -28,13 +33,19 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    _pushPopTaskArray = [[NSMutableArray alloc] init];
     _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
     
     rowTitleArray = [[NSArray alloc] initWithObjects:@"Medical History", @"Visual Acuity", @"Autorefractor", @"Intra-Ocular Pressure", @"Anterior Health Examination", @"Posterior Health Examination", @"Diagnosis and Follow-up", nil];
     _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0, nil];
     
+    self.navigationItem.title = @"SERI Advanced Eye Screening";
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
+    
+    [self addObserver:self forKeyPath:@"undergoneSeri" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+    
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -51,54 +62,102 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void) viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [self removeObserver:self forKeyPath:@"undergoneSeri"];
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
+    return 2;
+}
+
+- (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {    // fixed font style. use custom view (UILabel) if you want something different
+    if (section == 0) {
+        return @"Optional check";
+    }
+    else {
+        return @"Sub-sections";
+    }
+}
+
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    return 20;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return DEFAULT_ROW_HEIGHT_FOR_SECTIONS;
+    if (indexPath.section == 0)
+        return 44;
+    else if (indexPath.section==1)
+        return DEFAULT_ROW_HEIGHT_FOR_SECTIONS;
+    else
+        return DEFAULT_ROW_HEIGHT_FOR_SECTIONS;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [rowTitleArray count];
+    if (section == 0) {
+        return 1;
+    } else {
+        return [rowTitleArray count];
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    static NSString *simpleTableIdentifier = @"SimpleTableItem";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-    
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
-    }
-    
-    NSString *text = [rowTitleArray objectAtIndex:indexPath.row];
-    
-    [cell.textLabel setText:text];
-    
-    // Put in the ticks if necessary
-    if (indexPath.row < [self.completionCheck count]) {
-        if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
-            cell.accessoryType = UITableViewCellAccessoryCheckmark;
-        } else {
-            cell.accessoryType = UITableViewCellAccessoryNone;
+    if (indexPath.section == 0) {
+        SegmentedCell *cell = [tableView dequeueReusableCellWithIdentifier:@"SegmentedCell"];
+        if (cell == nil) {
+            // Load the top-level objects from the custom cell XIB.
+            NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"SegmentedCell" owner:self options:nil];
+            // Grab a pointer to the first object (presumably the custom cell, as that's all the XIB should contain).
+            cell = (SegmentedCell *) [topLevelObjects objectAtIndex:0];
         }
+        
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;    //not selectable, but still responding to touches.
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(yesNoSegmentCtrlChanged:) name:@"SegmentedCtrlChange" object:nil];
+
+        return cell;
+        
+    } else {
+        static NSString *simpleTableIdentifier = @"SimpleTableItem";
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+        
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
+        }
+        
+        NSString *text = [rowTitleArray objectAtIndex:indexPath.row];
+        
+        [cell.textLabel setText:text];
+        
+        
+        // Put in the ticks if necessary
+        if (indexPath.row < [self.completionCheck count]) {
+            if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            } else {
+                cell.accessoryType = UITableViewCellAccessoryNone;
+            }
+        }
+        return cell;
     }
     
-    return cell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    selectedRow = [NSNumber numberWithInteger:indexPath.row];
-    
-    [self performSegueWithIdentifier:@"seriSectionToFormSegue" sender:self];
-    
+    if (indexPath.section == 0) {
+        
+    } else {    //sub-sections
+        selectedRow = [NSNumber numberWithInteger:indexPath.row];
+        [self performSegueWithIdentifier:@"seriSectionToFormSegue" sender:self];
+    }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
 }
-
 
 #pragma mark - Reachability
 /*!
@@ -172,6 +231,21 @@
     }
 }
 
+#pragma mark - UIFont methods
+- (UIFont *) getDefaultFont {
+    UIFont *font = [UIFont fontWithName:DEFAULT_FONT_NAME size:DEFAULT_FONT_SIZE];
+    UIFont *boldedFont = [self boldFontWithFont:font];
+    return boldedFont;
+}
+
+- (UIFont *)boldFontWithFont:(UIFont *)font
+{
+    UIFontDescriptor * fontD = [font.fontDescriptor
+                                fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+    return [UIFont fontWithDescriptor:fontD size:0];
+}
+
+
 #pragma mark - NSNotification Methods
 
 - (void) reloadTable: (NSNotification *) notification {
@@ -181,6 +255,96 @@
         [self.tableView reloadData];    //put in the ticks
     }
 }
+
+- (void) yesNoSegmentCtrlChanged: (NSNotification *) notification {
+    BOOL value = [[notification.userInfo objectForKey:@"value"] boolValue];
+    
+    self.undergoneSeri = [NSNumber numberWithBool:value];   //remmeber must use the setter! otherwise it will not trigger the KVO
+    NSLog(@"%@", _undergoneSeri);
+}
+
+#pragma mark - KVO
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
+    
+    if ([keyPath isEqualToString:@"undergoneSeri"]) {
+//        NSLog(@"Change in Segmented Ctrl: %@", [change objectForKey:@"new"]);
+         [self postSingleFieldWithSection:@"seri_undergone" andFieldName:@"seri_undergone" andNewContent:[change objectForKey:@"new"]];
+    }
+}
+
+
+#pragma mark - Post data to server methods
+
+- (void) postSingleFieldWithSection:(NSString *) section andFieldName: (NSString *) fieldName andNewContent: (NSString *) content {
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSNumber *resident_id = [defaults objectForKey:kResidentId];
+    
+    if ((content != (id)[NSNull null]) && (content != nil)) {   //make sure don't insert nil or null value to a dictionary
+        
+        NSDictionary *dict = @{kResidentId:resident_id,
+                               kSectionName:section,
+                               kFieldName:fieldName,
+                               kNewContent:content
+                               };
+        
+        NSLog(@"Uploading %@ for $%@$ field", content, fieldName);
+        [KAStatusBar showWithStatus:@"Syncing..." andBarColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:0 alpha:1.0]];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        
+        [_pushPopTaskArray addObject:dict];
+        
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postDataGivenSectionAndFieldName:dict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
+    }
+}
+
+#pragma mark - Blocks
+
+- (void (^)(NSProgress *downloadProgress))progressBlock {
+    return ^(NSProgress *downloadProgress) {
+        
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        NSLog(@"%@", responseObject);
+        
+        [_pushPopTaskArray removeObjectAtIndex:0];
+        
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+        [KAStatusBar showWithStatus:@"All changes saved" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+        
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, NSError *error))errorBlock {
+    return ^(NSURLSessionDataTask *task, NSError *error) {
+        
+        NSLog(@"<<< SUBMISSION FAILED >>>");
+        
+        NSDictionary *retryDict = [_pushPopTaskArray firstObject];
+        
+        NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+        NSLog(@"error: %@", [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding]);
+        
+        
+        NSLog(@"\n\nRETRYING...");
+        
+        ServerComm *client = [ServerComm sharedServerCommInstance];
+        [client postDataGivenSectionAndFieldName:retryDict
+                                   progressBlock:[self progressBlock]
+                                    successBlock:[self successBlock]
+                                    andFailBlock:[self errorBlock]];
+        
+        
+    };
+}
+
 #pragma mark - Navigation
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

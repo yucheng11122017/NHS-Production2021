@@ -68,11 +68,21 @@ typedef enum formName {
 
 - (void)viewDidLoad {
     
+    /** initialise variables */
     internetDCed = false;
     _pushPopTaskArray = [[NSMutableArray alloc] init];
     _residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId]; //need this for fetching data
     
     _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
+    
+    citizenship = [[NSUserDefaults standardUserDefaults]
+                   stringForKey:kCitizenship];
+    age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
+                        stringForKey:kResidentAge];
+    gender = [[NSUserDefaults standardUserDefaults]
+              stringForKey:kGender];
+    neighbourhood = [[NSUserDefaults standardUserDefaults]
+                     stringForKey:kNeighbourhood];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
     

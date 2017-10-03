@@ -1157,7 +1157,7 @@ typedef enum formName {
     [section addFormRow:row];
     
     XLFormRowDescriptor *followUpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUp rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Follow-up:"];
-    followUpRow.selectorOptions = @[@"No Followup/Already on followup", @"Referral to eye-specialist", @"Cataract surgery"];
+    followUpRow.selectorOptions = @[@"No follow-up/Already on follow-up", @"Referral to eye-specialist", @"Cataract surgery", @"Given Free Spectacles Voucher"];
     followUpRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:followUpRow];
     
@@ -1167,7 +1167,7 @@ typedef enum formName {
     
     [section addFormRow:followUpRow];
     
-    XLFormRowDescriptor *eyeSpecRefRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEyeSpecRef rowType:XLFormRowDescriptorTypeSelectorAlertView title:@"Referral to eye specialist:"];
+    XLFormRowDescriptor *eyeSpecRefRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEyeSpecRef rowType:XLFormRowDescriptorTypeSelectorAlertView title:@"Provided with Referral Letter:"];
     eyeSpecRefRow.selectorOptions = @[@"Urgent", @"Non-urgent"];
     eyeSpecRefRow.noValueDisplayText = @"Tap here";
     eyeSpecRefRow.cellConfig[@"textLabel.numberOfLines"] = @0;

@@ -302,7 +302,6 @@ typedef enum residentDataSource {
     return residentSectionTitles;
 }
 
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     GenericTableViewCell *cell = (GenericTableViewCell *)[tableView dequeueReusableCellWithIdentifier:@"GenericTableCell"];

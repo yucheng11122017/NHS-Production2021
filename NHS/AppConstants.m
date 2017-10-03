@@ -98,6 +98,7 @@ NSString *const kNhsSerialNum = @"nhs_serial_num";
 //NSString *const kWasTaken = @"was_taken";     //no longer needed
 NSString *const kAge40 = @"age_40";
 NSString *const kChronicCond = @"chronic_cond";
+NSString *const kNoBloodTest = @"no_blood_test";
 NSString *const kWantFreeBt = @"want_free_bt";
 NSString *const kDidPhleb = @"did_phleb";
 NSString *const kFastingBloodGlucose = @"fasting_blood_glu";
@@ -108,10 +109,11 @@ NSString *const kCholesterolHdlRatio= @"cholesterol_hdl_ratio";
 NSString *const kTotCholesterol= @"total_cholesterol";
 
 #pragma mark - Mode of Screening
-
 NSString *const kScreenMode = @"screen_mode";
 NSString *const kApptDate = @"appt_date";
+NSString *const kTicketNum = @"ticket_number";
 NSString *const kApptTime = @"appt_time";
+NSString *const kNotes = @"notes";
 
 NSString *const kTime_8_10 = @"time_8_10";
 NSString *const kTime_10_12 = @"time_10_12";
@@ -122,6 +124,7 @@ NSString *const kPhlebAppt = @"phleb_appt";
 
 #pragma mark - Profiling
 
+/** Eligibility Assessments */
 NSString *const kProfilingConsent= @"consent";
 NSString *const kEmployStat= @"employment_status";
 NSString *const kEmployReasons= @"employment_reasons";
@@ -157,9 +160,8 @@ NSString *const kScaredFall= @"scared_fall";
 NSString *const kFeelFall= @"feel_fall";
 NSString *const kCognitiveImpair= @"cognitive_impairment";
 
-
-#pragma mark - Health Assessment and Risk Stratification
-
+/** Medical History */
+//Generic variables
 NSString *const kHasInformed= @"has_informed";
 NSString *const kCheckedBlood= @"checked_blood";
 NSString *const kCheckedBp= @"checked_bp";
@@ -167,32 +169,28 @@ NSString *const kSeeingDocRegularly= @"seeing_doc_regularly";
 NSString *const kCurrentlyPrescribed= @"currently_prescribed";
 NSString *const kTakingRegularly= @"taking_regularly";
 
-NSString *const kDMHasInformed= @"dm_has_informed";
+/* Diabetes Mellitus */
+NSString *const kDMHasInformed = @"dm_has_informed";
 NSString *const kDMCheckedBlood= @"dm_checked_blood";
 NSString *const kDMSeeingDocRegularly= @"dm_seeing_doc_regularly";
 NSString *const kDMCurrentlyPrescribed= @"dm_currently_prescribed";
 NSString *const kDMTakingRegularly= @"dm_taking_regularly";
 
+/* Hyperlipidemia */
 NSString *const kLipidHasInformed= @"lipid_has_informed";
 NSString *const kLipidCheckedBlood= @"lipid_checked_blood";
 NSString *const kLipidSeeingDocRegularly= @"lipid_seeing_doc_regularly";
 NSString *const kLipidCurrentlyPrescribed= @"lipid_currently_prescribed";
 NSString *const kLipidTakingRegularly= @"lipid_taking_regularly";
 
+/* Hypertension */
 NSString *const kHTHasInformed = @"ht_has_informed";
 NSString *const kHTCheckedBp = @"ht_checked_bp";
 NSString *const kHTSeeingDocRegularly = @"ht_seeing_doc_regularly";
 NSString *const kHTCurrentlyPrescribed = @"ht_currently_prescribed";
 NSString *const kHTTakingRegularly = @"ht_taking_regularly";
 
-NSString *const kPhqQ1 = @"phq_q1";
-NSString *const kPhqQ2 = @"phq_q2";
-NSString *const kPhq9Score = @"phq9_score";
-NSString *const kQ10Response = @"q10_response";
-NSString *const kFollowUpReq = @"follow_up_req";
-
-
-/* Risk Stratification */
+/** Risk Stratification */
 NSString *const kDiabeticFriend = @"diabetic_friend";
 NSString *const kDelivered4kgOrGestational = @"delivered4kg_or_gestational";
 NSString *const kHeartAttack = @"heart_attack";
@@ -203,9 +201,16 @@ NSString *const kSmoke = @"smoke";
 NSString *const kSmokeYes = @"smoke_yes";
 NSString *const kSmokeNo = @"smoke_no";
 
+#pragma mark - Geriatric Depression Assessment
+
+NSString *const kDidDepressAssess = @"did_depress_assess";
+NSString *const kPhqQ1 = @"phq_q1";
+NSString *const kPhqQ2 = @"phq_q2";
+NSString *const kPhq9Score = @"phq9_score";
+NSString *const kQ10Response = @"q10_response";
+NSString *const kFollowUpReq = @"follow_up_req";
 
 #pragma mark - Social Work
-
 
 /* Demographics */
 NSString *const kFilename = @"file_name";
@@ -225,6 +230,7 @@ NSString *const kHasPgp = @"has_pgp";
 NSString *const kHasMedisave = @"has_medisave";
 NSString *const kHasInsure = @"has_insure";
 NSString *const kHasCpfPayouts = @"has_cpf_payouts";
+NSString *const kNoneOfTheAbove = @"have_none";
 
 NSString *const kCpfAmt = @"cpf_amt";
 NSString *const kChasColor= @"chas_color";
@@ -246,6 +252,7 @@ NSString *const kToileting = @"toileting";
 NSString *const kWalk = @"walk";
 NSString *const kMobilityStatus = @"mobility_status";
 NSString *const kMobilityEquipment = @"mobility_equipment";
+NSString *const kMobilityEquipmentText = @"mobility_equipment_text";
 
 /* Social Support */
 NSString *const kHasCaregiver = @"has_caregiver";
@@ -319,7 +326,10 @@ NSString *const kLegal = @"legal";
 NSString *const kOtherServices = @"other_services";
 NSString *const kAccom = @"accom";
 NSString *const kOtherIssues = @"other_issues";
+NSString *const kOptionNil = @"option_nil";
 NSString *const kProblems = @"problems";
+NSString *const kInterventions = @"interventions";
+NSString *const kCommReview = @"comm_review";
 NSString *const kCaseCat = @"case_cat";
 NSString *const kSwVolName = @"sw_vol_name";
 NSString *const kSwVolContactNum = @"sw_vol_contact_num";
@@ -365,6 +375,7 @@ NSString *const kReferPapSmear = @"refer_pap_smear";
 
 #pragma mark - Doctor's consult
 
+NSString *const kDidDocConsult = @"did_doc_consult";
 NSString *const kDocNotes = @"doc_notes";
 NSString *const kDocName = @"doc_name";
 NSString *const kDocReferred = @"doc_referred";
@@ -504,6 +515,7 @@ NSString *const kDiagnosisOs = @"diagnosis_os";
 (Fall Risk Assmt Tab does not need to be completed for final submission)"
  */
 
+NSString *const kDidFallRiskAssess = @"did_fall_risk_assess";
 NSString *const kPsfuFRA = @"psfu";
 NSString *const kBalance = @"balance";
 NSString *const kGaitSpeed = @"gait_speed";

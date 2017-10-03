@@ -12,6 +12,8 @@
 		01137E891F7B6970002A0A48 /* HealthEduFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01137E881F7B6970002A0A48 /* HealthEduFormVC.m */; };
 		01137E8D1F7BADA4002A0A48 /* ProfilingTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01137E8C1F7BADA4002A0A48 /* ProfilingTableVC.m */; };
 		01137E901F7BAF7B002A0A48 /* ProfilingFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 01137E8F1F7BAF7B002A0A48 /* ProfilingFormVC.m */; };
+		012630451F8323C000065B1E /* SegmentedCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 012630441F8323C000065B1E /* SegmentedCell.xib */; };
+		013BE6201F83283500E16EFC /* SegmentedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 013BE61F1F83283500E16EFC /* SegmentedCell.m */; };
 		015831401DB4D2F80049F16C /* GenericTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0158313E1DB4D2F80049F16C /* GenericTableViewCell.m */; };
 		015831411DB4D2F80049F16C /* GenericTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0158313F1DB4D2F80049F16C /* GenericTableViewCell.xib */; };
 		015F682A1F4A7F4E000B6D5E /* SeriSubsectionTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 015F68291F4A7F4E000B6D5E /* SeriSubsectionTableVC.m */; };
@@ -86,6 +88,9 @@
 		01137E8C1F7BADA4002A0A48 /* ProfilingTableVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProfilingTableVC.m; sourceTree = "<group>"; };
 		01137E8E1F7BAF7B002A0A48 /* ProfilingFormVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProfilingFormVC.h; sourceTree = "<group>"; };
 		01137E8F1F7BAF7B002A0A48 /* ProfilingFormVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProfilingFormVC.m; sourceTree = "<group>"; };
+		012630441F8323C000065B1E /* SegmentedCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SegmentedCell.xib; path = Models/CustomUITableViewCell/SegmentedCell.xib; sourceTree = "<group>"; };
+		013BE61E1F83283500E16EFC /* SegmentedCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SegmentedCell.h; path = Models/SegmentedCell.h; sourceTree = "<group>"; };
+		013BE61F1F83283500E16EFC /* SegmentedCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SegmentedCell.m; path = Models/SegmentedCell.m; sourceTree = "<group>"; };
 		0158313D1DB4D2F80049F16C /* GenericTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GenericTableViewCell.h; path = Models/GenericTableViewCell.h; sourceTree = "<group>"; };
 		0158313E1DB4D2F80049F16C /* GenericTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GenericTableViewCell.m; path = Models/GenericTableViewCell.m; sourceTree = "<group>"; };
 		0158313F1DB4D2F80049F16C /* GenericTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GenericTableViewCell.xib; path = Models/GenericTableViewCell.xib; sourceTree = "<group>"; };
@@ -223,6 +228,9 @@
 			children = (
 				015F68281F4A7F4E000B6D5E /* SeriSubsectionTableVC.h */,
 				015F68291F4A7F4E000B6D5E /* SeriSubsectionTableVC.m */,
+				013BE61E1F83283500E16EFC /* SegmentedCell.h */,
+				013BE61F1F83283500E16EFC /* SegmentedCell.m */,
+				012630441F8323C000065B1E /* SegmentedCell.xib */,
 				015F682B1F4A846B000B6D5E /* SeriFormVC.h */,
 				015F682C1F4A846B000B6D5E /* SeriFormVC.m */,
 			);
@@ -590,6 +598,7 @@
 				015831411DB4D2F80049F16C /* GenericTableViewCell.xib in Resources */,
 				8E0852581D6DCCD7006E68FE /* blankScreeningForm.json in Resources */,
 				E120E4111D431E9B002DBC7E /* Main.storyboard in Resources */,
+				012630451F8323C000065B1E /* SegmentedCell.xib in Resources */,
 				E1A4F0E11D66BE2000EE9BBB /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -773,6 +782,7 @@
 				8EC56F8A1D60CDBB00938C2A /* AppConstants.m in Sources */,
 				E120E4081D431E9B002DBC7E /* main.m in Sources */,
 				E1EFB0931D433C3400510532 /* PatientScreeningListTableViewController.m in Sources */,
+				013BE6201F83283500E16EFC /* SegmentedCell.m in Sources */,
 				01D48ED51F3B5F40002C3928 /* SocialWorkFormVC.m in Sources */,
 				01B893FE1F3E05CC00201995 /* PageGuideVC.m in Sources */,
 				01D48ED21F3A1839002C3928 /* SocialWorkTableVC.m in Sources */,

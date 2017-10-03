@@ -32,6 +32,7 @@ typedef enum formName {
     XLFormRowDescriptor *relativesContactRow, *relativesEaseRow, *relativesCloseRow, *friendsContactRow, *friendsEaseRow, *friendsCloseRow, *socialScoreRow;
     BOOL internetDCed;
     BOOL isFormFinalized;
+    BOOL hasShownProposedBox;
 }
 
 @property (nonatomic) Reachability *hostReachability;
@@ -45,6 +46,7 @@ typedef enum formName {
 - (void)viewDidLoad {
     
     isFormFinalized = false;    //by default
+    hasShownProposedBox = false;
     XLFormViewController *form;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
@@ -184,7 +186,7 @@ typedef enum formName {
     
     XLFormRowDescriptor *whatYouHaveRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"what_you_have" rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Do you have the following?"];
     [self setDefaultFontWithRow:whatYouHaveRow];
-    whatYouHaveRow.selectorOptions = @[@"Community Health Assist Scheme", @"Pioneer Generation Package", @"Medisave", @"Insurance Coverage", @"CPF Pay Outs"];
+    whatYouHaveRow.selectorOptions = @[@"Community Health Assist Scheme", @"Pioneer Generation Package", @"Medisave", @"Insurance Coverage", @"CPF Pay Outs", @"None of the above"];
     whatYouHaveRow.required = YES;
     
     //value
@@ -302,8 +304,8 @@ typedef enum formName {
     
     XLFormRowDescriptor *finAssistEnufWhyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFinAssistEnufWhy rowType:XLFormRowDescriptorTypeTextView title:@""];
     finAssistEnufWhyRow.required = NO;
-    [finAssistEnufWhyRow.cellConfigAtConfigure setObject:@"Elaboration on sufficiency if assistance" forKey:@"textView.placeholder"];
-    finAssistEnufWhyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'No'", finAssistEnufRow];
+    [finAssistEnufWhyRow.cellConfigAtConfigure setObject:@"Elaboration on sufficiency of assistance" forKey:@"textView.placeholder"];
+//    finAssistEnufWhyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'No'", finAssistEnufRow];    //always appear instead (1924)
     
     //value
     if (currentSocioSitDict != (id)[NSNull null] && [currentSocioSitDict objectForKey:kFinAssistEnufWhy] != (id)[NSNull null]) {
@@ -391,6 +393,7 @@ typedef enum formName {
     }
     
     row.noValueDisplayText = @"Tap here for options";
+    row.required = YES;
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Mobility Status"];
@@ -402,6 +405,8 @@ typedef enum formName {
                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                  title:@"Mobility Status"];
     [self setDefaultFontWithRow:row];
+    row.noValueDisplayText = @"Tap here for options";
+    row.required = YES;
     row.selectorOptions = @[@"Ambulant", @"Able to walk with assistance (stick/frame)", @"Wheelchair-bound", @"Bed-ridden"];
     
     //value
@@ -411,19 +416,32 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMobilityEquipment
+    XLFormRowDescriptor *mobilEquipRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMobilityEquipment
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                   title:@"Do you require mobility equipment in your household? (e.g. non-slip mat, handle bar, etc)"];
-    row.selectorOptions = @[@"Yes", @"No"];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    mobilEquipRow.selectorOptions = @[@"Yes", @"No"];
+    [self setDefaultFontWithRow:mobilEquipRow];
+    mobilEquipRow.required = YES;
+    mobilEquipRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     
     //value
     if (currPhyStatusDict != (id)[NSNull null] && [currPhyStatusDict objectForKey:kMobilityEquipment] != (id)[NSNull null]) {
-        row.value = [self getYesNofromOneZero:[currPhyStatusDict objectForKey:kMobilityEquipment]];
+        mobilEquipRow.value = [self getYesNofromOneZero:[currPhyStatusDict objectForKey:kMobilityEquipment]];
     }
+    [section addFormRow:mobilEquipRow];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMobilityEquipmentText rowType:XLFormRowDescriptorTypeTextView title:@""];
+    row.required = NO;
+    [row.cellConfigAtConfigure setObject:@"Please elaborate more..." forKey:@"textView.placeholder"];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", mobilEquipRow];
+    
+    //value
+    if (currPhyStatusDict != (id)[NSNull null] && [currPhyStatusDict objectForKey:kMobilityEquipmentText] != (id)[NSNull null]) {
+        row.value = [currPhyStatusDict objectForKey:kMobilityEquipmentText];
+    }
+    
     [section addFormRow:row];
-
+    
     return [super initWithForm:formDescriptor];
     
 }
@@ -499,6 +517,7 @@ typedef enum formName {
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverContactNum rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     [self setDefaultFontWithRow:row];
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     
     //value
     if (socialSupportDict != (id)[NSNull null] && [socialSupportDict objectForKey:kCaregiverContactNum] != (id)[NSNull null]) {
@@ -551,6 +570,7 @@ typedef enum formName {
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactNum rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     [self setDefaultFontWithRow:row];
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
 
     //value
     if (socialSupportDict != (id)[NSNull null] && [socialSupportDict objectForKey:kEContactNum] != (id)[NSNull null]) {
@@ -807,6 +827,28 @@ typedef enum formName {
     }
 
     [section addFormRow:socialScoreRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];   //newly added (1927)
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q12.5" rowType:XLFormRowDescriptorTypeInfo title:@"Elaboration on social network e.g. ‘resident does not have many friends/does not contact friends frequently but receives strong support’"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+#warning ELABORATE NO VARIABLE YET
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"elaborate_soc_net" rowType:XLFormRowDescriptorTypeTextView title:@""];
+    [self setDefaultFontWithRow:row];
+//    [row.cellConfigAtConfigure setObject:@"" forKey:@"textView.placeholder"];
+    
+    //value
+    if (socialSupportDict != (id)[NSNull null] && [socialSupportDict objectForKey:@"elaborate_soc_net"] != (id)[NSNull null] && [[socialSupportDict objectForKey:@"elaborate_soc_net"] isKindOfClass:[NSString class]]) {
+        row.value = socialSupportDict[@"elaborate_soc_net"];
+    }
+    
+    [section addFormRow:row];
+
+    
 
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
@@ -1103,7 +1145,8 @@ typedef enum formName {
                             @"Legal",
                             @"Other services (Bedbugs, Mobility)",
                             @"Accommodation (Tenant issues, housing matters...)",
-                            @"Other Issues"];
+                            @"Other Issues",
+                            @"Nil"];
     problemsRow.noValueDisplayText = @"Tap here for options";
     problemsRow.required = YES;
     
@@ -1123,18 +1166,53 @@ typedef enum formName {
     
     [section addFormRow:row];
     
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *proposedIntervenInfoRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1.5" rowType:XLFormRowDescriptorTypeInfo title:@"Proposed Interventions"];
+    [self setDefaultFontWithRow:proposedIntervenInfoRow];
+    proposedIntervenInfoRow.required = NO;
+    [section addFormRow:proposedIntervenInfoRow];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kInterventions rowType:XLFormRowDescriptorTypeTextView title:@""];
+//    [row.cellConfigAtConfigure setObject:@"Elaborate on the presenting problems" forKey:@"textView.placeholder"];
+    row.required = YES;
+    
+    //value
+    if (summaryDict != (id)[NSNull null] && [summaryDict objectForKey:kInterventions] != (id)[NSNull null]) {
+        row.value = summaryDict[kInterventions];
+    }
+    
+    [section addFormRow:row];
+    
+    
+    
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Category"];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaseCat rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Follow-up case category"];
     [self setDefaultFontWithRow:row];
+    row.required = YES;
     row.selectorOptions = @[@"R1",@"R2",@"R3",@"R4"];
+    row.noValueDisplayText = @"Tap Here";
     
     //value
     if (summaryDict != (id)[NSNull null] && [summaryDict objectForKey:kCaseCat] != (id)[NSNull null]) {
         row.value = summaryDict[kCaseCat];
     }
     
+    [section addFormRow:row];
+    
+    //NEWLY ADDED
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCommReview rowType:XLFormRowDescriptorTypeBooleanCheck title:@"For Committee Review (✓)"];
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (summaryDict != (id)[NSNull null] && [summaryDict objectForKey:kCommReview] != (id)[NSNull null]) {
+        row.value = summaryDict[kCommReview];
+    }
     [section addFormRow:row];
     
     
@@ -1155,6 +1233,7 @@ typedef enum formName {
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSwVolContactNum rowType:XLFormRowDescriptorTypePhone title:@"Volunteer Contact No"];
     [self setDefaultFontWithRow:row];
     row.required = YES;
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     
     //value
     if (summaryDict != (id)[NSNull null] && [summaryDict objectForKey:kSwVolContactNum] != (id)[NSNull null]) {
@@ -1366,10 +1445,34 @@ typedef enum formName {
         [self processPresentingProblemsWithNewValue:newValue andOldValue:oldValue];
     } else if ([rowDescriptor.tag isEqualToString:kCaseCat]) {
         [self postSingleFieldWithSection:SECTION_SOC_WORK_SUMMARY andFieldName:kCaseCat andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kCommReview]) {
+        [self postSingleFieldWithSection:SECTION_SOC_WORK_SUMMARY andFieldName:kCommReview andNewContent:rowDescriptor.value];
     }
+
     
 }
 
+-(void)beginEditing:(XLFormRowDescriptor *)rowDescriptor {
+    if ([rowDescriptor.tag isEqualToString:kInterventions]) {
+        if (rowDescriptor.value == nil || [rowDescriptor.value isEqualToString:@""]) {
+            if (!hasShownProposedBox) {
+                hasShownProposedBox = true;
+                
+                UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Notice", nil)
+                                                                                          message:@"(i) Recommend and justify possible interventions \n(ii) What is resident's perception on whether they require/want the service?"
+                                                                                   preferredStyle:UIAlertControllerStyleAlert];
+                
+                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                                    style:UIAlertActionStyleDefault
+                                                                  handler:^(UIAlertAction * okAction){
+                                                                      
+                                                                  }]];
+                
+                [self presentViewController:alertController animated:YES completion:nil];
+            }
+        }
+    }
+}
 
 -(void)endEditing:(XLFormRowDescriptor *)rowDescriptor {    //works great for textField and textView
     
@@ -1393,6 +1496,10 @@ typedef enum formName {
         [self postSingleFieldWithSection:SECTION_CURRENT_SOCIOECO_SITUATION andFieldName:kFinAssistEnufWhy andNewContent:rowDescriptor.value];
     }
     
+    else if ([rowDescriptor.tag isEqualToString:kMobilityEquipmentText]) {
+        [self postSingleFieldWithSection:SECTION_CURRENT_PHY_STATUS andFieldName:kMobilityEquipmentText andNewContent:rowDescriptor.value];
+    }
+    
     //Social Support Assessment
     else if ([rowDescriptor.tag isEqualToString:kCaregiverName]) {
         [self postSingleFieldWithSection:SECTION_SOCIAL_SUPPORT andFieldName:kCaregiverName andNewContent:rowDescriptor.value];
@@ -1414,12 +1521,18 @@ typedef enum formName {
         [self postSingleFieldWithSection:SECTION_SOCIAL_SUPPORT andFieldName:kEContactNum andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kOthersText]) {
         [self postSingleFieldWithSection:SECTION_SOCIAL_SUPPORT andFieldName:kOthersText andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kHostOthers]) {
+    }
+#warning ELABORATION CHANGE HERE
+    else if ([rowDescriptor.tag isEqualToString:@"elaboration_soc_net"]) {
+        [self postSingleFieldWithSection:SECTION_SOCIAL_SUPPORT andFieldName:@"elaboration_soc_net" andNewContent:rowDescriptor.value];
+    }
+    else if ([rowDescriptor.tag isEqualToString:kHostOthers]) {
         [self postSingleFieldWithSection:SECTION_SOCIAL_SUPPORT andFieldName:kHostOthers andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kWhyNoParticipate]) {
         [self postSingleFieldWithSection:SECTION_SOCIAL_SUPPORT andFieldName:kWhyNoParticipate andNewContent:rowDescriptor.value];
     }
 
+    
     //Psychological Well-being
     else if ([rowDescriptor.tag isEqualToString:kPsychoticRemarks]) {
         [self postSingleFieldWithSection:SECTION_PSYCH_WELL_BEING andFieldName:kPsychoticRemarks andNewContent:rowDescriptor.value];
@@ -1435,7 +1548,11 @@ typedef enum formName {
     // Summary
     else if ([rowDescriptor.tag isEqualToString:kProblems]) {
         [self postSingleFieldWithSection:SECTION_SOC_WORK_SUMMARY andFieldName:kProblems andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kSwVolName]) {
+    } else if ([rowDescriptor.tag isEqualToString:kInterventions]) {
+        [self postSingleFieldWithSection:SECTION_SOC_WORK_SUMMARY andFieldName:kInterventions andNewContent:rowDescriptor.value];
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kSwVolName]) {
         [self postSingleFieldWithSection:SECTION_SOC_WORK_SUMMARY andFieldName:kSwVolName andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kSwVolContactNum]) {
         [self postSingleFieldWithSection:SECTION_SOC_WORK_SUMMARY andFieldName:kSwVolContactNum andNewContent:rowDescriptor.value];
@@ -1952,6 +2069,7 @@ typedef enum formName {
     else if ([svc containsString:@"services"]) return kOtherServices;
     else if ([svc containsString:@"Accommodation"]) return kAccom;
     else if ([svc containsString:@"Other Issues"]) return kOtherIssues;
+    else if ([svc containsString:@"Nil"]) return kOptionNil;
     
     else return @"";
 }
@@ -1976,8 +2094,8 @@ typedef enum formName {
 
 
 - (NSArray *) getDoyouHaveFollowingArray: (NSDictionary *) dict {
-    NSArray *keyArray = @[kHasChas, kHasPgp, kHasMedisave, kHasInsure, kHasCpfPayouts];
-    NSArray *textArray = @[@"Community Health Assist Scheme", @"Pioneer Generation Package", @"Medisave", @"Insurance Coverage", @"CPF Pay Outs",];
+    NSArray *keyArray = @[kHasChas, kHasPgp, kHasMedisave, kHasInsure, kHasCpfPayouts, kNoneOfTheAbove];
+    NSArray *textArray = @[@"Community Health Assist Scheme", @"Pioneer Generation Package", @"Medisave", @"Insurance Coverage", @"CPF Pay Outs",@"None of the above"];
     NSMutableArray *returnArray = [[NSMutableArray alloc]init];
     
     for (int i=0; i<[keyArray count]; i++) {
@@ -2088,7 +2206,7 @@ typedef enum formName {
 }
 
 - (NSArray *) getPresentingProblemsArray: (NSDictionary *) dict {
-    NSArray *keyArray = @[kFinancial, kEldercare, kBasic, kBehEmo, kFamMarital, kEmployment, kLegal, kOtherServices, kAccom, kOtherIssues];
+    NSArray *keyArray = @[kFinancial, kEldercare, kBasic, kBehEmo, kFamMarital, kEmployment, kLegal, kOtherServices, kAccom, kOtherIssues, kOptionNil];
     NSArray *textArray = @[@"Financial",
                            @"ElderCare",
                            @"BASIC/Childcare",
@@ -2098,7 +2216,8 @@ typedef enum formName {
                            @"Legal",
                            @"Other services (Bedbugs, Mobility)",
                            @"Accommodation (Tenant issues, housing matters...)",
-                           @"Other Issues"];
+                           @"Other Issues",
+                           @"Nil"];
     NSMutableArray *returnArray = [[NSMutableArray alloc]init];
     
     for (int i=0; i<[keyArray count]; i++) {

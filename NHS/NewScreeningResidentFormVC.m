@@ -245,6 +245,13 @@
 - (void (^)(NSURLSessionDataTask *task, id responseObject))personalInfoSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
         NSLog(@"Personal info submission success");
+        
+        if ([responseObject objectForKey:@"reason"]) {  //if it's not nil (which means there's duplicates)
+            [SVProgressHUD setMinimumDismissTimeInterval:1.0];
+            [SVProgressHUD showErrorWithStatus:@"This NRIC is already registered!"];
+            return;
+        }
+        
         self.resident_id = [responseObject objectForKey:kResidentId];
         
         [[NSUserDefaults standardUserDefaults] setObject:self.resident_id forKey:kResidentId];

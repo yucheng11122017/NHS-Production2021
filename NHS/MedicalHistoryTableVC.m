@@ -11,7 +11,7 @@
 #import "Reachability.h"
 #import "SVProgressHUD.h"
 #import "ServerComm.h"
-#import "HealthAssessAndRiskFormVC.h"
+#import "ProfilingFormVC.h"
 #import "ScreeningDictionary.h"
 
 @interface MedicalHistoryTableVC () {
@@ -123,7 +123,7 @@
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    selectedRow = [NSNumber numberWithInteger:indexPath.row];
+    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 1)];
     
     [self performSegueWithIdentifier:@"medHistToFormSegue" sender:self];
     

@@ -150,6 +150,7 @@ extern NSString *const SearchBarIsFirstResponderKey;
 //extern NSString *const kWasTaken;
 extern NSString *const kAge40;
 extern NSString *const kChronicCond;
+extern NSString *const kNoBloodTest;
 extern NSString *const kWantFreeBt;
 extern NSString *const kDidPhleb;
 extern NSString *const kFastingBloodGlucose;
@@ -162,7 +163,9 @@ extern NSString *const kTotCholesterol;
 #pragma mark - Mode of Screening
 extern NSString *const kScreenMode;
 extern NSString *const kApptDate;
+extern NSString *const kTicketNum;
 extern NSString *const kApptTime;
+extern NSString *const kNotes;
 
 extern NSString *const kTime_8_10;
 extern NSString *const kTime_10_12;
@@ -172,6 +175,8 @@ extern NSString *const kTime_2_4;
 extern NSString *const kPhlebAppt;
 
 #pragma mark - Profiling
+
+/** Eligibility Assessments */
 extern NSString *const kProfilingConsent;
 extern NSString *const kEmployStat;
 extern NSString *const kEmployReasons;
@@ -192,9 +197,9 @@ extern NSString *const kWantColonoscopyRef;
 extern NSString *const kFitLast12Mths;
 extern NSString *const kColonoscopy10Yrs;
 extern NSString *const kWantFitKit;
-extern NSString *const kSporean;
 extern NSString *const kMammo2Yrs;
 extern NSString *const kHasChas;
+extern NSString *const kSporean;
 extern NSString *const kWantMammo;
 extern NSString *const kPap3Yrs;
 extern NSString *const kEngagedSex;
@@ -207,8 +212,8 @@ extern NSString *const kScaredFall;
 extern NSString *const kFeelFall;
 extern NSString *const kCognitiveImpair;
 
-#pragma mark - Health Assessment and Risk Stratisfaction
-
+/** Medical History */
+//Generic variables
 extern NSString *const kHasInformed;
 extern NSString *const kCheckedBlood;
 extern NSString *const kCheckedBp;
@@ -216,24 +221,41 @@ extern NSString *const kSeeingDocRegularly;
 extern NSString *const kCurrentlyPrescribed;
 extern NSString *const kTakingRegularly;
 
+/* Diabetes Mellitus */
 extern NSString *const kDMHasInformed;
 extern NSString *const kDMCheckedBlood;
 extern NSString *const kDMSeeingDocRegularly;
 extern NSString *const kDMCurrentlyPrescribed;
 extern NSString *const kDMTakingRegularly;
 
+/* Hyperlipidemia */
 extern NSString *const kLipidHasInformed;
 extern NSString *const kLipidCheckedBlood;
 extern NSString *const kLipidSeeingDocRegularly;
 extern NSString *const kLipidCurrentlyPrescribed;
 extern NSString *const kLipidTakingRegularly;
 
+/* Hypertension */
 extern NSString *const kHTHasInformed;
 extern NSString *const kHTCheckedBp;
 extern NSString *const kHTSeeingDocRegularly;
 extern NSString *const kHTCurrentlyPrescribed;
 extern NSString *const kHTTakingRegularly;
 
+/** Risk Stratification */
+extern NSString *const kDiabeticFriend;
+extern NSString *const kDelivered4kgOrGestational;
+extern NSString *const kHeartAttack;
+extern NSString *const kStroke;
+extern NSString *const kAneurysm;
+extern NSString *const kKidneyDisease;
+extern NSString *const kSmoke;
+extern NSString *const kSmokeYes;
+extern NSString *const kSmokeNo;
+
+#pragma mark - Geriatric Depression Assessment
+
+extern NSString *const kDidDepressAssess;
 extern NSString *const kPhqQ1;
 extern NSString *const kPhqQ2;
 extern NSString *const kPhq9Score;
@@ -271,6 +293,7 @@ extern NSString *const kHasPgp;
 extern NSString *const kHasMedisave;
 extern NSString *const kHasInsure;
 extern NSString *const kHasCpfPayouts;
+extern NSString *const kNoneOfTheAbove;
 
 extern NSString *const kCpfAmt;
 extern NSString *const kChasColor;
@@ -292,6 +315,7 @@ extern NSString *const kToileting;
 extern NSString *const kWalk;
 extern NSString *const kMobilityStatus;
 extern NSString *const kMobilityEquipment;
+extern NSString *const kMobilityEquipmentText;
 
 #pragma mark Social Support
 extern NSString *const kHasCaregiver;
@@ -365,7 +389,10 @@ extern NSString *const kLegal;
 extern NSString *const kOtherServices;
 extern NSString *const kAccom;
 extern NSString *const kOtherIssues;
+extern NSString *const kOptionNil;
 extern NSString *const kProblems;
+extern NSString *const kInterventions;
+extern NSString *const kCommReview;
 extern NSString *const kCaseCat;
 extern NSString *const kSwVolName;
 extern NSString *const kSwVolContactNum;
@@ -411,6 +438,7 @@ extern NSString *const kReferPapSmear;
 
 #pragma mark - Doctor's consult
 
+extern NSString *const kDidDocConsult;
 extern NSString *const kDocNotes;
 extern NSString *const kDocName;
 extern NSString *const kDocReferred;
@@ -548,7 +576,7 @@ extern NSString *const kDiagnosisOs;
  (Enable only if criteria is fulfilled in PROFILING tab)
  (Fall Risk Assmt Tab does not need to be completed for final submission)"
  */
-
+extern NSString *const kDidFallRiskAssess;
 extern NSString *const kPsfuFRA;
 extern NSString *const kBalance;
 extern NSString *const kGaitSpeed;
