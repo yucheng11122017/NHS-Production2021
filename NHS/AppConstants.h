@@ -258,6 +258,13 @@ extern NSString *const kSmokeNo;
 extern NSString *const kDidDepressAssess;
 extern NSString *const kPhqQ1;
 extern NSString *const kPhqQ2;
+extern NSString *const kPhqQ3;
+extern NSString *const kPhqQ4;
+extern NSString *const kPhqQ5;
+extern NSString *const kPhqQ6;
+extern NSString *const kPhqQ7;
+extern NSString *const kPhqQ8;
+extern NSString *const kPhqQ9;
 extern NSString *const kPhq9Score;
 extern NSString *const kQ10Response;
 extern NSString *const kFollowUpReq;
@@ -280,6 +287,7 @@ extern NSString *const kFilename;
 
 #pragma mark Current Socioeconomic Situation
 extern NSString *const kCopeFin;
+extern NSString *const kDescribeWork;
 extern NSString *const kWhyNotCopeFin;
 extern NSString *const kMediExp;
 extern NSString *const kHouseRent;
@@ -344,6 +352,7 @@ extern NSString *const kFriendsContact;
 extern NSString *const kFriendsEase;
 extern NSString *const kFriendsClose;
 extern NSString *const kSocialScore;
+extern NSString *const kSocialNetwork;
 extern NSString *const kParticipateActivities;
 extern NSString *const kSac;
 extern NSString *const kFsc;
@@ -413,8 +422,8 @@ extern NSString *const kIsDiabetic;
 extern NSString *const kCbg;
 extern NSString *const kBp2Sys;
 extern NSString *const kBp2Dias;
-extern NSString *const kBp12AvgSys;
-extern NSString *const kBp12AvgDias;
+//extern NSString *const kBp12AvgSys;       removed since build 2021
+//extern NSString *const kBp12AvgDias;
 extern NSString *const kBp3Sys;
 extern NSString *const kBp3Dias;
 

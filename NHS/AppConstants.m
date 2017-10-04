@@ -206,6 +206,13 @@ NSString *const kSmokeNo = @"smoke_no";
 NSString *const kDidDepressAssess = @"did_depress_assess";
 NSString *const kPhqQ1 = @"phq_q1";
 NSString *const kPhqQ2 = @"phq_q2";
+NSString *const kPhqQ3 = @"phq_q3";
+NSString *const kPhqQ4 = @"phq_q4";
+NSString *const kPhqQ5 = @"phq_q5";
+NSString *const kPhqQ6 = @"phq_q6";
+NSString *const kPhqQ7 = @"phq_q7";
+NSString *const kPhqQ8 = @"phq_q8";
+NSString *const kPhqQ9 = @"phq_q9";
 NSString *const kPhq9Score = @"phq9_score";
 NSString *const kQ10Response = @"q10_response";
 NSString *const kFollowUpReq = @"follow_up_req";
@@ -217,6 +224,7 @@ NSString *const kFilename = @"file_name";
 
 /* Current Socioeconomic Situation */
 NSString *const kCopeFin = @"cope_fin";
+NSString *const kDescribeWork = @"describe_work";
 
 NSString *const kWhyNotCopeFin = @"why_not_cope_fin";   //not submitted
 NSString *const kMediExp = @"medi_exp";
@@ -281,6 +289,7 @@ NSString *const kFriendsContact = @"friends_contact";
 NSString *const kFriendsEase = @"friends_ease";
 NSString *const kFriendsClose = @"friends_close";
 NSString *const kSocialScore = @"social_score";
+NSString *const kSocialNetwork = @"social_network";
 NSString *const kParticipateActivities = @"participate_activities";
 NSString *const kSac = @"sac";
 NSString *const kFsc = @"fsc";
@@ -350,8 +359,8 @@ NSString *const kIsDiabetic = @"is_diabetic";
 NSString *const kCbg = @"cbg";
 NSString *const kBp2Sys = @"bp2_sys";
 NSString *const kBp2Dias = @"bp2_dias";
-NSString *const kBp12AvgSys = @"bp12_avg_sys";
-NSString *const kBp12AvgDias = @"bp12_avg_dias";
+//NSString *const kBp12AvgSys = @"bp12_avg_sys";    //removed since build 2021
+//NSString *const kBp12AvgDias = @"bp12_avg_dias";
 NSString *const kBp3Sys = @"bp3_sys";
 NSString *const kBp3Dias = @"bp3_dias";
 
@@ -383,7 +392,7 @@ NSString *const kDocReferred = @"doc_referred";
 
 #pragma mark - Basic dental check-up
 
-NSString *const kDentalUndergone = @"dental_undergone";
+NSString *const kDentalUndergone = @"undergone_dental";
 NSString *const kDentistReferred = @"dentist_referred";
 
 

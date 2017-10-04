@@ -1256,10 +1256,10 @@ typedef enum formName {
     
     XLFormRowDescriptor *takeRegularlyQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ10
                                                                                    rowType:XLFormRowDescriptorTypeInfo
-                                                                                     title:@"Are you taking your cholesterol medication regularly?"];
+                                                                                     title:@"Are you taking your cholesterol medication regularly? (≥ 90% of time)"];
     [self setDefaultFontWithRow:takeRegularlyQRow];
     takeRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribedRow];
+    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
     [section addFormRow:takeRegularlyQRow];
     
     // Segmented Control
@@ -1271,7 +1271,7 @@ typedef enum formName {
         takeRegularlyRow.value = [self getYesNoFromOneZero:hyperlipidDict[kTakingRegularly]];
     }
     
-    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", prescribedRow];
+    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
     
     [section addFormRow:takeRegularlyRow];
     
@@ -1282,20 +1282,12 @@ typedef enum formName {
                 seeDocRegularRow.required = NO;
                 prescribedRow.required = NO;
                 lipidCheckBloodRow.required = YES;
-                
-                takeRegularlyQRow.hidden = @(1);
-                takeRegularlyRow.hidden = @(1);
                 takeRegularlyRow.required = NO;
             } else {
                 seeDocRegularRow.required = YES;
                 prescribedRow.required = YES;
                 lipidCheckBloodRow.required = NO;
-                
-                if ([prescribedRow.value isEqualToString:@"YES"]) {
-                    takeRegularlyQRow.hidden = @(0);
-                    takeRegularlyRow.hidden = @(0);
-                    takeRegularlyRow.required = YES;
-                }
+                takeRegularlyRow.required = YES;
             }
         }
     };
@@ -1305,32 +1297,34 @@ typedef enum formName {
             seeDocRegularRow.required = YES;
             prescribedRow.required = YES;
             lipidCheckBloodRow.required = NO;
+            takeRegularlyRow.required = YES;
         } else {
             seeDocRegularRow.required = NO;
             prescribedRow.required = NO;
             lipidCheckBloodRow.required = YES;
+            takeRegularlyRow.required = NO;
         }
     }
     
-    prescribedRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([newValue isEqualToString:@"YES"]) {
-                takeRegularlyQRow.hidden = @(0);
-                takeRegularlyRow.hidden = @(0);
-                takeRegularlyRow.required = YES;
-            } else {
-                takeRegularlyQRow.hidden = @(1);
-                takeRegularlyRow.hidden = @(1);
-                takeRegularlyRow.required = NO;
-            }
-        }
-    };
+//    prescribedRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+//        if (oldValue != newValue) {
+//            if ([newValue isEqualToString:@"YES"]) {
+//                takeRegularlyQRow.hidden = @(0);
+//                takeRegularlyRow.hidden = @(0);
+//                takeRegularlyRow.required = YES;
+//            } else {
+//                takeRegularlyQRow.hidden = @(1);
+//                takeRegularlyRow.hidden = @(1);
+//                takeRegularlyRow.required = NO;
+//            }
+//        }
+//    };
     
-    if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kCurrentlyPrescribed] != (id)[NSNull null]) {
-        if ([prescribedRow.value isEqualToString:@"YES"] && [hasInformed.value isEqualToString:@"YES"]) {
-            takeRegularlyRow.required = YES;
-        }
-    }
+//    if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kCurrentlyPrescribed] != (id)[NSNull null]) {
+//        if ([prescribedRow.value isEqualToString:@"YES"] && [hasInformed.value isEqualToString:@"YES"]) {
+//            takeRegularlyRow.required = YES;
+//        }
+//    }
     return [super initWithForm:formDescriptor];
 }
 

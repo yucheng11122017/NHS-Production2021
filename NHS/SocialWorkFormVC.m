@@ -142,6 +142,26 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
+    XLFormRowDescriptor *describeWorkInfoRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"question" rowType:XLFormRowDescriptorTypeInfo title:@"Describe your current/past employment and work experiences (e.g. type of job, workplace, work duration, work frequency, relationship with superior, relationship with colleagues)"];
+    describeWorkInfoRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    [self setDefaultFontWithRow:describeWorkInfoRow];
+    
+    [section addFormRow:describeWorkInfoRow];
+    
+    XLFormRowDescriptor *describeWorkRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDescribeWork rowType:XLFormRowDescriptorTypeTextView title:@""];
+    [describeWorkRow.cellConfigAtConfigure setObject:@"Comment here..." forKey:@"textView.placeholder"];
+    describeWorkRow.required = NO;
+    
+    //value
+    if (currentSocioSitDict != (id)[NSNull null] && [currentSocioSitDict objectForKey:kDescribeWork] != (id)[NSNull null]) {
+        describeWorkRow.value = currentSocioSitDict[kDescribeWork];
+    }
+    
+    [section addFormRow:describeWorkRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
     XLFormRowDescriptor *copeFinancialRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCopeFin rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Are you able to cope financially?"];
     [self setDefaultFontWithRow:copeFinancialRow];
     copeFinancialRow.selectorOptions = @[@"Yes", @"No"];
@@ -358,7 +378,7 @@ typedef enum formName {
 
 - (id) initCurrentPhysStatus {
     
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Current Physical Situation"];
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Current Physical Status"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Activities of Daily Living"];
@@ -836,14 +856,13 @@ typedef enum formName {
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
-#warning ELABORATE NO VARIABLE YET
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"elaborate_soc_net" rowType:XLFormRowDescriptorTypeTextView title:@""];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSocialNetwork rowType:XLFormRowDescriptorTypeTextView title:@""];
     [self setDefaultFontWithRow:row];
 //    [row.cellConfigAtConfigure setObject:@"" forKey:@"textView.placeholder"];
     
     //value
-    if (socialSupportDict != (id)[NSNull null] && [socialSupportDict objectForKey:@"elaborate_soc_net"] != (id)[NSNull null] && [[socialSupportDict objectForKey:@"elaborate_soc_net"] isKindOfClass:[NSString class]]) {
-        row.value = socialSupportDict[@"elaborate_soc_net"];
+    if (socialSupportDict != (id)[NSNull null] && [socialSupportDict objectForKey:kSocialNetwork] != (id)[NSNull null] && [[socialSupportDict objectForKey:kSocialNetwork] isKindOfClass:[NSString class]]) {
+        row.value = socialSupportDict[kSocialNetwork];
     }
     
     [section addFormRow:row];
@@ -1480,7 +1499,9 @@ typedef enum formName {
         rowDescriptor.value = @"";  //empty string
     }
     
-    if ([rowDescriptor.tag isEqualToString:kMoreWhyNotCopeFin]) {
+    if ([rowDescriptor.tag isEqualToString:kDescribeWork]) {
+        [self postSingleFieldWithSection:SECTION_CURRENT_SOCIOECO_SITUATION andFieldName:kDescribeWork andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kMoreWhyNotCopeFin]) {
         [self postSingleFieldWithSection:SECTION_CURRENT_SOCIOECO_SITUATION andFieldName:kMoreWhyNotCopeFin andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kCpfAmt]) {
         [self postSingleFieldWithSection:SECTION_CURRENT_SOCIOECO_SITUATION andFieldName:kCpfAmt andNewContent:rowDescriptor.value];
@@ -1521,10 +1542,8 @@ typedef enum formName {
         [self postSingleFieldWithSection:SECTION_SOCIAL_SUPPORT andFieldName:kEContactNum andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kOthersText]) {
         [self postSingleFieldWithSection:SECTION_SOCIAL_SUPPORT andFieldName:kOthersText andNewContent:rowDescriptor.value];
-    }
-#warning ELABORATION CHANGE HERE
-    else if ([rowDescriptor.tag isEqualToString:@"elaboration_soc_net"]) {
-        [self postSingleFieldWithSection:SECTION_SOCIAL_SUPPORT andFieldName:@"elaboration_soc_net" andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kSocialNetwork]) {
+        [self postSingleFieldWithSection:SECTION_SOCIAL_SUPPORT andFieldName:kSocialNetwork andNewContent:rowDescriptor.value];
     }
     else if ([rowDescriptor.tag isEqualToString:kHostOthers]) {
         [self postSingleFieldWithSection:SECTION_SOCIAL_SUPPORT andFieldName:kHostOthers andNewContent:rowDescriptor.value];
@@ -1770,6 +1789,7 @@ typedef enum formName {
     else if ([expenses containsString:@"Medisave"]) return kHasMedisave;
     else if ([expenses containsString:@"Insurance"]) return kHasInsure;
     else if ([expenses containsString:@"CPF"]) return kHasCpfPayouts;
+    else if ([expenses containsString:@"None"]) return kNoneOfTheAbove;
     else return @"";
 }
 

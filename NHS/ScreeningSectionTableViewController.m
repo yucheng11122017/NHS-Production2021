@@ -192,18 +192,20 @@ typedef enum sectionRowNumber {
             }
         }
         
-        if (indexPath.row == GeriatricDepressionAssess) {   //Geriatric Depression Assessment
-            if ([age intValue] <65) {
-                [cell.textLabel setTextColor:[UIColor grayColor]];
-            }
-        }
-        
         if (alreadySubmitted) {
             cell.userInteractionEnabled = NO;
             [cell.textLabel setTextColor:[UIColor grayColor]];
+            return cell;    //disable all sections regardless
         } else {
             cell.userInteractionEnabled = YES;
             [cell.textLabel setTextColor:[UIColor blackColor]];
+        }
+        
+        if (indexPath.row == GeriatricDepressionAssess) {   //Geriatric Depression Assessment (Age < 65)
+            if ([age intValue] <65) {
+                [cell.textLabel setTextColor:[UIColor grayColor]];
+                cell.userInteractionEnabled = NO;
+            }
         }
     
         if ((indexPath.row >= SeriAdvancedEyeScreening) && (indexPath.row <= GeriatricDementiaAssess)) {   //between 10 to 12
