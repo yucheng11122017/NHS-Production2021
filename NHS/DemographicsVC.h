@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DemographicsVC : UIViewController 
+@interface DemographicsVC : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 
 @end

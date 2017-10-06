@@ -206,6 +206,16 @@ typedef enum sectionRowNumber {
                 [cell.textLabel setTextColor:[UIColor grayColor]];
                 cell.userInteractionEnabled = NO;
             }
+            
+            NSDictionary *geriaDepreAssmtDict = [self.fullScreeningForm objectForKey:SECTION_DEPRESSION];
+            if (geriaDepreAssmtDict != nil && geriaDepreAssmtDict != (id)[NSNull null]) {
+                if ([geriaDepreAssmtDict objectForKey:kPhq9Score] != nil && [geriaDepreAssmtDict objectForKey:kPhq9Score] != (id)[NSNull null]) {
+                    if ([[geriaDepreAssmtDict objectForKey:kPhq9Score] integerValue] >= 5) {
+                        [cell.textLabel setTextColor:[UIColor redColor]];
+                    }
+                }
+            }
+            
         }
     
         if ((indexPath.row >= SeriAdvancedEyeScreening) && (indexPath.row <= GeriatricDementiaAssess)) {   //between 10 to 12

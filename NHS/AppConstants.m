@@ -203,7 +203,7 @@ NSString *const kSmokeNo = @"smoke_no";
 
 #pragma mark - Geriatric Depression Assessment
 
-NSString *const kDidDepressAssess = @"did_depress_assess";
+//NSString *const kDidDepressAssess = @"did_depress_assess";
 NSString *const kPhqQ1 = @"phq_q1";
 NSString *const kPhqQ2 = @"phq_q2";
 NSString *const kPhqQ3 = @"phq_q3";

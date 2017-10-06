@@ -72,7 +72,7 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
                          andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
 #pragma mark - Genogram stuffs
--(NSString *)getretrievedGenogramImagePath;
+-(NSString *)getRetrievedGenogramImagePath;
 
 -(void)retrieveGenogramImageForResident:(NSNumber *)residentID
                                withNric:(NSString *)nric;

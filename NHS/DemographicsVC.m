@@ -15,6 +15,7 @@
 
 
 #define GENOGRAM_LOADED_NOTIF @"Genogram image downloaded"
+#define DEGREES_TO_RADIANS(angle) ((angle) / 180.0 * M_PI)
 
 
 @interface DemographicsVC () {
@@ -29,6 +30,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (strong, nonatomic) UIImage* genogramImage;
 @property (strong, nonatomic) UIView *infoBox;
+@property (strong, nonatomic) UIToolbar *toolbar;
 @property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
 
 
@@ -129,7 +131,6 @@
         if (!genogramExist) // this will be done after fetching the image for genogram exist case
             [self setupImageViewAndNavigationController];
     }
-
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
@@ -142,8 +143,6 @@
     }
     
     [super viewWillDisappear:animated];
-    
-    
 }
 
 
@@ -198,12 +197,19 @@
 }
 
 - (void) setupImageViewAndNavigationController {
-    self.imageView.frame = self.view.frame;
+    
+    if (_genogramImage.size.width > _genogramImage.size.height) {   //portrait image
+        _genogramImage = [self rotateImage:_genogramImage byDegree:90];
+    }
     [self.imageView setImage:_genogramImage];
+    
     self.imageView.hidden = NO;
-    self.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.imageView.contentMode = UIViewContentModeScaleToFill;
+    
     [self.navigationController setNavigationBarHidden:YES];
     self.navigationController.hidesBarsOnTap = true;    //to hide the top bar when tapped elsewhere
+    
+    [self createBottomBar];
 }
 
 - (void) infoButtonAction: (UIButton *) sender {
@@ -234,6 +240,45 @@
                              
                          }];
     }
+}
+
+- (void) createBottomBar {
+    CGRect frame, remain;
+    CGRectDivide(self.view.bounds, &frame, &remain, 44, CGRectMaxYEdge);
+    self.toolbar = [[UIToolbar alloc] initWithFrame:frame];
+    UIBarButtonItem *replaceImageBtn = [[UIBarButtonItem alloc] initWithTitle:@"Replace Image" style:UIBarButtonItemStylePlain target:self action:@selector(pickImage:)];
+//    UIBarButtonItem *button1 = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleDone target:self action:nil];
+    UIBarButtonItem *spacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
+//    UIBarButtonItem *button2=[[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleDone target:self action:nil];
+    [_toolbar setItems:[[NSArray alloc] initWithObjects:spacer,replaceImageBtn, spacer,nil]];
+    [_toolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin];
+    [self.view addSubview:_toolbar];
+}
+
+- (UIImage *)rotateImage:(UIImage*)image byDegree:(CGFloat)degrees
+{
+    UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0,0,image.size.width, image.size.height)];
+    CGAffineTransform t = CGAffineTransformMakeRotation(DEGREES_TO_RADIANS(degrees));
+    rotatedViewBox.transform = t;
+    CGSize rotatedSize = rotatedViewBox.frame.size;
+    //[rotatedViewBox release];
+    
+    UIGraphicsBeginImageContext(rotatedSize);
+    CGContextRef bitmap = UIGraphicsGetCurrentContext();
+    
+    
+    CGContextTranslateCTM(bitmap, rotatedSize.width, rotatedSize.height);
+    
+    CGContextRotateCTM(bitmap, DEGREES_TO_RADIANS(degrees));
+    
+    
+    CGContextScaleCTM(bitmap, 1.0, -1.0);
+    CGContextDrawImage(bitmap, CGRectMake(-image.size.width, -image.size.height, image.size.width, image.size.height), [image CGImage]);
+    
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+    
 }
 
 - (void) setupInfoBox {
@@ -274,9 +319,19 @@
     _infoBox.alpha = 0;
     
 }
+
+//- (void) toggleVisibility: (UIView *) view {
+//    view.hidden = !view.hidden;
+//}
+//
+//#pragma mark - UIGestureRecogniser
+//- (void) singleTap: (UITapGestureRecognizer *) tap {
+//    [self toggleVisibility: self.toolbar];
+//}
+
 #pragma mark - NSNotificationCenter
 - (void) imageExist: (NSNotification *) notification {
-    NSString *genogramImagePath = [[ServerComm sharedServerCommInstance] getretrievedGenogramImagePath];
+    NSString *genogramImagePath = [[ServerComm sharedServerCommInstance] getRetrievedGenogramImagePath];
     _genogramImage = [UIImage imageWithContentsOfFile:genogramImagePath];
     
     [self setupImageViewAndNavigationController];
@@ -290,6 +345,7 @@
     ServerComm *client = [ServerComm sharedServerCommInstance];
     [client saveGenogram:_genogramImage forResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
     [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:kCheckGeno andNewContent:@"1"];    //post this for completion too.
+    [self setupImageViewAndNavigationController];
     
 }
 
@@ -314,6 +370,16 @@
     
 //    self.navigationItem.rightBarButtonItem = nil;
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
+}
+
+-(void) pickImage:(id)sender {
+    
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.delegate = self;
+    picker.allowsEditing = NO;  //defines whether you can edit the image or not.
+    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    
+    [self presentViewController:picker animated:YES completion:NULL];
 }
 
 
@@ -344,6 +410,29 @@
                                     successBlock:[self successBlock]
                                     andFailBlock:[self errorBlock]];
     }
+}
+
+
+#pragma mark - UIImagePickerControllerDelegate methods
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    
+    //    UIImage *chosenImage = info[UIImagePickerControllerEditedImage];
+    UIImage *pickedImageOriginal = [info objectForKey:UIImagePickerControllerOriginalImage];
+    
+    
+    NSLog(@"%@", pickedImageOriginal);
+    
+    NSDictionary *dict = @{@"image":pickedImageOriginal};
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"displayImage"
+                                                        object:nil
+                                                      userInfo:dict];
+    [picker dismissViewControllerAnimated:YES completion:NULL];
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    
+    [picker dismissViewControllerAnimated:YES completion:NULL];
+    
 }
 
 #pragma mark - Blocks

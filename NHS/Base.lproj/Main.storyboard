@@ -927,7 +927,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="h95-5S-rnj">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
                             </imageView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jj1-00-oPl">
                                 <rect key="frame" x="62" y="700" width="250" height="300"/>
@@ -945,7 +945,7 @@
                             <constraint firstItem="h95-5S-rnj" firstAttribute="top" secondItem="l1r-en-KbN" secondAttribute="top" id="FHP-Mk-OjE"/>
                             <constraint firstItem="Jj1-00-oPl" firstAttribute="centerY" secondItem="l1r-en-KbN" secondAttribute="centerY" constant="516.5" id="KAI-2e-yn5"/>
                             <constraint firstItem="h95-5S-rnj" firstAttribute="centerX" secondItem="Jj1-00-oPl" secondAttribute="centerX" id="VWV-Zt-NBF"/>
-                            <constraint firstItem="h95-5S-rnj" firstAttribute="bottom" secondItem="RN7-Sh-lDy" secondAttribute="top" id="WXP-aV-5W7"/>
+                            <constraint firstItem="h95-5S-rnj" firstAttribute="bottom" secondItem="RN7-Sh-lDy" secondAttribute="top" constant="-44" id="WXP-aV-5W7"/>
                             <constraint firstItem="h95-5S-rnj" firstAttribute="leading" secondItem="l1r-en-KbN" secondAttribute="leading" id="b9O-ZL-kRf"/>
                             <constraint firstItem="Jj1-00-oPl" firstAttribute="centerX" secondItem="l1r-en-KbN" secondAttribute="centerX" id="g0D-oR-T2Z"/>
                             <constraint firstAttribute="trailing" secondItem="h95-5S-rnj" secondAttribute="trailing" id="r1r-3x-Xa6"/>

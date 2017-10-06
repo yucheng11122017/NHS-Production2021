@@ -88,6 +88,7 @@
         NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
         NSString *errorString =[[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
         NSLog(@"error: %@", errorString);
+        [SVProgressHUD setMinimumDismissTimeInterval:1.0];
         [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
         [SVProgressHUD showErrorWithStatus:@"Download failed"];
     };

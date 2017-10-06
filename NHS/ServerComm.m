@@ -207,7 +207,7 @@
 
 #pragma mark - Image DL & UL
 
--(NSString *)getretrievedGenogramImagePath{
+-(NSString *)getRetrievedGenogramImagePath{
     return [self.retrievedGenogramImagePath copy];
 }
 
@@ -237,12 +237,29 @@
                                                                                                          appropriateForURL:nil
                                                                                                                     create:NO
                                                                                                                      error:nil];
-                                            return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+                                            
+                                            NSURL *fileUrl = [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+                                            
+                                            /** Delete existing file if any! */
+                                            BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:[fileUrl relativePath]];
+                                            
+                                            if (fileExists) {
+                                                NSError *error;
+                                                BOOL success = [[NSFileManager defaultManager] removeItemAtPath:[fileUrl relativePath] error:&error];
+                                                
+                                                if (success)
+                                                    NSLog(@"Deleted existing file!");
+                                                else
+                                                    NSLog(@"Could not delete file -:%@ ",[error localizedDescription]);
+                                            }
+                                            
+                                            return fileUrl;
                                         }
                                                                    completionHandler:
                                         ^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
                                             
                                             [SVProgressHUD dismiss];
+                                            NSLog(@"Filepath: %@", filePath.path);
                                             self.retrievedGenogramImagePath = filePath.path;
                                             if (error) {
                                                 NSLog(@"Error: %@", error);
@@ -385,10 +402,12 @@
     return ^(NSURLResponse *response, NSDictionary *responseObject, NSError *error) {
         if (error) {
             NSLog(@"Error: %@", error);
+            [SVProgressHUD setMinimumDismissTimeInterval:1.0];
             [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
             [SVProgressHUD showErrorWithStatus:@"Upload failed!"];
         } else {
             NSLog(@"Success: %@ %@", response, responseObject);
+            [SVProgressHUD setMinimumDismissTimeInterval:1.0];
             [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
             [SVProgressHUD showSuccessWithStatus:@"Upload successful!"];
         }

@@ -255,7 +255,7 @@ extern NSString *const kSmokeNo;
 
 #pragma mark - Geriatric Depression Assessment
 
-extern NSString *const kDidDepressAssess;
+//extern NSString *const kDidDepressAssess;
 extern NSString *const kPhqQ1;
 extern NSString *const kPhqQ2;
 extern NSString *const kPhqQ3;
