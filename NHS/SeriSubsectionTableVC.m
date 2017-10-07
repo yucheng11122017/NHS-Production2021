@@ -24,7 +24,7 @@
 @property (nonatomic) Reachability *hostReachability;
 @property (strong, nonatomic) NSMutableArray *completionCheck;
 @property (strong, nonatomic) NSDictionary *fullScreeningForm;
-@property (strong, nonatomic) NSNumber *undergoneSeri;
+@property (strong, nonatomic) NSString *undergoneSeri;
 @property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
 @end
 
@@ -44,7 +44,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
     
-    [self addObserver:self forKeyPath:@"undergoneSeri" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+    
     
     
     self.tableView.delegate = self;
@@ -57,6 +57,13 @@
     
 }
 
+- (void) viewWillAppear:(BOOL)animated {
+    
+    //must add here, otherwise App will crash
+    [self addObserver:self forKeyPath:@"undergoneSeri" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+    
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -64,8 +71,9 @@
 
 - (void) viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
+
     [self removeObserver:self forKeyPath:@"undergoneSeri"];
+    [[ScreeningDictionary sharedInstance] fetchFromServer];
 }
 
 #pragma mark - Table view data source
@@ -117,6 +125,16 @@
         }
         
         cell.selectionStyle = UITableViewCellSelectionStyleNone;    //not selectable, but still responding to touches.
+        
+        NSDictionary *medHistoryDict = [self.fullScreeningForm objectForKey:SECTION_SERI_MED_HIST];
+        //value
+        if (medHistoryDict != (id)[NSNull null] && [medHistoryDict objectForKey:kUndergoneAdvSeri] != (id)[NSNull null]) {
+//            NSLog(@"Value from server: %@", medHistoryDict[kUndergoneAdvSeri]);
+            if ([medHistoryDict[kUndergoneAdvSeri] isEqual:@1]) cell.segmentCtrl.selectedSegmentIndex = 0;  //reversed position
+            else cell.segmentCtrl.selectedSegmentIndex = 1;
+            
+        }
+        
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(yesNoSegmentCtrlChanged:) name:@"SegmentedCtrlChange" object:nil];
 
@@ -259,7 +277,7 @@
 - (void) yesNoSegmentCtrlChanged: (NSNotification *) notification {
     BOOL value = [[notification.userInfo objectForKey:@"value"] boolValue];
     
-    self.undergoneSeri = [NSNumber numberWithBool:value];   //remmeber must use the setter! otherwise it will not trigger the KVO
+    self.undergoneSeri = [NSString stringWithFormat:@"%d", value];   //remember must use the setter! otherwise it will not trigger the KVO
     NSLog(@"%@", _undergoneSeri);
 }
 
@@ -267,8 +285,7 @@
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
     
     if ([keyPath isEqualToString:@"undergoneSeri"]) {
-//        NSLog(@"Change in Segmented Ctrl: %@", [change objectForKey:@"new"]);
-         [self postSingleFieldWithSection:@"seri_undergone" andFieldName:@"seri_undergone" andNewContent:[change objectForKey:@"new"]];
+        [self postSingleFieldWithSection:SECTION_SERI_MED_HIST andFieldName:kUndergoneAdvSeri andNewContent:[change objectForKey:@"new"]];
     }
 }
 

@@ -414,7 +414,7 @@
                                     <action selector="kampGlamBtnPressed:" destination="S31-Zx-304" eventType="touchUpInside" id="otD-xL-j2o"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pis-Jm-asG">
+                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pis-Jm-asG">
                                 <rect key="frame" x="84" y="162" width="208" height="72"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="72" id="eVC-mP-6fh"/>

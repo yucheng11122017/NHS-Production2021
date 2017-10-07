@@ -398,7 +398,10 @@ NSString *const kDentistReferred = @"dentist_referred";
 
 #pragma mark - SERI Advanced Eye Screening
 
+
+
 /* Medical History */
+NSString *const kUndergoneAdvSeri = @"undergone_adv_seri";
 NSString *const kChiefComp = @"chief_comp";
 NSString *const kOcuHist = @"ocu_hist";
 NSString *const kHealthHist = @"health_hist";

@@ -461,6 +461,8 @@ extern NSString *const kDentistReferred;
 
 #pragma mark - SERI Advanced Eye Screening
 
+extern NSString *const kUndergoneAdvSeri;
+
 #pragma mark Medical History
 extern NSString *const kChiefComp;
 extern NSString *const kOcuHist;
