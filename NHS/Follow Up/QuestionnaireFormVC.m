@@ -25,6 +25,7 @@ typedef enum formName {
 @interface QuestionnaireFormVC () {
     BOOL internetDCed;
     BOOL isFormFinalized;
+    int currentForm;
 }
 
 @property (nonatomic) Reachability *hostReachability;
@@ -55,9 +56,11 @@ typedef enum formName {
             //case 0 is for demographics
         case 1:
             form = [self initMedicalIssues];
+            currentForm = MedicalIssues;
             break;
         case 2:
             form = [self initSocialIssues];
+            currentForm = SocialIssues;
             break;
         default:
             break;
@@ -78,14 +81,18 @@ typedef enum formName {
     }
     
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
-    
-    [super viewDidLoad];
-    
-
-    
 }
 
+- (void) viewWillDisappear:(BOOL)animated {
+    //    [self saveEntriesIntoDictionary];
+    [KAStatusBar dismiss];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kReachabilityChangedNotification object:nil];
+    [[ScreeningDictionary sharedInstance] fetchFromServer];
+    
+    [super viewWillDisappear:animated];
+    
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -97,10 +104,8 @@ typedef enum formName {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Medical Issues"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
-    
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    NSDictionary *medIssuesDict = [_fullScreeningForm objectForKey:@"NEED TO CHANGE THIS"];
+
+    NSDictionary *medIssuesDict = [_fullScreeningForm objectForKey:SECTION_PSFU_MED_ISSUES];
     
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
     
@@ -156,33 +161,33 @@ typedef enum formName {
     }
 
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMedFamilyName rowType:XLFormRowDescriptorTypeName title:@"Name"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFamilyName rowType:XLFormRowDescriptorTypeName title:@"Name"];
     [self setDefaultFontWithRow:row];
     
     //value
-    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kMedFamilyName] != (id)[NSNull null]) {
-        row.value = medIssuesDict[kMedFamilyName];
+    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kFamilyName] != (id)[NSNull null]) {
+        row.value = medIssuesDict[kFamilyName];
     }
     
     [familySection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMedFamilyAdd rowType:XLFormRowDescriptorTypeTextView title:@"Address"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFamilyAdd rowType:XLFormRowDescriptorTypeTextView title:@"Address"];
     [self setDefaultFontWithRow:row];
     
     //value
-    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kMedFamilyAdd] != (id)[NSNull null]) {
-        row.value = [medIssuesDict objectForKey:kMedFamilyAdd];
+    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kFamilyAdd] != (id)[NSNull null]) {
+        row.value = [medIssuesDict objectForKey:kFamilyAdd];
     }
     
     [familySection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMedFamilyHp rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFamilyHp rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     [self setDefaultFontWithRow:row];
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     
     //value
-    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kMedFamilyHp] != (id)[NSNull null]) {
-        row.value = medIssuesDict[kMedFamilyHp];
+    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kFamilyHp] != (id)[NSNull null]) {
+        row.value = medIssuesDict[kFamilyHp];
     }
     [familySection addFormRow:row];
 
@@ -203,33 +208,33 @@ typedef enum formName {
 
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMedFlatmateName rowType:XLFormRowDescriptorTypeName title:@"Name"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFlatmateName rowType:XLFormRowDescriptorTypeName title:@"Name"];
     [self setDefaultFontWithRow:row];
     
     //value
-    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kMedFlatmateName] != (id)[NSNull null]) {
-        row.value = medIssuesDict[kMedFlatmateName];
+    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kFlatmateName] != (id)[NSNull null]) {
+        row.value = medIssuesDict[kFlatmateName];
     }
     
     [flatmateSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMedFlatmateAdd rowType:XLFormRowDescriptorTypeTextView title:@"Address"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFlatmateAdd rowType:XLFormRowDescriptorTypeTextView title:@"Address"];
     [self setDefaultFontWithRow:row];
     
     //value
-    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kMedFlatmateAdd] != (id)[NSNull null]) {
-        row.value = [medIssuesDict objectForKey:kMedFlatmateAdd];
+    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kFlatmateAdd] != (id)[NSNull null]) {
+        row.value = [medIssuesDict objectForKey:kFlatmateAdd];
     }
     
     [flatmateSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMedFlatmateHp rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFlatmateHp rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     [self setDefaultFontWithRow:row];
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     
     //value
-    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kMedFlatmateHp] != (id)[NSNull null]) {
-        row.value = medIssuesDict[kMedFlatmateHp];
+    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kFlatmateHp] != (id)[NSNull null]) {
+        row.value = medIssuesDict[kFlatmateHp];
     }
     [flatmateSection addFormRow:row];
     
@@ -248,33 +253,33 @@ typedef enum formName {
         neighbourSection.hidden = @YES;
     }
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMedNeighbourName rowType:XLFormRowDescriptorTypeName title:@"Name"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourName rowType:XLFormRowDescriptorTypeName title:@"Name"];
     [self setDefaultFontWithRow:row];
     
     //value
-    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kMedNeighbourName] != (id)[NSNull null]) {
-        row.value = medIssuesDict[kMedNeighbourName];
+    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kNeighbourName] != (id)[NSNull null]) {
+        row.value = medIssuesDict[kNeighbourName];
     }
     
     [neighbourSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMedNeighbourAdd rowType:XLFormRowDescriptorTypeTextView title:@"Address"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourAdd rowType:XLFormRowDescriptorTypeTextView title:@"Address"];
     [self setDefaultFontWithRow:row];
     
     //value
-    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kMedNeighbourAdd] != (id)[NSNull null]) {
-        row.value = [medIssuesDict objectForKey:kMedNeighbourAdd];
+    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kNeighbourAdd] != (id)[NSNull null]) {
+        row.value = [medIssuesDict objectForKey:kNeighbourAdd];
     }
     
     [neighbourSection addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMedNeighbourHp rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourHp rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     [self setDefaultFontWithRow:row];
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
     
     //value
-    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kMedNeighbourHp] != (id)[NSNull null]) {
-        row.value = medIssuesDict[kMedNeighbourHp];
+    if (medIssuesDict != (id)[NSNull null] && [medIssuesDict objectForKey:kNeighbourHp] != (id)[NSNull null]) {
+        row.value = medIssuesDict[kNeighbourHp];
     }
     [neighbourSection addFormRow:row];
     
@@ -384,9 +389,7 @@ typedef enum formName {
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    NSDictionary *currentSocioSitDict = [_fullScreeningForm objectForKey:@"NEED TO CHANGE THIS"];
+    NSDictionary *socIssuesDict = [_fullScreeningForm objectForKey:SECTION_PSFU_SOCIAL_ISSUES];
     
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
     
@@ -397,10 +400,318 @@ typedef enum formName {
         }
     }
     
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *faceSocProbRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFaceSocialProb rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is this resident currently facing any social problems?"];
+    [self setDefaultFontWithRow:faceSocProbRow];
+    faceSocProbRow.selectorOptions = @[@"Yes", @"No"];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kFaceSocialProb] != (id)[NSNull null]) {
+        faceSocProbRow.value = [self getYesNofromOneZero:socIssuesDict[kFaceSocialProb]];
+    }
+    
+    faceSocProbRow.required = YES;
+    
+    faceSocProbRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    [section addFormRow:faceSocProbRow];
+    
+    XLFormRowDescriptor *whoFaceSocProbRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWhoFaceSocialProb rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Who is facing the social problem?"];
+    [self setDefaultFontWithRow:whoFaceSocProbRow];
+    whoFaceSocProbRow.selectorOptions = @[@"Resident", @"Resident's family", @"Resident's flatmate",@"Resident's neighbour"];
+    whoFaceSocProbRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", faceSocProbRow];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null]) {
+        whoFaceSocProbRow.value = [self getSocialIssueWhoFaceArray:socIssuesDict];
+    }
+    
+    [section addFormRow:whoFaceSocProbRow];
+    
+    /** Family */
+    
+    XLFormSectionDescriptor *familySection = [XLFormSectionDescriptor formSectionWithTitle:@"Family Details"];
+    [formDescriptor addFormSection:familySection];
+    
+    if (whoFaceSocProbRow.value != nil) {
+        if ([whoFaceSocProbRow.value containsObject:@"Resident's family"]) {
+            familySection.hidden = @NO;
+        } else {
+            familySection.hidden = @YES;
+        }
+    } else {
+        familySection.hidden = @YES;
+    }
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFamilyName rowType:XLFormRowDescriptorTypeName title:@"Name"];
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kFamilyName] != (id)[NSNull null]) {
+        row.value = socIssuesDict[kFamilyName];
+    }
+    
+    [familySection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFamilyAdd rowType:XLFormRowDescriptorTypeTextView title:@"Address"];
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kFamilyAdd] != (id)[NSNull null]) {
+        row.value = [socIssuesDict objectForKey:kFamilyAdd];
+    }
+    
+    [familySection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFamilyHp rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    [self setDefaultFontWithRow:row];
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kFamilyHp] != (id)[NSNull null]) {
+        row.value = socIssuesDict[kFamilyHp];
+    }
+    [familySection addFormRow:row];
+    
+    /** Flatmate */
+    
+    XLFormSectionDescriptor *flatmateSection = [XLFormSectionDescriptor formSectionWithTitle:@"Flatmate Details"];
+    [formDescriptor addFormSection:flatmateSection];
+    
+    if (whoFaceSocProbRow.value != nil) {
+        if ([whoFaceSocProbRow.value containsObject:@"Resident's flatmate"]) {
+            flatmateSection.hidden = @NO;
+        } else {
+            flatmateSection.hidden = @YES;
+        }
+    } else {
+        flatmateSection.hidden = @YES;
+    }
+    
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFlatmateName rowType:XLFormRowDescriptorTypeName title:@"Name"];
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kFlatmateName] != (id)[NSNull null]) {
+        row.value = socIssuesDict[kFlatmateName];
+    }
+    
+    [flatmateSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFlatmateAdd rowType:XLFormRowDescriptorTypeTextView title:@"Address"];
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kFlatmateAdd] != (id)[NSNull null]) {
+        row.value = [socIssuesDict objectForKey:kFlatmateAdd];
+    }
+    
+    [flatmateSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFlatmateHp rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    [self setDefaultFontWithRow:row];
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kFlatmateHp] != (id)[NSNull null]) {
+        row.value = socIssuesDict[kFlatmateHp];
+    }
+    [flatmateSection addFormRow:row];
+    
+    /** Flatmate */
+    
+    XLFormSectionDescriptor *neighbourSection = [XLFormSectionDescriptor formSectionWithTitle:@"Neighbour Details"];
+    [formDescriptor addFormSection:neighbourSection];
+    
+    if (whoFaceSocProbRow.value != nil) {
+        if ([whoFaceSocProbRow.value containsObject:@"Resident's neighbour"]) {
+            neighbourSection.hidden = @NO;
+        } else {
+            neighbourSection.hidden = @YES;
+        }
+    } else {
+        neighbourSection.hidden = @YES;
+    }
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourName rowType:XLFormRowDescriptorTypeName title:@"Name"];
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kNeighbourName] != (id)[NSNull null]) {
+        row.value = socIssuesDict[kNeighbourName];
+    }
+    
+    [neighbourSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourAdd rowType:XLFormRowDescriptorTypeTextView title:@"Address"];
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kNeighbourAdd] != (id)[NSNull null]) {
+        row.value = [socIssuesDict objectForKey:kNeighbourAdd];
+    }
+    
+    [neighbourSection addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNeighbourHp rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
+    [self setDefaultFontWithRow:row];
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kNeighbourHp] != (id)[NSNull null]) {
+        row.value = socIssuesDict[kNeighbourHp];
+    }
+    [neighbourSection addFormRow:row];
+    
+    // Detect change of options to show relevant sections
+    
+    whoFaceSocProbRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue containsObject:@"Resident's family"]) {
+                familySection.hidden = @NO;
+            } else {
+                familySection.hidden = @YES;
+            }
+            if ([newValue containsObject:@"Resident's flatmate"]) {
+                flatmateSection.hidden = @NO;
+            } else {
+                flatmateSection.hidden = @YES;
+            }
+            if ([newValue containsObject:@"Resident's neighbour"]) {
+                neighbourSection.hidden = @NO;
+            } else {
+                neighbourSection.hidden = @YES;
+            }
+        }
+    };
+    
+    
+    /** Section II */
+    
+    XLFormSectionDescriptor * section2 =  [XLFormSectionDescriptor formSectionWithTitle:@""];;
+    [formDescriptor addFormSection:section2];
+    
+    XLFormRowDescriptor *notConnSocWkAgencyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNotConnectSocWkAgency rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is this resident currently NOT connected to a social work agency?"];
+    [self setDefaultFontWithRow:notConnSocWkAgencyRow];
+    notConnSocWkAgencyRow.selectorOptions = @[@"Yes", @"No"];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kNotConnectSocWkAgency] != (id)[NSNull null]) {
+        notConnSocWkAgencyRow.value = [self getYesNofromOneZero:socIssuesDict[kNotConnectSocWkAgency]];
+    }
+    
+    notConnSocWkAgencyRow.required = YES;
+    
+    notConnSocWkAgencyRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    [section2 addFormRow:notConnSocWkAgencyRow];
+    
+    XLFormRowDescriptor *unwillSeekAgencyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kUnwillingSeekAgency rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is this resident unwilling to seek agency help directly on their own?"];
+    [self setDefaultFontWithRow:unwillSeekAgencyRow];
+    unwillSeekAgencyRow.selectorOptions = @[@"Yes", @"No"];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kUnwillingSeekAgency] != (id)[NSNull null]) {
+        unwillSeekAgencyRow.value = [self getYesNofromOneZero:socIssuesDict[kUnwillingSeekAgency]];
+    }
+    
+    unwillSeekAgencyRow.required = YES;
+    
+    unwillSeekAgencyRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    [section2 addFormRow:unwillSeekAgencyRow];
+    
+    XLFormRowDescriptor *nhsswRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNhsswFlag rowType:XLFormRowDescriptorTypeBooleanCheck title:@"Flag this resident to NHSSW (✓)"];
+    [self setDefaultFontWithRow:nhsswRow];
+    nhsswRow.disabled = @YES;   //it will be auto-assigned
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kNhsswFlag] != (id)[NSNull null]) {
+        nhsswRow.value = socIssuesDict[kNhsswFlag];
+    }
+    [section2 addFormRow:nhsswRow];
+    
+    notConnSocWkAgencyRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqualToString:@"Yes"]) {
+                if (unwillSeekAgencyRow.value != nil && [unwillSeekAgencyRow.value isEqualToString:@"Yes"]) {
+                    nhsswRow.value = @1;    // give it a tick
+                } else {
+                    nhsswRow.value = @0;
+                }
+            } else {
+                nhsswRow.value = @0;
+            }
+            [self updateFormRow:nhsswRow];
+        }
+    };
+    
+    
+    unwillSeekAgencyRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqualToString:@"Yes"]) {
+                if (notConnSocWkAgencyRow.value != nil && [notConnSocWkAgencyRow.value isEqualToString:@"Yes"]) {
+                    nhsswRow.value = @1;    // give it a tick
+                } else {
+                    nhsswRow.value = @0;
+                }
+            } else {
+                nhsswRow.value = @0;
+            }
+            [self updateFormRow:nhsswRow];
+        }
+    };
+    
+    [section2 addFormRow:nhsswRow];
+    
+    XLFormSectionDescriptor *section3 = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section3];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q_spectrum" rowType:XLFormRowDescriptorTypeInfo title:@"What is the spectrum of concern(s)?"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    
+    [section3 addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpectrumConcerns rowType:XLFormRowDescriptorTypeTextView title:@""];
+    [row.cellConfigAtConfigure setObject:@"Type here..." forKey:@"textView.placeholder"];
+    //value
+    if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kSpectrumConcerns] != (id)[NSNull null]) {
+        row.value = [socIssuesDict objectForKey:kSpectrumConcerns];
+    }
+    
+    [section3 addFormRow:row];
+    
+    XLFormSectionDescriptor *section4 = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section4];
+    
+    XLFormRowDescriptor *natureOfIssueRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNatureOfIssue rowType:XLFormRowDescriptorTypeMultipleSelector title:@"What is the nature of the issue?"];
+    [self setDefaultFontWithRow:natureOfIssueRow];
+    natureOfIssueRow.selectorOptions = @[@"Caregiving", @"Financial", @"Others"];
+    
+    //value
+    if (socIssuesDict != (id)[NSNull null]) {
+        natureOfIssueRow.value = [self getNatureOfIssueArray:socIssuesDict];
+    }
+    
+    [section4 addFormRow:natureOfIssueRow];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSocIssueOthersText rowType:XLFormRowDescriptorTypeText title:@"Others: "];
+    [self setDefaultFontWithRow:row];
+    [row.cellConfigAtConfigure setObject:@"Please specify here..." forKey:@"textField.placeholder"];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", natureOfIssueRow];
+    //value
+    if (socIssuesDict != (id)[NSNull null]) {
+        row.value = [socIssuesDict objectForKey:kSocIssueOthersText];
+    }
+    
+    [section4 addFormRow:row];
+    
+    
     return [super initWithForm:formDescriptor];
     
 }
-
 
 #pragma mark - Buttons
 
@@ -472,6 +783,99 @@ typedef enum formName {
     
     
 }
+
+
+#pragma mark - XLFormDescriptorDelegate
+
+-(void)formRowDescriptorValueHasChanged:(XLFormRowDescriptor *)rowDescriptor oldValue:(id)oldValue newValue:(id)newValue
+{
+    [super formRowDescriptorValueHasChanged:rowDescriptor oldValue:oldValue newValue:newValue];
+    
+    NSString* ansFromYesNo;
+    if (newValue != (id)[NSNull null] && [newValue isKindOfClass:[NSString class]]) {
+        if ([newValue isEqualToString:@"Yes"])
+            ansFromYesNo = @"1";
+        else if ([newValue isEqualToString:@"No"])
+            ansFromYesNo = @"0";
+    }
+    
+    /** Medical Issues */
+    if ([rowDescriptor.tag isEqualToString:kFaceMedProb]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_MED_ISSUES andFieldName:kFaceMedProb andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kWhoFaceMedProb]) {   //multiple choice
+        [self processMedProblemWithNewValue:newValue andOldValue:oldValue];
+    } else if ([rowDescriptor.tag isEqualToString:kHaveHighBpChosCbg]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_MED_ISSUES andFieldName:kHaveHighBpChosCbg andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kHaveOtherMedIssues]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_MED_ISSUES andFieldName:kHaveOtherMedIssues andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kPsfuSeeingDoct]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_MED_ISSUES andFieldName:kPsfuSeeingDoct andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kNhsfuFlag]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_MED_ISSUES andFieldName:kNhsfuFlag andNewContent:newValue];
+    }
+    
+    
+    /** Social Issues */
+    else if ([rowDescriptor.tag isEqualToString:kFaceSocialProb]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:kFaceSocialProb andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kWhoFaceSocialProb]) {   //multiple choice
+        [self processSocialProblemWithNewValue:newValue andOldValue:oldValue];
+    } else if ([rowDescriptor.tag isEqualToString:kNotConnectSocWkAgency]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:kNotConnectSocWkAgency andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kUnwillingSeekAgency]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:kUnwillingSeekAgency andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kNhsswFlag]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:kNhsswFlag andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kNatureOfIssue]) {
+        [self processNatureOfIssueWithNewValue:newValue andOldValue:oldValue];
+    }
+}
+
+-(void)endEditing:(XLFormRowDescriptor *)rowDescriptor {    //works great for textField and textView
+    
+    if (rowDescriptor.value == nil) {
+        rowDescriptor.value = @"";  //empty string
+    }
+    NSString *section;
+    
+    if (currentForm == MedicalIssues) section = SECTION_PSFU_MED_ISSUES;
+    else if (currentForm == SocialIssues) section = SECTION_PSFU_SOCIAL_ISSUES;
+    
+    /** Medical Issues */
+    if ([rowDescriptor.tag isEqualToString:kFamilyName]) {
+        [self postSingleFieldWithSection:section andFieldName:kFamilyName andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kFamilyHp]) {
+        [self postSingleFieldWithSection:section andFieldName:kFamilyHp andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kFamilyAdd]) {
+        [self postSingleFieldWithSection:section andFieldName:kFamilyAdd andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kFlatmateName]) {
+        [self postSingleFieldWithSection:section andFieldName:kFlatmateName andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kFlatmateHp]) {
+        [self postSingleFieldWithSection:section andFieldName:kFlatmateHp andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kFlatmateAdd]) {
+        [self postSingleFieldWithSection:section andFieldName:kFlatmateAdd andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kNeighbourName]) {
+        [self postSingleFieldWithSection:section andFieldName:kNeighbourName andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kNeighbourHp]) {
+        [self postSingleFieldWithSection:section andFieldName:kNeighbourHp andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kNeighbourAdd]) {
+        [self postSingleFieldWithSection:section andFieldName:kNeighbourAdd andNewContent:rowDescriptor.value];
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kHistMedIssues]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:kHistMedIssues andNewContent:rowDescriptor.value];
+    }
+    
+    /** Social Issues */
+    
+    else if ([rowDescriptor.tag isEqualToString:kSpectrumConcerns]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:kSpectrumConcerns andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kSocIssueOthersText]) {
+        [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:kSocIssueOthersText andNewContent:rowDescriptor.value];
+    }
+}
+
+
 
 #pragma mark - Reachability
 /*!
@@ -609,7 +1013,44 @@ typedef enum formName {
     NSArray *textArray = @[@"Resident",
                            @"Resident's family",
                            @"Resident's flatmate",
-                           @"Resident's Neighbour"];
+                           @"Resident's neighbour"];
+    NSMutableArray *returnArray = [[NSMutableArray alloc]init];
+    
+    for (int i=0; i<[keyArray count]; i++) {
+        NSString *key = keyArray[i];
+        if (dict[key] != (id)[NSNull null]) {
+            if ([dict[key] isEqual:@1])
+                [returnArray addObject:textArray[i]];
+        }
+    }
+    
+    return returnArray;
+}
+
+- (NSArray *) getSocialIssueWhoFaceArray: (NSDictionary *) dict {
+    NSArray *keyArray = @[kSocialResident, kSocialResFamily, kSocialResFlatmate, kSocialResNeighbour];
+    NSArray *textArray = @[@"Resident",
+                           @"Resident's family",
+                           @"Resident's flatmate",
+                           @"Resident's neighbour"];
+    NSMutableArray *returnArray = [[NSMutableArray alloc]init];
+    
+    for (int i=0; i<[keyArray count]; i++) {
+        NSString *key = keyArray[i];
+        if (dict[key] != (id)[NSNull null]) {
+            if ([dict[key] isEqual:@1])
+                [returnArray addObject:textArray[i]];
+        }
+    }
+    
+    return returnArray;
+}
+
+- (NSArray *) getNatureOfIssueArray: (NSDictionary *) dict {
+    NSArray *keyArray = @[kSocIssueCaregiving, kSocIssueFinancial, kSocIssueOthers];
+    NSArray *textArray = @[@"Caregiving",
+                           @"Financial",
+                           @"Others"];
     NSMutableArray *returnArray = [[NSMutableArray alloc]init];
     
     for (int i=0; i<[keyArray count]; i++) {
@@ -638,6 +1079,122 @@ typedef enum formName {
         }
     }
     return @"";
+}
+
+
+- (void) processMedProblemWithNewValue: (NSArray *) newValue andOldValue: (NSArray *) oldValue {
+    
+    if (newValue != oldValue) {
+        
+        if (newValue != nil && newValue != (id) [NSNull null]) {
+            if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
+                [oldSet addObjectsFromArray:oldValue];
+                NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
+                [newSet addObjectsFromArray:newValue];
+                
+                if ([newSet count] > [oldSet count]) {
+                    [newSet minusSet:oldSet];
+                    NSArray *array = [newSet allObjects];
+                    [self postSingleFieldWithSection:SECTION_PSFU_MED_ISSUES andFieldName:[self getFieldNameFromFaceMedProblems:[array firstObject]] andNewContent:@"1"];
+                } else {
+                    [oldSet minusSet:newSet];
+                    NSArray *array = [oldSet allObjects];
+                    [self postSingleFieldWithSection:SECTION_PSFU_MED_ISSUES andFieldName:[self getFieldNameFromFaceMedProblems:[array firstObject]] andNewContent:@"0"];
+                }
+            } else {
+                [self postSingleFieldWithSection:SECTION_PSFU_MED_ISSUES andFieldName:[self getFieldNameFromFaceMedProblems:[newValue firstObject]] andNewContent:@"1"];
+            }
+        } else {
+            if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                [self postSingleFieldWithSection:SECTION_PSFU_MED_ISSUES andFieldName:[self getFieldNameFromFaceMedProblems:[oldValue firstObject]] andNewContent:@"0"];
+            }
+        }
+    }
+}
+
+- (NSString *) getFieldNameFromFaceMedProblems: (NSString *) expenses {
+    if ([expenses containsString:@"Resident's family"]) return kMedResFamily;
+    else if ([expenses containsString:@"Resident's flatmate"]) return kMedResFlatmate;
+    else if ([expenses containsString:@"Resident's neighbour"]) return kMedResNeighbour;
+    else return kMedResident;
+}
+
+- (void) processSocialProblemWithNewValue: (NSArray *) newValue andOldValue: (NSArray *) oldValue {
+    
+    if (newValue != oldValue) {
+        
+        if (newValue != nil && newValue != (id) [NSNull null]) {
+            if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
+                [oldSet addObjectsFromArray:oldValue];
+                NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
+                [newSet addObjectsFromArray:newValue];
+                
+                if ([newSet count] > [oldSet count]) {
+                    [newSet minusSet:oldSet];
+                    NSArray *array = [newSet allObjects];
+                    [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:[self getFieldNameFromFaceSocialProblems:[array firstObject]] andNewContent:@"1"];
+                } else {
+                    [oldSet minusSet:newSet];
+                    NSArray *array = [oldSet allObjects];
+                    [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:[self getFieldNameFromFaceSocialProblems:[array firstObject]] andNewContent:@"0"];
+                }
+            } else {
+                [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:[self getFieldNameFromFaceSocialProblems:[newValue firstObject]] andNewContent:@"1"];
+            }
+        } else {
+            if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:[self getFieldNameFromFaceSocialProblems:[oldValue firstObject]] andNewContent:@"0"];
+            }
+        }
+    }
+}
+
+- (NSString *) getFieldNameFromFaceSocialProblems: (NSString *) expenses {
+    
+    if ([expenses containsString:@"Resident's family"]) return kSocialResFamily;
+    else if ([expenses containsString:@"Resident's flatmate"]) return kSocialResFlatmate;
+    else if ([expenses containsString:@"Resident's neighbour"]) return kSocialResNeighbour;
+    else return kSocialResident;
+}
+
+- (void) processNatureOfIssueWithNewValue: (NSArray *) newValue andOldValue: (NSArray *) oldValue {
+    
+    if (newValue != oldValue) {
+        
+        if (newValue != nil && newValue != (id) [NSNull null]) {
+            if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
+                [oldSet addObjectsFromArray:oldValue];
+                NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
+                [newSet addObjectsFromArray:newValue];
+                
+                if ([newSet count] > [oldSet count]) {
+                    [newSet minusSet:oldSet];
+                    NSArray *array = [newSet allObjects];
+                    [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:[self getFieldNameFromNatureOfIssue:[array firstObject]] andNewContent:@"1"];
+                } else {
+                    [oldSet minusSet:newSet];
+                    NSArray *array = [oldSet allObjects];
+                    [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:[self getFieldNameFromNatureOfIssue:[array firstObject]] andNewContent:@"0"];
+                }
+            } else {
+                [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:[self getFieldNameFromNatureOfIssue:[newValue firstObject]] andNewContent:@"1"];
+            }
+        } else {
+            if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:[self getFieldNameFromNatureOfIssue:[oldValue firstObject]] andNewContent:@"0"];
+            }
+        }
+    }
+}
+
+- (NSString *) getFieldNameFromNatureOfIssue: (NSString *) string {
+    if ([string containsString:@"Caregiving"]) return kSocIssueCaregiving;
+    else if ([string containsString:@"Financial"]) return kSocIssueFinancial;
+    else if ([string containsString:@"Others"]) return kSocIssueOthers;
+    else return @"";
 }
 
 

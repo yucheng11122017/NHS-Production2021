@@ -343,7 +343,18 @@
     
 }
 
+#pragma mark - NSNotification Methods
 
+- (void) reloadTable: (NSNotification *) notification {
+    _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
+    @synchronized (self) {
+        [self updateCellAccessory];
+        [self.tableView reloadData];    //put in the ticks
+    }
+}
+
+
+#pragma mark - Cell Accessory Update
 - (void) updateCellAccessory {
     if ([_completionCheck count] < 1) {
         _completionCheck = [[NSMutableArray alloc] init];
@@ -382,16 +393,6 @@
     }
     if (count == 3) return @1;
     else return @0;
-}
-
-#pragma mark - NSNotification Methods
-
-- (void) reloadTable: (NSNotification *) notification {
-    _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
-    @synchronized (self) {
-        [self updateCellAccessory];
-        [self.tableView reloadData];    //put in the ticks
-    }
 }
 
 #pragma mark - Navigation

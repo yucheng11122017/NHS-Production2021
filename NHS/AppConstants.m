@@ -670,58 +670,60 @@ NSString *const kPostScreenEdScore = @"post_screen_ed_score";
 #pragma mark - PSFU Questionnaire
 
 /** Medical Issues */
-NSString *const kFaceMedProb = @"face_med_problem";
+NSString *const kFaceMedProb = @"facing_med_probs";
 NSString *const kWhoFaceMedProb = @"who_face_med_prob";
 
-NSString *const kMedResident = @"med_resident";
-NSString *const kMedResFamily = @"med_resident_family";
-NSString *const kMedResFlatmate = @"med_resident_flatmate";
-NSString *const kMedResNeighbour = @"med_resident_neighbour";
+NSString *const kMedResident = @"med_prob_resi";
+NSString *const kMedResFamily = @"med_prob_fam";
+NSString *const kMedResFlatmate = @"med_prob_fm";
+NSString *const kMedResNeighbour = @"med_prob_nei";
 
-NSString *const kMedFamilyName = @"med_family_name";
-NSString *const kMedFamilyAdd = @"med_family_add";
-NSString *const kMedFamilyHp = @"med_family_hp";
-NSString *const kMedFlatmateName = @"med_flatmate_name";
-NSString *const kMedFlatmateAdd = @"med_flatmate_add";
-NSString *const kMedFlatmateHp = @"med_flatmate_hp";
-NSString *const kMedNeighbourName = @"med_neighbour_name";
-NSString *const kMedNeighbourAdd = @"med_neighbour_add";
-NSString *const kMedNeighbourHp = @"med_neighbour_hp";
+NSString *const kFamilyName = @"fam_name";
+NSString *const kFamilyAdd = @"fam_addr";
+NSString *const kFamilyHp = @"fam_hp";
+NSString *const kFlatmateName = @"fm_name";
+NSString *const kFlatmateAdd = @"fm_addr";
+NSString *const kFlatmateHp = @"fm_hp";
+NSString *const kNeighbourName = @"nei_name";
+NSString *const kNeighbourAdd = @"nei_addr";
+NSString *const kNeighbourHp = @"nei_hp";
 
-NSString *const kHaveHighBpChosCbg = @"have_high_bp_chos_cbg";
-NSString *const kHaveOtherMedIssues = @"have_other_med_issues";
-NSString *const kHistMedIssues = @"history_med_issue";
-NSString *const kPsfuSeeingDoct = @"psfu_see_doc";
-NSString *const kNhsfuFlag = @"nhsfu_flag";
+NSString *const kHaveHighBpChosCbg = @"bad_bp_chol_cbg";
+NSString *const kHaveOtherMedIssues = @"other_med_issues";
+NSString *const kHistMedIssues = @"other_med_issues_hist";
+NSString *const kPsfuSeeingDoct = @"seeing_doc_now";
+NSString *const kNhsfuFlag = @"flag_to_nhsfu";
 
 /** Social Issues */
-NSString *const kFaceSocialProb = @"face_social_problem";
+NSString *const kFaceSocialProb = @"facing_soc_probs";
 NSString *const kWhoFaceSocialProb = @"who_face_social_prob";
 
-NSString *const kSocialResident = @"social_resident";
-NSString *const kSocialResFamily = @"social_resident_family";
-NSString *const kSocialResFlatmate = @"social_resident_flatmate";
-NSString *const kSocialResNeighbour = @"social_resident_neighbour";
+NSString *const kSocialResident = @"soc_prob_resi";
+NSString *const kSocialResFamily = @"soc_prob_fam";
+NSString *const kSocialResFlatmate = @"soc_prob_fm";
+NSString *const kSocialResNeighbour = @"soc_prob_nei";
 
-NSString *const kSocialFamilyName = @"social_family_name";
-NSString *const kSocialFamilyAdd = @"social_family_add";
-NSString *const kSocialFamilyHp = @"social_family_hp";
-NSString *const kSocialFlatmateName = @"social_flatmate_name";
-NSString *const kSocialFlatmateAdd = @"social_flatmate_add";
-NSString *const kSocialFlatmateHp = @"social_flatmate_hp";
-NSString *const kSocialNeighbourName = @"social_neighbour_name";
-NSString *const kSocialNeighbourAdd = @"social_neighbour_add";
-NSString *const kSocialNeighbourHp = @"social_neighbour_hp";
+//Share the same from med issues
 
-NSString *const kNotConnectSocWkAgency = @"not_connect_soc_wk_agency";  // Q3
-NSString *const kUnwillingSeekAgency = @"unwilling_seek_agency";        // Q4
-NSString *const kNhsswFlag = @"nhssw_flag";     //auto-check if ans 3 & 4 is yes
-NSString *const kSpectrumConcerns = @"spectrum_concerns";
+//NSString *const kSocialFamilyName = @"fam_name";
+//NSString *const kSocialFamilyAdd = @"fam_addr";
+//NSString *const kSocialFamilyHp = @"fam_hp";
+//NSString *const kSocialFlatmateName = @"fm_name";
+//NSString *const kSocialFlatmateAdd = @"fm_addr";
+//NSString *const kSocialFlatmateHp = @"fm_hp";
+//NSString *const kSocialNeighbourName = @"nei_name";
+//NSString *const kSocialNeighbourAdd = @"nei_addr";
+//NSString *const kSocialNeighbourHp = @"nei_hp";
+
+NSString *const kNotConnectSocWkAgency = @"not_conn";  // Q3
+NSString *const kUnwillingSeekAgency = @"unwilling_to_seek_help";        // Q4
+NSString *const kNhsswFlag = @"flag_to_nhssw";     //auto-check if ans 3 & 4 is yes
+NSString *const kSpectrumConcerns = @"concerns";
 NSString *const kNatureOfIssue = @"nature_of_issue";
-NSString *const kSocIssueCaregiving = @"soc_issue_caregiving";
-NSString *const kSocIssueFinancial = @"soc_issue_financial";
-NSString *const kSocIssueOthers = @"soc_issue_others";
-NSString *const kSocIssueOthersText = @"soc_issue_others_text";
+NSString *const kSocIssueCaregiving = @"issue_caregiving";
+NSString *const kSocIssueFinancial = @"issue_fin";
+NSString *const kSocIssueOthers = @"issue_others";
+NSString *const kSocIssueOthersText = @"specify_issue";
 
 #pragma mark - Check Variables
 NSString *const kCheckPhleb = @"check_phleb";
@@ -760,8 +762,8 @@ NSString *const kCheckEdPostScreen = @"check_ed_post_screen";
 NSString *const kCheckHhie = @"check_hhie";
 NSString *const kCheckFuncHearing = @"check_func_hearing";
 
-NSString *const kCheckPSFUMedIssues = @"psfu_med_issues";
-NSString *const kCheckPSFUSocialIssues = @"psfu_social_issues";
+NSString *const kCheckPSFUMedIssues = @"check_psfu_med";
+NSString *const kCheckPSFUSocialIssues = @"check_psfu_social";
 
 
 

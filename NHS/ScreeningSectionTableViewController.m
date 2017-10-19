@@ -399,28 +399,6 @@ typedef enum sectionRowNumber {
 - (void) updateFormType: (NSNotification *) notification {
     formType = LoadedDraftScreeningForm;        //changed status
 }
-#pragma mark - Server API
-- (void) processConnectionStatus {
-    if(status == NotReachable)
-    {
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"No Internet!", nil)
-                                                                                  message:@"You're not connected to Internet."
-                                                                           preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * okAction){
-                                                              //                                                              [self.refreshControl endRefreshing];
-                                                          }]];
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
-    else if (status == ReachableViaWiFi || status == ReachableViaWWAN) {
-        if (_residentID != nil && _residentID != (id) [NSNull null])
-            [[ScreeningDictionary sharedInstance] fetchFromServer];
-    }
-    
-}
-
 
 #pragma mark - Post data to server methods
 

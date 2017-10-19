@@ -65,6 +65,8 @@
 #define SECTION_POST_HEALTH_EDU                 @"post_health_edu"
 #define SECTION_CHECKS                          @"checks"
 #define SECTION_POST_HEALTH_SCREEN              @"post_health_screen"
+#define SECTION_PSFU_MED_ISSUES                 @"psfu_med"
+#define SECTION_PSFU_SOCIAL_ISSUES              @"psfu_social"
 
 
 #pragma mark - UserDefaults
@@ -739,15 +741,15 @@ extern NSString *const kMedResFamily;
 extern NSString *const kMedResFlatmate;
 extern NSString *const kMedResNeighbour;
 
-extern NSString *const kMedFamilyName;
-extern NSString *const kMedFamilyAdd;
-extern NSString *const kMedFamilyHp;
-extern NSString *const kMedFlatmateName;
-extern NSString *const kMedFlatmateAdd;
-extern NSString *const kMedFlatmateHp;
-extern NSString *const kMedNeighbourName;
-extern NSString *const kMedNeighbourAdd;
-extern NSString *const kMedNeighbourHp;
+extern NSString *const kFamilyName;
+extern NSString *const kFamilyAdd;
+extern NSString *const kFamilyHp;
+extern NSString *const kFlatmateName;
+extern NSString *const kFlatmateAdd;
+extern NSString *const kFlatmateHp;
+extern NSString *const kNeighbourName;
+extern NSString *const kNeighbourAdd;
+extern NSString *const kNeighbourHp;
 
 extern NSString *const kHaveHighBpChosCbg;
 extern NSString *const kHaveOtherMedIssues;
@@ -764,15 +766,17 @@ extern NSString *const kSocialResFamily;
 extern NSString *const kSocialResFlatmate;
 extern NSString *const kSocialResNeighbour;
 
-extern NSString *const kSocialFamilyName;
-extern NSString *const kSocialFamilyAdd;
-extern NSString *const kSocialFamilyHp;
-extern NSString *const kSocialFlatmateName;
-extern NSString *const kSocialFlatmateAdd;
-extern NSString *const kSocialFlatmateHp;
-extern NSString *const kSocialNeighbourName;
-extern NSString *const kSocialNeighbourAdd;
-extern NSString *const kSocialNeighbourHp;
+// share the same from Med Issues
+
+//extern NSString *const kSocialFamilyName;
+//extern NSString *const kSocialFamilyAdd;
+//extern NSString *const kSocialFamilyHp;
+//extern NSString *const kSocialFlatmateName;
+//extern NSString *const kSocialFlatmateAdd;
+//extern NSString *const kSocialFlatmateHp;
+//extern NSString *const kSocialNeighbourName;
+//extern NSString *const kSocialNeighbourAdd;
+//extern NSString *const kSocialNeighbourHp;
 
 extern NSString *const kNotConnectSocWkAgency;
 extern NSString *const kUnwillingSeekAgency;
