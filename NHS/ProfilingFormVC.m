@@ -280,6 +280,7 @@ typedef enum formName {
             }
         }
     };
+    
     noOfPplInHouse.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if (oldValue != newValue) {
             if (mthHouseIncome.value == (id)[NSNull null] || noOfPplInHouse.value == (id)[NSNull null])
@@ -1659,15 +1660,16 @@ typedef enum formName {
 {
     [super formRowDescriptorValueHasChanged:rowDescriptor oldValue:oldValue newValue:newValue];
     NSString* ansFromYesNo;
+    
     if (newValue != (id)[NSNull null] && [newValue isKindOfClass:[NSString class]]) {
-        if ([newValue isEqualToString:@"YES"])
+        if ([newValue isEqualToString:@"YES"] || [newValue isEqualToString:@"Yes"])
             ansFromYesNo = @"1";
-        else if ([newValue isEqualToString:@"NO"])
+        else if ([newValue isEqualToString:@"NO"] || [newValue isEqualToString:@"No"])
             ansFromYesNo = @"0";
     }
     
     /* Profiling */
-    else if ([rowDescriptor.tag isEqualToString:kProfilingConsent]) {
+    if ([rowDescriptor.tag isEqualToString:kProfilingConsent]) {
         [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kProfilingConsent andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kEmployStat]) {
         [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kEmployStat andNewContent:newValue];
@@ -1729,7 +1731,7 @@ typedef enum formName {
     
     /* Diabetes Mellitus */
     
-    if ([rowDescriptor.tag isEqualToString:kDMHasInformed]) {
+    else if ([rowDescriptor.tag isEqualToString:kDMHasInformed]) {
         [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kHasInformed andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kDMCheckedBlood]) {
         [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kCheckedBlood andNewContent:newValue];
@@ -1824,7 +1826,7 @@ typedef enum formName {
         }];
     }    
     /* Profiling */
-    else if ([rowDescriptor.tag isEqualToString:kEmployReasons]) {
+    if ([rowDescriptor.tag isEqualToString:kEmployReasons]) {
         [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kEmployReasons andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kEmployOthers]) {
         [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kEmployOthers andNewContent:rowDescriptor.value];

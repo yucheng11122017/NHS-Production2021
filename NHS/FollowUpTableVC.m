@@ -49,7 +49,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     
-    return 2;
+    return 3;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -66,8 +66,10 @@
     
     if (indexPath.row == 0) {
         text = @"NHS Health Report";
-    } else {
+    } else if (indexPath.row == 1) {
         text = @"Health Education";
+    } else {
+        text = @"Questionnaire";       // recently added
     }
     
     [cell.textLabel setText:text];
@@ -86,9 +88,11 @@
         [self downloadReport];
     } else if (indexPath.row == 1) {
         [self performSegueWithIdentifier:@"FollowUpToHealthEdSegue" sender:self];
+    } else {
+        [self performSegueWithIdentifier:@"FollowUpToQuestionnaireSegue" sender:self];
     }
     
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 #pragma mark - Report Btn API

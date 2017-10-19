@@ -36,10 +36,10 @@
                     </connections>
                 </segmentedControl>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Undergone SERI Adv Eye Screening?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OUm-5I-4wX">
-                    <rect key="frame" x="16" y="12" width="281" height="21"/>
+                    <rect key="frame" x="16" y="12" width="262" height="20"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="21" id="WY3-Cu-ZXO"/>
-                        <constraint firstAttribute="width" constant="281" id="zQy-c5-8aP"/>
+                        <constraint firstAttribute="height" constant="20" id="WY3-Cu-ZXO"/>
+                        <constraint firstAttribute="width" constant="262" id="zQy-c5-8aP"/>
                     </constraints>
                     <fontDescription key="fontDescription" name="AppleSDGothicNeo-Bold" family="Apple SD Gothic Neo" pointSize="15"/>
                     <nil key="textColor"/>
@@ -50,24 +50,22 @@
             <constraints>
                 <constraint firstItem="xgA-vI-3F1" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="0II-f4-0eV"/>
                 <constraint firstItem="OUm-5I-4wX" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="12" id="2aL-hB-sKb"/>
-                <constraint firstAttribute="trailing" secondItem="OUm-5I-4wX" secondAttribute="trailing" constant="78" id="36R-Vv-Tld"/>
+                <constraint firstAttribute="trailing" secondItem="OUm-5I-4wX" secondAttribute="trailing" constant="97" id="36R-Vv-Tld"/>
                 <constraint firstItem="xgA-vI-3F1" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="KYJ-GG-6e8"/>
                 <constraint firstItem="xgA-vI-3F1" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" id="MCv-EY-ST2"/>
                 <constraint firstItem="OUm-5I-4wX" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="12" id="VeX-LA-FUE"/>
                 <constraint firstAttribute="trailing" secondItem="xgA-vI-3F1" secondAttribute="trailing" constant="16" id="XIG-iI-Exp"/>
                 <constraint firstItem="OUm-5I-4wX" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="12" id="Zhc-oY-mBm"/>
                 <constraint firstItem="OUm-5I-4wX" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="a6q-xO-hFJ"/>
-                <constraint firstAttribute="bottom" secondItem="OUm-5I-4wX" secondAttribute="bottom" constant="11" id="ef0-s8-XR4"/>
+                <constraint firstAttribute="bottom" secondItem="OUm-5I-4wX" secondAttribute="bottom" constant="12" id="ef0-s8-XR4"/>
                 <constraint firstAttribute="trailing" secondItem="xgA-vI-3F1" secondAttribute="trailing" constant="16" id="fYS-Ca-k1t"/>
                 <constraint firstItem="OUm-5I-4wX" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="16" id="mGv-In-8uH"/>
-                <constraint firstItem="xgA-vI-3F1" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="286" id="n9k-zX-hZQ"/>
+                <constraint firstItem="xgA-vI-3F1" firstAttribute="leading" relation="lessThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leading" constant="286" id="n9k-zX-hZQ"/>
                 <constraint firstItem="OUm-5I-4wX" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="16" id="nlu-5y-9Lx"/>
                 <constraint firstItem="OUm-5I-4wX" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="16" id="p5O-cU-SQ6"/>
-                <constraint firstItem="xgA-vI-3F1" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="286" id="rMa-oG-doh"/>
                 <constraint firstItem="xgA-vI-3F1" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="s38-k2-bUU"/>
                 <constraint firstItem="OUm-5I-4wX" firstAttribute="centerY" secondItem="xgA-vI-3F1" secondAttribute="centerY" id="sj8-vy-zbW"/>
                 <constraint firstItem="OUm-5I-4wX" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="uft-NR-5ah"/>
-                <constraint firstItem="xgA-vI-3F1" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="vJQ-AD-ban"/>
                 <constraint firstAttribute="bottom" secondItem="xgA-vI-3F1" secondAttribute="bottom" constant="8" id="xej-Q4-xeJ"/>
             </constraints>
             <nil key="simulatedTopBarMetrics"/>
@@ -76,6 +74,7 @@
             <connections>
                 <outlet property="segmentCtrl" destination="xgA-vI-3F1" id="7pV-12-Bic"/>
             </connections>
+            <point key="canvasLocation" x="33.5" y="94"/>
         </view>
     </objects>
 </document>

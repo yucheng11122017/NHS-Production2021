@@ -428,7 +428,7 @@ typedef enum rowTypes {
     };
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressPostCode rowType:XLFormRowDescriptorTypeInteger title:@"Postal Code"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressPostCode rowType:XLFormRowDescriptorTypePhone title:@"Postal Code"];
     row.value = _residentParticularsDict[kAddressPostCode];
     row.required = YES;
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];

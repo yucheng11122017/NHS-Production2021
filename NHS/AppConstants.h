@@ -35,6 +35,7 @@
 #define SECTION_FALL_RISK_ELIGIBLE              @"fall_risk_eligible"
 #define SECTION_GERIATRIC_DEMENTIA_ELIGIBLE     @"geriatric_dementia_eligible"
 #define SECTION_GENOGRAM                        @"genograms"
+#define SECTION_PROFILING_COMMENTS              @"profiling_comments"
 #define SECTION_DIABETES                        @"diabetes"
 #define SECTION_HYPERLIPIDEMIA                  @"hyperlipidemia"
 #define SECTION_HYPERTENSION                    @"hypertension"
@@ -177,6 +178,7 @@ extern NSString *const kPhlebAppt;
 #pragma mark - Profiling
 
 /** Eligibility Assessments */
+extern NSString *const kProfilingComments;
 extern NSString *const kProfilingConsent;
 extern NSString *const kEmployStat;
 extern NSString *const kEmployReasons;
@@ -725,6 +727,63 @@ extern NSString *const kPostScreenEdu25;
 
 extern NSString *const kPostScreenEdScore;
 
+
+#pragma mark - PSFU Questionnaire
+
+/** Medical Issues */
+extern NSString *const kFaceMedProb;
+extern NSString *const kWhoFaceMedProb;
+
+extern NSString *const kMedResident;
+extern NSString *const kMedResFamily;
+extern NSString *const kMedResFlatmate;
+extern NSString *const kMedResNeighbour;
+
+extern NSString *const kMedFamilyName;
+extern NSString *const kMedFamilyAdd;
+extern NSString *const kMedFamilyHp;
+extern NSString *const kMedFlatmateName;
+extern NSString *const kMedFlatmateAdd;
+extern NSString *const kMedFlatmateHp;
+extern NSString *const kMedNeighbourName;
+extern NSString *const kMedNeighbourAdd;
+extern NSString *const kMedNeighbourHp;
+
+extern NSString *const kHaveHighBpChosCbg;
+extern NSString *const kHaveOtherMedIssues;
+extern NSString *const kHistMedIssues;
+extern NSString *const kPsfuSeeingDoct;
+extern NSString *const kNhsfuFlag;
+
+/** Social Issues */
+extern NSString *const kFaceSocialProb;
+extern NSString *const kWhoFaceSocialProb;
+
+extern NSString *const kSocialResident;
+extern NSString *const kSocialResFamily;
+extern NSString *const kSocialResFlatmate;
+extern NSString *const kSocialResNeighbour;
+
+extern NSString *const kSocialFamilyName;
+extern NSString *const kSocialFamilyAdd;
+extern NSString *const kSocialFamilyHp;
+extern NSString *const kSocialFlatmateName;
+extern NSString *const kSocialFlatmateAdd;
+extern NSString *const kSocialFlatmateHp;
+extern NSString *const kSocialNeighbourName;
+extern NSString *const kSocialNeighbourAdd;
+extern NSString *const kSocialNeighbourHp;
+
+extern NSString *const kNotConnectSocWkAgency;
+extern NSString *const kUnwillingSeekAgency;
+extern NSString *const kNhsswFlag;
+extern NSString *const kSpectrumConcerns;
+extern NSString *const kNatureOfIssue;
+extern NSString *const kSocIssueCaregiving;
+extern NSString *const kSocIssueFinancial;
+extern NSString *const kSocIssueOthers;
+extern NSString *const kSocIssueOthersText;
+
 #pragma mark - Check Variables
 extern NSString *const kCheckPhleb;
 extern NSString *const kCheckScreenMode;
@@ -757,5 +816,7 @@ extern NSString *const kCheckFall;
 extern NSString *const kCheckDementia;
 extern NSString *const kCheckEd;
 extern NSString *const kCheckEdPostScreen;
+extern NSString *const kCheckPSFUMedIssues;
+extern NSString *const kCheckPSFUSocialIssues;
 
 @end

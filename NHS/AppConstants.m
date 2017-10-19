@@ -125,6 +125,7 @@ NSString *const kPhlebAppt = @"phleb_appt";
 #pragma mark - Profiling
 
 /** Eligibility Assessments */
+NSString *const kProfilingComments = @"comments";
 NSString *const kProfilingConsent= @"consent";
 NSString *const kEmployStat= @"employment_status";
 NSString *const kEmployReasons= @"employment_reasons";
@@ -169,21 +170,21 @@ NSString *const kSeeingDocRegularly= @"seeing_doc_regularly";
 NSString *const kCurrentlyPrescribed= @"currently_prescribed";
 NSString *const kTakingRegularly= @"taking_regularly";
 
-/* Diabetes Mellitus */
+/** Diabetes Mellitus */
 NSString *const kDMHasInformed = @"dm_has_informed";
 NSString *const kDMCheckedBlood= @"dm_checked_blood";
 NSString *const kDMSeeingDocRegularly= @"dm_seeing_doc_regularly";
 NSString *const kDMCurrentlyPrescribed= @"dm_currently_prescribed";
 NSString *const kDMTakingRegularly= @"dm_taking_regularly";
 
-/* Hyperlipidemia */
+/** Hyperlipidemia */
 NSString *const kLipidHasInformed= @"lipid_has_informed";
 NSString *const kLipidCheckedBlood= @"lipid_checked_blood";
 NSString *const kLipidSeeingDocRegularly= @"lipid_seeing_doc_regularly";
 NSString *const kLipidCurrentlyPrescribed= @"lipid_currently_prescribed";
 NSString *const kLipidTakingRegularly= @"lipid_taking_regularly";
 
-/* Hypertension */
+/** Hypertension */
 NSString *const kHTHasInformed = @"ht_has_informed";
 NSString *const kHTCheckedBp = @"ht_checked_bp";
 NSString *const kHTSeeingDocRegularly = @"ht_seeing_doc_regularly";
@@ -219,10 +220,10 @@ NSString *const kFollowUpReq = @"follow_up_req";
 
 #pragma mark - Social Work
 
-/* Demographics */
+/** Demographics */
 NSString *const kFilename = @"file_name";
 
-/* Current Socioeconomic Situation */
+/** Current Socioeconomic Situation */
 NSString *const kCopeFin = @"cope_fin";
 NSString *const kDescribeWork = @"describe_work";
 
@@ -251,7 +252,7 @@ NSString *const kFinAssistEnuf = @"fin_assist_enuf";
 NSString *const kFinAssistEnufWhy = @"fin_assist_enuf_why";
 NSString *const kSocSvcAware = @"soc_svc_aware";
 
-/* Current Physical Status */
+/** Current Physical Status */
 NSString *const kBathe = @"bathe";
 NSString *const kDress = @"dress";
 NSString *const kEat = @"eat";
@@ -262,7 +263,7 @@ NSString *const kMobilityStatus = @"mobility_status";
 NSString *const kMobilityEquipment = @"mobility_equipment";
 NSString *const kMobilityEquipmentText = @"mobility_equipment_text";
 
-/* Social Support */
+/** Social Support */
 NSString *const kHasCaregiver = @"has_caregiver";
 NSString *const kCaregiverName = @"caregiver_name";
 NSString *const kCaregiverRs = @"caregiver_rs";
@@ -306,13 +307,13 @@ NSString *const kWhyNotOthers = @"why_not_others";
 NSString *const kWhyNoParticipate = @"why_no_participate";
 NSString *const kHostOthers = @"host_others";
 
-/* Psychological well-being*/
+/** Psychological well-being*/
 NSString *const kIsPsychotic = @"is_psychotic";
 NSString *const kPsychoticRemarks = @"psychotic_remarks";
 NSString *const kSuicideIdeas = @"suicide_ideas";
 NSString *const kSuicideIdeasRemarks = @"suicide_ideas_remarks";
 
-/* Additional Services */
+/** Additional Services */
 NSString *const kBedbug = @"bedbug";
 NSString *const kDriedScars = @"dried_scars";
 NSString *const kHoardingBeh = @"hoarding_beh";
@@ -324,7 +325,7 @@ NSString *const kBedbugOthersText = @"bedbug_others_text";
 NSString *const kRequiresBedbug = @"requires_bedbug";
 NSString *const kRequiresDecluttering = @"requires_decluttering";
 
-/* Summary */
+/** Summary */
 NSString *const kFinancial = @"financial";
 NSString *const kEldercare = @"eldercare";
 NSString *const kBasic = @"basic";
@@ -346,7 +347,7 @@ NSString *const kSwVolContactNum = @"sw_vol_contact_num";
 
 #pragma mark - Triage
 
-/* Clinical Results */
+/** Clinical Results */
 NSString *const kBp1Sys = @"bp1_sys";
 NSString *const kBp1Dias = @"bp1_dias";
 NSString *const kHeightCm = @"height_cm";
@@ -400,14 +401,14 @@ NSString *const kDentistReferred = @"dentist_referred";
 
 
 
-/* Medical History */
+/** Medical History */
 NSString *const kUndergoneAdvSeri = @"undergone_adv_seri";
 NSString *const kChiefComp = @"chief_comp";
 NSString *const kOcuHist = @"ocu_hist";
 NSString *const kHealthHist = @"health_hist";
 NSString *const kMedHistComments = @"med_hist_comments";
 
-/* Visual Acuity */
+/** Visual Acuity */
 NSString *const kVaDone = @"va_done";
 NSString *const kVa = @"va";
 NSString *const kVaSnellenOd = @"va_snellen_od";
@@ -424,7 +425,7 @@ NSString *const kNearLogmarOs = @"near_logmar_os";
 NSString *const kNearNxOs = @"near_nx_os";
 NSString *const kVaComments = @"va_comments";
 
-/* Autorefractor */
+/** Autorefractor */
 NSString *const kAutoDone = @"auto_done";
 NSString *const kSpRightR1 = @"sp_right_r1";
 NSString *const kSpRightR2 = @"sp_right_r2";
@@ -471,13 +472,13 @@ NSString *const kKerAxLeftR2 = @"ker_ax_left_r2";
 NSString *const kPupilDist = @"pupil_dist";
 NSString *const kAutorefractorComment = @"autorefractor_comment";
 
-/* Intra-ocular Pressure */
+/** Intra-ocular Pressure */
 NSString *const kIopDone = @"iop_done";
 NSString *const kIopRight = @"iop_right";
 NSString *const kIopLeft = @"iop_left";
 NSString *const kIopComment = @"iop_comment";
 
-/* Anterior Health Examination */
+/** Anterior Health Examination */
 NSString *const kAheDone = @"ahe_done";
 NSString *const kAheOd = @"ahe_od";
 NSString *const kAheOdRemark = @"ahe_od_remark";
@@ -485,7 +486,7 @@ NSString *const kAheOs = @"ahe_os";
 NSString *const kAheOsRemark = @"ahe_os_remark";
 NSString *const kAheComment = @"ahe_comment";
 
-/* Posterior Health Examination */
+/** Posterior Health Examination */
 NSString *const kPheDone = @"phe_done";
 NSString *const kPheFundusOd = @"phe_fundus_od";
 NSString *const kPheFundusOdRemark = @"phe_fundus_od_remark";
@@ -493,7 +494,7 @@ NSString *const kPheFundusOs = @"phe_fundus_os";
 NSString *const kPheFundusOsRemark = @"phe_fundus_os_remark";
 NSString *const kPheComment = @"phe_comment";
 
-/* Diagnosis and Follow-up */
+/** Diagnosis and Follow-up */
 NSString *const kOdNormal = @"od_normal";
 NSString *const kOdRefractive = @"od_refractive";
 NSString *const kOdCataract = @"od_cataract";
@@ -551,7 +552,7 @@ NSString *const kReqFollowupGDA = @"req_followup";
 
 #pragma mark - Health Education
 
-/* General education field for submission */
+/** General education field for submission */
 NSString *const kEdu1 = @"edu_1";
 NSString *const kEdu2 = @"edu_2";
 NSString *const kEdu3 = @"edu_3";
@@ -581,7 +582,7 @@ NSString *const kPreEdScore = @"pre_ed_score";
 
 
 
-/* Pre-education Knowledge Quiz */
+/** Pre-education Knowledge Quiz */
 NSString *const kPreEdu1 = @"pre_edu_01";
 NSString *const kPreEdu2 = @"pre_edu_02";
 NSString *const kPreEdu3 = @"pre_edu_03";
@@ -608,7 +609,7 @@ NSString *const kPreEdu23 = @"pre_edu_23";
 NSString *const kPreEdu24 = @"pre_edu_24";
 NSString *const kPreEdu25 = @"pre_edu_25";
 
-/* Post-education Knowledge Quiz */
+/** Post-education Knowledge Quiz */
 NSString *const kPostEdu1 = @"post_edu_01";
 NSString *const kPostEdu2 = @"post_edu_02";
 NSString *const kPostEdu3 = @"post_edu_03";
@@ -637,7 +638,7 @@ NSString *const kPostEdu25 = @"post_edu_25";
 NSString *const kPostEdScore = @"post_ed_score";
 NSString *const kDateEd = @"date_ed";
 
-/* Post-screening Knowledge Quiz */
+/** Post-screening Knowledge Quiz */
 NSString *const kPostScreenEdu1 = @"post_screen_edu_01";
 NSString *const kPostScreenEdu2 = @"post_screen_edu_02";
 NSString *const kPostScreenEdu3 = @"post_screen_edu_03";
@@ -665,6 +666,62 @@ NSString *const kPostScreenEdu24 = @"post_screen_edu_24";
 NSString *const kPostScreenEdu25 = @"post_screen_edu_25";
 
 NSString *const kPostScreenEdScore = @"post_screen_ed_score";
+
+#pragma mark - PSFU Questionnaire
+
+/** Medical Issues */
+NSString *const kFaceMedProb = @"face_med_problem";
+NSString *const kWhoFaceMedProb = @"who_face_med_prob";
+
+NSString *const kMedResident = @"med_resident";
+NSString *const kMedResFamily = @"med_resident_family";
+NSString *const kMedResFlatmate = @"med_resident_flatmate";
+NSString *const kMedResNeighbour = @"med_resident_neighbour";
+
+NSString *const kMedFamilyName = @"med_family_name";
+NSString *const kMedFamilyAdd = @"med_family_add";
+NSString *const kMedFamilyHp = @"med_family_hp";
+NSString *const kMedFlatmateName = @"med_flatmate_name";
+NSString *const kMedFlatmateAdd = @"med_flatmate_add";
+NSString *const kMedFlatmateHp = @"med_flatmate_hp";
+NSString *const kMedNeighbourName = @"med_neighbour_name";
+NSString *const kMedNeighbourAdd = @"med_neighbour_add";
+NSString *const kMedNeighbourHp = @"med_neighbour_hp";
+
+NSString *const kHaveHighBpChosCbg = @"have_high_bp_chos_cbg";
+NSString *const kHaveOtherMedIssues = @"have_other_med_issues";
+NSString *const kHistMedIssues = @"history_med_issue";
+NSString *const kPsfuSeeingDoct = @"psfu_see_doc";
+NSString *const kNhsfuFlag = @"nhsfu_flag";
+
+/** Social Issues */
+NSString *const kFaceSocialProb = @"face_social_problem";
+NSString *const kWhoFaceSocialProb = @"who_face_social_prob";
+
+NSString *const kSocialResident = @"social_resident";
+NSString *const kSocialResFamily = @"social_resident_family";
+NSString *const kSocialResFlatmate = @"social_resident_flatmate";
+NSString *const kSocialResNeighbour = @"social_resident_neighbour";
+
+NSString *const kSocialFamilyName = @"social_family_name";
+NSString *const kSocialFamilyAdd = @"social_family_add";
+NSString *const kSocialFamilyHp = @"social_family_hp";
+NSString *const kSocialFlatmateName = @"social_flatmate_name";
+NSString *const kSocialFlatmateAdd = @"social_flatmate_add";
+NSString *const kSocialFlatmateHp = @"social_flatmate_hp";
+NSString *const kSocialNeighbourName = @"social_neighbour_name";
+NSString *const kSocialNeighbourAdd = @"social_neighbour_add";
+NSString *const kSocialNeighbourHp = @"social_neighbour_hp";
+
+NSString *const kNotConnectSocWkAgency = @"not_connect_soc_wk_agency";  // Q3
+NSString *const kUnwillingSeekAgency = @"unwilling_seek_agency";        // Q4
+NSString *const kNhsswFlag = @"nhssw_flag";     //auto-check if ans 3 & 4 is yes
+NSString *const kSpectrumConcerns = @"spectrum_concerns";
+NSString *const kNatureOfIssue = @"nature_of_issue";
+NSString *const kSocIssueCaregiving = @"soc_issue_caregiving";
+NSString *const kSocIssueFinancial = @"soc_issue_financial";
+NSString *const kSocIssueOthers = @"soc_issue_others";
+NSString *const kSocIssueOthersText = @"soc_issue_others_text";
 
 #pragma mark - Check Variables
 NSString *const kCheckPhleb = @"check_phleb";
@@ -703,6 +760,8 @@ NSString *const kCheckEdPostScreen = @"check_ed_post_screen";
 NSString *const kCheckHhie = @"check_hhie";
 NSString *const kCheckFuncHearing = @"check_func_hearing";
 
+NSString *const kCheckPSFUMedIssues = @"psfu_med_issues";
+NSString *const kCheckPSFUSocialIssues = @"psfu_social_issues";
 
 
 

@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ProfilingTableVC : UITableViewController <UITableViewDelegate, UITableViewDataSource>
+@interface ProfilingTableVC : UITableViewController <UITableViewDelegate, UITableViewDataSource, UITextViewDelegate>
 
 @end
