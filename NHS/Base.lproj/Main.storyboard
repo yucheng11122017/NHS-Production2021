@@ -7,6 +7,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -469,11 +470,18 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Screening List" id="lqX-CG-fRh">
                         <barButtonItem key="backBarButtonItem" title="Back" id="fL8-dh-Ton"/>
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="swo-gt-Wou">
-                            <connections>
-                                <action selector="addBtnPressed:" destination="3ah-3q-ezO" id="q8k-FZ-4aa"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="swo-gt-Wou">
+                                <connections>
+                                    <action selector="addBtnPressed:" destination="3ah-3q-ezO" id="q8k-FZ-4aa"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="sorting_icon" style="plain" id="VVG-C8-ZOa" userLabel="Sorting">
+                                <connections>
+                                    <action selector="sortBtnPressed:" destination="3ah-3q-ezO" id="HMY-5t-NUj"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <segue destination="Rmh-CE-vE7" kind="show" identifier="showSelectProfileTableVC" id="gep-8f-DgT"/>
@@ -1310,6 +1318,7 @@
     <resources>
         <image name="NHS logo" width="447" height="289"/>
         <image name="camscannerIcon" width="100" height="100"/>
+        <image name="sorting_icon" width="22" height="22"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="U4k-2U-zez"/>

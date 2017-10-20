@@ -26,6 +26,7 @@ typedef enum formName {
     BOOL internetDCed;
     BOOL isFormFinalized;
     int currentForm;
+    XLFormRowDescriptor *faceSocProbRow;
 }
 
 @property (nonatomic) Reachability *hostReachability;
@@ -403,7 +404,7 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
-    XLFormRowDescriptor *faceSocProbRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFaceSocialProb rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is this resident currently facing any social problems?"];
+    faceSocProbRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFaceSocialProb rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is this resident currently facing any social problems?"];
     [self setDefaultFontWithRow:faceSocProbRow];
     faceSocProbRow.selectorOptions = @[@"Yes", @"No"];
     
@@ -597,6 +598,7 @@ typedef enum formName {
     XLFormRowDescriptor *notConnSocWkAgencyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNotConnectSocWkAgency rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is this resident currently NOT connected to a social work agency?"];
     [self setDefaultFontWithRow:notConnSocWkAgencyRow];
     notConnSocWkAgencyRow.selectorOptions = @[@"Yes", @"No"];
+    notConnSocWkAgencyRow.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", faceSocProbRow];
     
     //value
     if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kNotConnectSocWkAgency] != (id)[NSNull null]) {
@@ -611,6 +613,7 @@ typedef enum formName {
     XLFormRowDescriptor *unwillSeekAgencyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kUnwillingSeekAgency rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is this resident unwilling to seek agency help directly on their own?"];
     [self setDefaultFontWithRow:unwillSeekAgencyRow];
     unwillSeekAgencyRow.selectorOptions = @[@"Yes", @"No"];
+    unwillSeekAgencyRow.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", faceSocProbRow];
     
     //value
     if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kUnwillingSeekAgency] != (id)[NSNull null]) {
@@ -671,11 +674,13 @@ typedef enum formName {
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q_spectrum" rowType:XLFormRowDescriptorTypeInfo title:@"What is the spectrum of concern(s)?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    row.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", faceSocProbRow];
     
     [section3 addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpectrumConcerns rowType:XLFormRowDescriptorTypeTextView title:@""];
     [row.cellConfigAtConfigure setObject:@"Type here..." forKey:@"textView.placeholder"];
+    row.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", faceSocProbRow];
     //value
     if (socIssuesDict != (id)[NSNull null] && [socIssuesDict objectForKey:kSpectrumConcerns] != (id)[NSNull null]) {
         row.value = [socIssuesDict objectForKey:kSpectrumConcerns];
@@ -689,6 +694,7 @@ typedef enum formName {
     XLFormRowDescriptor *natureOfIssueRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNatureOfIssue rowType:XLFormRowDescriptorTypeMultipleSelector title:@"What is the nature of the issue?"];
     [self setDefaultFontWithRow:natureOfIssueRow];
     natureOfIssueRow.selectorOptions = @[@"Caregiving", @"Financial", @"Others"];
+    natureOfIssueRow.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", faceSocProbRow];
     
     //value
     if (socIssuesDict != (id)[NSNull null]) {
@@ -743,43 +749,47 @@ typedef enum formName {
     
     NSLog(@"%@", [self.form formValues]);
     
-    NSArray * validationErrors = [self formValidationErrors];
-    if (validationErrors.count > 0){
-        [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
-            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
-            cell.backgroundColor = [UIColor orangeColor];
-            [UIView animateWithDuration:0.3 animations:^{
-                cell.backgroundColor = [UIColor whiteColor];
-            }];
-        }];
-        [self showFormValidationError:[validationErrors firstObject]];
-        
-        return;
+    if (faceSocProbRow.value != nil && [faceSocProbRow.value isEqualToString:@"No"] && currentForm == SocialIssues ){      //special exception, ignore all required fields
+        // do nothing
     } else {
-        NSString *fieldName;
-        
-        switch ([self.formNo intValue]) {
-            case MedicalIssues: fieldName = kCheckPSFUMedIssues;
-                break;
-            case SocialIssues: fieldName = kCheckPSFUSocialIssues;
-                break;
-            default:
-                break;
-                
+        NSArray * validationErrors = [self formValidationErrors];
+        if (validationErrors.count > 0){
+            [validationErrors enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XLFormValidationStatus * validationStatus = [[obj userInfo] objectForKey:XLValidationStatusErrorKey];
+                UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:validationStatus.rowDescriptor]];
+                cell.backgroundColor = [UIColor orangeColor];
+                [UIView animateWithDuration:0.3 animations:^{
+                    cell.backgroundColor = [UIColor whiteColor];
+                }];
+            }];
+            [self showFormValidationError:[validationErrors firstObject]];
+            
+            return; //will return here if there's error
         }
-        
-        [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"1"];
-        [SVProgressHUD setMaximumDismissTimeInterval:1.0];
-        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
-        [SVProgressHUD showSuccessWithStatus:@"Completed!"];
-        
-        self.navigationItem.rightBarButtonItem = nil;
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
-        [self.form setDisabled:YES];
-        [self.tableView endEditing:YES];    //to really disable the table
-        [self.tableView reloadData];
     }
+    
+    NSString *fieldName;
+    
+    switch ([self.formNo intValue]) {
+        case MedicalIssues: fieldName = kCheckPSFUMedIssues;
+            break;
+        case SocialIssues: fieldName = kCheckPSFUSocialIssues;
+            break;
+        default:
+            break;
+            
+    }
+    
+    [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"1"];
+    [SVProgressHUD setMaximumDismissTimeInterval:1.0];
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
+    [SVProgressHUD showSuccessWithStatus:@"Completed!"];
+    
+    self.navigationItem.rightBarButtonItem = nil;
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
+    [self.form setDisabled:YES];
+    [self.tableView endEditing:YES];    //to really disable the table
+    [self.tableView reloadData];
     
     
 }
@@ -825,7 +835,12 @@ typedef enum formName {
     } else if ([rowDescriptor.tag isEqualToString:kUnwillingSeekAgency]) {
         [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:kUnwillingSeekAgency andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kNhsswFlag]) {
-        [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:kNhsswFlag andNewContent:newValue];
+        double delayInSeconds = 0.5;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            //code to be executed on the main queue after delay
+            [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:kNhsswFlag andNewContent:newValue];    //prevent miss-saving due to concurrent submission
+        });
     } else if ([rowDescriptor.tag isEqualToString:kNatureOfIssue]) {
         [self processNatureOfIssueWithNewValue:newValue andOldValue:oldValue];
     }

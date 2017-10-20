@@ -28,14 +28,12 @@ typedef enum getDataState {
     successful
 } getDataState;
 
-typedef enum residentDataSource {
-    server,
-    local
+typedef enum Category {
+    fullList,
+    flaggedList
 } residentDataSource;
 
 @interface PatientScreeningListTableViewController ()  <UISearchBarDelegate, UISearchControllerDelegate, UISearchResultsUpdating>
-
-@property (strong,nonatomic) UIBarButtonItem *addButton;
 
 @property (nonatomic, strong) UISearchController *searchController;
 
@@ -48,8 +46,8 @@ typedef enum residentDataSource {
 @property (strong, nonatomic) NSMutableArray *residentNames;
 @property (strong, nonatomic) NSMutableArray *residentScreenTimestamp;
 @property (strong, nonatomic) NSMutableDictionary *residentsGroupedInSections;
+@property (strong, nonatomic) NSMutableDictionary *residentsGroupedInFlag;
 @property (strong, nonatomic) NSMutableDictionary *retrievedResidentData;
-@property (strong, nonatomic) NSArray *localSavedFilename;
 
 @property (strong, nonatomic) NSDictionary *sampleResidentDict;
 @property (nonatomic) Reachability *hostReachability;
@@ -62,12 +60,14 @@ typedef enum residentDataSource {
     NSNumber *selectedResidentID;
     NSNumber *draftID;
     NSArray *residentSectionTitles;
+    NSArray *flaggedSectionTitles;
     NSNumber *residentDataLocalOrServer;
     BOOL loadDataFlag;
     NetworkStatus status;
     int fetchDataState;
     BOOL appTesting;
     BOOL internetDCed;
+    enum Category currentCategory;
 }
 
 - (void)viewDidLoad {
@@ -83,7 +83,7 @@ typedef enum residentDataSource {
     self.residentNames = [[NSMutableArray alloc] init];
     self.residentScreenTimestamp = [[NSMutableArray alloc] init];
     self.residentsGroupedInSections = [[NSMutableDictionary alloc] init];
-    self.localSavedFilename = [[NSArray alloc] init];
+    self.residentsGroupedInFlag = [[NSMutableDictionary alloc] init];
     fetchDataState = inactive;
     
     // Initialize the refresh control.
@@ -93,13 +93,7 @@ typedef enum residentDataSource {
     [self.refreshControl addTarget:self
                             action:@selector(refreshConnectionAndTable)
                   forControlEvents:UIControlEventValueChanged];
-    
-    [self getLocalSavedData];
-//    Reachability *reachability = [Reachability reachabilityForInternetConnection];
-//    [reachability startNotifier];
-//    
-//    status = [reachability currentReachabilityStatus];
-//    [self processConnectionStatus];
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
     
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
@@ -129,18 +123,10 @@ typedef enum residentDataSource {
     [self generateFakePatient];
     #endif
     
-    
-//    self.navigationItem.rightBarButtonItem = self.addButton;
-    
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 
 - (void) viewWillAppear:(BOOL)animated {
-    self.navigationItem.title = @"List of Screened Residents";
+    self.navigationItem.title = @"Full List of Residents";
     [super viewWillAppear:animated];
     
     [self refreshConnectionAndTable];
@@ -244,54 +230,38 @@ typedef enum residentDataSource {
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if (fetchDataState == failed) {
-        if ([self.localSavedFilename count] > 0) {
-            return 1;
-        }
-        else {
             return 0;
-        }
     } else {
-        if ([self.localSavedFilename count] > 0) {
-            return ([residentSectionTitles count]+1);
-        } else {
+        if (currentCategory == fullList)
             return [residentSectionTitles count];    //alphabets + locally saved files
-        }
+        else
+            return [flaggedSectionTitles count];
     }
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    if ([self.localSavedFilename count] > 0) {
-        if (section == 0) {
-            return @"Drafts";
-        } else {
-            NSInteger newSection = section-1;
-
-            return [residentSectionTitles objectAtIndex:(newSection)];    //because first section is for drafts.
-        }
-        
-    } else {
+    if (currentCategory == fullList) {
         return [residentSectionTitles objectAtIndex:section];
+    } else {
+        return [flaggedSectionTitles objectAtIndex:section];
     }
     
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSString *sectionTitle;
+    
     NSArray *sectionResident;
     
-    if ([self.localSavedFilename count] > 0) {
-        if(section == 0) {
-            return [self.localSavedFilename count];
-        } else {
-            // Return the number of rows in the section.
-            sectionTitle = [residentSectionTitles objectAtIndex:(section-1)];    //first section reserved for drafts.
-            sectionResident = [self.residentsGroupedInSections objectForKey:sectionTitle];
-            return [sectionResident count];
-        }
-    } else {    //no draft files
-        sectionTitle = [residentSectionTitles objectAtIndex:section];
+    if (currentCategory == fullList) {
+        NSString *sectionTitle = [residentSectionTitles objectAtIndex:section];
         sectionResident = [self.residentsGroupedInSections objectForKey:sectionTitle];
+        return [sectionResident count];
+    } else {
+        
+        
+        NSString *sectionTitle = [flaggedSectionTitles objectAtIndex:section];
+        sectionResident = [self.residentsGroupedInFlag objectForKey:sectionTitle];
         return [sectionResident count];
     }
 }
@@ -299,7 +269,10 @@ typedef enum residentDataSource {
 //Indexing purpose!
 - (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
 {
-    return residentSectionTitles;
+    if (currentCategory == fullList)
+        return residentSectionTitles;
+    else
+        return nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -310,26 +283,22 @@ typedef enum residentDataSource {
         NSArray *nib = [[NSBundle mainBundle] loadNibNamed:@"GenericTableViewCell" owner:self options:nil];
         cell = [nib objectAtIndex:0];
     }
+    NSArray *residentsInSection;
     
-    // Configure the cell...
-    NSString *sectionTitle;
-    
-    if ([self.localSavedFilename count] > 0) { //if there are local saved data...
-        if (indexPath.section == 0) {   //section for Drafts
-            NSRange range = [[self.localSavedFilename objectAtIndex:indexPath.row] rangeOfString:@"_"];
-            NSString *displayText = [[self.localSavedFilename objectAtIndex:indexPath.row] substringToIndex:(range.location)];
-            cell.nameLabel.text = @"Draft";
-            cell.NRICLabel.text = displayText;
-            cell.dateLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
-//            cell.detailTextLabel.text = [[self.localSavedFilename objectAtIndex:indexPath.row]substringFromIndex:(range.location+1)];
-            return cell;
-        } else {
-            sectionTitle = [residentSectionTitles objectAtIndex:(indexPath.section-1)];  //update sectionlist
-        }
-    } else {
+    if (currentCategory == fullList) {
+        NSString *sectionTitle;
+        
         sectionTitle = [residentSectionTitles objectAtIndex:indexPath.section];
+        residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
+    } else {
+        NSString *sectionTitle;
+        
+        sectionTitle = [flaggedSectionTitles objectAtIndex:indexPath.section];
+        residentsInSection = [self.residentsGroupedInFlag objectForKey:sectionTitle];
     }
-    NSArray *residentsInSection = [self.residentsGroupedInSections objectForKey:sectionTitle];
+    
+    
+    
     NSString *residentName = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kName];
     NSString *residentNric = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kNRIC];
 //    NSString *lastUpdatedTS = [[residentsInSection objectAtIndex:indexPath.row] objectForKey:kLastUpdateTs];
@@ -381,22 +350,7 @@ typedef enum residentDataSource {
     [self resetAllUserDefaults];
     
     if (tableView == self.tableView) {      //not in the searchResult view
-        //check if user clicked on drafts first
-        if ([self.localSavedFilename count] > 0) {
-            if (indexPath.section == 0) {   //part of the drafts...
-                selectedResidentID = [NSNumber numberWithInteger:indexPath.row];
-                //            residentDataLocalOrServer = [NSNumber numberWithInt:local];
-                //            loadDataFlag = YES;
-                draftID = [NSNumber numberWithInteger:indexPath.row];
-                selectedResidentID = @(-2); //indicate load from file
-                [self performSegueWithIdentifier:@"LoadScreeningFormSegue" sender:self];
-                
-                [tableView deselectRowAtIndexPath:indexPath animated:NO];
-                return;
-            }
-        }
         
-        //not part of draft
         selectedResident = [[NSDictionary alloc] initWithDictionary:[self findResidentInfoFromSectionRow:indexPath]];
         selectedResidentID = [selectedResident objectForKey:kResidentId];
         
@@ -469,17 +423,21 @@ typedef enum residentDataSource {
 - (NSDictionary *) findResidentInfoFromSectionRow: (NSIndexPath *)indexPath{
     
     NSInteger section;
-    if ([self.localSavedFilename count] > 0) {
-        section = indexPath.section - 1;
-    } else {
-        section = indexPath.section;
-    }
+
+    section = indexPath.section;
+    
     NSInteger row = indexPath.row;
-    
-    NSString *sectionAlphabet = [[NSString alloc] initWithString:[residentSectionTitles objectAtIndex:section]];
-    NSArray *residentsWithAlphabet = [self.residentsGroupedInSections objectForKey:sectionAlphabet];
-    
-    return [residentsWithAlphabet objectAtIndex:row];
+    if (currentCategory == fullList) {
+        NSString *sectionAlphabet = [[NSString alloc] initWithString:[residentSectionTitles objectAtIndex:section]];
+        NSArray *residentsWithAlphabet = [self.residentsGroupedInSections objectForKey:sectionAlphabet];
+        
+        return [residentsWithAlphabet objectAtIndex:row];
+    } else {
+        NSString *sectionFlag = [[NSString alloc] initWithString:[flaggedSectionTitles objectAtIndex:section]];
+        NSArray *residentsUnderFlag = [self.residentsGroupedInFlag objectForKey:sectionFlag];
+        
+        return [residentsUnderFlag objectAtIndex:row];
+    }
     
 }
 
@@ -507,6 +465,37 @@ typedef enum residentDataSource {
         [alertController.view.superview addGestureRecognizer:singleTap];    //tap elsewhere to close the alertView
     }];
 
+}
+- (IBAction)sortBtnPressed:(id)sender {
+    
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Category", nil)
+                                                                              message:@""
+                                                                       preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Full list of residents", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * action) {
+                                                          currentCategory = fullList;
+                                                          self.navigationItem.title = @"Full List of Residents";
+                                                          [self.tableView reloadData];
+                                                          [self.refreshControl endRefreshing];
+                                                      }]];
+    
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Flagged residents", nil)
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction * action) {
+                                                          currentCategory = flaggedList;
+                                                          [self flagSorting];
+                                                          self.navigationItem.title = @"Flagged Residents";
+                                                          [self.tableView reloadData];
+                                                      }]];
+    
+    
+    [self presentViewController:alertController animated:YES completion:^{
+        UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
+        alertController.view.superview.userInteractionEnabled = YES;
+        [alertController.view.superview addGestureRecognizer:singleTap];    //tap elsewhere to close the alertView
+    }];
+    
 }
 
 -(void)handleSingleTap:(UITapGestureRecognizer *)sender{
@@ -679,15 +668,6 @@ typedef enum residentDataSource {
 
 #pragma mark - Screening Resident API
 
-- (void)getLocalSavedData {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *folderPath = [documentsDirectory stringByAppendingString:@"/Screening"];
-    
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
-    self.localSavedFilename = [fileManager contentsOfDirectoryAtPath:folderPath
-                                                               error:nil];
-}
 
 - (void)getAllScreeningResidents {
     if (!appTesting) {
@@ -737,7 +717,6 @@ typedef enum residentDataSource {
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))successBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
-        int i;
         [self.residentNames removeAllObjects];   //reset this array first
         [self.residentScreenTimestamp removeAllObjects];   //reset this array first
         NSArray *patients = [responseObject objectForKey:@"0"];      //somehow double brackets... (())
@@ -750,22 +729,11 @@ typedef enum residentDataSource {
         
         
         
-        self.screeningResidents = [[NSMutableArray alloc] initWithArray:mutArray];
+        self.screeningResidents = [[NSMutableArray alloc] initWithArray:mutArray];  // of a specific neighbourhood, eg. Kampong Glam
         
-        NSSortDescriptor *sortDescriptor;
-        sortDescriptor = [[NSSortDescriptor alloc] initWithKey:kName ascending:YES];
-        NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
-        self.screeningResidents = [[self.screeningResidents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
-        
-        for (i=0; i<[self.screeningResidents count]; i++) {
-            [self.residentNames addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:kName]];
-            [self.residentScreenTimestamp addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:kLastUpdateTs]];
-        }
-        
-        //sort alphabetically
-        self.residentNames = [[self.residentNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] mutableCopy];
-        
-        [self putNamesIntoSections];
+        [self fullNamelistSort];
+        [self putNamesIntoSections];    //for full list of residents (A-Z sections)
+        currentCategory = fullList;
         [self.tableView reloadData];
         [self.refreshControl endRefreshing];
     };
@@ -823,6 +791,8 @@ typedef enum residentDataSource {
     };
 }
 
+#pragma mark - Sorting Methods
+
 - (void) putNamesIntoSections {
     NSArray *letters = [@"A B C D E F G H I J K L M N O P Q R S T U V W X Y Z" componentsSeparatedByString:@" "];
     NSMutableArray *temp = [[NSMutableArray alloc] init];
@@ -831,12 +801,12 @@ typedef enum residentDataSource {
     for(int i=0;i<26;i++) {
         for (int j=0; j<[self.residentNames count]; j++) {
             if([[[self.residentNames objectAtIndex:j] uppercaseString] hasPrefix:[[letters objectAtIndex:i] uppercaseString]]) {
-                [temp addObject:[self.screeningResidents objectAtIndex:j]];
+                [temp addObject:[self.screeningResidents objectAtIndex:j]];     // using the same index of the residentNames, add the dictionary to temp
                 found = TRUE;
             }
             if(j==([self.residentNames count]-1)) {  //reached the end
                 if (found) {
-                    [self.residentsGroupedInSections setObject:temp forKey:[letters objectAtIndex:i]];
+                    [self.residentsGroupedInSections setObject:temp forKey:[letters objectAtIndex:i]];  //add the residents' details into respective alphabets
                     temp = [temp mutableCopy];
                     [temp removeAllObjects];
                 }
@@ -844,10 +814,86 @@ typedef enum residentDataSource {
         }
         found = FALSE;
     }
-    //    NSLog(@"%@", self.patientsGroupedInSections);
+
     residentSectionTitles = [[self.residentsGroupedInSections allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];     //get the keys in alphabetical order
 }
 
+- (void) fullNamelistSort {
+    NSSortDescriptor *sortDescriptor;
+    sortDescriptor = [[NSSortDescriptor alloc] initWithKey:kName ascending:YES];
+    NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
+    self.screeningResidents = [[self.screeningResidents sortedArrayUsingDescriptors:sortDescriptors] mutableCopy];      //sorted patients array
+    
+    for (int i=0; i<[self.screeningResidents count]; i++) {
+        [self.residentNames addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:kName]];
+        [self.residentScreenTimestamp addObject:[[self.screeningResidents objectAtIndex:i] objectForKey:kLastUpdateTs]];
+    }
+    
+    //sort alphabetically
+    self.residentNames = [[self.residentNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] mutableCopy];
+}
+
+- (void) flagSorting {
+    int i;
+    BOOL nhsfuFlag = false, nhsswFlag = false;
+    
+    [_residentsGroupedInFlag removeAllObjects];
+    
+    NSMutableArray *nhsfuArray, *nhsswArray, *bothArray;
+    nhsfuArray = [[NSMutableArray alloc] init];
+    nhsswArray = [[NSMutableArray alloc] init];
+    bothArray = [[NSMutableArray alloc] init];
+    
+    for (i=0; i < self.screeningResidents.count ; i++) {
+        NSDictionary *dict = _screeningResidents[i];
+        
+        if ([dict objectForKey:kNhsfuFlag] && [dict objectForKey:kNhsfuFlag] != (id)[NSNull null]) {
+            nhsfuFlag = [[dict objectForKey:kNhsfuFlag] boolValue];
+        }
+        if ([dict objectForKey:kNhsswFlag] && [dict objectForKey:kNhsswFlag] != (id)[NSNull null]) {
+            nhsswFlag = [[dict objectForKey:kNhsswFlag] boolValue];
+        }
+        
+        if (nhsfuFlag && nhsswFlag) {
+//            NSLog(@"Both: %@", [[_screeningResidents objectAtIndex:i] objectForKey:@"resident_name"]);
+            [bothArray addObject:dict];
+            nhsfuFlag = nhsswFlag = 0;      //reset before continuing
+            continue;
+        }
+        
+        if (nhsfuFlag) {
+//            NSLog(@"NHSFU: %@", [[_screeningResidents objectAtIndex:i] objectForKey:@"resident_name"]);
+            [nhsfuArray addObject:dict];
+        } else if (nhsswFlag) {
+//            NSLog(@"NHSSW: %@", [[_screeningResidents objectAtIndex:i] objectForKey:@"resident_name"]);
+            [nhsswArray addObject:dict];
+        }
+        
+        nhsfuFlag = nhsswFlag = 0;      //reset before continuing
+    }
+    
+    if ([nhsfuArray count] > 0 ) {
+        [self.residentsGroupedInFlag setObject:nhsfuArray forKey:@"Flagged to NHSFU"];
+    }
+    if ([nhsswArray count] > 0 ) {
+        [self.residentsGroupedInFlag setObject:nhsswArray forKey:@"Flagged to NHSSW"];
+    }
+    if ([bothArray count] > 0) {
+        [self.residentsGroupedInFlag setObject:bothArray forKey:@"Flagged to BOTH"];
+    }
+    
+    flaggedSectionTitles = [self.residentsGroupedInFlag allKeys];
+    
+    // Make sure that BOTH is the last index
+    if ([flaggedSectionTitles containsObject:@"Flagged to BOTH"]) {
+        NSUInteger index = [flaggedSectionTitles indexOfObject:@"Flagged to BOTH"];
+        if (index != [flaggedSectionTitles count] -1) {
+            NSMutableArray *temp = [flaggedSectionTitles mutableCopy];
+            [temp exchangeObjectAtIndex:index withObjectAtIndex:([flaggedSectionTitles count] -1)];
+            flaggedSectionTitles = temp;
+        }
+    }
+}
 
 #pragma mark - NSNotification Methods
 
@@ -859,7 +905,6 @@ typedef enum residentDataSource {
         [self getAllDataForOneResident];
     }
     else {
-        [self getLocalSavedData];
 #ifndef DISABLE_SERVER_DATA_FETCH
         [self getAllScreeningResidents];
 #endif
@@ -962,6 +1007,8 @@ typedef enum residentDataSource {
     [self.tableView reloadData];
     [self.refreshControl endRefreshing];
 }
+
+#pragma mark - UserDefaults methods
 
 - (void) resetAllUserDefaults {
     BOOL isComm = [[[NSUserDefaults standardUserDefaults] objectForKey:@"isComm"] boolValue];
