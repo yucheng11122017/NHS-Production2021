@@ -121,7 +121,9 @@ static KAStatusBar *sharedView;
         
     if(!delay){
         // Place activity indicator based on text length
-        CGSize textSize = [status sizeWithFont:[self.messageLabel font]];
+//        CGSize textSize = [status sizeWithFont:[self.messageLabel font]];     //deprecated
+        CGSize textSize = [status sizeWithAttributes:@{NSFontAttributeName: [self.messageLabel font]}];
+        
         float xOffset = (self.messageLabel.frame.size.width - textSize.width)/2;
         self.activityIndicator.transform = CGAffineTransformMakeTranslation(xOffset, 0);
         

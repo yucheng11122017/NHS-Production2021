@@ -603,6 +603,7 @@ typedef enum Category {
     [NSCompoundPredicate andPredicateWithSubpredicates:andMatchPredicates];
     searchResults = [[searchResults filteredArrayUsingPredicate:finalCompoundPredicate] mutableCopy];
     
+    NSLog(@"%@", searchResults);
     // hand over the filtered results to our search results table
     SearchResultsTableController *tableController = (SearchResultsTableController *)self.searchController.searchResultsController;
     tableController.filteredProducts = searchResults;

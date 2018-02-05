@@ -878,7 +878,7 @@ typedef enum formName {
     }
     
     else if ([rowDescriptor.tag isEqualToString:kHistMedIssues]) {
-        [self postSingleFieldWithSection:SECTION_PSFU_SOCIAL_ISSUES andFieldName:kHistMedIssues andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_PSFU_MED_ISSUES andFieldName:kHistMedIssues andNewContent:rowDescriptor.value];
     }
     
     /** Social Issues */
