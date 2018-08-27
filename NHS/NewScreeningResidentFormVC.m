@@ -58,7 +58,7 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Submit" style:UIBarButtonItemStyleDone target:self action:@selector(submitBtnPressed:)];
     
     [super viewDidLoad];
-
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -178,7 +178,7 @@
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];   /// NEW SECTION
     [formDescriptor addFormSection:section];
-
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNokRelationship rowType:XLFormRowDescriptorTypeSelectorPush title:@"Relationship to resident"]; //i.e. (resident's ______)
     row.required = YES;
     row.selectorOptions = @[@"Son", @"Daughter", @"Nephew", @"Niece", @"Father", @"Mother", @"Uncle", @"Aunt", @"Other", @"Nil"];
@@ -227,7 +227,7 @@
             }
         }
     };
-
+    
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];   /// NEW SECTION
     [formDescriptor addFormSection:section];
@@ -315,8 +315,8 @@
     [section addFormRow:wantFreeBtRow];
     
     XLFormRowDescriptor *sporeanRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr
-                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"Singaporean?"];
+                                                                            rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                              title:@"Singaporean?"];
     [self setDefaultFontWithRow:sporeanRow];
     sporeanRow.selectorOptions = @[@"Yes",@"No"];
     sporeanRow.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -324,8 +324,8 @@
     [section addFormRow:sporeanRow];
     
     XLFormRowDescriptor *prRow = [XLFormRowDescriptor formRowDescriptorWithTag:kIsPr
-                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"PR?"];
+                                                                       rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                         title:@"PR?"];
     [self setDefaultFontWithRow:prRow];
     prRow.selectorOptions = @[@"Yes",@"No"];
     prRow.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -354,8 +354,8 @@
     };
     
     XLFormRowDescriptor *age40aboveRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeCheck
-                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"Age 40 and above?"];
+                                                                               rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                                 title:@"Age 40 and above?"];
     [self setDefaultFontWithRow:age40aboveRow];
     age40aboveRow.disabled = @YES;
     age40aboveRow.selectorOptions = @[@"Yes",@"No"];
@@ -384,7 +384,7 @@
             }
         }
     };
-
+    
     age40aboveRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:age40aboveRow];
     
@@ -406,16 +406,16 @@
     [section addFormRow:noFollowUpPcpRow];
     
     XLFormRowDescriptor *noBloodTestRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNoBloodTest
-                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"Have not taken a blood test in the past 3 years?"];
+                                                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                                  title:@"Have not taken a blood test in the past 3 years?"];
     [self setDefaultFontWithRow:noBloodTestRow];
     noBloodTestRow.selectorOptions = @[@"Yes",@"No"];
     noBloodTestRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:noBloodTestRow];
     
     XLFormRowDescriptor *eligibleBTRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"eligible_BT"
-                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"Is resident eligible for a blood test? (auto-calculated)"];
+                                                                               rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                                 title:@"Is resident eligible for a blood test? (auto-calculated)"];
     [self setDefaultFontWithRow:eligibleBTRow];
     eligibleBTRow.disabled = @YES;
     eligibleBTRow.selectorOptions = @[@"Yes",@"No"];
@@ -609,7 +609,7 @@
                     apptDateQRow.hidden = @NO;
                     phlebApptQRow.hidden = @YES;
                     phlebApptRow.hidden = @YES;
-
+                    
                 } else {
                     apptDateRow.hidden = @YES;
                     apptDateQRow.hidden = @YES;
@@ -656,133 +656,17 @@
         }
     };
     
-//    XLFormRowDescriptor *phlebApptRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhlebAppt rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Phlebotomy Appointment"];
-//    phlebApptRow.required = NO;
-//
-//    if ([screenModeRow.value isEqualToString:@"Door-to-door"] && qualifyPhleb)
-//        phlebApptRow.disabled = @0;
-//    else
-//        phlebApptRow.disabled = @1;
-//
-//
-//    if ([neighbourhood isEqualToString:@"Eunos Crescent"]) {
-//        phlebApptRow.selectorOptions = @[@"9 Sept, 8-11am", @"10 Sept, 8-11am"];
-//    } else {
-//        phlebApptRow.selectorOptions = @[@"7 Oct, 8-11am", @"8 Oct, 8-11am"];
-//    }
-//    phlebApptRow.noValueDisplayText = @"Tap here";
-//    [self setDefaultFontWithRow:phlebApptRow];
-//    [section addFormRow:phlebApptRow];
-//
-//    if (screenModeRow.value != (id)[NSNull null] && screeningDateRow.value != (id)[NSNull null]) {
-//        if ([screenModeRow.value isEqualToString:@"Centralised"] && [screeningDateRow.value isEqualToString:@"7 Oct"]) {       // 2 initial conditions to fulfill
-//            //            ticketNumRow.hidden = @NO;
-//            //            ticketNumRow.required = YES;
-//
-//            phlebApptRow.selectorOptions = @[@"7 Oct, 7-7.45am", @"7 Oct, 7.45-8.15am", @"8 Oct, 8-11am"];
-//
-//            if (qualifyPhleb) {
-//                phlebApptRow.disabled = @NO;
-//                phlebApptRow.required = YES;
-//            }
-//        }
-//    }
-//
-//    screenModeRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-//        if (newValue != oldValue) {
-//
-//            if ([newValue isEqualToString:@"Door-to-door"] && qualifyPhleb) {    //need to be door-to-door and qualify for phleb too!
-//
-//                if ([neighbourhood containsString:@"Kampong"]) {
-//                    phlebApptRow.selectorOptions = @[@"7 Oct, 8-11am", @"8 Oct, 8-11am"];
-//                }
-//                phlebApptRow.disabled = @0;
-//                phlebApptRow.required = YES;
-//            } else if ([newValue isEqualToString:@"Door-to-door"]) {
-//                d2dTimeRow.required = YES;
-//            }
-//            else {
-//                phlebApptRow.disabled = @1;
-//                phlebApptRow.required = NO;
-//            }
-//
-//            if ([newValue isEqualToString:@"Centralised"] && (screeningDateRow.value != (id) [NSNull null]) && [screeningDateRow.value isEqualToString:@"7 Oct"]) {
-//                //                ticketNumRow.hidden = @NO;
-//                //                ticketNumRow.required = YES;
-//
-//                if ([neighbourhood containsString:@"Kampong"]) {
-//                    phlebApptRow.selectorOptions = @[@"7 Oct, 7-7.45am", @"7 Oct, 7.45-8.15am", @"8 Oct, 8-11am"];
-//                }
-//
-//                if (qualifyPhleb) {  //3rd condition need to be met too!
-//                    phlebApptRow.disabled = @NO;
-//                    phlebApptRow.required = YES;
-//                } else {
-//                    phlebApptRow.disabled = @YES;
-//                    phlebApptRow.required = NO;
-//                }
-//            } else if ([newValue isEqualToString:@"Centralised"]) {
-//                d2dTimeRow.required = NO;
-//            }
-//            else {    // if the above 2 conditions are not met
-//                //                ticketNumRow.hidden = @YES;
-//                //                ticketNumRow.required = NO;
-//            }
-//            [self reloadFormRow:phlebApptRow];
-//            //            [self reloadFormRow:ticketNumRow];
-//        }
-//    };
-//
-//    screeningDateRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-//        if (newValue != oldValue) {
-//            if (newValue != nil && newValue != (id) [NSNull null]) {
-//                if ([newValue isEqualToString:@"7 Oct"]) {
-//
-//                    d2dTimeRow.selectorOptions = @[@"10am-12pm", @"12pm-2pm", @"2pm-4pm"];
-//
-//                    if ([screenModeRow.value isEqualToString:@"Centralised"]) {
-//
-//                        if ([neighbourhood containsString:@"Kampong"]) {
-//                            phlebApptRow.selectorOptions = @[@"7 Oct, 7-7.45am", @"7 Oct, 7.45-8.15am", @"8 Oct, 8-11am"];
-//                            //                            ticketNumRow.hidden = @NO;
-//                            //                            ticketNumRow.required = YES;
-//                        }
-//
-//                        if (qualifyPhleb) {
-//                            phlebApptRow.disabled = @NO;
-//                            phlebApptRow.required = YES;
-//                        } else {
-//                            phlebApptRow.disabled = @YES;
-//                            phlebApptRow.required = NO;
-//                        }
-//                    } else {    // Door-to-door (7th October)
-//                        //                        ticketNumRow.hidden = @YES;
-//                        //                        ticketNumRow.required = NO;
-//                    }
-//
-//                } else if ([newValue isEqualToString:@"8 Oct"]) {
-//
-//                    if ([neighbourhood containsString:@"Kampong"]) {
-//                        phlebApptRow.selectorOptions = @[@"7 Oct, 8-11am", @"8 Oct, 8-11am"];
-//                        d2dTimeRow.selectorOptions = @[@"8am-10am", @"10am-12pm", @"12pm-2pm", @"2pm-4pm"];
-//                        //                        ticketNumRow.hidden = @YES;
-//                        //                        ticketNumRow.required = NO;
-//
-//                        if ([screenModeRow.value isEqualToString:@"Centralised"]) {
-//                            phlebApptRow.disabled = @YES;
-//                            phlebApptRow.required = NO;
-//                        }
-//                    }
-//                }
-//                //                [self updateFormRow:ticketNumRow];
-//                [self updateFormRow:d2dTimeRow];
-//                [self updateFormRow:phlebApptRow];
-//            }
-//        }
-//    };
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Notes"];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *commentsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNotes rowType:XLFormRowDescriptorTypeTextView title:@""];
+    [commentsRow.cellConfigAtConfigure setObject:@"Notes..." forKey:@"textView.placeholder"];
+    commentsRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:commentsRow];
+    
+    [section addFormRow:commentsRow];
     
     
-
     return [super initWithForm:formDescriptor];
 }
 
@@ -848,7 +732,7 @@
                                         encoding:NSUTF8StringEncoding];
                   NSLog(@"error: %@", errorString);
                   
-
+                  
               }];
         return;
     } else if ([rowDescriptor.tag isEqualToString:kNRIC2]) {
@@ -871,7 +755,7 @@
     } else if ([rowDescriptor.tag isEqualToString:kAddressOthersBlock])  {
         NSString *blkNumber = rowDescriptor.value;
         if ([rowDescriptor.value containsString:@"Blk "]) {
-           blkNumber  = [[rowDescriptor.value mutableCopy] stringByReplacingOccurrencesOfString:@"Blk " withString:@""];
+            blkNumber  = [[rowDescriptor.value mutableCopy] stringByReplacingOccurrencesOfString:@"Blk " withString:@""];
         } else if ([rowDescriptor.value containsString:@"BLK "]) {
             blkNumber = [[rowDescriptor.value mutableCopy] stringByReplacingOccurrencesOfString:@"BLK " withString:@""];
         } else if ([rowDescriptor.value containsString:@"Block "]) {
@@ -936,17 +820,15 @@
         
         if ([fields objectForKey:kGender] != [NSNull null]) {
             if ([[fields objectForKey:kGender] isEqualToString:@"Male"]) {
-                //            [resi_particulars setObject:@"M" forKey:kGender];
                 gender = @"M";
             } else if ([[fields objectForKey:kGender] isEqualToString:@"Female"]) {
                 gender = @"F";
-                //            [resi_particulars setObject:@"F" forKey:kGender];
             }
         }
         NSString *CAPSed = [fields[kName] uppercaseString];
         name = CAPSed;
         
-//        name = fields[kName];
+        //        name = fields[kName];
         nric = fields[kNRIC];
         
         birthDate = [self getDateStringFromFormValue:fields andRowTag:kBirthDate];
@@ -989,11 +871,34 @@
                                 kNoBloodTest:[self getOneZerofromYesNo:[fields objectForKey:kNoBloodTest]],
                                 kDidPhleb:[fields objectForKey:kDidPhleb]
                                 };
+        
+        NSDictionary *dict3 = @{kScreenMode:[fields objectForKey:kScreenMode],
+                                kNotes:[fields objectForKey:kNotes],
+                                kCentralDate:[fields objectForKey:kCentralDate],
+                                kPhlebAppt:[fields objectForKey:kPhlebAppt],
+                                kApptDate:[fields objectForKey:kApptDate]
+                                };
+        
+        //        NSMutableDictionary *mutDict3 = [dict3 mutableCopy];
+        //        if ([fields objectForKey:kCentralDate] != (id)[NSNull null] && [fields objectForKey:kCentralDate]) {
+        //            [mutDict3 setObject:[fields objectForKey:kCentralDate] forKey:kCentralDate];
+        //        }
+        //        if ([fields objectForKey:kPhlebAppt] != (id)[NSNull null] && [fields objectForKey:kPhlebAppt]) {
+        //            [mutDict3 setObject:[fields objectForKey:kPhlebAppt] forKey:kPhlebAppt];
+        //        }
+        //        if ([fields objectForKey:kApptDate] != (id)[NSNull null] && [fields objectForKey:kApptDate]) {
+        //            [mutDict3 setObject:[fields objectForKey:kApptDate] forKey:kApptDate];
+        //        }
+        //
+        //        dict3 = mutDict3;   //replace the original dictionary
+        
         NSDictionary *finalDict = @{@"resi_particulars": dict,
-                                    @"phlebotomy_eligibility_assmt": dict2};
+                                    @"phlebotomy_eligibility_assmt": dict2,
+                                    @"mode_of_screening":dict3
+                                    };
         
         [self submitNewResidentEntry:finalDict];
-
+        
     }
 }
 
@@ -1083,7 +988,7 @@
                                                               //do nothing for now
                                                           }]];
         [self presentViewController:alertController animated:YES completion:nil];
-
+        
         
     };
 }
@@ -1122,7 +1027,7 @@
 - (NSString *) getStreetFromAddress: (NSString *) string {
     
     if ([neighbourhood isEqualToString:@"Kampong Glam"]) {
-            if ([string containsString:@"Beach"]) return @"Beach Rd";
+        if ([string containsString:@"Beach"]) return @"Beach Rd";
         else if ([string containsString:@"North"]) return @"North Bridge Rd";
         else if ([string containsString:@"Sultan"]) return @"Jln Sultan";
         else return @"Others";
@@ -1159,7 +1064,7 @@
     else if ([language isEqualToString:@"Teochew"]) fieldName = kLangTeoChew;
     else if ([language isEqualToString:@"Others"]) fieldName = kLangOthers;
     
-//    [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:fieldName andNewContent:value];
+    //    [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:fieldName andNewContent:value];
 }
 
 - (NSDictionary *) addLangFieldsIfAny: (NSDictionary *) dict {
@@ -1278,13 +1183,13 @@
 
 
 /*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
 
 @end
