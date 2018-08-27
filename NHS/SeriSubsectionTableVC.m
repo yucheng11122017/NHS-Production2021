@@ -79,16 +79,16 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 2;
+    return 1;
 }
 
 - (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {    // fixed font style. use custom view (UILabel) if you want something different
-    if (section == 0) {
-        return @"Optional check";
-    }
-    else {
+//    if (section == 0) {
+//        return @"Optional check";
+//    }
+//    else {
         return @"Sub-sections";
-    }
+//    }
 }
 
 
@@ -97,82 +97,82 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 0)
-        return 44;
-    else if (indexPath.section==1)
+//    if (indexPath.section == 0)
+//        return 44;
+//    else if (indexPath.section==1)
         return DEFAULT_ROW_HEIGHT_FOR_SECTIONS;
-    else
-        return DEFAULT_ROW_HEIGHT_FOR_SECTIONS;
+//    else
+//        return DEFAULT_ROW_HEIGHT_FOR_SECTIONS;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (section == 0) {
-        return 1;
-    } else {
+//    if (section == 0) {
+//        return 1;
+//    } else {
         return [rowTitleArray count];
-    }
+//    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    if (indexPath.section == 0) {
-        SegmentedCell *cell = [tableView dequeueReusableCellWithIdentifier:@"SegmentedCell"];
-        if (cell == nil) {
-            // Load the top-level objects from the custom cell XIB.
-            NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"SegmentedCell" owner:self options:nil];
-            // Grab a pointer to the first object (presumably the custom cell, as that's all the XIB should contain).
-            cell = (SegmentedCell *) [topLevelObjects objectAtIndex:0];
-        }
-        
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;    //not selectable, but still responding to touches.
-        
-        NSDictionary *medHistoryDict = [self.fullScreeningForm objectForKey:SECTION_SERI_MED_HIST];
-        //value
-        if (medHistoryDict != (id)[NSNull null] && [medHistoryDict objectForKey:kUndergoneAdvSeri] != (id)[NSNull null]) {
-//            NSLog(@"Value from server: %@", medHistoryDict[kUndergoneAdvSeri]);
-            if ([medHistoryDict[kUndergoneAdvSeri] isEqual:@1]) cell.segmentCtrl.selectedSegmentIndex = 0;  //reversed position
-            else cell.segmentCtrl.selectedSegmentIndex = 1;
-            
-        }
-        
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(yesNoSegmentCtrlChanged:) name:@"SegmentedCtrlChange" object:nil];
-
-        return cell;
-        
-    } else {
-        static NSString *simpleTableIdentifier = @"SimpleTableItem";
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
-        
-        if (cell == nil) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
-        }
-        
-        NSString *text = [rowTitleArray objectAtIndex:indexPath.row];
-        
-        [cell.textLabel setText:text];
-        
-        
-        // Put in the ticks if necessary
-        if (indexPath.row < [self.completionCheck count]) {
-            if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
-                cell.accessoryType = UITableViewCellAccessoryCheckmark;
-            } else {
-                cell.accessoryType = UITableViewCellAccessoryNone;
-            }
-        }
-        return cell;
+//    if (indexPath.section == 0) {
+//        SegmentedCell *cell = [tableView dequeueReusableCellWithIdentifier:@"SegmentedCell"];
+//        if (cell == nil) {
+//            // Load the top-level objects from the custom cell XIB.
+//            NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"SegmentedCell" owner:self options:nil];
+//            // Grab a pointer to the first object (presumably the custom cell, as that's all the XIB should contain).
+//            cell = (SegmentedCell *) [topLevelObjects objectAtIndex:0];
+//        }
+//
+//        cell.selectionStyle = UITableViewCellSelectionStyleNone;    //not selectable, but still responding to touches.
+//
+//        NSDictionary *medHistoryDict = [self.fullScreeningForm objectForKey:SECTION_SERI_MED_HIST];
+//        //value
+//        if (medHistoryDict != (id)[NSNull null] && [medHistoryDict objectForKey:kUndergoneAdvSeri] != (id)[NSNull null]) {
+////            NSLog(@"Value from server: %@", medHistoryDict[kUndergoneAdvSeri]);
+//            if ([medHistoryDict[kUndergoneAdvSeri] isEqual:@1]) cell.segmentCtrl.selectedSegmentIndex = 0;  //reversed position
+//            else cell.segmentCtrl.selectedSegmentIndex = 1;
+//
+//        }
+//
+//
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(yesNoSegmentCtrlChanged:) name:@"SegmentedCtrlChange" object:nil];
+//
+//        return cell;
+//
+//    } else {
+    static NSString *simpleTableIdentifier = @"SimpleTableItem";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+    
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];      //must have subtitle settings
     }
+    
+    NSString *text = [rowTitleArray objectAtIndex:indexPath.row];
+    
+    [cell.textLabel setText:text];
+    
+    
+    // Put in the ticks if necessary
+    if (indexPath.row < [self.completionCheck count]) {
+        if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        }
+    }
+    return cell;
+//    }
     
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.section == 0) {
-        
-    } else {    //sub-sections
-        selectedRow = [NSNumber numberWithInteger:indexPath.row];
-        [self performSegueWithIdentifier:@"seriSectionToFormSegue" sender:self];
-    }
+//    if (indexPath.section == 0) {
+//
+//    } else {    //sub-sections
+    selectedRow = [NSNumber numberWithInteger:indexPath.row];
+    [self performSegueWithIdentifier:@"seriSectionToFormSegue" sender:self];
+//    }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
 }

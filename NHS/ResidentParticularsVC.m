@@ -194,31 +194,31 @@ typedef enum rowTypes {
     row.selectorOptions = @[@"Singaporean", @"PR", @"Foreigner", @"Stateless"];
     [section addFormRow:row];
     
-    XLFormRowDescriptor *religionRow;
-    religionRow = [XLFormRowDescriptor formRowDescriptorWithTag:kReligion rowType:XLFormRowDescriptorTypeSelectorPush title:@"Religion"];
-    religionRow.value = _residentParticularsDict[kReligion];
-    religionRow.selectorOptions = @[@"Buddhism", @"Taoism", @"Islam", @"Christianity", @"Hinduism", @"No Religion", @"Others"];
-    [self setDefaultFontWithRow:religionRow];
-    religionRow.required = YES;
-    [section addFormRow:religionRow];
+//    XLFormRowDescriptor *religionRow;
+//    religionRow = [XLFormRowDescriptor formRowDescriptorWithTag:kReligion rowType:XLFormRowDescriptorTypeSelectorPush title:@"Religion"];
+//    religionRow.value = _residentParticularsDict[kReligion];
+//    religionRow.selectorOptions = @[@"Buddhism", @"Taoism", @"Islam", @"Christianity", @"Hinduism", @"No Religion", @"Others"];
+//    [self setDefaultFontWithRow:religionRow];
+//    religionRow.required = YES;
+//    [section addFormRow:religionRow];
+//
+//    religionRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//        if (newValue != oldValue) {
+//            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
+//        }
+//    };
     
-    religionRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
-        }
-    };
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"religion_others" rowType:XLFormRowDescriptorTypeText title:@"Others: "];
-    row.required = NO;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", religionRow];
-    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [self setDefaultFontWithRow:row];
-    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"religion_others" rowType:XLFormRowDescriptorTypeText title:@"Others: "];
+//    row.required = NO;
+//    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", religionRow];
+//    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+//    [self setDefaultFontWithRow:row];
+//    [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHpNumber rowType:XLFormRowDescriptorTypePhone title:@"HP Number"];
     row.required = YES;
     row.value = [_residentParticularsDict objectForKey:kHpNumber];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Please check that you have input the correct number" regex:@"^(?=.*\\d).{8}$"]];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:row];
     [section addFormRow:row];
@@ -247,7 +247,7 @@ typedef enum rowTypes {
     
     
     XLFormRowDescriptor * spokenLangRow;
-    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Language"];
+    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Languages"];
     spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
     [self setDefaultFontWithRow:spokenLangRow];
     spokenLangRow.required = YES;
@@ -284,85 +284,85 @@ typedef enum rowTypes {
         }
     };
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLangOthersText rowType:XLFormRowDescriptorTypeText title:@"Others: "];
-    row.required = NO;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", spokenLangRow];
-    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [self setDefaultFontWithRow:row];
-    row.value = [_residentParticularsDict objectForKey:kLangOthersText];
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMaritalStatus rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Marital Status"];
-    row.selectorOptions = @[@"Divorced", @"Married", @"Separated", @"Single", @"Widowed"];
-    row.value = _residentParticularsDict[kMaritalStatus];
-    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kMaritalStatus andNewContent:newValue];
-        }
-    };
-    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLangOthersText rowType:XLFormRowDescriptorTypeText title:@"Others: "];
+//    row.required = NO;
+//    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", spokenLangRow];
+//    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+//    [self setDefaultFontWithRow:row];
+//    row.value = [_residentParticularsDict objectForKey:kLangOthersText];
+//    [section addFormRow:row];
+//
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMaritalStatus rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Marital Status"];
+//    row.selectorOptions = @[@"Divorced", @"Married", @"Separated", @"Single", @"Widowed"];
+//    row.value = _residentParticularsDict[kMaritalStatus];
+//    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//        if (newValue != oldValue) {
+//            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kMaritalStatus andNewContent:newValue];
+//        }
+//    };
+//
 //    if ([[resiPartiDict objectForKey:@"marital_status"] isEqualToString:@""]) {
 //        row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(3) displayText:@"Single"];   //default value
 //    } else {
 //        row.value = [row.selectorOptions objectAtIndex:[[resiPartiDict objectForKey:@"marital_status"] integerValue]] ;
 //    }
-    [self setDefaultFontWithRow:row];
-    row.noValueDisplayText = @"Tap here";
-    row.required = YES;
-    [section addFormRow:row];
+//    [self setDefaultFontWithRow:row];
+//    row.noValueDisplayText = @"Tap here";
+//    row.required = YES;
+//    [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHousingType rowType:XLFormRowDescriptorTypeSelectorPush title:@"Housing Type"];
-    row.selectorOptions = @[@"Owned, 1-room", @"Owned, 2-room", @"Owned, 3-room", @"Owned, 4-room", @"Owned, 5-room", @"Rental, 1-room", @"Rental, 2-room", @"Rental, 3-room", @"Rental, 4-room", @"Private"];
-    row.required = YES;
-    [self setDefaultFontWithRow:row];
-    
-    row.value = [self getHousingOwnedRentedFromTwoValues];
-    
-    [section addFormRow:row];
-    
-    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            
-            NSString *housingType;
-            
-            if ([newValue rangeOfString:@"Owned"].location != NSNotFound) {
-                housingType = @"Owned";
-            } else if ([newValue rangeOfString:@"Rental"].location != NSNotFound) {
-                housingType = @"Rented";
-            } else {
-                housingType = @"Private";
-            }
-            
-            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kHousingType andNewContent:housingType];
-            if ([housingType isEqualToString:@"Private"]) return;   //no need to post HousingNumRooms
-            
-            
-            NSUInteger loc = [newValue rangeOfString:@"-"].location;
-            NSString *room = [newValue substringWithRange:NSMakeRange(loc-1, 1)];
-            
-            
-            double delayInSeconds = 0.5;    //no longer necessary
-            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                //code to be executed on the main queue after delay
-                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kHousingNumRooms andNewContent:room];
-            });
-        }
-    };
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHighestEduLevel rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Highest Education Level"];
-    row.value = _residentParticularsDict[kHighestEduLevel];
-    row.noValueDisplayText = @"Tap here";
-    row.selectorOptions = @[@"ITE/Pre-U/JC", @"No formal qualifications", @"Primary",@"Secondary",@"University"];
-    [self setDefaultFontWithRow:row];
-    row.required = YES;
-    [section addFormRow:row];
-    
-    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kHighestEduLevel andNewContent:newValue];
-        }
-    };
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHousingType rowType:XLFormRowDescriptorTypeSelectorPush title:@"Housing Type"];
+//    row.selectorOptions = @[@"Owned, 1-room", @"Owned, 2-room", @"Owned, 3-room", @"Owned, 4-room", @"Owned, 5-room", @"Rental, 1-room", @"Rental, 2-room", @"Rental, 3-room", @"Rental, 4-room", @"Private"];
+//    row.required = YES;
+//    [self setDefaultFontWithRow:row];
+//
+//    row.value = [self getHousingOwnedRentedFromTwoValues];
+//
+//    [section addFormRow:row];
+//
+//    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//        if (newValue != oldValue) {
+//
+//            NSString *housingType;
+//
+//            if ([newValue rangeOfString:@"Owned"].location != NSNotFound) {
+//                housingType = @"Owned";
+//            } else if ([newValue rangeOfString:@"Rental"].location != NSNotFound) {
+//                housingType = @"Rented";
+//            } else {
+//                housingType = @"Private";
+//            }
+//
+//            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kHousingType andNewContent:housingType];
+//            if ([housingType isEqualToString:@"Private"]) return;   //no need to post HousingNumRooms
+//
+//
+//            NSUInteger loc = [newValue rangeOfString:@"-"].location;
+//            NSString *room = [newValue substringWithRange:NSMakeRange(loc-1, 1)];
+//
+//
+//            double delayInSeconds = 0.5;    //no longer necessary
+//            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+//            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+//                //code to be executed on the main queue after delay
+//                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kHousingNumRooms andNewContent:room];
+//            });
+//        }
+//    };
+//
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHighestEduLevel rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Highest Education Level"];
+//    row.value = _residentParticularsDict[kHighestEduLevel];
+//    row.noValueDisplayText = @"Tap here";
+//    row.selectorOptions = @[@"ITE/Pre-U/JC", @"No formal qualifications", @"Primary",@"Secondary",@"University"];
+//    [self setDefaultFontWithRow:row];
+//    row.required = YES;
+//    [section addFormRow:row];
+//
+//    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//        if (newValue != oldValue) {
+//            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kHighestEduLevel andNewContent:newValue];
+//        }
+//    };
     
     XLFormRowDescriptor *addressRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAddress rowType:XLFormRowDescriptorTypeSelectorPush title:@"Address"];
     if ([neighbourhood isEqualToString:@"Kampong Glam"])
@@ -374,13 +374,13 @@ typedef enum rowTypes {
     [self setDefaultFontWithRow:addressRow];
     [section addFormRow:addressRow];
     
-    XLFormRowDescriptor *addrOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
-    addrOthersRow.value = _residentParticularsDict[kAddressOthers];
-    addrOthersRow.required = NO;
-    addrOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", addressRow];
-    [addrOthersRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [self setDefaultFontWithRow:addrOthersRow];
-    [section addFormRow:addrOthersRow];
+//    XLFormRowDescriptor *addrOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressOthers rowType:XLFormRowDescriptorTypeText title:@"Others: "];
+//    addrOthersRow.value = _residentParticularsDict[kAddressOthers];
+//    addrOthersRow.required = NO;
+//    addrOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", addressRow];
+//    [addrOthersRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+//    [self setDefaultFontWithRow:addrOthersRow];
+//    [section addFormRow:addrOthersRow];
     
     addressRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
@@ -396,9 +396,9 @@ typedef enum rowTypes {
             });
             
             if ([newValue containsString:@"Others"]) {
-                addrOthersRow.required = YES;  //force to fill in address if selected 'Others'
+//                addrOthersRow.required = YES;  //force to fill in address if selected 'Others'
             } else {
-                addrOthersRow.required = NO;
+//                addrOthersRow.required = NO;
             }
         }
     };
@@ -436,13 +436,13 @@ typedef enum rowTypes {
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Postal Code must be 6 digits" regex:@"^(?=.*\\d).{6}$"]];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressDuration rowType:XLFormRowDescriptorTypeDecimal title:@"No. of years resided in current block"];
-    row.value = _residentParticularsDict[kAddressDuration];
-    row.required = YES;
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [self setDefaultFontWithRow:row];
-    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressDuration rowType:XLFormRowDescriptorTypeDecimal title:@"No. of years resided in current block"];
+//    row.value = _residentParticularsDict[kAddressDuration];
+//    row.required = YES;
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+//    [self setDefaultFontWithRow:row];
+//    [section addFormRow:row];
     
     return [super initWithForm:formDescriptor];
 }
@@ -459,13 +459,14 @@ typedef enum rowTypes {
         rowDescriptor.value = CAPSed;
         [self reloadFormRow:rowDescriptor];
         
-    } else if ([rowDescriptor.tag isEqualToString:kAddressOthers]) {
-        NSString *CAPSed = [rowDescriptor.value uppercaseString];
-        rowDescriptor.value = CAPSed;
-        [self reloadFormRow:rowDescriptor];
-        //no return here...
     }
-        
+//    else if ([rowDescriptor.tag isEqualToString:kAddressOthers]) {
+//        NSString *CAPSed = [rowDescriptor.value uppercaseString];
+//        rowDescriptor.value = CAPSed;
+//        [self reloadFormRow:rowDescriptor];
+//        //no return here...
+//    }
+    
     NSArray * validationErrors = [self formValidationErrors];
     if (validationErrors.count > 0) {
         
@@ -699,22 +700,22 @@ typedef enum rowTypes {
     return [localDateTime description];
 }
 
-- (NSString *) getHousingOwnedRentedFromTwoValues {
-    
-    if (_residentParticularsDict[kHousingNumRooms] != (id) [NSNull null]) { //got some value
-        NSString *numRooms = _residentParticularsDict[kHousingNumRooms];
-        NSString *housingType = _residentParticularsDict[kHousingType];
-        
-        if (housingType == (id)[NSNull null] || housingType == nil)     //don't continue
-            return @"";
-        
-        if (![housingType isEqualToString:@"Private"])
-            return [NSString stringWithFormat:@"%@, %@-room", housingType, numRooms];
-        else
-            return @"Private";
-    }
-    return @"";
-}
+//- (NSString *) getHousingOwnedRentedFromTwoValues {
+//
+//    if (_residentParticularsDict[kHousingNumRooms] != (id) [NSNull null]) { //got some value
+//        NSString *numRooms = _residentParticularsDict[kHousingNumRooms];
+//        NSString *housingType = _residentParticularsDict[kHousingType];
+//
+//        if (housingType == (id)[NSNull null] || housingType == nil)     //don't continue
+//            return @"";
+//
+//        if (![housingType isEqualToString:@"Private"])
+//            return [NSString stringWithFormat:@"%@, %@-room", housingType, numRooms];
+//        else
+//            return @"Private";
+//    }
+//    return @"";
+//}
 
 - (void) postSpokenLangWithLangName:(NSString *) language andValue: (NSString *) value {
     NSString *fieldName;

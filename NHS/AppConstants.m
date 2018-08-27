@@ -10,7 +10,6 @@
 
 @implementation AppConstants
 
-
 #pragma mark - UserDefaults
 
 NSString *const kResidentAge = @"resident_age";
@@ -33,22 +32,25 @@ NSString *const kNewContent = @"new_content";
 NSString *const kScreenLocation = @"screening_location";
 NSString *const kResiParticulars = @"resi_particulars";
 
-
-
-
 #pragma mark - Resident Particulars
 
 NSString *const kName = @"resident_name";
 NSString *const kNRIC = @"nric";
+NSString *const kNRIC2 = @"reenter_nric";
 NSString *const kGender = @"gender";
 NSString *const kBirthDate = @"birth_date";
 NSString *const kBirthYear = @"birth_year";
+NSString *const kAge = @"age";
+
 NSString *const kCitizenship = @"citizenship_status";
 NSString *const kReligion = @"religion";
 NSString *const kReligionOthers = @"religion_others";
 NSString *const kHpNumber = @"hp_number";
 NSString *const kHouseNumber = @"house_number";
-NSString *const kEthnicity = @"ethnicity";
+NSString *const kNokName = @"nok_name";
+NSString *const kNokRelationship = @"nok_relationship";
+NSString *const kNokContact = @"nok_contact";
+
 // 1700
 NSString *const kNhsSerialId = @"nhs_serial_id";
 
@@ -64,24 +66,25 @@ NSString *const kLangTeoChew = @"lang_teochew";
 NSString *const kLangOthers = @"lang_others";
 NSString *const kLangOthersText  = @"lang_others_text";
 
-NSString *const kMaritalStatus = @"marital_status";
-NSString *const kHousingType = @"housing_type";
-NSString *const kHousingNumRooms = @"housing_num_rooms";
-NSString *const kHighestEduLevel = @"highest_edu_level";
+NSString *const kEthnicity = @"ethnicity";
+NSString *const kWrittenLang = @"written_lang";
 
 NSString *const kAddress = @"address";  //not for submission
 NSString *const kAddressStreet = @"address_street";
 NSString *const kAddressBlock = @"address_block";
-NSString *const kAddressOthers = @"address_others";
+NSString *const kAddressOthersBlock = @"address_others_block";
+NSString *const kAddressOthersRoadName = @"address_others_road_name";
+
 NSString *const kAddressUnitNum = @"address_unit_num";
-NSString *const kAddressDuration = @"address_duration";
 NSString *const kAddressPostCode = @"address_postalcode";
 
-NSString *const kIsFinal = @"is_final";
-
 NSString *const kNeighbourhood = @"neighbourhood";
+NSString *const kScreeningLocation = @"screening_location";
 NSString *const kRemarks = @"remarks";
 NSString *const kPreregCompleted = @"prereg_completed";
+NSString *const kIsFinal = @"is_final";
+NSString *const kConsent = @"consent";
+NSString *const kConsentToResearch = @"consent_research";
 NSString *const kNhsSerialNum = @"nhs_serial_num";
 
 
@@ -93,7 +96,7 @@ NSString *const kNhsSerialNum = @"nhs_serial_num";
  NSString *const SearchBarTextKey = @"SearchBarTextKey";
  NSString *const SearchBarIsFirstResponderKey = @"SearchBarIsFirstResponderKey";
 
-#pragma mark - Phlebotomy
+#pragma mark - Phlebotomy Eligibility Assessment
 
 //NSString *const kWasTaken = @"was_taken";     //no longer needed
 NSString *const kAge40 = @"age_40";
@@ -101,6 +104,9 @@ NSString *const kChronicCond = @"chronic_cond";
 NSString *const kNoBloodTest = @"no_blood_test";
 NSString *const kWantFreeBt = @"want_free_bt";
 NSString *const kDidPhleb = @"did_phleb";
+NSString *const kIsPr = @"is_pr";
+
+#pragma mark - Phlebotomy (not in registration fields)
 NSString *const kFastingBloodGlucose = @"fasting_blood_glu";
 NSString *const kTriglycerides = @"triglycerides";
 NSString *const kLDL= @"ldl";
@@ -110,17 +116,12 @@ NSString *const kTotCholesterol= @"total_cholesterol";
 
 #pragma mark - Mode of Screening
 NSString *const kScreenMode = @"screen_mode";
+NSString *const kCentralDate = @"central_date";
 NSString *const kApptDate = @"appt_date";
-NSString *const kTicketNum = @"ticket_number";
+//NSString *const kTicketNum = @"ticket_number";
 NSString *const kApptTime = @"appt_time";
-NSString *const kNotes = @"notes";
-
-NSString *const kTime_8_10 = @"time_8_10";
-NSString *const kTime_10_12 = @"time_10_12";
-NSString *const kTime_12_2 = @"time_12_2";
-NSString *const kTime_2_4 = @"time_2_4";
-
 NSString *const kPhlebAppt = @"phleb_appt";
+NSString *const kNotes = @"notes";
 
 #pragma mark - Profiling
 
@@ -366,8 +367,8 @@ NSString *const kBp3Sys = @"bp3_sys";
 NSString *const kBp3Dias = @"bp3_dias";
 
 
-#pragma mark - Snellen Eye Test
-
+#pragma mark - 4. Basic Vision
+NSString *const kSpecs = @"specs";
 NSString *const kRightEye = @"right_eye";
 NSString *const kLeftEye = @"left_eye";
 NSString *const kSix12 = @"six_12";
@@ -732,7 +733,7 @@ NSString *const kCheckProfiling = @"check_profiling";
 NSString *const kCheckDiabetes = @"check_diabetes";
 NSString *const kCheckHyperlipidemia = @"check_hyperlipidemia";
 NSString *const kCheckHypertension = @"check_hypertension";
-NSString *const kCheckDepression = @"check_depression";
+NSString *const kCheckSwDepress = @"check_sw_depression";
 NSString *const kCheckRiskStrat = @"check_risk_strat";
 NSString *const kCheckGeno = @"check_geno";
 NSString *const kCheckSocioEco = @"check_socioeco";

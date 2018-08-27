@@ -39,7 +39,7 @@
 #define SECTION_DIABETES                        @"diabetes"
 #define SECTION_HYPERLIPIDEMIA                  @"hyperlipidemia"
 #define SECTION_HYPERTENSION                    @"hypertension"
-#define SECTION_DEPRESSION                      @"depression"
+#define SECTION_SW_DEPRESSION                   @"sw_depression"
 #define SECTION_RISK_STRATIFICATION             @"risk_stratification"
 #define SECTION_CURRENT_SOCIOECO_SITUATION      @"current_socioeco_situation"
 #define SECTION_CURRENT_PHY_STATUS              @"current_phy_status"
@@ -100,15 +100,20 @@ extern NSString *const kNhsSerialId;
 
 extern NSString *const kName;
 extern NSString *const kNRIC;
+extern NSString *const kNRIC2;
 extern NSString *const kGender;
 extern NSString *const kBirthDate;
 extern NSString *const kBirthYear;
+extern NSString *const kAge;
+
 extern NSString *const kCitizenship;
 extern NSString *const kReligion;
 extern NSString *const kReligionOthers;
 extern NSString *const kHpNumber;
 extern NSString *const kHouseNumber;
-extern NSString *const kEthnicity;
+extern NSString *const kNokName;
+extern NSString *const kNokRelationship;
+extern NSString *const kNokContact;
 
 extern NSString *const kSpokenLang;
 extern NSString *const kLangCanto;
@@ -122,40 +127,47 @@ extern NSString *const kLangTeoChew;
 extern NSString *const kLangOthers;
 extern NSString *const kLangOthersText;
 
-extern NSString *const kMaritalStatus;
-extern NSString *const kHousingType;
-extern NSString *const kHousingNumRooms;
-extern NSString *const kHighestEduLevel;
+extern NSString *const kEthnicity;
+extern NSString *const kWrittenLang;
 
-extern NSString *const kAddress;  //not for submission
+extern NSString *const kAddress;
 extern NSString *const kAddressStreet;
 extern NSString *const kAddressBlock;
-extern NSString *const kAddressOthers;
+extern NSString *const kAddressOthersBlock;
+extern NSString *const kAddressOthersRoadName;
+
 extern NSString *const kAddressUnitNum;
-extern NSString *const kAddressDuration;
 extern NSString *const kAddressPostCode;
 
-extern NSString *const kIsFinal;
-
 extern NSString *const kNeighbourhood;
+extern NSString *const kScreeningLocation;;
 extern NSString *const kRemarks;
 extern NSString *const kPreregCompleted;
+extern NSString *const kIsFinal;
+extern NSString *const kConsent;
+extern NSString *const kConsentToResearch;
 extern NSString *const kNhsSerialNum;
 
-#pragma mark - SearchBar constants
+
+
+/* Search Bar constants
+ ********************************************/
 extern NSString *const ViewControllerTitleKey;
 extern NSString *const SearchControllerIsActiveKey;
 extern NSString *const SearchBarTextKey;
 extern NSString *const SearchBarIsFirstResponderKey;
 
+#pragma mark - Phlebotomy Eligibility Assessment
 
-#pragma mark - Phlebotomy
-//extern NSString *const kWasTaken;
-extern NSString *const kAge40;
+//NSString *const kWasTaken = @"was_taken";     //no longer needed
+//extern NSString *const kAge40;
 extern NSString *const kChronicCond;
 extern NSString *const kNoBloodTest;
 extern NSString *const kWantFreeBt;
 extern NSString *const kDidPhleb;
+extern NSString *const kIsPr;
+
+#pragma mark - Phlebotomy (not in registration fields)
 extern NSString *const kFastingBloodGlucose;
 extern NSString *const kTriglycerides;
 extern NSString *const kLDL;
@@ -165,17 +177,12 @@ extern NSString *const kTotCholesterol;
 
 #pragma mark - Mode of Screening
 extern NSString *const kScreenMode;
+extern NSString *const kCentralDate;
 extern NSString *const kApptDate;
-extern NSString *const kTicketNum;
+//extern NSString *const kTicketNum;
 extern NSString *const kApptTime;
-extern NSString *const kNotes;
-
-extern NSString *const kTime_8_10;
-extern NSString *const kTime_10_12;
-extern NSString *const kTime_12_2;
-extern NSString *const kTime_2_4;
-
 extern NSString *const kPhlebAppt;
+extern NSString *const kNotes;
 
 #pragma mark - Profiling
 
@@ -432,8 +439,8 @@ extern NSString *const kBp3Sys;
 extern NSString *const kBp3Dias;
 
 
-#pragma mark - Snellen Eye Test
-
+#pragma mark - 4. Basic Vision
+extern NSString *const kSpecs;
 extern NSString *const kRightEye;
 extern NSString *const kLeftEye;
 extern NSString *const kSix12;
@@ -795,7 +802,7 @@ extern NSString *const kCheckProfiling;
 extern NSString *const kCheckDiabetes;
 extern NSString *const kCheckHyperlipidemia;
 extern NSString *const kCheckHypertension;
-extern NSString *const kCheckDepression;
+extern NSString *const kCheckSwDepress;
 extern NSString *const kCheckRiskStrat;
 extern NSString *const kCheckGeno;
 extern NSString *const kCheckSocioEco;

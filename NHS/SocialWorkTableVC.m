@@ -49,7 +49,12 @@
     
     
     self.navigationItem.title = @"Social Work";
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Demographics",@"Current Socioeconomic Situation",@"Current Physical Status", @"Social Support Assessment", @"Psychological Well-being", @"Additional Services", @"Summary",  nil];
+    
+    //2017
+//    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Demographics",@"Current Socioeconomic Situation",@"Current Physical Status", @"Social Support Assessment", @"Psychological Well-being", @"Additional Services", @"Summary",  nil];
+    
+    //2018
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Depression Assessment (Adv) - PHQ-9", @"Social Work (Adv) Assessments (U/C)", @"Social Work Referrals (U/C)",  nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -113,19 +118,24 @@
         }
     }
     
+    if ([cell.textLabel.text containsString:@"U/C"]) {
+        cell.userInteractionEnabled = NO;
+        [cell.textLabel setTextColor:[UIColor grayColor]];
+    }
+    
     return cell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     selectedRow = [NSNumber numberWithInteger:indexPath.row];
     
-    if (indexPath.row == 0) {
-        [self performSegueWithIdentifier:@"socialWorkToDemographicsSegue" sender:self];
-    }
-    else
-    {
-        [self performSegueWithIdentifier:@"socialWorkToFormVC" sender:self];
-    }
+//    if (indexPath.row == 0) {
+//        [self performSegueWithIdentifier:@"socialWorkToDemographicsSegue" sender:self];
+//    }
+//    else
+//    {
+    [self performSegueWithIdentifier:@"socialWorkToFormVC" sender:self];
+//    }
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }

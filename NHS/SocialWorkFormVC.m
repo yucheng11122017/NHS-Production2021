@@ -30,14 +30,17 @@ typedef enum formName {
 
 @interface SocialWorkFormVC () {
     XLFormRowDescriptor *relativesContactRow, *relativesEaseRow, *relativesCloseRow, *friendsContactRow, *friendsEaseRow, *friendsCloseRow, *socialScoreRow;
+    XLFormRowDescriptor *preEdScoreRow, *postEdScoreRow, *showPostEdSectionBtnRow, *phqTotalScoreRow;
     BOOL internetDCed;
     BOOL isFormFinalized;
     BOOL hasShownProposedBox;
+    BOOL hasShownDepressAlertBox;
 }
 
 @property (nonatomic) Reachability *hostReachability;
 @property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
 @property (strong, nonatomic) NSDictionary *fullScreeningForm;
+@property (strong, nonatomic) NSMutableArray *phqQuestionsArray;
 
 @end
 
@@ -63,24 +66,28 @@ typedef enum formName {
     int formNumber = [_formNo intValue];
     switch (formNumber) {
             //case 0 is for demographics
-        case 1:
-            form = [self initCurrentSocioSituation];
+            
+        case 0:
+            form = [self initDepressAssessPhq9];
             break;
-        case 2:
-            form = [self initCurrentPhysStatus];
-            break;
-        case 3:
-            form = [self initSocialSupportAssessment];
-            break;
-        case 4:
-            form = [self initPsychWellbeing];
-            break;
-        case 5:
-            form = [self initAdditionalSvcs];
-            break;
-        case 6:
-            form = [self initSummary];
-            break;
+//        case 1:
+//            form = [self initCurrentSocioSituation];
+//            break;
+//        case 2:
+//            form = [self initCurrentPhysStatus];
+//            break;
+//        case 3:
+//            form = [self initSocialSupportAssessment];
+//            break;
+//        case 4:
+//            form = [self initPsychWellbeing];
+//            break;
+//        case 5:
+//            form = [self initAdditionalSvcs];
+//            break;
+//        case 6:
+//            form = [self initSummary];
+//            break;
         default:
             break;
     }
@@ -537,7 +544,7 @@ typedef enum formName {
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCaregiverContactNum rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Please check that you have input the correct number" regex:@"^(?=.*\\d).{8}$"]];
     
     //value
     if (socialSupportDict != (id)[NSNull null] && [socialSupportDict objectForKey:kCaregiverContactNum] != (id)[NSNull null]) {
@@ -590,7 +597,7 @@ typedef enum formName {
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kEContactNum rowType:XLFormRowDescriptorTypePhone title:@"Contact Number"];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Please check that you have input the correct number" regex:@"^(?=.*\\d).{8}$"]];
 
     //value
     if (socialSupportDict != (id)[NSNull null] && [socialSupportDict objectForKey:kEContactNum] != (id)[NSNull null]) {
@@ -1252,7 +1259,7 @@ typedef enum formName {
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSwVolContactNum rowType:XLFormRowDescriptorTypePhone title:@"Volunteer Contact No"];
     [self setDefaultFontWithRow:row];
     row.required = YES;
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Contact number must be 8 digits" regex:@"^(?=.*\\d).{8}$"]];
+    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Please check that you have input the correct number" regex:@"^(?=.*\\d).{8}$"]];
     
     //value
     if (summaryDict != (id)[NSNull null] && [summaryDict objectForKey:kSwVolContactNum] != (id)[NSNull null]) {
@@ -1265,6 +1272,416 @@ typedef enum formName {
     return [super initWithForm:formDescriptor];
 }
 
+- (id) initDepressAssessPhq9 {
+
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"PHQ-9"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+
+    self.phqQuestionsArray = [[NSMutableArray alloc] init];
+
+    NSDictionary *geriaDepreAssmtDict = [self.fullScreeningForm objectForKey:SECTION_SW_DEPRESSION];
+
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckSwDepress];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDidDepressAssess rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone Depression Assessment?"];
+//    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kDidDepressAssess] != (id)[NSNull null])
+//        row.value = [self getYesNofromOneZero:geriaDepreAssmtDict[kDidDepressAssess]];
+//
+//    [self setDefaultFontWithRow:row];
+//    row.selectorOptions = @[@"Yes", @"No"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [section addFormRow:row];
+
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+
+    NSArray *phqOptions = @[@"Not at all [0]", @"Several days [1]", @"More than half the days [2]", @"Nearly Every day [3]"];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1" rowType:XLFormRowDescriptorTypeInfo title:@"1. Little interest or pleasure in doing things"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+
+    XLFormRowDescriptor *phqQ1Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ1 rowType:XLFormRowDescriptorTypeSelectorAlertView title:@""];
+    phqQ1Row.selectorOptions = phqOptions;
+    phqQ1Row.noValueDisplayText = @"Tap here";
+
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ1] != (id)[NSNull null]) {
+        phqQ1Row.value = [self getSelectorOptionFromNumber:geriaDepreAssmtDict[kPhqQ1]];
+    }
+
+    [section addFormRow:phqQ1Row];
+
+    [_phqQuestionsArray addObject:phqQ1Row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q2" rowType:XLFormRowDescriptorTypeInfo title:@"2. Feeling down, depressed or hopeless"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+
+    XLFormRowDescriptor *phqQ2Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ2 rowType:XLFormRowDescriptorTypeSelectorAlertView title:@""];
+    phqQ2Row.selectorOptions = phqOptions;
+    phqQ2Row.noValueDisplayText = @"Tap here";
+
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ2] != (id)[NSNull null]) {
+        phqQ2Row.value = [self getSelectorOptionFromNumber:geriaDepreAssmtDict[kPhqQ2]];
+    }
+
+    [section addFormRow:phqQ2Row];
+
+    [_phqQuestionsArray addObject:phqQ2Row];
+
+    XLFormSectionDescriptor *q3_9Section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:q3_9Section];
+    q3_9Section.hidden = @YES;
+
+    // Show the rest of the questions if value >= 2
+    if (phqQ1Row.value != nil && phqQ1Row.value != (id)[NSNull null]) {
+        if ([[self getNumberFromPhqOption:phqQ1Row.value] integerValue] >= 2) q3_9Section.hidden = @NO;
+    }
+    if (phqQ2Row.value != nil && phqQ2Row.value != (id)[NSNull null]) {
+        if ([[self getNumberFromPhqOption:phqQ2Row.value] integerValue] >= 2) q3_9Section.hidden = @NO;
+    }
+
+
+    /** Section for Q3-Q9 */
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q3" rowType:XLFormRowDescriptorTypeInfo title:@"3. Trouble falling asleep, staying asleep, or sleeping too much"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [q3_9Section addFormRow:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ3 rowType:XLFormRowDescriptorTypeSelectorAlertView title:@""];
+    row.selectorOptions = phqOptions;
+    row.noValueDisplayText = @"Tap here";
+
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ3] != (id)[NSNull null]) {
+        row.value = [self getSelectorOptionFromNumber:geriaDepreAssmtDict[kPhqQ3]];
+    }
+
+    [q3_9Section addFormRow:row];
+
+    [_phqQuestionsArray addObject:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q4" rowType:XLFormRowDescriptorTypeInfo title:@"4. Feeling tired or having little energy"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [q3_9Section addFormRow:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ4 rowType:XLFormRowDescriptorTypeSelectorAlertView title:@""];
+    row.selectorOptions = phqOptions;
+    row.noValueDisplayText = @"Tap here";
+
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ4] != (id)[NSNull null]) {
+        row.value = [self getSelectorOptionFromNumber:geriaDepreAssmtDict[kPhqQ4]];
+    }
+
+    [q3_9Section addFormRow:row];
+
+    [_phqQuestionsArray addObject:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q5" rowType:XLFormRowDescriptorTypeInfo title:@"5. Poor appetite or overeating"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [q3_9Section addFormRow:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ5 rowType:XLFormRowDescriptorTypeSelectorAlertView title:@""];
+    row.selectorOptions = phqOptions;
+    row.noValueDisplayText = @"Tap here";
+
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ5] != (id)[NSNull null]) {
+        row.value = [self getSelectorOptionFromNumber:geriaDepreAssmtDict[kPhqQ5]];
+    }
+
+    [q3_9Section addFormRow:row];
+
+    [_phqQuestionsArray addObject:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q6" rowType:XLFormRowDescriptorTypeInfo title:@"6. Feeling bad about yourself - or that you're a failure or have let yourself or your family down"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [q3_9Section addFormRow:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ6 rowType:XLFormRowDescriptorTypeSelectorAlertView title:@""];
+    row.selectorOptions = phqOptions;
+    row.noValueDisplayText = @"Tap here";
+
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ6] != (id)[NSNull null]) {
+        row.value = [self getSelectorOptionFromNumber:geriaDepreAssmtDict[kPhqQ6]];
+    }
+
+    [q3_9Section addFormRow:row];
+
+    [_phqQuestionsArray addObject:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q7" rowType:XLFormRowDescriptorTypeInfo title:@"7. Trouble concentrating on things, such as reading the newspaper or watching television"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [q3_9Section addFormRow:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ7 rowType:XLFormRowDescriptorTypeSelectorAlertView title:@""];
+    row.selectorOptions = phqOptions;
+    row.noValueDisplayText = @"Tap here";
+
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ7] != (id)[NSNull null]) {
+        row.value = [self getSelectorOptionFromNumber:geriaDepreAssmtDict[kPhqQ7]];
+    }
+
+    [q3_9Section addFormRow:row];
+
+    [_phqQuestionsArray addObject:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q8" rowType:XLFormRowDescriptorTypeInfo title:@"8. Moving or speaking so slowly that other people could have noticed. Or the opposite - being so fidgety or restless that you have been moving around a lot more than usual"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [q3_9Section addFormRow:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ8 rowType:XLFormRowDescriptorTypeSelectorAlertView title:@""];
+    row.selectorOptions = phqOptions;
+    row.noValueDisplayText = @"Tap here";
+
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ8] != (id)[NSNull null]) {
+        row.value = [self getSelectorOptionFromNumber:geriaDepreAssmtDict[kPhqQ8]];
+    }
+
+    [q3_9Section addFormRow:row];
+
+    [_phqQuestionsArray addObject:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q9" rowType:XLFormRowDescriptorTypeInfo title:@"9. Thoughts that you would be better off dead or of hurting yourself in some way"];
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [q3_9Section addFormRow:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ9 rowType:XLFormRowDescriptorTypeSelectorAlertView title:@""];
+    row.selectorOptions = phqOptions;
+    row.noValueDisplayText = @"Tap here";
+
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ9] != (id)[NSNull null]) {
+        row.value = [self getSelectorOptionFromNumber:geriaDepreAssmtDict[kPhqQ9]];
+    }
+
+    [q3_9Section addFormRow:row];
+
+    [_phqQuestionsArray addObject:row];
+
+    // PHQ Q9
+    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+
+        if (!hasShownDepressAlertBox) {
+            int totalScore = [self calculateTotalPhqScore];
+
+            if (totalScore >= 5) {
+                hasShownDepressAlertBox = true;
+                UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Take note", nil)
+                                                                                          message:@"Please bring resident to the geriatric assessments booth at the multi-purpose hall for referral"
+                                                                                   preferredStyle:UIAlertControllerStyleAlert];
+
+                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                                    style:UIAlertActionStyleDefault
+                                                                  handler:^(UIAlertAction * okAction) {
+                                                                      //do nothing for now
+                                                                  }]];
+                [self presentViewController:alertController animated:YES completion:nil];
+            }
+        }
+    };
+
+//    XLFormRowDescriptor* phqQ1Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ1
+//                                                                          rowType:XLFormRowDescriptorTypeStepCounter
+//                                                                            title:@"PHQ-2 question 1 Score"];
+//    [self setDefaultFontWithRow:phqQ1Row];
+//    phqQ1Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [phqQ1Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
+//    [phqQ1Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
+//    [phqQ1Row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
+//    [phqQ1Row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
+//
+//    //value
+//    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ1] != (id)[NSNull null]) {
+//        phqQ1Row.value = geriaDepreAssmtDict[kPhqQ1];
+//    }
+//
+//    [section addFormRow:phqQ1Row];
+//
+//    XLFormRowDescriptor* phqQ2Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ2
+//                                                                          rowType:XLFormRowDescriptorTypeStepCounter
+//                                                                            title:@"PHQ-2 question 2 Score"];
+//    [self setDefaultFontWithRow:phqQ2Row];
+//    phqQ2Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [phqQ2Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
+//    [phqQ2Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
+//    [phqQ2Row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
+//    [phqQ2Row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
+//
+//    //value
+//    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ2] != (id)[NSNull null]) {
+//        phqQ2Row.value = geriaDepreAssmtDict[kPhqQ2];
+//    }
+//
+//    [section addFormRow:phqQ2Row];
+//
+//
+//
+//    XLFormRowDescriptor* phq9ScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhq9Score
+//                                                                              rowType:XLFormRowDescriptorTypeNumber
+//                                                                                title:@"Total score for PHQ-9"];
+//    [self setDefaultFontWithRow:phq9ScoreRow];
+//    phq9ScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    phq9ScoreRow.disabled = @(1);
+//
+//    if (phqQ1Row.value != (id) [NSNull null] && phqQ2Row.value != (id)[NSNull null]) {
+//        if ([phqQ1Row.value intValue] > 1 || [phqQ2Row.value intValue] >1) {
+//            phq9ScoreRow.disabled = @(0);
+//        }
+//    }
+//    //value
+//    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhq9Score] != (id)[NSNull null]) {
+//        phq9ScoreRow.value = geriaDepreAssmtDict[kPhq9Score];
+//    }
+//
+//    [section addFormRow:phq9ScoreRow];
+
+    XLFormSectionDescriptor *section3 = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section3];
+
+    XLFormRowDescriptor* q10Row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q10"
+                                                                                rowType:XLFormRowDescriptorTypeInfo
+                                                                                  title:@"10. If you checked off any problems, how difficult have those problems made it for you to Do your work, take care of things at home, or get along with other people?"];
+    [self setDefaultFontWithRow:q10Row];
+    q10Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    q10Row.disabled = @(1); //default disabled.
+
+    [section3 addFormRow:q10Row];
+
+
+    XLFormRowDescriptor* q10ResponseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ10Response
+                                                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                                                  title:@""];
+    q10ResponseRow.selectorOptions = @[@"Not difficult at all", @"Somewhat difficult", @"Very difficult",@"Extremely difficult"];
+    q10ResponseRow.noValueDisplayText = @"Tap here";
+    q10ResponseRow.disabled = @(1);
+//    if (phqQ1Row.value != (id) [NSNull null] && phqQ2Row.value != (id)[NSNull null]) {
+//        if ([phqQ1Row.value intValue] > 1 || [phqQ2Row.value intValue] >1) {
+//            q10ResponseRow.disabled = @(0);
+//        }
+//    }
+
+
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kQ10Response] != (id)[NSNull null]) {
+        q10ResponseRow.value = geriaDepreAssmtDict[kQ10Response];
+    }
+
+    [section3 addFormRow:q10ResponseRow];
+
+    phqQ1Row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([self getScoreFromPhqOptions:newValue] > 1)  {
+//                phq9ScoreRow.disabled = @(0);
+                q3_9Section.hidden = @NO;
+            }
+            else {
+                if (phqQ2Row.value != nil && phqQ2Row.value != (id) [NSNull null]) {
+                    if ([self getScoreFromPhqOptions:phqQ2Row.value] < 2) {    //only when both lower than 2, then disable field
+                        //                    phq9ScoreRow.disabled = @(1);
+                        [q3_9Section setHidden:@YES];
+                    }
+                } else {
+                    [q3_9Section setHidden:@YES];
+                }
+            }
+
+//            [self reloadFormRow:phq9ScoreRow];
+            [self reloadFormRow:q10ResponseRow];
+            [self reloadFormRow:q10Row];
+            [self.tableView reloadData];
+        }
+    };
+
+    phqQ2Row.onChangeBlock= ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([self getScoreFromPhqOptions:newValue] > 1) {
+//                phq9ScoreRow.disabled = @(0);
+                q3_9Section.hidden = @NO;
+            }
+            else {
+                if (phqQ1Row.value != nil  && phqQ1Row.value != (id) [NSNull null]) {
+                    if ([self getScoreFromPhqOptions:phqQ1Row.value] < 2) {    //only when both lower than 2, then disable field
+                        //                    phq9ScoreRow.disabled = @(1);
+                        [q3_9Section setHidden:@YES];
+                    }
+                } else {
+                    [q3_9Section setHidden:@YES];
+                }
+            }
+//            [self reloadFormRow:phq9ScoreRow];
+            [self reloadFormRow:q10Row];
+            [self reloadFormRow:q10ResponseRow];
+            [self.tableView reloadData];
+        }
+    };
+
+    XLFormSectionDescriptor *scoreSection = [XLFormSectionDescriptor formSectionWithTitle:@"Total Score (auto-calculate)"];
+    [formDescriptor addFormSection:scoreSection];
+
+    phqTotalScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhq9Score rowType:XLFormRowDescriptorTypeInfo title:@"Total Score"];
+
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhq9Score] != (id)[NSNull null]) {
+        phqTotalScoreRow.value = geriaDepreAssmtDict[kPhq9Score];
+        if ([phqTotalScoreRow.value integerValue]>= 5) {
+            q10Row.disabled = @NO;  //enable this
+            q10ResponseRow.disabled = @NO;
+        }
+    }
+
+
+    [scoreSection addFormRow:phqTotalScoreRow];
+
+    phqTotalScoreRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([phqTotalScoreRow.value integerValue] >= 5) {
+                q10Row.disabled = @NO;  //enable this
+                q10ResponseRow.disabled = @NO;
+            } else {
+                q10Row.disabled = @YES;  //enable this
+                q10ResponseRow.disabled = @YES;
+            }
+            [self reloadFormRow:q10Row];
+            [self reloadFormRow:q10ResponseRow];
+        }
+    };
+
+//    XLFormSectionDescriptor *finalSection = [XLFormSectionDescriptor formSectionWithTitle:@""];
+//    [formDescriptor addFormSection:finalSection];
+
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUpReq
+//                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+//                                                  title:@"Does resident require further follow up?"];
+//    [self setDefaultFontWithRow:row];
+//    row.selectorOptions = @[@"Yes",@"No"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//
+//    //value
+//    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kFollowUpReq] != (id)[NSNull null]) {
+//        row.value = [self getYesNofromOneZero:geriaDepreAssmtDict[kFollowUpReq]];
+//    }
+//    [finalSection addFormRow:row];
+
+    return [super initWithForm:formDescriptor];
+}
 
 
 #pragma mark - Buttons
@@ -1360,8 +1777,6 @@ typedef enum formName {
     
 }
 
-
-
 #pragma mark - XLFormDescriptorDelegate
 
 -(void)formRowDescriptorValueHasChanged:(XLFormRowDescriptor *)rowDescriptor oldValue:(id)oldValue newValue:(id)newValue
@@ -1384,7 +1799,60 @@ typedef enum formName {
             ansFromYESNO = @"0";
     }
     
-    if ([rowDescriptor.tag isEqualToString:kCopeFin]) {
+    /* Geriatric Dementia Assessment */
+    if ([rowDescriptor.tag isEqualToString:kPhqQ1]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kPhqQ1 andNewContent:[self getNumberFromPhqOption:newValue]];
+        phqTotalScoreRow.value = [NSNumber numberWithInt:[self calculateTotalPhqScore]];
+        [self reloadFormRow:phqTotalScoreRow];
+    } else if ([rowDescriptor.tag isEqualToString:kPhqQ2]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kPhqQ2 andNewContent:[self getNumberFromPhqOption:newValue]];
+        phqTotalScoreRow.value = [NSNumber numberWithInt:[self calculateTotalPhqScore]];
+        [self reloadFormRow:phqTotalScoreRow];
+    } else if ([rowDescriptor.tag isEqualToString:kPhqQ3]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kPhqQ3 andNewContent:[self getNumberFromPhqOption:newValue]];
+        phqTotalScoreRow.value = [NSNumber numberWithInt:[self calculateTotalPhqScore]];
+        [self reloadFormRow:phqTotalScoreRow];
+    } else if ([rowDescriptor.tag isEqualToString:kPhqQ4]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kPhqQ4 andNewContent:[self getNumberFromPhqOption:newValue]];
+        phqTotalScoreRow.value = [NSNumber numberWithInt:[self calculateTotalPhqScore]];
+        [self reloadFormRow:phqTotalScoreRow];
+    } else if ([rowDescriptor.tag isEqualToString:kPhqQ5]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kPhqQ5 andNewContent:[self getNumberFromPhqOption:newValue]];
+        phqTotalScoreRow.value = [NSNumber numberWithInt:[self calculateTotalPhqScore]];
+        [self reloadFormRow:phqTotalScoreRow];
+    } else if ([rowDescriptor.tag isEqualToString:kPhqQ6]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kPhqQ6 andNewContent:[self getNumberFromPhqOption:newValue]];
+        phqTotalScoreRow.value = [NSNumber numberWithInt:[self calculateTotalPhqScore]];
+        [self reloadFormRow:phqTotalScoreRow];
+    } else if ([rowDescriptor.tag isEqualToString:kPhqQ7]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kPhqQ7 andNewContent:[self getNumberFromPhqOption:newValue]];
+        phqTotalScoreRow.value = [NSNumber numberWithInt:[self calculateTotalPhqScore]];
+        [self reloadFormRow:phqTotalScoreRow];
+    } else if ([rowDescriptor.tag isEqualToString:kPhqQ8]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kPhqQ8 andNewContent:[self getNumberFromPhqOption:newValue]];
+        phqTotalScoreRow.value = [NSNumber numberWithInt:[self calculateTotalPhqScore]];
+        [self reloadFormRow:phqTotalScoreRow];
+    }  else if ([rowDescriptor.tag isEqualToString:kPhqQ9]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kPhqQ9 andNewContent:[self getNumberFromPhqOption:newValue]];
+        phqTotalScoreRow.value = [NSNumber numberWithInt:[self calculateTotalPhqScore]];
+        [self reloadFormRow:phqTotalScoreRow];
+    } else if ([rowDescriptor.tag isEqualToString:kPhq9Score]) {
+        
+        // if don't delay, not 100% success rate in submission
+        double delayInSeconds = 0.5;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            //code to be executed on the main queue after delay
+            [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kPhq9Score andNewContent:newValue];
+        });
+    }  else if ([rowDescriptor.tag isEqualToString:kQ10Response]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kQ10Response andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kFollowUpReq]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kFollowUpReq andNewContent:ansFromYesNo];
+    }
+    
+    
+    else if ([rowDescriptor.tag isEqualToString:kCopeFin]) {
         [self postSingleFieldWithSection:SECTION_CURRENT_SOCIOECO_SITUATION andFieldName:kCopeFin andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kWhyNotCopeFin]) {
         [self processWhyNotCopeSubmissionWithNewValue:newValue andOldValue:oldValue];
@@ -2251,6 +2719,42 @@ typedef enum formName {
     return returnArray;
 }
 
+
+- (NSString *) getSelectorOptionFromNumber: (NSNumber *) number {
+    if ([number isEqualToNumber:@0]) return @"Not at all [0]";
+    else if ([number isEqualToNumber:@1]) return @"Several days [1]";
+    else if ([number isEqualToNumber:@2]) return @"More than half the days [2]";
+    else return @"Nearly every day [3]";
+}
+
+- (NSString *) getNumberFromPhqOption: (NSString *) str {
+    if ([str containsString:@"0"]) return @"0";
+    else if ([str containsString:@"1"]) return @"1";
+    else if ([str containsString:@"2"]) return @"2";
+    else return @"3";
+}
+
+- (int) getScoreFromPhqOptions: (NSString *) option {
+    if ([option isEqualToString:@"Not at all [0]"]) return 0;
+    else if ([option isEqualToString:@"Several days [1]"]) return 1;
+    else if ([option isEqualToString:@"More than half the days [2]"]) return 2;
+    else return 3;
+}
+
+- (int) calculateTotalPhqScore {
+    
+    int totalScore = 0;
+    
+    for (XLFormRowDescriptor *row in _phqQuestionsArray) {
+        if (row.value != nil && row.value !=(id)[NSNull null]) {
+            if ([row.value containsString:@"0"]) totalScore = totalScore;
+            else if ([row.value containsString:@"1"]) totalScore += 1;
+            else if ([row.value containsString:@"2"]) totalScore += 2;
+            else if ([row.value containsString:@"3"]) totalScore += 3;
+        }
+    }
+    return totalScore;
+}
 
 - (NSString *) getYesNofromOneZero: (id) value {
     if ([value isKindOfClass:[NSString class]]) {

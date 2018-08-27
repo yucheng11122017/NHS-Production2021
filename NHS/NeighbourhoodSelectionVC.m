@@ -27,9 +27,9 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-- (IBAction)eunosCresBtnPressed:(id)sender {
-    selectedNeighbourhood = @"Eunos Crescent";
-    [[NSUserDefaults standardUserDefaults] setObject:@"Eunos Crescent" forKey:kNeighbourhood];
+- (IBAction)lengkokBahruBtnPressed:(id)sender {
+    selectedNeighbourhood = @"Lengkok Bahru";
+    [[NSUserDefaults standardUserDefaults] setObject:@"Lengkok Bahru" forKey:kNeighbourhood];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self performSegueWithIdentifier:@"neighbourhoodToScreeningListSegue" sender:self];
 }

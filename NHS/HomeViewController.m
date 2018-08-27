@@ -13,8 +13,6 @@
 #import "HTPressableButton.h"
 #import "UIColor+HTColor.h"
 
-
-
 @interface HomeViewController ()
 
 @property (strong, nonatomic) HTPressableButton *preRegBtn;

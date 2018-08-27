@@ -17,8 +17,9 @@
 #define ERROR_MSG_DELAY 5.0f
 
 #define FULLNAME_TEXTFIELD_TAG 1
-#define USERNAME_TEXTFIELD_TAG 2
-#define PASSWORD_TEXTFIELD_TAG 3
+#define MATRIC_NO_TEXTFIELD_TAG 2
+#define USERNAME_TEXTFIELD_TAG 3
+#define PASSWORD_TEXTFIELD_TAG 4
 
 //#define DEVELOPMENT_PHASE 1
 
@@ -32,6 +33,7 @@
 
 @property(strong, nonatomic) IBOutlet UIImageView *nhsLogoImageView;
 @property (weak, nonatomic) IBOutlet UITextField *fullNameField;
+@property (weak, nonatomic) IBOutlet UITextField *matricNoField;
 @property(strong, nonatomic) IBOutlet UITextField *usernameField;
 @property(strong, nonatomic) IBOutlet UITextField *passwordField;
 @property(strong, nonatomic) IBOutlet UILabel *errorMsgLabel;
@@ -66,22 +68,27 @@
     // Some Type configurations for Full Name and Username field
     self.fullNameField.autocapitalizationType = UITextAutocapitalizationTypeWords;
     self.fullNameField.autocorrectionType = UITextAutocorrectionTypeNo;
+    self.matricNoField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+    self.matricNoField.autocorrectionType = UITextAutocorrectionTypeNo;
     self.usernameField.autocorrectionType = UITextAutocorrectionTypeNo;
     
     // set textfield delegate - for responding to return button presses
     self.fullNameField.delegate = self;
+    self.matricNoField.delegate = self;
     self.usernameField.delegate = self;
     self.passwordField.delegate = self;
     
     // set tags for identifying textfields
     self.fullNameField.tag = FULLNAME_TEXTFIELD_TAG;
+    self.matricNoField.tag = MATRIC_NO_TEXTFIELD_TAG;
     self.usernameField.tag = USERNAME_TEXTFIELD_TAG;
     self.passwordField.tag = PASSWORD_TEXTFIELD_TAG;
     
 #ifdef DEVELOPMENT_PHASE
     self.fullNameField.text = @"Testing";
-    self.usernameField.text = @"nhs16comm1";
-    self.passwordField.text = @"2016comm1";
+    self.matricNoField.text = @"A0087489E";
+    self.usernameField.text = @"nhs17comm1";
+    self.passwordField.text = @"2017comm1";
 #endif
     
     
@@ -199,15 +206,28 @@
 }
 
 - (IBAction)loginButtonPressed:(id)sender {
-    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
-    [SVProgressHUD showWithStatus:@"Logging in..."];
     
     NSString *username = self.usernameField.text;
     NSString *password = self.passwordField.text;
     NSString *fullname = self.fullNameField.text;
+    NSString *matric_no = self.matricNoField.text;
     //bypassing for now
 //    NSString *username = ;
 //    NSString *password = ;
+    
+    
+    if (![self isMatricNumberValid:matric_no]) {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Invalid Matric Number" message:@"Please check that you have input the correct number." preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            //do nothing for now;
+        }];
+        [alertController addAction:okAction];
+        [self presentViewController:alertController animated:YES completion:nil];
+        return;     //don't continue from here....
+    }
+    
+    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
+    [SVProgressHUD showWithStatus:@"Logging in..."];
     
     // prepare password for submission: hash 5 times
     NSString *passkey = [self createSHA512:password];
@@ -221,13 +241,18 @@
     // submit credentials
 //    NSString *url = @"https://nus-nhs.ml/volunteerLogin"; //for DEV
     NSString *url = @"https://nhs-som.nus.edu.sg/volunteerLoginName";
-    NSDictionary *dict = @{@"fullname": fullname, @"username" : username, @"passkey" : passkey, @"device_type":deviceType, @"device_name":deviceName };
+    NSDictionary *dict = @{@"fullname": fullname,
+                           @"username" : username,
+                           @"passkey" : passkey,
+                           @"device_type":deviceType,
+                           @"device_name":deviceName,
+                           @"matric_number":matric_no };
     NSDictionary *dataDict = @{ @"data" : dict };
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     manager.requestSerializer = [AFJSONRequestSerializer serializer];
-    
+
     [manager POST:url
        parameters:dataDict
          progress:nil
@@ -325,10 +350,26 @@
     NSLog(@"Show DeviceInfoLabel!");
 }
 
+-(BOOL)isMatricNumberValid: (NSString *) matricNumber {
+    NSError  *error  = NULL;
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:
+                                  @"^[a-zA-Z]\\d{7}[a-zA-Z]$"
+                                                                           options:0
+                                                                             error:
+                                  &error];
+    NSUInteger numOfMatches = [regex numberOfMatchesInString:matricNumber
+                                                       options:0
+                                                         range:
+                                 NSMakeRange(0, [matricNumber length])];
+    
+    return numOfMatches == 1;
+}
+
  #pragma mark - Navigation
  
  - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
  }
  
 @end
+
 

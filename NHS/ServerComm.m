@@ -102,8 +102,7 @@
     
 }
 
-#pragma mark - Resident Particulars
-
+#pragma mark - Resident Particulars    
 //updated
 - (void)postNewResidentWithDict:(NSDictionary *) personalInfoDict
                    progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock

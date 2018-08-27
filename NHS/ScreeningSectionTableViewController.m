@@ -26,20 +26,18 @@ typedef enum typeOfForm {
 } typeOfForm;
 
 typedef enum sectionRowNumber {
-    Phlebotomy,
-    ModeOfScreening,
-    Profiling,
-    GeriatricDepressionAssess,
-    SocialWork,
     Triage,
-    SnellenEyeTest,
-    AdditionalServices,
+    Phlebotomy,
+    Profiling,
+    BasicVision,
+    AdvancedGeriatric,
+    Dental,
+    Hearing,
+    AdvancedVision,
     DoctorsConsultation,
-    BasicDentalCheckup,
-    SeriAdvancedEyeScreening,
-    FallRiskAssessment,
-    GeriatricDementiaAssess,
-    HealthEducation
+    AdditionalServices,
+    SocialWork,
+    Summary_HealthEducation
 } sectionRowNumber;
 
 
@@ -135,7 +133,11 @@ typedef enum sectionRowNumber {
     }
 #endif
     
-    self.rowTitles = @[@"Phlebotomy", @"Mode of Screening",@"Profiling", @"Geriatric Depression Assessment", @"Social Work", @"Triage", @"Snellen Eye Test", @"Additional Services", @"Doctor's Consultation", @"Basic Dental Check-up", @"SERI Advanced Eye Screening", @"Fall Risk Assessment", @"Geriatric Dementia Asssesment", @"Health Education"];
+    //2018
+    self.rowTitles = @[@"1. Triage", @"2. Phlebotomy", @"3. Profiling (U/C)", @"4. Basic Vision", @"5. Advanced Geriatric (U/C)", @"6. Dental (U/C)", @"7. Hearing (U/C)", @"8. Advanced Vision", @"9. Doctor's Consultation", @"10. Additional Services", @"11. Social Work", @"Summary & Health Education (U/C)"];
+    
+    //2017
+//    self.rowTitles = @[@"Phlebotomy", @"Mode of Screening",@"Profiling", @"Geriatric Depression Assessment", @"Social Work", @"Triage", @"4. Basic Vision", @"Additional Services", @"Doctor's Consultation", @"6. Dental", @"8. Advanced Vision", @"5. Advanced Geriatric", @"Geriatric Dementia Asssesment", @"Health Education"];
     
      self.clearsSelectionOnViewWillAppear = YES;
     
@@ -201,54 +203,60 @@ typedef enum sectionRowNumber {
             [cell.textLabel setTextColor:[UIColor blackColor]];
         }
         
-        if (indexPath.row == GeriatricDepressionAssess) {   //Geriatric Depression Assessment (Age < 65)
-            if ([age intValue] <65) {
-                [cell.textLabel setTextColor:[UIColor grayColor]];
-                cell.userInteractionEnabled = NO;
-            }
-            
-            NSDictionary *geriaDepreAssmtDict = [self.fullScreeningForm objectForKey:SECTION_DEPRESSION];
-            if (geriaDepreAssmtDict != nil && geriaDepreAssmtDict != (id)[NSNull null]) {
-                if ([geriaDepreAssmtDict objectForKey:kPhq9Score] != nil && [geriaDepreAssmtDict objectForKey:kPhq9Score] != (id)[NSNull null]) {
-                    if ([[geriaDepreAssmtDict objectForKey:kPhq9Score] integerValue] >= 5) {
-                        [cell.textLabel setTextColor:[UIColor redColor]];
-                    }
-                }
-            }
-            
-        }
-    
-        if ((indexPath.row >= SeriAdvancedEyeScreening) && (indexPath.row <= GeriatricDementiaAssess)) {   //between 10 to 12
-            if (indexPath.row == SeriAdvancedEyeScreening) {  //SERI
-                //Enable SERI
-                if ([[[NSUserDefaults standardUserDefaults] objectForKey:kQualifySeri] isEqual:@"1"]) {
-                    if (!alreadySubmitted) {
-                        cell.userInteractionEnabled = YES;
-                        [cell.textLabel setTextColor:[UIColor blackColor]];
-                    }
-                    return cell;    //don't disable.
-                }
-            } else if (indexPath.row == FallRiskAssessment) {
-                if ([[[NSUserDefaults standardUserDefaults] objectForKey:kQualifyFallAssess] isEqual:@"1"]) {
-                    if (!alreadySubmitted) {
-                        cell.userInteractionEnabled = YES;
-                        [cell.textLabel setTextColor:[UIColor blackColor]];
-                    }
-                    return cell;    //don't disable.
-                }
-            } else if (indexPath.row == GeriatricDementiaAssess) {
-                if ([[[NSUserDefaults standardUserDefaults] objectForKey:kQualifyDementia] isEqual:@"1"]) {
-                    if (!alreadySubmitted) {
-                        cell.userInteractionEnabled = YES;
-                        [cell.textLabel setTextColor:[UIColor blackColor]];
-                    }
-                    return cell;    //don't disable.
-                }
-            }
-            
+        if ([cell.textLabel.text containsString:@"U/C"]) {
             cell.userInteractionEnabled = NO;
             [cell.textLabel setTextColor:[UIColor grayColor]];
+            return cell;
         }
+        
+//        if (indexPath.row == GeriatricDepressionAssess) {   //Geriatric Depression Assessment (Age < 65)
+//            if ([age intValue] <65) {
+//                [cell.textLabel setTextColor:[UIColor grayColor]];
+//                cell.userInteractionEnabled = NO;
+//            }
+//
+//            NSDictionary *geriaDepreAssmtDict = [self.fullScreeningForm objectForKey:SECTION_DEPRESSION];
+//            if (geriaDepreAssmtDict != nil && geriaDepreAssmtDict != (id)[NSNull null]) {
+//                if ([geriaDepreAssmtDict objectForKey:kPhq9Score] != nil && [geriaDepreAssmtDict objectForKey:kPhq9Score] != (id)[NSNull null]) {
+//                    if ([[geriaDepreAssmtDict objectForKey:kPhq9Score] integerValue] >= 5) {
+//                        [cell.textLabel setTextColor:[UIColor redColor]];
+//                    }
+//                }
+//            }
+//
+//        }
+////
+//        if ((indexPath.row >= SeriAdvancedEyeScreening) && (indexPath.row <= GeriatricDementiaAssess)) {   //between 10 to 12
+//            if (indexPath.row == SeriAdvancedEyeScreening) {  //SERI
+//                //Enable SERI
+//                if ([[[NSUserDefaults standardUserDefaults] objectForKey:kQualifySeri] isEqual:@"1"]) {
+//                    if (!alreadySubmitted) {
+//                        cell.userInteractionEnabled = YES;
+//                        [cell.textLabel setTextColor:[UIColor blackColor]];
+//                    }
+//                    return cell;    //don't disable.
+//                }
+//            } else if (indexPath.row == FallRiskAssessment) {
+//                if ([[[NSUserDefaults standardUserDefaults] objectForKey:kQualifyFallAssess] isEqual:@"1"]) {
+//                    if (!alreadySubmitted) {
+//                        cell.userInteractionEnabled = YES;
+//                        [cell.textLabel setTextColor:[UIColor blackColor]];
+//                    }
+//                    return cell;    //don't disable.
+//                }
+//            } else if (indexPath.row == GeriatricDementiaAssess) {
+//                if ([[[NSUserDefaults standardUserDefaults] objectForKey:kQualifyDementia] isEqual:@"1"]) {
+//                    if (!alreadySubmitted) {
+//                        cell.userInteractionEnabled = YES;
+//                        [cell.textLabel setTextColor:[UIColor blackColor]];
+//                    }
+//                    return cell;    //don't disable.
+//                }
+//            }
+//
+//            cell.userInteractionEnabled = NO;
+//            [cell.textLabel setTextColor:[UIColor grayColor]];
+//        }
     }
     
     //submit button
@@ -304,30 +312,20 @@ typedef enum sectionRowNumber {
             [self performSegueWithIdentifier:@"sectionToProfilingSegue" sender:self];
             return;
         }
-        else if (indexPath.row == GeriatricDepressionAssess) {
-            selectedRow = [NSNumber numberWithInteger:GeriatricDepressionAssess];
-        } else if (indexPath.row == SocialWork) {
+        else if (indexPath.row == SocialWork) {
             [self performSegueWithIdentifier:@"screenSectionToSocialWorkSegue" sender:self];
             return;
         } else if (indexPath.row == Triage) {
             selectedRow = [NSNumber numberWithInteger:Triage];
-        } else if (indexPath.row == SnellenEyeTest) {
-            selectedRow = [NSNumber numberWithInteger:SnellenEyeTest];
         } else if (indexPath.row == AdditionalServices) {
             selectedRow = [NSNumber numberWithInteger:AdditionalServices];
+        } else if (indexPath.row == AdvancedVision) {
+            [self performSegueWithIdentifier:@"screeningSectionToSeriSubsectionSegue" sender:self];
+            return;
         } else if (indexPath.row == DoctorsConsultation) {
             selectedRow = [NSNumber numberWithInteger:DoctorsConsultation];
-        } else if (indexPath.row == BasicDentalCheckup) {
-            selectedRow = [NSNumber numberWithInteger:BasicDentalCheckup];
-          } else if (indexPath.row == SeriAdvancedEyeScreening) {
-              [self performSegueWithIdentifier:@"screeningSectionToSeriSubsectionSegue" sender:self];
-              return;
-          } else if (indexPath.row == FallRiskAssessment) {
-              selectedRow = [NSNumber numberWithInteger:FallRiskAssessment];
-          } else if (indexPath.row == GeriatricDementiaAssess) {
-              selectedRow = [NSNumber numberWithInteger:GeriatricDementiaAssess];
-          } else if (indexPath.row == HealthEducation) {
-            selectedRow = [NSNumber numberWithInteger:HealthEducation];
+        }  else if (indexPath.row == Summary_HealthEducation) {
+            selectedRow = [NSNumber numberWithInteger:Summary_HealthEducation];
         }
 
         
@@ -525,7 +523,7 @@ typedef enum sectionRowNumber {
     }
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
     
-    NSArray *lookupTable = @[kCheckPhleb, kCheckScreenMode, @"profiling_overall",kCheckDepression,@"check_social_work", kCheckTriage, kCheckSnellen, kCheckAdd, kCheckDocConsult, kCheckDental, @"check_overall_seri", kCheckFall,kCheckDementia, kCheckEd];
+    NSArray *lookupTable = @[kCheckPhleb, kCheckScreenMode, @"profiling_overall",kCheckSwDepress,@"check_social_work", kCheckTriage, kCheckSnellen, kCheckAdd, kCheckDocConsult, kCheckDental, @"check_overall_seri", kCheckFall,kCheckDementia, kCheckEd];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {
@@ -535,8 +533,6 @@ typedef enum sectionRowNumber {
             }
             else if (i == SocialWork) {
                 [_completionCheck addObject:[self checkAllSocialWorkSections:checksDict]];
-            } else if (i== SeriAdvancedEyeScreening) {
-                [_completionCheck addObject:[self checkAllSeriSections:checksDict]];
             } else {
                 NSString *key = lookupTable[i];
                 

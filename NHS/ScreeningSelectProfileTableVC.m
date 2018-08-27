@@ -137,10 +137,11 @@ typedef enum getDataState {
     } else {
         NSString *text = [_yearlyProfile objectAtIndex:indexPath.row];
         [cell.textLabel setText:text];
-        NSNumber *preRegDone =[_residentDetails[kResiParticulars] objectForKey:kPreregCompleted];
+//        NSNumber *preRegDone =[_residentDetails[kResiParticulars] objectForKey:kPreregCompleted];
+        NSNumber *preRegDone = @1;
         NSNumber *serialNum = [[NSUserDefaults standardUserDefaults] objectForKey:kNhsSerialNum];
         
-        if ([text containsString:@"2017"]) {
+        if ([text containsString:@"2018"]) {
             if ([preRegDone isEqual:@0]) {
                 [cell setUserInteractionEnabled:NO];
                 [cell.textLabel setTextColor:[UIColor grayColor]];
@@ -173,7 +174,7 @@ typedef enum getDataState {
             
         }
         
-        else if ([text containsString:@"2018"] || [text containsString:@"2019"]) {
+        else if ([text containsString:@"2017"] || [text containsString:@"2019"]) {
             [cell setUserInteractionEnabled:NO];
             [cell.textLabel setTextColor:[UIColor grayColor]];
         }
@@ -194,17 +195,17 @@ typedef enum getDataState {
     }
     else if (indexPath.section == 1){   //past profiles
         
-        if (indexPath.row > 0) {
+        if (indexPath.row != 1) {
             [tableView deselectRowAtIndexPath:indexPath animated:YES];
             //do nothing
-        } else {    //only for 2017 profile
+        } else {    //only for 2018 profile
             [self showPopUpBox];
         }
     }
 }
 
 - (void) showPopUpBox {
-    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"2017 Screening Profile", nil)
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"2018 Screening Profile", nil)
                                                                               message:@""
                                                                        preferredStyle:UIAlertControllerStyleAlert];
     

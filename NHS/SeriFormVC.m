@@ -137,6 +137,12 @@ typedef enum formName {
         }
     }
     
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUndergoneAdvSeri rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone Advanced SERI?"];
+    [self setDefaultFontWithRow:row];
+    row.required = YES;
+    row.selectorOptions = @[@"Yes", @"No"];
+    [section addFormRow:row];
+    
     
     rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1" rowType:XLFormRowDescriptorTypeInfo title:@"Chief Complaint"];
     [self setDefaultFontWithRow:rowInfo];
@@ -214,6 +220,7 @@ typedef enum formName {
     
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kVaDone rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Done?"];
+    row.required = YES;
     row.selectorOptions = @[@"Done", @"Not Done", @"Refused"];
     [self setDefaultFontWithRow:row];
     
@@ -227,6 +234,7 @@ typedef enum formName {
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kVa rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Presenting VA"];
+    row.required = YES;
     row.selectorOptions = @[@"With glasses", @"Without Glasses"];
     [self setDefaultFontWithRow:row];
     
@@ -235,7 +243,8 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kVaSnellenOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA Snellen OD: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kVaSnellenOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA Snellen OD: 6/"];
+    row.required = YES;
     [self setDefaultFontWithRow:row];
     
     if (vaDict != (id)[NSNull null] && [vaDict objectForKey:kVaSnellenOd] != (id)[NSNull null])
@@ -243,7 +252,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    vaLogmarOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVaLogmarOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA LogMAR OD: "];
+    vaLogmarOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVaLogmarOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA LogMAR OD:"];
     [self setDefaultFontWithRow:vaLogmarOdRow];
     
     if (vaDict != (id)[NSNull null] && [vaDict objectForKey:kVaLogmarOd] != (id)[NSNull null])
@@ -251,7 +260,8 @@ typedef enum formName {
     
     [section addFormRow:vaLogmarOdRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kVaSnellenOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA Snellen OS: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kVaSnellenOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA Snellen OS: 6/"];
+    row.required = YES;
     [self setDefaultFontWithRow:row];
     
     //value
@@ -261,7 +271,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    vaLogmarOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVaLogmarOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA LogMAR OS: "];
+    vaLogmarOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVaLogmarOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA LogMAR OS: +/-"];
     [self setDefaultFontWithRow:vaLogmarOsRow];
     
     //value
@@ -270,7 +280,8 @@ typedef enum formName {
     
     [section addFormRow:vaLogmarOsRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPinSnellenOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole Snellen OD: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPinSnellenOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole Snellen OD: 6/"];
+    row.required = YES;
     [self setDefaultFontWithRow:row];
     
     //value
@@ -279,7 +290,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    pinholeLogmarOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPinLogmarOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole LogMAR OD: "];
+    pinholeLogmarOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPinLogmarOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole LogMAR OD: +/-"];
     [self setDefaultFontWithRow:pinholeLogmarOdRow];
     
     //value
@@ -288,7 +299,8 @@ typedef enum formName {
     
     [section addFormRow:pinholeLogmarOdRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPinSnellenOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole Snellen OS: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPinSnellenOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole Snellen OS: 6/"];
+    row.required = YES;
     [self setDefaultFontWithRow:row];
     
     //value
@@ -297,7 +309,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    pinholeLogmarOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPinLogmarOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole LogMAR OS: "];
+    pinholeLogmarOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPinLogmarOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole LogMAR OS: +/-"];
     [self setDefaultFontWithRow:pinholeLogmarOsRow];
     
     //value
@@ -306,7 +318,7 @@ typedef enum formName {
     
     [section addFormRow:pinholeLogmarOsRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearLogmarOd rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity LogMAR OD: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearLogmarOd rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity LogMAR OD: +/-"];
     [self setDefaultFontWithRow:row];
     
     //value
@@ -315,7 +327,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearNxOd rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity Nx OD: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearNxOd rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity Nx OD: +/-"];
     [self setDefaultFontWithRow:row];
     
     //value
@@ -324,7 +336,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearLogmarOs rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity LogMAR OS: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearLogmarOs rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity LogMAR OS: +/-"];
     [self setDefaultFontWithRow:row];
     
     //value
@@ -333,7 +345,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearNxOs rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity Nx OS: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearNxOs rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity Nx OS: +/-"];
     [self setDefaultFontWithRow:row];
     
     //value
@@ -861,6 +873,7 @@ typedef enum formName {
     }
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kIopDone rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Done?"];
+    row.required = YES;
     row.selectorOptions = @[@"Done", @"Not Done", @"Refused"];
     [self setDefaultFontWithRow:row];
     
@@ -927,6 +940,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAheDone rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Done?"];
     row.selectorOptions = @[@"Done", @"Not Done", @"Refused"];
+    row.required = YES;
     [self setDefaultFontWithRow:row];
     
     //value
@@ -1018,6 +1032,7 @@ typedef enum formName {
     
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kPheDone rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Done?"];
+    row.required = YES;
     row.selectorOptions = @[@"Done", @"Not Done", @"Refused"];
     [self setDefaultFontWithRow:row];
     
@@ -1113,6 +1128,7 @@ typedef enum formName {
     
     
     XLFormRowDescriptor *diagOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiagnosisOd rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Diagnosis OD: "];
+    diagOdRow.required = YES;
     diagOdRow.selectorOptions = @[@"Normal", @"Refractive Error", @"Cataract", @"Glaucoma", @"Age-related macular degeneration", @"Diabetic Retinopathy/maculopathy", @"Others"];
     diagOdRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:diagOdRow];
@@ -1135,6 +1151,7 @@ typedef enum formName {
     [section addFormRow:row];
     
     XLFormRowDescriptor *diagOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiagnosisOs rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Diagnosis OS: "];
+    diagOsRow.required = YES;
     diagOsRow.selectorOptions = @[@"Normal", @"Refractive Error", @"Cataract", @"Glaucoma", @"Age-related macular degeneration", @"Diabetic Retinopathy/maculopathy", @"Others"];
     diagOsRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:diagOsRow];
@@ -1157,7 +1174,8 @@ typedef enum formName {
     [section addFormRow:row];
     
     XLFormRowDescriptor *followUpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUp rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Follow-up:"];
-    followUpRow.selectorOptions = @[@"No follow-up/Already on follow-up", @"Referral to eye-specialist", @"Cataract surgery", @"Given Free Spectacles Voucher"];
+    followUpRow.required = YES;
+    followUpRow.selectorOptions = @[@"No FU needed", @"Already on FU", @"Need spectacles", @"Referral to eye specialist", @"Cataract Surgery"];
     followUpRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:followUpRow];
     
@@ -1357,6 +1375,11 @@ typedef enum formName {
             ansFromYESNO = @"0";
     }
     
+    //Medical History
+    if ([rowDescriptor.tag isEqualToString:kUndergoneAdvSeri]) {
+        [self postSingleFieldWithSection:SECTION_SERI_MED_HIST andFieldName:kUndergoneAdvSeri andNewContent:ansFromYesNo];
+    }
+
     //Visual Acuity
     if ([rowDescriptor.tag isEqualToString:kVaDone]) {
         [self postSingleFieldWithSection:SECTION_SERI_VA andFieldName:kVaDone andNewContent:newValue];
