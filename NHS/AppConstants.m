@@ -34,6 +34,7 @@ NSString *const kResiParticulars = @"resi_particulars";
 
 #pragma mark - Resident Particulars
 
+NSString *const kOldRecord = @"old_record";
 NSString *const kName = @"resident_name";
 NSString *const kNRIC = @"nric";
 NSString *const kNRIC2 = @"reenter_nric";
@@ -144,7 +145,7 @@ NSString *const kAgeAbove50= @"age_above_50";
 NSString *const kRelWColorectCancer= @"rel_w_colorect_cancer";
 NSString *const kColonoscopy3yrs= @"colonoscopy_3_yrs";
 NSString *const kWantColonoscopyRef= @"want_colonoscopy_ref";
-NSString *const kFitLast12Mths= @"fit_last_2_mths";
+NSString *const kFitLast12Mths= @"fit_last_12_mths";
 NSString *const kColonoscopy10Yrs= @"colonoscopy_10_yrs";
 NSString *const kWantFitKit= @"want_fit_kit";
 NSString *const kMammo2Yrs= @"mammo_2_yrs";
@@ -192,6 +193,18 @@ NSString *const kHTSeeingDocRegularly = @"ht_seeing_doc_regularly";
 NSString *const kHTCurrentlyPrescribed = @"ht_currently_prescribed";
 NSString *const kHTTakingRegularly = @"ht_taking_regularly";
 
+/** Healthcare Barriers */
+NSString *const kExistingDoc = @"existing_doc";
+NSString *const kWhyNotFollowUp = @"why_not_follow_up";
+NSString *const kOtherBarrier = @"other_barrier";
+
+/** Family History */
+NSString *const kFamHighBp = @"fam_high_bp";
+NSString *const kFamHighCholes = @"fam_high_choles";
+NSString *const kFamChd = @"fam_chd";
+NSString *const kFamStroke = @"fam_stroke";
+NSString *const kFamNone = @"fam_none";
+
 /** Risk Stratification */
 NSString *const kDiabeticFriend = @"diabetic_friend";
 NSString *const kDelivered4kgOrGestational = @"delivered4kg_or_gestational";
@@ -202,6 +215,34 @@ NSString *const kKidneyDisease = @"kidney_disease";
 NSString *const kSmoke = @"smoke";
 NSString *const kSmokeYes = @"smoke_yes";
 NSString *const kSmokeNo = @"smoke_no";
+
+/** Diet History */
+NSString *const kAlcohol = @"alcohol";
+NSString *const kEatHealthy = @"eat_healthy";
+NSString *const kVege = @"vege";
+NSString *const kFruits = @"fruits";
+NSString *const kGrainsCereals = @"grains_cereals";
+NSString *const kHighFats = @"high_fats";
+NSString *const kProcessedFoods = @"processed_foods";
+
+/** Exercise History */
+NSString *const kEngagePhysical = @"engage_physical";
+NSString *const kNoTime = @"no_time";
+NSString *const kTooTired = @"too_tired";
+NSString *const kTooLazy = @"too_lazy";
+NSString *const kNoInterest = @"no_interest";
+
+/** Fall Risk Eligible */
+NSString *const kUndergoneAssmt = @"undergone_assmt";
+NSString *const kMobility = @"mobility";
+NSString *const kNumFalls = @"num_falls";
+NSString *const kAssistLevel = @"assist_level";
+NSString *const kSteadiness = @"steadiness";
+NSString *const kFallRiskScore = @"fall_risk_score";
+NSString *const kFallRiskStatus = @"fall_risk_status";
+
+
+
 
 #pragma mark - Geriatric Depression Assessment
 
@@ -733,8 +774,19 @@ NSString *const kCheckProfiling = @"check_profiling";
 NSString *const kCheckDiabetes = @"check_diabetes";
 NSString *const kCheckHyperlipidemia = @"check_hyperlipidemia";
 NSString *const kCheckHypertension = @"check_hypertension";
+NSString *const kCheckHealthcareBarriers = @"check_healthcare_barriers";
+NSString *const kCheckFamilyHist = @"check_family_hist";
 NSString *const kCheckSwDepress = @"check_sw_depression";
-NSString *const kCheckRiskStrat = @"check_risk_strat";
+NSString *const kCheckRiskStratification = @"check_risk_stratification";
+NSString *const kCheckDiet = @"check_diet";
+NSString *const kCheckExercise = @"check_exercise";
+NSString *const kCheckFitEligible = @"check_fit_eligible";
+NSString *const kCheckMammogramEligible = @"check_mammogram_eligible";
+NSString *const kCheckPapSmearEligible = @"check_pap_smear_eligible";
+NSString *const kCheckFallRiskEligible = @"kCheckFallRiskEligible";
+NSString *const kCheckGeriatricDementiaEligible = @"check_geriatric_dementia_eligible";
+
+
 NSString *const kCheckGeno = @"check_geno";
 NSString *const kCheckSocioEco = @"check_socioeco";
 NSString *const kCheckCurrentPhyStatus = @"check_current_phy_status";

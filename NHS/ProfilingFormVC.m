@@ -1,4 +1,4 @@
-//
+    //
 //  ProfilingFormVC.m
 //  NHS
 //
@@ -107,12 +107,44 @@ typedef enum formName {
             form = [self initHypertension];
             break;
         case 4:
+            form = [self initMedHistOthers];
+            break;
+        case 5:
+            form = [self initSurgery];
+            break;
+        case 6:
+            form = [self initHealthcareBarriers];
+            break;
+        case 7:
+            form = [self initFamilyHistory];
+            break;
+        case 8:
             form = [self initRiskStratification];
             break;
+        case 9:
+            form = [self initDietHistory];
+            break;
+        case 10:
+            form = [self initExerciseHistory];
+            break;
+        case 11:
+            form = [self initFitEligible];
+            break;
+        case 12:
+            form = [self initMammogramEligible];
+            break;
+        case 13:
+            form = [self initPapSmearEligible];
+            break;
+        case 14:
+            form = [self initFallRiskAsmt];
+            break;
+
+            
         default:
             break;
     }
-    [self.form setAddAsteriskToRequiredRowsTitle:NO];
+    [self.form setAddAsteriskToRequiredRowsTitle:YES];
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
     
     if (isFormFinalized) {
@@ -510,8 +542,10 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    XLFormRowDescriptor *fitLast12MthsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFitLast12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Has not done FIT in the last 12 months?"];
+    
+    XLFormRowDescriptor *fitLast12MthsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFitLast12Mths rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Have you done a FIT (Faecal Immunochemical Test) in the past 12 months?"];
     if (fitEligibDict != (id)[NSNull null] && [fitEligibDict objectForKey:kFitLast12Mths] != (id)[NSNull null]) fitLast12MthsRow.value = fitEligibDict[kFitLast12Mths];
+    
     [self setDefaultFontWithRow:fitLast12MthsRow];
     fitLast12MthsRow.required = NO;
     fitLast12MthsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
@@ -578,6 +612,8 @@ typedef enum formName {
             
         }
     };
+    
+   
     
     // for the initial setting
     if (sporeanPr && age50 && relColorectCancer && colon3Yrs && wantColRef) {
@@ -1028,15 +1064,10 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical History: Diabetes Mellitus"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ1
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Has a western-trained doctor ever told you that you have diabetes? *"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [self setDefaultFontWithRow:row];
-    [section addFormRow:row];
-    
-    XLFormRowDescriptor *hasInformedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    hasInformedRow.selectorOptions = @[@"YES", @"NO"];
+    XLFormRowDescriptor *hasInformedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Has a western-trained doctor ever told you that you have diabetes?"];
+    [self setDefaultFontWithRow:hasInformedRow];
+    hasInformedRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    hasInformedRow.selectorOptions = @[@"Yes", @"No"];
     hasInformedRow.required = YES;
     
     if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kHasInformed] != (id)[NSNull null]) {
@@ -1047,17 +1078,17 @@ typedef enum formName {
     
     XLFormRowDescriptor *hasCheckedBloodQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ2
                                                                                      rowType:XLFormRowDescriptorTypeInfo
-                                                                                       title:@"Have you checked your blood sugar in the past 3 years?"];
+                                                                                       title:@"When was the last time you checked your blood sugar?"];
     [self setDefaultFontWithRow:hasCheckedBloodQRow];
     hasCheckedBloodQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    hasCheckedBloodQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformedRow];
+    hasCheckedBloodQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'No'", hasInformedRow];
     [section addFormRow:hasCheckedBloodQRow];
     
     XLFormRowDescriptor *hasCheckedBloodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMCheckedBlood rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
-    
-    hasCheckedBloodRow.selectorOptions = @[@"No",@"Yes, 2 yrs ago",@"Yes, 3 yrs ago",@"Yes < 1 yr ago"];
+    hasCheckedBloodRow.required = YES;
+    hasCheckedBloodRow.selectorOptions = @[@"Within past 3 years", @"More than 3 years ago"];
     hasCheckedBloodRow.noValueDisplayText = @"Tap Here";
-    hasCheckedBloodRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformedRow];
+    hasCheckedBloodRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'No'", hasInformedRow];
     
     if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kCheckedBlood] != (id)[NSNull null]) {
         hasCheckedBloodRow.value = diabetesDict[kCheckedBlood];
@@ -1067,84 +1098,84 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ3
                                                 rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Are you seeing your doctor regularly for your diabetes?"];
+                                                  title:@"How often are you seeing your doctor for your diabetes?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformedRow];
     [section addFormRow:row];
     
-    XLFormRowDescriptor *seeDocRegularRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    seeDocRegularRow.selectorOptions = @[@"YES", @"NO"];
-    
-    ;
+    XLFormRowDescriptor *seeDocRegularRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    seeDocRegularRow.selectorOptions = @[@"Regular (Interval of 6 months or less)", @"Occasionally (Interval of more than 6 months)", @"Seldom (last appointment was >1 year ago)", @"Not at all"];
+    seeDocRegularRow.required = YES;
     if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kSeeingDocRegularly] != (id)[NSNull null]) {
-        seeDocRegularRow.value = [self getYesNoFromOneZero:diabetesDict[kSeeingDocRegularly]];
+        seeDocRegularRow.value = diabetesDict[kSeeingDocRegularly];
     }
-    seeDocRegularRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
+    seeDocRegularRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformedRow];
     [section addFormRow:seeDocRegularRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ4
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Are you currently prescribed medication for your diabetes?"];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
-    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ4
+//                                                rowType:XLFormRowDescriptorTypeInfo
+//                                                  title:@"If yes to (a), are you taking any medication for your diabetes?"];
+//    [self setDefaultFontWithRow:row];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformedRow];
+//    [section addFormRow:row];
     
-    XLFormRowDescriptor *currentPrescrRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    currentPrescrRow.selectorOptions = @[@"YES", @"NO"];
-    
+    XLFormRowDescriptor *currentPrescrRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Are you taking any medication for your diabetes?"];
+    [self setDefaultFontWithRow:currentPrescrRow];
+    currentPrescrRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    currentPrescrRow.required = YES;
+    currentPrescrRow.selectorOptions = @[@"Yes", @"No"];
     
     if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kCurrentlyPrescribed] != (id)[NSNull null]) {
         currentPrescrRow.value = [self getYesNoFromOneZero:diabetesDict[kCurrentlyPrescribed]];
     }
     
-    currentPrescrRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
+    currentPrescrRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformedRow];
     [section addFormRow:currentPrescrRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ5
                                                 rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Are you taking your diabetes medication regularly? (≥ 90% of time)"];
+                                                  title:@"How often do you forget to take your diabetes medication in a week?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformedRow];
     [section addFormRow:row];
     
     // Segmented Control
     XLFormRowDescriptor *takingRegularRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDMTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    takingRegularRow.selectorOptions = @[@"YES", @"NO"];
+    takingRegularRow.required = YES;
+    takingRegularRow.selectorOptions = @[@"0", @"1-3", @"4-6", @"≥7"];
     
     
     if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kTakingRegularly] != (id)[NSNull null]) {
-        takingRegularRow.value = [self getYesNoFromOneZero:diabetesDict[kTakingRegularly]];
+        takingRegularRow.value = diabetesDict[kTakingRegularly];
     }
-    takingRegularRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformedRow];
+    takingRegularRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformedRow];
     [section addFormRow:takingRegularRow];
     
-    // For initial value
-    if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kHasInformed] != (id)[NSNull null]) {
-        if ([diabetesDict[kHasInformed] isEqualToNumber:@1]) {
-            seeDocRegularRow.required = YES;
-            currentPrescrRow.required = YES;
-            takingRegularRow.required = YES;
-        } else {
-            hasCheckedBloodRow.required = YES;
-        }
-    }
-    
-    //For detecting change
-    hasInformedRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqualToString:@"YES"]) {
-                seeDocRegularRow.required = YES;
-                currentPrescrRow.required = YES;
-                takingRegularRow.required = YES;
-            } else {
-                hasCheckedBloodRow.required = YES;
-            }
-        }
-    };
-    
+//    // For initial value
+//    if (diabetesDict != (id)[NSNull null] && [diabetesDict objectForKey:kHasInformed] != (id)[NSNull null]) {
+//        if ([diabetesDict[kHasInformed] isEqualToNumber:@1]) {
+//            seeDocRegularRow.required = YES;
+//            currentPrescrRow.required = YES;
+//            takingRegularRow.required = YES;
+//        } else {
+//            hasCheckedBloodRow.required = YES;
+//        }
+//    }
+//    //For detecting change
+//    hasInformedRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//        if (newValue != oldValue) {
+//            if ([newValue isEqualToString:@"Yes"]) {
+//                seeDocRegularRow.required = YES;
+//                currentPrescrRow.required = YES;
+//                takingRegularRow.required = YES;
+//            } else {
+//                hasCheckedBloodRow.required = YES;
+//            }
+//        }
+//    };
     return [super initWithForm:formDescriptor];
 }
 
@@ -1170,16 +1201,17 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical History: Hyperlipidemia"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ6
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Has a western-trained doctor ever told you that you have high cholesterol? *"];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ6
+//                                                rowType:XLFormRowDescriptorTypeInfo
+//                                                  title:@"Has a western-trained doctor ever told you that you have high cholesterol?"];
+//    [self setDefaultFontWithRow:row];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [section addFormRow:row];
     
-    XLFormRowDescriptor *hasInformed = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    XLFormRowDescriptor *hasInformed = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Has a western-trained doctor ever told you that you have high cholesterol?"];
     [self setDefaultFontWithRow:hasInformed];
-    hasInformed.selectorOptions = @[@"YES", @"NO"];
+    hasInformed.cellConfig[@"textLabel.numberOfLines"] = @0;
+    hasInformed.selectorOptions = @[@"Yes", @"No"];
     hasInformed.required = YES;
     
     if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kHasInformed] != (id)[NSNull null]) {
@@ -1190,21 +1222,20 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ7
                                                 rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Have you checked your blood cholesterol in the past 3 years?"];
+                                                  title:@"When was the last time you checked your blood cholesterol?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'No'", hasInformed];
     [section addFormRow:row];
     
     XLFormRowDescriptor *lipidCheckBloodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidCheckedBlood
                                                                                     rowType:XLFormRowDescriptorTypeSelectorActionSheet
                                                                                       title:@""];
-    lipidCheckBloodRow.selectorOptions = @[@"No",
-                                           @"Yes, 2 yrs ago",
-                                           @"Yes, 3 yrs ago",
-                                           @"Yes < 1 yr ago"];
+    lipidCheckBloodRow.required = YES;
+    lipidCheckBloodRow.selectorOptions = @[@"Within past 3 years",
+                                           @"More than 3 years ago"];
     
-    lipidCheckBloodRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed];
+    lipidCheckBloodRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'No'", hasInformed];
     lipidCheckBloodRow.noValueDisplayText = @"Tap Here";
     
     if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kCheckedBlood] != (id)[NSNull null]) {
@@ -1213,37 +1244,35 @@ typedef enum formName {
     
     [section addFormRow:lipidCheckBloodRow];
     
-    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ8
                                                 rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Are you seeing your doctor regularly? (regular = every 6 mths or less, or as per doctor scheduled to follow up)"];
+                                                  title:@"How often are you seeing your doctor for your high cholesterol?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed];
     [section addFormRow:row];
     
-    XLFormRowDescriptor *seeDocRegularRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    seeDocRegularRow.selectorOptions = @[@"YES", @"NO"];
+    XLFormRowDescriptor *seeDocRegularRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidSeeingDocRegularly
+                                                                                  rowType:XLFormRowDescriptorTypeSelectorPush
+                                                                                    title:@""];
+    seeDocRegularRow.selectorOptions = @[@"Regular (Interval of 6 months or less)",
+                                         @"Occasionally (Interval of more than 6 months)",
+                                         @"Seldom (last appointment was >1 year ago)",
+                                         @"Not at all"];
     
     if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kSeeingDocRegularly] != (id)[NSNull null]) {
-        seeDocRegularRow.value = [self getYesNoFromOneZero:hyperlipidDict[kSeeingDocRegularly]];
+        seeDocRegularRow.value = hyperlipidDict[kSeeingDocRegularly];
     }
     
-    seeDocRegularRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    seeDocRegularRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed];
     [section addFormRow:seeDocRegularRow];
     
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ9
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Are you currently prescribed medication for your high cholesterol?"];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
-    [section addFormRow:row];
-    
-    XLFormRowDescriptor *prescribedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    prescribedRow.selectorOptions = @[@"YES", @"NO"];
-    prescribedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    XLFormRowDescriptor *prescribedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Are you taking any medication for your high cholesterol?"];
+    [self setDefaultFontWithRow:prescribedRow];
+    prescribedRow.required = YES;
+    prescribedRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    prescribedRow.selectorOptions = @[@"Yes", @"No"];
+    prescribedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed];
     
     if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kCurrentlyPrescribed] != (id)[NSNull null]) {
         prescribedRow.value = [self getYesNoFromOneZero:hyperlipidDict[kCurrentlyPrescribed]];
@@ -1253,55 +1282,53 @@ typedef enum formName {
     
     XLFormRowDescriptor *takeRegularlyQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ10
                                                                                    rowType:XLFormRowDescriptorTypeInfo
-                                                                                     title:@"Are you taking your cholesterol medication regularly? (≥ 90% of time)"];
+                                                                                     title:@"How often do you forget to take your cholesterol medication in a week?"];
     [self setDefaultFontWithRow:takeRegularlyQRow];
     takeRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed];
     [section addFormRow:takeRegularlyQRow];
     
     // Segmented Control
     XLFormRowDescriptor *takeRegularlyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLipidTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    [self setDefaultFontWithRow:row];
-    takeRegularlyRow.selectorOptions = @[@"YES", @"NO"];
+    takeRegularlyRow.required = YES;
+    takeRegularlyRow.selectorOptions = @[@"0", @"1-3", @"4-6", @"≥7"];
     
     if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kTakingRegularly] != (id)[NSNull null]) {
-        takeRegularlyRow.value = [self getYesNoFromOneZero:hyperlipidDict[kTakingRegularly]];
+        takeRegularlyRow.value = hyperlipidDict[kTakingRegularly];
     }
     
-    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed];
+    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed];
     
     [section addFormRow:takeRegularlyRow];
-    
-    
-    hasInformed.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([newValue isEqualToString:@"NO"]) {
-                seeDocRegularRow.required = NO;
-                prescribedRow.required = NO;
-                lipidCheckBloodRow.required = YES;
-                takeRegularlyRow.required = NO;
-            } else {
-                seeDocRegularRow.required = YES;
-                prescribedRow.required = YES;
-                lipidCheckBloodRow.required = NO;
-                takeRegularlyRow.required = YES;
-            }
-        }
-    };
-    
-    if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kHasInformed] != (id)[NSNull null]) {
-        if ([hasInformed.value isEqualToString:@"YES"]) {
-            seeDocRegularRow.required = YES;
-            prescribedRow.required = YES;
-            lipidCheckBloodRow.required = NO;
-            takeRegularlyRow.required = YES;
-        } else {
-            seeDocRegularRow.required = NO;
-            prescribedRow.required = NO;
-            lipidCheckBloodRow.required = YES;
-            takeRegularlyRow.required = NO;
-        }
-    }
+//    hasInformed.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+//        if (oldValue != newValue) {
+//            if ([newValue isEqualToString:@"NO"]) {
+//                seeDocRegularRow.required = NO;
+//                prescribedRow.required = NO;
+//                lipidCheckBloodRow.required = YES;
+//                takeRegularlyRow.required = NO;
+//            } else {
+//                seeDocRegularRow.required = YES;
+//                prescribedRow.required = YES;
+//                lipidCheckBloodRow.required = NO;
+//                takeRegularlyRow.required = YES;
+//            }
+//        }
+//    };
+//
+//    if (hyperlipidDict != (id)[NSNull null] && [hyperlipidDict objectForKey:kHasInformed] != (id)[NSNull null]) {
+//        if ([hasInformed.value isEqualToString:@"YES"]) {
+//            seeDocRegularRow.required = YES;
+//            prescribedRow.required = YES;
+//            lipidCheckBloodRow.required = NO;
+//            takeRegularlyRow.required = YES;
+//        } else {
+//            seeDocRegularRow.required = NO;
+//            prescribedRow.required = NO;
+//            lipidCheckBloodRow.required = YES;
+//            takeRegularlyRow.required = NO;
+//        }
+//    }
     
 //    prescribedRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
 //        if (oldValue != newValue) {
@@ -1329,7 +1356,6 @@ typedef enum formName {
 -(id) initHypertension {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@""];
     XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
     
     NSDictionary *hypertensionDict = [self.fullScreeningForm objectForKey:SECTION_HYPERTENSION];
     
@@ -1346,16 +1372,10 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Medical History: Hypertension"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kQ1
-                                                rowType:XLFormRowDescriptorTypeInfo
-                                                  title:@"Has a western-trained doctor ever told you that you have high BP? *"];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:row];
-    
-    XLFormRowDescriptor *hasInformed_HT = [XLFormRowDescriptor formRowDescriptorWithTag:kHTHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    [self setDefaultFontWithRow:row];
-    hasInformed_HT.selectorOptions = @[@"YES", @"NO"];
+    XLFormRowDescriptor *hasInformed_HT = [XLFormRowDescriptor formRowDescriptorWithTag:kHTHasInformed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Has a western-trained doctor ever told you that you have high BP?"];
+    [self setDefaultFontWithRow:hasInformed_HT];
+    hasInformed_HT.cellConfig[@"textLabel.numberOfLines"] = @0;
+    hasInformed_HT.selectorOptions = @[@"Yes", @"No"];
     hasInformed_HT.required = YES;
     
     if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kHasInformed] != (id)[NSNull null]) {
@@ -1366,53 +1386,61 @@ typedef enum formName {
     
     XLFormRowDescriptor *checkedBPQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ2
                                                                                rowType:XLFormRowDescriptorTypeInfo
-                                                                                 title:@"Have you checked your BP in the last 1 year?"];
+                                                                                 title:@"When was the last time you checked your blood pressure?"];
     [self setDefaultFontWithRow:checkedBPQRow];
     checkedBPQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    checkedBPQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed_HT];
+    checkedBPQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'No'", hasInformed_HT];
     [section addFormRow:checkedBPQRow];
     
-    XLFormRowDescriptor *checkedBP = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCheckedBp rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    XLFormRowDescriptor *checkedBP = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCheckedBp rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
     [self setDefaultFontWithRow:checkedBP];
-    checkedBP.selectorOptions = @[@"YES", @"NO"];
-    checkedBP.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", hasInformed_HT];
+    checkedBP.required = YES;
+    checkedBP.selectorOptions = @[@"Within past 3 years", @"More than 3 years ago"];
+    checkedBP.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'No'", hasInformed_HT];
     if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kCheckedBp] != (id)[NSNull null]) {
-        checkedBP.value = [self getYesNoFromOneZero:hypertensionDict[kCheckedBp]];
+        checkedBP.value = hypertensionDict[kCheckedBp];
     }
     [section addFormRow:checkedBP];
     
     
     XLFormRowDescriptor *seeDocRegularlyQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ3
                                                                                      rowType:XLFormRowDescriptorTypeInfo
-                                                                                       title:@"Are you seeing your doctor regularly for your high BP?"];
+                                                                                       title:@"How often are you seeing your doctor for your high blood pressure?"];
     [self setDefaultFontWithRow:seeDocRegularlyQRow];
     seeDocRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    seeDocRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
+    seeDocRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed_HT];
     [section addFormRow:seeDocRegularlyQRow];
-    XLFormRowDescriptor *seeDocRegularlyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHTSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
-    seeDocRegularlyRow.selectorOptions = @[@"YES", @"NO"];
+    
+    XLFormRowDescriptor *seeDocRegularlyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHTSeeingDocRegularly rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
+    seeDocRegularlyRow.required = YES;
+    seeDocRegularlyRow.selectorOptions = @[@"Regular (Interval of 6 months or less)",
+                                           @"Occasionally (Interval of more than 6 months)",
+                                           @"Seldom (last appointment was >1 year ago)",
+                                           @"Not at all"];
     
     //value
     if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kSeeingDocRegularly] != (id)[NSNull null]) {
-        seeDocRegularlyRow.value = [self getYesNoFromOneZero:hypertensionDict[kSeeingDocRegularly]];
+        seeDocRegularlyRow.value = hypertensionDict[kSeeingDocRegularly];
     }
     
-    seeDocRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
+    seeDocRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed_HT];
     [section addFormRow:seeDocRegularlyRow];
     
     
-    XLFormRowDescriptor *prescribedQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ4
-                                                                                rowType:XLFormRowDescriptorTypeInfo
-                                                                                  title:@"Are you currently prescribed medication for your high BP?"];
-    [self setDefaultFontWithRow:prescribedQRow];
-    prescribedQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    prescribedQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
-    [section addFormRow:prescribedQRow];
+//    XLFormRowDescriptor *prescribedQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ4
+//                                                                                rowType:XLFormRowDescriptorTypeInfo
+//                                                                                  title:@""];
+//    [self setDefaultFontWithRow:prescribedQRow];
+//    prescribedQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    prescribedQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed_HT];
+//    [section addFormRow:prescribedQRow];
     
-    XLFormRowDescriptor *prescribedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    XLFormRowDescriptor *prescribedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHTCurrentlyPrescribed rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Are you taking any medication for your high blood pressure?"];
+    prescribedRow.required = YES;
     [self setDefaultFontWithRow:prescribedRow];
-    prescribedRow.selectorOptions = @[@"YES", @"NO"];
-    prescribedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
+    prescribedRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    prescribedRow.selectorOptions = @[@"Yes", @"No"];
+    prescribedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed_HT];
     
     //value
     if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kHTCurrentlyPrescribed] != (id)[NSNull null]) {
@@ -1424,81 +1452,302 @@ typedef enum formName {
     
     XLFormRowDescriptor *takeRegularlyQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kQ5
                                                                                    rowType:XLFormRowDescriptorTypeInfo
-                                                                                     title:@"Are you taking your BP medication regularly?"];
+                                                                                     title:@"How often do you forget to take your blood pressure medication in a week?"];
     [self setDefaultFontWithRow:takeRegularlyQRow];
     takeRegularlyQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
+    takeRegularlyQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed_HT];
     [section addFormRow:takeRegularlyQRow];
     
     // Segmented Control
     XLFormRowDescriptor *takeRegularlyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHTTakingRegularly rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@""];
+    takeRegularlyRow.required = YES;
     [self setDefaultFontWithRow:takeRegularlyRow];
-    takeRegularlyRow.selectorOptions = @[@"YES", @"NO"];
+    takeRegularlyRow.selectorOptions = @[@"0", @"1-3", @"4-6", @"≥7"];
     
     //value
     if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kHTTakingRegularly] != (id)[NSNull null]) {
-        takeRegularlyRow.value = [self getYesNoFromOneZero:hypertensionDict[kTakingRegularly]];
+        takeRegularlyRow.value = hypertensionDict[kTakingRegularly];
     }
     
-    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", hasInformed_HT];
+    takeRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed_HT];
     [section addFormRow:takeRegularlyRow];
-    
-    
-    hasInformed_HT.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqualToString:@"YES"]) {
-                seeDocRegularlyRow.required = YES;
-                prescribedRow.required = YES;
-                takeRegularlyRow.required = YES;
-                checkedBP.required = NO;
-            } else {
-                seeDocRegularlyRow.required = NO;
-                prescribedRow.required = NO;
-                takeRegularlyRow.required = NO;
-                checkedBP.required = YES;
-            }
-        }
-    };
-    
-    if (hypertensionDict != (id)[NSNull null] && [hypertensionDict objectForKey:kHasInformed] != (id)[NSNull null]) {
-        if ([hasInformed_HT.value isEqualToString:@"YES"]) {
-            seeDocRegularlyRow.required = YES;
-            prescribedRow.required = YES;
-            takeRegularlyRow.required = YES;
-            checkedBP.required = NO;
-        } else {
-            seeDocRegularlyRow.required = NO;
-            prescribedRow.required = NO;
-            takeRegularlyRow.required = NO;
-            checkedBP.required = YES;
-        }
-    }
-    
-    //    checkedBP.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-    //        if (oldValue != newValue) {
-    //            if ([newValue isEqualToString:@"NO"]) {
-    //                takeRegularlyQRow.hidden = @(1);
-    //                takeRegularlyRow.hidden = @(1);
-    //            } else {
-    ////                if ([prescribedRow.value isEqualToString:@"YES"]) {
-    //                    takeRegularlyQRow.hidden = @(0);
-    //                    takeRegularlyRow.hidden = @(0);
-    ////                }
-    //            }
-    //        }
-    //    };
-    
     
     return [super initWithForm:formDescriptor];
 }
 
+- (id) initMedHistOthers {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Others"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    NSDictionary *medHistOthersDict = [self.fullScreeningForm objectForKey:@"some_section_for_now"];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[@"some_section_for_now"];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    XLFormRowDescriptor *otherMedQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"other_medication_q"
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Are you taking any other medications?"];
+    [self setDefaultFontWithRow:otherMedQRow];
+    otherMedQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:otherMedQRow];
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"other_medication"
+                                                rowType:XLFormRowDescriptorTypeText
+                                                  title:@""];
+    row.required = YES;
+    [row.cellConfigAtConfigure setObject:@"Type here" forKey:@"textField.placeholder"];
+    //value
+    if (medHistOthersDict != (id)[NSNull null] && [medHistOthersDict objectForKey:@"other_medication"] != (id)[NSNull null]) {
+        row.value = medHistOthersDict[@"other_medication"];
+    }
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *otherMedCondQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"other_med_condition_q"
+                                                                              rowType:XLFormRowDescriptorTypeInfo
+                                                                                title:@"Is there any medical conditions we should take note of?"];
+    [self setDefaultFontWithRow:otherMedCondQRow];
+    otherMedCondQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:otherMedCondQRow];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"other_med_condition"
+                                                rowType:XLFormRowDescriptorTypeText
+                                                  title:@""];
+    row.required = YES;
+    [row.cellConfigAtConfigure setObject:@"Type here" forKey:@"textField.placeholder"];
+    //value
+    if (medHistOthersDict != (id)[NSNull null] && [medHistOthersDict objectForKey:@"other_med_condition"] != (id)[NSNull null]) {
+        row.value = medHistOthersDict[@"other_med_condition"];
+    }
+    [section addFormRow:row];
+    
+    return [super initWithForm:formDescriptor];
+}
+
+- (id) initSurgery {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Surgery"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    NSDictionary *surgeryDict = [self.fullScreeningForm objectForKey:@"some_section_for_now"];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[@"some_section_for_now"];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    XLFormRowDescriptor *surgeryQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"surgery_q"
+                                                                              rowType:XLFormRowDescriptorTypeInfo
+                                                                                title:@"Have you had any surgery?"];
+    [self setDefaultFontWithRow:surgeryQRow];
+    surgeryQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:surgeryQRow];
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"surgery"
+                                                rowType:XLFormRowDescriptorTypeText
+                                                  title:@""];
+    row.required = YES;
+    [row.cellConfigAtConfigure setObject:@"Type here" forKey:@"textField.placeholder"];
+    //value
+    if (surgeryDict != (id)[NSNull null] && [surgeryDict objectForKey:@"surgery"] != (id)[NSNull null]) {
+        row.value = surgeryDict[@"surgery"];
+    }
+    [section addFormRow:row];
+    
+    return [super initWithForm:formDescriptor];
+    
+}
+
+- (id) initHealthcareBarriers {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Healthcare Barriers"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    NSDictionary *healthcareBarriersDict = [self.fullScreeningForm objectForKey:SECTION_HEALTHCARE_BARRIERS];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[SECTION_HEALTHCARE_BARRIERS];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    NSString *frequency = [self checkFreqGoingDocConsult];      //"going", "not", or <empty string>
+    
+    XLFormRowDescriptor *docExistConditionQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExistingDoc
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Which doctor do you see for your existing conditions?"];
+    [self setDefaultFontWithRow:docExistConditionQRow];
+    docExistConditionQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:docExistConditionQRow];
+    
+    XLFormRowDescriptor *existConditionRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExistingDoc rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    existConditionRow.required = YES;
+    existConditionRow.noValueDisplayText = @"Tap for options";
+    existConditionRow.selectorOptions = @[@"General Practitioner / Family Doctor", @"Polyclinic", @"Specialist Outpatient Clinic (Hospital)"];
+    //value
+    if (healthcareBarriersDict != (id)[NSNull null] && [healthcareBarriersDict objectForKey:kExistingDoc] != (id)[NSNull null]) {
+        existConditionRow.value = healthcareBarriersDict[kExistingDoc];
+    }
+    [section addFormRow:existConditionRow];
+    
+    XLFormRowDescriptor *whyNotFollowUpQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExistingDoc
+                                                                                       rowType:XLFormRowDescriptorTypeInfo
+                                                                                         title:@"Why do you not follow-up with your doctor for your existing conditions?"];
+    [self setDefaultFontWithRow:whyNotFollowUpQRow];
+    whyNotFollowUpQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:whyNotFollowUpQRow];
+    
+    XLFormRowDescriptor *whyNotFollowUpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWhyNotFollowUp rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    whyNotFollowUpRow.selectorOptions = @[@"Do not see the need for the tests",
+                            @"Challenging to make time to go for appointments",
+                            @"Difficulty getting to clinic (mobility)",
+                            @"Financial issues",
+                            @"Scared of doctor",
+                            @"Prefer traditional medicine",
+                            @"Others"];
+    whyNotFollowUpRow.noValueDisplayText = @"Tap for options";
+    whyNotFollowUpRow.required = YES;
+    //value
+    if (healthcareBarriersDict != (id)[NSNull null] && [healthcareBarriersDict objectForKey:kWhyNotFollowUp] != (id)[NSNull null]) {
+        whyNotFollowUpRow.value = healthcareBarriersDict[kWhyNotFollowUp];
+    }
+    [section addFormRow:whyNotFollowUpRow];
+    
+    if ([frequency isEqualToString:@"going"]) {
+        whyNotFollowUpQRow.disabled = @YES;
+        whyNotFollowUpRow.disabled = @YES;
+    } else if ([frequency isEqualToString:@"not"]) {
+        docExistConditionQRow.disabled = @YES;
+        existConditionRow.disabled = @YES;
+    } else {
+        whyNotFollowUpQRow.disabled = @YES;
+        whyNotFollowUpRow.disabled = @YES;
+        docExistConditionQRow.disabled = @YES;
+        existConditionRow.disabled = @YES;
+    }
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kOtherBarrier rowType:XLFormRowDescriptorTypeText title:@"Others (please specify):"];
+    row.required = NO;
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", whyNotFollowUpRow];
+    [self setDefaultFontWithRow:row];
+    //value
+    if (healthcareBarriersDict != (id)[NSNull null] && [healthcareBarriersDict objectForKey:kOtherBarrier] != (id)[NSNull null]) {
+        row.value = healthcareBarriersDict[kOtherBarrier];
+    }
+    [section addFormRow:row];
+    
+    return [super initWithForm:formDescriptor];
+    
+}
+
+- (id) initFamilyHistory {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Family History"];
+    XLFormSectionDescriptor * section;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    NSDictionary *famHistDict = [self.fullScreeningForm objectForKey:SECTION_FAM_HIST];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckFamilyHist];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    XLFormRowDescriptor *famHistQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExistingDoc
+                                                                                       rowType:XLFormRowDescriptorTypeInfo
+                                                                                         title:@"Do you have a first degree relative (parent/sibling/child) with the following conditions?"];
+    [self setDefaultFontWithRow:famHistQRow];
+    famHistQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:famHistQRow];
+    
+    XLFormRowDescriptor *famHistRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_fam_hist" rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
+    famHistRow.required = YES;
+    famHistRow.noValueDisplayText = @"Tap for options";
+    famHistRow.selectorOptions = @[@"High blood pressure",
+                                   @"High blood cholesterol",
+                                   @"Heart attack or coronary heart disease (narrowed blood vessels supplying heart muscle)",
+                                   @"Stroke",
+                                   @"No, they do not have any of the above"];
+    
+    famHistRow.value = [self getFamHistArray:famHistDict];
+    
+    
+    famHistRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if (newValue != nil && newValue != (id) [NSNull null]) {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
+                    [oldSet addObjectsFromArray:oldValue];
+                    NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
+                    [newSet addObjectsFromArray:newValue];
+                    
+                    if ([newSet count] > [oldSet count]) {
+                        [newSet minusSet:oldSet];
+                        NSArray *array = [newSet allObjects];
+                        [self postFamHistWithOptionName:[array firstObject] andValue:@"1"];
+                    } else {
+                        [oldSet minusSet:newSet];
+                        NSArray *array = [oldSet allObjects];
+                        [self postFamHistWithOptionName:[array firstObject] andValue:@"0"];
+                    }
+                } else {
+                    [self postFamHistWithOptionName:[newValue firstObject] andValue:@"1"];
+                }
+            } else {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    [self postFamHistWithOptionName:[oldValue firstObject] andValue:@"0"];
+                }
+            }
+        }
+    };
+    
+    
+    [section addFormRow:famHistRow];
+    
+    return [super initWithForm:formDescriptor];
+}
+
+
 -(id) initRiskStratification {
     
     
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@""];
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Lipids Risk Stratification"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Risk Stratification"];
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
     NSDictionary *riskStratDict = [self.fullScreeningForm objectForKey:SECTION_RISK_STRATIFICATION];
@@ -1506,7 +1755,7 @@ typedef enum formName {
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
     
     if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckRiskStrat];
+        NSNumber *check = checkDict[kCheckRiskStratification];
         if ([check isKindOfClass:[NSNumber class]]) {
             isFormFinalized = [check boolValue];
         }
@@ -1514,10 +1763,10 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDiabeticFriend
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"Do you have a first degree relative with diabetes mellitus? *"];
+                                                  title:@"Do you have a first degree relative (parent/sibling/child) with diabetes mellitus?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.selectorOptions = @[@"YES", @"NO"];
+    row.selectorOptions = @[@"Yes", @"No"];
     row.required = YES;
     
     //value
@@ -1529,10 +1778,10 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDelivered4kgOrGestational
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"Have you delivered a baby 4 kg or more; or were previously diagnosed with gestational diabetes mellitus? *"];
+                                                  title:@"Have you delivered a baby 4 kg or more; or were previously diagnosed with gestational diabetes mellitus?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.selectorOptions = @[@"YES", @"NO"];
+    row.selectorOptions = @[@"Yes", @"No"];
     row.required = YES;
     
     //value
@@ -1544,10 +1793,10 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHeartAttack
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"Have you ever suffered from a \"heart attack\" or been told by your doctor that you have coronary heart disease (heart disease caused by narrowed blood vessels supplying the heart muscle)? *"];
+                                                  title:@"Have you ever suffered from a \"heart attack\" or been told by your doctor that you have coronary heart disease (heart disease caused by narrowed blood vessels supplying the heart muscle)?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.selectorOptions = @[@"YES", @"NO"];
+    row.selectorOptions = @[@"Yes", @"No"];
     row.required = YES;
     
     //value
@@ -1558,10 +1807,10 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kStroke
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"Have you ever been diagnosed by your doctor to have a stroke? *"];
+                                                  title:@"Have you ever been diagnosed by your doctor to have a stroke?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.selectorOptions = @[@"YES", @"NO"];
+    row.selectorOptions = @[@"Yes", @"No"];
     row.required = YES;
     
     //value
@@ -1573,10 +1822,10 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAneurysm
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"Has your doctor told you that the blood vessels to your limbs are diseased and have become narrower (peripheral artery disease) or that any other major blood vessels in your body have weakened walls that have “ballooned out” (aneurysm)? *"];
+                                                  title:@"Has your doctor ever told you that the blood vessels to your limbs are diseased and have become narrower (peripheral artery disease) or that any other major blood vessels in your body have weakened walls that have \"ballooned out\" (aneurysm)?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.selectorOptions = @[@"YES", @"NO"];
+    row.selectorOptions = @[@"Yes", @"No"];
     row.required = YES;
     
     //value
@@ -1588,10 +1837,10 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKidneyDisease
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                  title:@"Have you ever been diagnosed by your doctor to have chronic kidney disease? *"];
+                                                  title:@"Have you ever been diagnosed by your doctor to have chronic kidney disease?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.selectorOptions = @[@"YES", @"NO"];
+    row.selectorOptions = @[@"Yes", @"No"];
     row.required = YES;
     
     //value
@@ -1603,10 +1852,10 @@ typedef enum formName {
     
     XLFormRowDescriptor *doYouSmokeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSmoke
                                                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                                                 title:@"Do you smoke? *"];
+                                                                                 title:@"Do you smoke?"];
     [self setDefaultFontWithRow:doYouSmokeRow];
     doYouSmokeRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    doYouSmokeRow.selectorOptions = @[@"YES", @"NO"];
+    doYouSmokeRow.selectorOptions = @[@"Yes", @"No"];
     doYouSmokeRow.required = YES;
     
     //value
@@ -1619,10 +1868,11 @@ typedef enum formName {
                                                 rowType:XLFormRowDescriptorTypeSelectorPush
                                                   title:@"Choose one only"];
     [self setDefaultFontWithRow:row];
-    row.selectorOptions = @[@"≥ 1 cigarette (or equivalent) per day on average",
-                            @"< 1 cigarette (or equivalent) per day on average"];
+    row.selectorOptions = @[@"Less than 1 cigarette (or equivalent) per day on average",
+                            @"Between 1 to 10 cigarettes (or equivalent) per day on average",
+                            @"More than 10 cigarettes (or equivalent) per day on average"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'YES'", doYouSmokeRow];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", doYouSmokeRow];
     //value
     if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kSmokeYes] != (id)[NSNull null]) {
         row.value = riskStratDict[kSmokeYes];
@@ -1637,7 +1887,7 @@ typedef enum formName {
     row.selectorOptions = @[@"I have stopped smoking completely",
                             @"I have never smoked before"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'NO'", doYouSmokeRow];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'No'", doYouSmokeRow];
     
     //value
     if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kSmokeNo] != (id)[NSNull null]) {
@@ -1649,6 +1899,644 @@ typedef enum formName {
     return [super initWithForm:formDescriptor];
 }
 
+- (id) initDietHistory {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Diet History"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor *row;
+    
+    NSDictionary *dietHistDict = [self.fullScreeningForm objectForKey:SECTION_DIET];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckDiet];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    section.footerTitle = @"Note: Standard drink = 1 shot of hard liquor OR 1 can/bottle of beer OR 1 glass of wine";
+    
+    XLFormRowDescriptor *alcoholQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExistingDoc
+                                                                             rowType:XLFormRowDescriptorTypeInfo
+                                                                               title:@"Do you drink alcohol?"];
+    [self setDefaultFontWithRow:alcoholQRow];
+    alcoholQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:alcoholQRow];
+    
+    XLFormRowDescriptor *alcoholRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAlcohol rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    alcoholRow.required = YES;
+    alcoholRow.noValueDisplayText = @"Tap for options";
+    alcoholRow.selectorOptions = @[@"More than 2 standard drinks per day on average",
+                                   @"Less than 2 standard drinks per day on average",
+                                   @"Quit alcoholic drinks",
+                                   @"No"];
+    
+    //value
+    if (dietHistDict != (id)[NSNull null] && [dietHistDict objectForKey:kAlcohol] != (id)[NSNull null]) {
+        alcoholRow.value = dietHistDict[kAlcohol];
+    }
+    
+    [section addFormRow:alcoholRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *eatHealthyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEatHealthy
+                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                  title:@"Do you consciously try to eat more fruits, vegetables, whole grain and cereals?"];
+    [self setDefaultFontWithRow:eatHealthyRow];
+    eatHealthyRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    eatHealthyRow.selectorOptions = @[@"Yes", @"No"];
+    eatHealthyRow.required = YES;
+    
+    //value
+    if (dietHistDict != (id)[NSNull null] && [dietHistDict objectForKey:kEatHealthy] != (id)[NSNull null]) {
+        eatHealthyRow.value = [self getYesNoFromOneZero:dietHistDict[kEatHealthy]];
+    }
+    [section addFormRow:eatHealthyRow];
+    
+    XLFormSectionDescriptor *vegeSection = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:vegeSection];
+    vegeSection.footerTitle = @"Note: 1 serving = 1 small apple/orange; 1 wedge papaya/watermelon; 10 grapes/longans; 1 cup 100% fruit juice";
+    vegeSection.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", eatHealthyRow];
+    
+    XLFormRowDescriptor *vegetablesRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVege rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Vegetables"];
+    [self setDefaultFontWithRow:vegetablesRow];
+    vegetablesRow.required = YES;
+    vegetablesRow.noValueDisplayText = @"Tap for options";
+    vegetablesRow.selectorOptions = @[@"1 serving per day",
+                                   @"2 or more servings per day"];
+    
+    //value
+    if (dietHistDict != (id)[NSNull null] && [dietHistDict objectForKey:kVege] != (id)[NSNull null]) {
+        vegetablesRow.value = dietHistDict[kVege];
+    }
+    [vegeSection addFormRow:vegetablesRow];
+    
+    XLFormSectionDescriptor *fruitsSection = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:fruitsSection];
+    fruitsSection.footerTitle = @"Note: 1 serving = 3/4 mug cooked vegetables OR 1/4 round plate cooked vegetables";
+    fruitsSection.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", eatHealthyRow];
+    
+    XLFormRowDescriptor *fruitsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFruits rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Fruits"];
+    [self setDefaultFontWithRow:fruitsRow];
+    fruitsRow.required = YES;
+    fruitsRow.noValueDisplayText = @"Tap for options";
+    fruitsRow.selectorOptions = @[@"1 serving per day",
+                                      @"2 or more servings per day"];
+    
+    //value
+    if (dietHistDict != (id)[NSNull null] && [dietHistDict objectForKey:kFruits] != (id)[NSNull null]) {
+        fruitsRow.value = dietHistDict[kFruits];
+    }
+    
+    [fruitsSection addFormRow:fruitsRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *grainCerealsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGrainsCereals
+                                                                               rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                                 title:@"Whole grain and cereals"];
+    [self setDefaultFontWithRow:grainCerealsRow];
+    grainCerealsRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    grainCerealsRow.selectorOptions = @[@"Yes", @"No"];
+    grainCerealsRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", eatHealthyRow];
+    grainCerealsRow.required = YES;
+    
+    //value
+    if (dietHistDict != (id)[NSNull null] && [dietHistDict objectForKey:kGrainsCereals] != (id)[NSNull null]) {
+        grainCerealsRow.value = [self getYesNoFromOneZero:dietHistDict[kGrainsCereals]];
+    }
+    [section addFormRow:grainCerealsRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *highFatsQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"high_fats_q" rowType:XLFormRowDescriptorTypeInfo title:@"How often do you eat high fat foods e.g. hamburger, butter, fried food?"];
+    [self setDefaultFontWithRow:highFatsQRow];
+    highFatsQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:highFatsQRow];
+    
+    XLFormRowDescriptor *highFatsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHighFats rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
+    highFatsRow.required = YES;
+    highFatsRow.noValueDisplayText = @"Tap for options";
+    highFatsRow.selectorOptions = @[@"Less than 2 times per week",
+                                  @"2-5 times per week",
+                                    @"Almost daily"];
+    
+    //value
+    if (dietHistDict != (id)[NSNull null] && [dietHistDict objectForKey:kHighFats] != (id)[NSNull null]) {
+        highFatsRow.value = dietHistDict[kHighFats];
+    }
+    
+    [section addFormRow:highFatsRow];
+    
+    XLFormRowDescriptor *processedFoodQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"processed_foods_q" rowType:XLFormRowDescriptorTypeInfo title:@"How often do you eat high fat foods e.g. hamburger, butter, fried food?"];
+    [self setDefaultFontWithRow:processedFoodQRow];
+    processedFoodQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:processedFoodQRow];
+    
+    XLFormRowDescriptor *processedFoodRow = [XLFormRowDescriptor formRowDescriptorWithTag:kProcessedFoods rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
+    processedFoodRow.required = YES;
+    processedFoodRow.noValueDisplayText = @"Tap for options";
+    processedFoodRow.selectorOptions = @[@"Less than 2 times per week",
+                                    @"2-5 times per week",
+                                    @"Almost daily"];
+    
+    //value
+    if (dietHistDict != (id)[NSNull null] && [dietHistDict objectForKey:kProcessedFoods] != (id)[NSNull null]) {
+        processedFoodRow.value = dietHistDict[kProcessedFoods];
+    }
+    [section addFormRow:processedFoodRow];
+    
+    
+    return [super initWithForm:formDescriptor];
+}
+
+- (id) initExerciseHistory {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Exercise History"];
+    XLFormSectionDescriptor * section;
+    
+    NSDictionary *exerciseHistDict = [self.fullScreeningForm objectForKey:SECTION_EXERCISE];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckDiet];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    section.footerTitle = @"Note: aerobic exercises include brisk walking, jogging, running, cycling, swimming, vigorous sports or similar activities.";
+    
+    XLFormRowDescriptor *engagePhyActivityQRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExistingDoc
+                                                                             rowType:XLFormRowDescriptorTypeInfo
+                                                                               title:@"How often do you engage in physical activity?"];
+    [self setDefaultFontWithRow:engagePhyActivityQRow];
+    engagePhyActivityQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:engagePhyActivityQRow];
+    
+    XLFormRowDescriptor *engagePhyActivityRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAlcohol rowType:XLFormRowDescriptorTypeSelectorPush title:@""];
+    engagePhyActivityRow.required = YES;
+    engagePhyActivityRow.noValueDisplayText = @"Tap for options";
+    engagePhyActivityRow.selectorOptions = @[@"Sedentary or inactive",
+                                             @"Usual daily physical activities e.g. housework, walking to home/work",
+                                             @"Low level of exertion (slight rise in breathing/heart rate), regularly (≥5 days per week), with sufficient duration (≥10 min each time)",
+                                             @"Aerobic exercises for 20-60 min per week",
+                                             @"Aerobic exercises for 1-3 h per week",
+                                             @"Aerobic exercises for > 3h per week"];
+    
+    [section addFormRow:engagePhyActivityRow];
+    
+    XLFormRowDescriptor *reasonNotExerciseQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"question" rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"What are your main reasons for not doing any physical activity?"];
+    [self setDefaultFontWithRow:reasonNotExerciseQRow];
+    reasonNotExerciseQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:reasonNotExerciseQRow];
+    
+    XLFormRowDescriptor *reasonNotExerciseRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_not_exercise_reason" rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
+    reasonNotExerciseRow.selectorOptions = @[@"No time (family/work commitments)",
+                                             @"Too tired",
+                                             @"Too lazy",
+                                             @"No interest"];
+    reasonNotExerciseRow.noValueDisplayText = @"Tap for options";
+    reasonNotExerciseRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Sedentary'", engagePhyActivityRow];
+    [section addFormRow:reasonNotExerciseRow];
+    reasonNotExerciseRow.required = YES;
+    
+    
+    return [super initWithForm:formDescriptor];
+}
+
+- (id) initFitEligible {
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"FIT Eligibility"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    NSDictionary *fitEligibDict = [self.fullScreeningForm objectForKey:SECTION_FIT_ELIGIBLE];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckFitEligible];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"age_50" rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Age 50 and above"];
+    [self setDefaultFontWithRow:row];
+    row.selectorOptions = @[@"Yes", @"No"];
+    row.required = NO;
+    row.disabled = @(1);
+    if ([age integerValue] >= 50) {
+        row.value = @"Yes";
+        age50 = YES;
+    }
+    else {
+        row.value = @"No";
+        age50 = NO;
+//        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
+    }
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *fitLast12MthsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFitLast12Mths rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Has not done FIT in the last 12 months?"];
+    if (fitEligibDict != (id)[NSNull null] && [fitEligibDict objectForKey:kFitLast12Mths] != (id)[NSNull null])
+        fitLast12MthsRow.value = [self getYesNoFromOneZero:fitEligibDict[kFitLast12Mths]];
+    [self setDefaultFontWithRow:fitLast12MthsRow];
+    fitLast12MthsRow.selectorOptions = @[@"Yes", @"No"];
+    fitLast12MthsRow.required = NO;
+    fitLast12MthsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    [section addFormRow:fitLast12MthsRow];
+    
+    fitLast12MthsRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                fit12Mths = TRUE;
+            } else {
+                fit12Mths = FALSE;
+            }
+            if (sporeanPr && age50 && fit12Mths && colonsc10Yrs && wantFitKit) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFIT];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFIT];
+            }
+            
+        }
+    };
+    
+    XLFormRowDescriptor *colonoscopy10YrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kColonoscopy10Yrs rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Has not done colonoscopy in the past 10 years?"];
+    if (fitEligibDict != (id)[NSNull null] && [fitEligibDict objectForKey:kColonoscopy10Yrs] != (id)[NSNull null])
+        colonoscopy10YrsRow.value = [self getYesNoFromOneZero:fitEligibDict[kColonoscopy10Yrs]];
+    [self setDefaultFontWithRow:colonoscopy10YrsRow];
+    colonoscopy10YrsRow.selectorOptions = @[@"Yes", @"No"];
+    colonoscopy10YrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    colonoscopy10YrsRow.required = NO;
+    [section addFormRow:colonoscopy10YrsRow];
+    
+    colonoscopy10YrsRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                colonsc10Yrs = TRUE;
+            } else {
+                colonsc10Yrs = FALSE;
+            }
+            if (sporeanPr && age50 && fit12Mths && colonsc10Yrs && wantFitKit) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFIT];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFIT];
+            }
+            
+        }
+    };
+    
+    XLFormRowDescriptor *wantFitKitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantFitKit rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does resident want a free FIT kit?"];
+    if (fitEligibDict != (id)[NSNull null] && [fitEligibDict objectForKey:kWantFitKit] != (id)[NSNull null]) wantFitKitRow.value =
+        wantFitKitRow.value = [self getYesNoFromOneZero:fitEligibDict[kWantFitKit]];
+    [self setDefaultFontWithRow:wantFitKitRow];
+    wantFitKitRow.selectorOptions = @[@"Yes", @"No"];
+    wantFitKitRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    wantFitKitRow.required = NO;
+    [section addFormRow:wantFitKitRow];
+    
+    wantFitKitRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                wantFitKit = TRUE;
+            } else {
+                wantFitKit = FALSE;
+            }
+            if (sporeanPr && age50 && fit12Mths && colonsc10Yrs && wantFitKit) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyFIT];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyFIT];
+            }
+            
+        }
+    };
+    
+    // for the initial setting
+    if (sporeanPr && age50 && relColorectCancer && colon3Yrs && wantColRef) {
+        disableFIT = true;
+        fitLast12MthsRow.disabled = [NSNumber numberWithBool:disableFIT];
+        colonoscopy10YrsRow.disabled = [NSNumber numberWithBool:disableFIT];
+        wantFitKitRow.disabled = [NSNumber numberWithBool:disableFIT];
+    }
+    
+    
+    return [super initWithForm:formDescriptor];
+    
+}
+
+- (id) initMammogramEligible {
+    
+    age5069 = noMammo2Yrs = hasChas = wantMammo = false;
+    
+    BOOL isMale;
+    if ([gender isEqualToString:@"M"]) {
+        isMale=true;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyPapSmear];
+    }
+    else isMale = false;
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Mammogram Eligibility"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    NSDictionary *mammoEligibDict = [self.fullScreeningForm objectForKey:SECTION_MAMMOGRAM_ELIGIBLE];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckMammogramEligible];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Singaporean/PR"];
+    [self setDefaultFontWithRow:row];
+    row.selectorOptions = @[@"Yes", @"No"];
+    row.required = NO;
+    row.disabled = @(1);
+    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"]) {
+        sporeanPr = true;
+        row.value = @"Yes";
+    }
+    else {
+        sporeanPr = false;
+        row.value = @"No";
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
+    }
+    
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"age_50_69" rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Aged 50 to 69?"];
+    [self setDefaultFontWithRow:row];
+    row.selectorOptions = @[@"Yes", @"No"];
+    row.required = NO;
+    row.disabled = @(1);
+    if ([age integerValue] >= 50 && [age integerValue] <= 69) {
+        row.value = @"Yes";
+        age5069 = YES;
+    }
+    else {
+        row.value = @"No";
+        age5069 = NO;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
+    }
+    [section addFormRow:row];
+    
+    XLFormRowDescriptor *mammo2YrsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammo2Yrs rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Has not done mammogram in the last 2 years?"];
+    if (mammoEligibDict != (id)[NSNull null] && [mammoEligibDict objectForKey:kMammo2Yrs] != (id)[NSNull null])
+        mammo2YrsRow.value = [self getYesNoFromOneZero:mammoEligibDict[kMammo2Yrs]];
+    [self setDefaultFontWithRow:mammo2YrsRow];
+    mammo2YrsRow.selectorOptions = @[@"Yes", @"No"];
+    mammo2YrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    mammo2YrsRow.required = NO;
+    mammo2YrsRow.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+    [section addFormRow:mammo2YrsRow];
+    
+    mammo2YrsRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@"Yes"]) {
+                noMammo2Yrs = TRUE;
+            } else {
+                noMammo2Yrs = FALSE;
+            }
+            if (sporean && age5069 && noMammo2Yrs && hasChas && wantMammo) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyMammo];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyMammo];
+            }
+            
+        }
+    };
+    
+    XLFormRowDescriptor *wantMammoRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantMammo rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does resident want a free mammogram referral?"];
+    if (mammoEligibDict != (id)[NSNull null] && [mammoEligibDict objectForKey:kWantMammo] != (id)[NSNull null])
+        wantMammoRow.value = [self getYesNoFromOneZero:mammoEligibDict[kWantMammo]];
+    wantMammoRow.selectorOptions = @[@"Yes", @"No"];
+    [self setDefaultFontWithRow:wantMammoRow];
+    wantMammoRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    wantMammoRow.required = NO;
+    wantMammoRow.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+    [section addFormRow:wantMammoRow];
+    
+    wantMammoRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@"Yes"]) {
+                wantMammo = TRUE;
+            } else {
+                wantMammo = FALSE;
+            }
+            if (sporean && age5069 && noMammo2Yrs && hasChas && wantMammo) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyMammo];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyMammo];
+            }
+        }
+    };
+    
+    return [super initWithForm:formDescriptor];
+    
+}
+
+- (id) initPapSmearEligible {
+    
+    BOOL isMale;
+    if ([gender isEqualToString:@"M"]) {
+        isMale=true;
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyPapSmear];
+    }
+    else isMale = false;
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Eligibility for Pap Smear"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    NSDictionary *papSmearEligibDict = _fullScreeningForm[SECTION_PAP_SMEAR_ELIGIBLE];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckMammogramEligible];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    XLFormRowDescriptor *sporeanPrRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Singaporean/PR"];
+    [self setDefaultFontWithRow:sporeanPrRow];
+    sporeanPrRow.selectorOptions = @[@"Yes", @"No"];
+    sporeanPrRow.required = NO;
+    sporeanPrRow.disabled = @(1);
+    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"]) {
+        sporeanPr = YES;
+        sporeanPrRow.value = @"Yes";
+    }
+    else {
+        sporeanPr = NO;
+        sporeanPrRow.value = @"No";
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyPapSmear];
+    }
+    //    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+    [section addFormRow:sporeanPrRow];
+    
+    XLFormRowDescriptor *ageCheckRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeCheck2 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Aged 25 to 69"];
+    [self setDefaultFontWithRow:ageCheckRow];
+    ageCheckRow.selectorOptions = @[@"Yes", @"No"];
+    ageCheckRow.required = NO;
+    ageCheckRow.disabled = @(1);
+    if (([age integerValue] >= 25) && ([age integerValue] < 70)) {
+        age2569 = YES;
+        ageCheckRow.value = @"Yes";
+    }
+    else {
+        age2569 = NO;
+        ageCheckRow.value = @"No";
+        [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyPapSmear];
+    }
+    //    row.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+    [section addFormRow:ageCheckRow];
+    
+    XLFormRowDescriptor *pap3Yrs = [XLFormRowDescriptor formRowDescriptorWithTag:kPap3Yrs rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Have you done a pap smear in the last 3 years?"];
+    if (papSmearEligibDict != (id)[NSNull null] && [papSmearEligibDict objectForKey:kPap3Yrs] != (id)[NSNull null])
+        pap3Yrs.value = [self getYesNoFromOneZero:papSmearEligibDict[kPap3Yrs]];
+    [self setDefaultFontWithRow:pap3Yrs];
+    pap3Yrs.selectorOptions = @[@"Yes", @"No"];
+    pap3Yrs.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    pap3Yrs.required = NO;
+    pap3Yrs.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+    [section addFormRow:pap3Yrs];
+    
+    pap3Yrs.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                noPapSmear3Yrs = TRUE;
+            } else {
+                noPapSmear3Yrs = FALSE;
+            }
+            if (sporeanPr && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
+            }
+            
+        }
+    };
+    
+    XLFormRowDescriptor *engageSexRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEngagedSex rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Have you engaged in sexual intercourse before?"];
+    if (papSmearEligibDict != (id)[NSNull null] && [papSmearEligibDict objectForKey:kEngagedSex] != (id)[NSNull null])
+        engageSexRow.value = [self getYesNoFromOneZero:papSmearEligibDict[kEngagedSex]];
+    [self setDefaultFontWithRow:engageSexRow];
+    engageSexRow.selectorOptions = @[@"Yes", @"No"];
+    engageSexRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    engageSexRow.required = NO;
+    engageSexRow.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+    [section addFormRow:engageSexRow];
+    
+    engageSexRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                hadSex = TRUE;
+            } else {
+                hadSex = FALSE;
+            }
+            if (sporeanPr && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
+            }
+            
+        }
+    };
+    
+    XLFormRowDescriptor *wantPapRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantPap rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does resident want a free pap smear referral?"];
+    if (papSmearEligibDict != (id)[NSNull null] && [papSmearEligibDict objectForKey:kWantPap] != (id)[NSNull null])
+        wantPapRow.value = [self getYesNoFromOneZero:papSmearEligibDict[kWantPap]];
+    [self setDefaultFontWithRow:wantPapRow];
+    wantPapRow.selectorOptions = @[@"Yes", @"No"];
+    wantPapRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    wantPapRow.required = NO;
+    wantPapRow.disabled = isMale? [NSNumber numberWithBool:YES]:[NSNumber numberWithBool:NO];
+    [section addFormRow:wantPapRow];
+    
+    wantPapRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqual:@1]) {
+                wantPapSmear = TRUE;
+            } else {
+                wantPapSmear = FALSE;
+            }
+            if (sporeanPr && age2569 && noPapSmear3Yrs && hadSex && wantPapSmear) {
+                [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:kQualifyPapSmear];
+            } else {
+                [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifyPapSmear];
+            }
+            
+        }
+    };
+    
+    return [super initWithForm:formDescriptor];
+    
+}
+
+- (id) initFallRiskAsmt {
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Fall Risk Assessment (Basic)"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    NSDictionary *fallRiskEligibleDict = _fullScreeningForm[SECTION_FALL_RISK_ELIGIBLE];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckMammogramEligible];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kMobilityStatus
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@"Current mobility Status"];
+    [self setDefaultFontWithRow:row];
+    row.noValueDisplayText = @"Tap here for options";
+    row.required = YES;
+    row.selectorOptions = @[@"Ambulant", @"Assistance required (stick/frame)", @"Wheelchair-bound", @"Bedridden"];
+    
+    //value
+    if (fallRiskEligibleDict != (id)[NSNull null] && [fallRiskEligibleDict objectForKey:kMobility] != (id)[NSNull null]) {
+        row.value = fallRiskEligibleDict[kMobility];
+    }
+    
+    [section addFormRow:row];
+    
+    return [super initWithForm:formDescriptor];
+}
 
 #pragma mark - XLFormDescriptorDelegate
 
@@ -1689,30 +2577,6 @@ typedef enum formName {
         [self postSingleFieldWithSection:SECTION_COLONOSCOPY_ELIGIBLE andFieldName:kWantColonoscopyRef andNewContent:newValue];
     }
     
-    else if ([rowDescriptor.tag isEqualToString:kFitLast12Mths]) {
-        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kFitLast12Mths andNewContent:newValue];
-    }else if ([rowDescriptor.tag isEqualToString:kColonoscopy10Yrs]) {
-        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kColonoscopy10Yrs andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kWantFitKit]) {
-        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kWantFitKit andNewContent:newValue];
-    }
-    
-    else if ([rowDescriptor.tag isEqualToString:kMammo2Yrs]) {
-        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_ELIGIBLE andFieldName:kMammo2Yrs andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kHasChas]) {
-        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_ELIGIBLE andFieldName:kHasChas andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kWantMammo]) {
-        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_ELIGIBLE andFieldName:kWantMammo andNewContent:newValue];
-    }
-    
-    else if ([rowDescriptor.tag isEqualToString:kPap3Yrs]) {
-        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kPap3Yrs andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kEngagedSex]) {
-        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kEngagedSex andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kWantPap]) {
-        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kWantPap andNewContent:newValue];
-    }
-    
     else if ([rowDescriptor.tag isEqualToString:kFallen12Mths]) {
         [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kFallen12Mths andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kScaredFall]) {
@@ -1732,35 +2596,81 @@ typedef enum formName {
     } else if ([rowDescriptor.tag isEqualToString:kDMCheckedBlood]) {
         [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kCheckedBlood andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kDMSeeingDocRegularly]) {
-        [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kSeeingDocRegularly andNewContent:ansFromYesNo];
+        [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kSeeingDocRegularly andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kDMCurrentlyPrescribed]) {
         [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kCurrentlyPrescribed andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kDMTakingRegularly]) {
-        [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kTakingRegularly andNewContent:ansFromYesNo];
+        [self postSingleFieldWithSection:SECTION_DIABETES andFieldName:kTakingRegularly andNewContent:newValue];
     }
+    
+    /* Hyperlipidemia */
     
     else if ([rowDescriptor.tag isEqualToString:kLipidHasInformed]) {
         [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kHasInformed andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kLipidCheckedBlood]) {
         [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kCheckedBlood andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kLipidSeeingDocRegularly]) {
-        [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kSeeingDocRegularly andNewContent:ansFromYesNo];
+        [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kSeeingDocRegularly andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kLipidCurrentlyPrescribed]) {
         [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kCurrentlyPrescribed andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kLipidTakingRegularly]) {
-        [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kTakingRegularly andNewContent:ansFromYesNo];
+        [self postSingleFieldWithSection:SECTION_HYPERLIPIDEMIA andFieldName:kTakingRegularly andNewContent:newValue];
     }
+    
+    /* HyperTension */
     
     else if ([rowDescriptor.tag isEqualToString:kHTHasInformed]) {
         [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kHasInformed andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kHTCheckedBp]) {
-        [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kCheckedBp andNewContent:ansFromYesNo];
+        [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kCheckedBp andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kHTSeeingDocRegularly]) {
-        [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kSeeingDocRegularly andNewContent:ansFromYesNo];
+        [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kSeeingDocRegularly andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kHTCurrentlyPrescribed]) {
         [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kCurrentlyPrescribed andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kHTTakingRegularly]) {
-        [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kTakingRegularly andNewContent:ansFromYesNo];
+        [self postSingleFieldWithSection:SECTION_HYPERTENSION andFieldName:kTakingRegularly andNewContent:newValue];
+    }
+    
+    /* Diet History */
+    else if ([rowDescriptor.tag isEqualToString:kAlcohol]) {
+        [self postSingleFieldWithSection:SECTION_DIET andFieldName:kAlcohol andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kEatHealthy]) {
+        [self postSingleFieldWithSection:SECTION_DIET andFieldName:kEatHealthy andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kVege]) {
+        [self postSingleFieldWithSection:SECTION_DIET andFieldName:kVege andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kFruits]) {
+        [self postSingleFieldWithSection:SECTION_DIET andFieldName:kFruits andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kGrainsCereals]) {
+        [self postSingleFieldWithSection:SECTION_DIET andFieldName:kGrainsCereals andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kHighFats]) {
+        [self postSingleFieldWithSection:SECTION_DIET andFieldName:kGrainsCereals andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kProcessedFoods]) {
+        [self postSingleFieldWithSection:SECTION_DIET andFieldName:kProcessedFoods andNewContent:newValue];
+    }
+    
+    /* FIT Eligibility */
+    else if ([rowDescriptor.tag isEqualToString:kFitLast12Mths]) {
+        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kFitLast12Mths andNewContent:ansFromYesNo];
+    }else if ([rowDescriptor.tag isEqualToString:kColonoscopy10Yrs]) {
+        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kColonoscopy10Yrs andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kWantFitKit]) {
+        [self postSingleFieldWithSection:SECTION_FIT_ELIGIBLE andFieldName:kWantFitKit andNewContent:ansFromYesNo];
+    }
+    
+    /* Mammogram Eligibility */
+    else if ([rowDescriptor.tag isEqualToString:kMammo2Yrs]) {
+        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_ELIGIBLE andFieldName:kMammo2Yrs andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kWantMammo]) {
+        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_ELIGIBLE andFieldName:kWantMammo andNewContent:ansFromYesNo];
+    }
+    
+    /* Pap Smear Eligibility */
+    else if ([rowDescriptor.tag isEqualToString:kPap3Yrs]) {
+        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kPap3Yrs andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kEngagedSex]) {
+        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kEngagedSex andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kWantPap]) {
+        [self postSingleFieldWithSection:SECTION_PAP_SMEAR_ELIGIBLE andFieldName:kWantPap andNewContent:ansFromYesNo];
     }
     
     /* Geriatric Depression Assessment */
@@ -1797,6 +2707,8 @@ typedef enum formName {
     } else if ([rowDescriptor.tag isEqualToString:kSmokeNo]) {
         [self postSingleFieldWithSection:SECTION_RISK_STRATIFICATION andFieldName:kSmokeNo andNewContent:rowDescriptor.value];
     }
+    
+    /* */
     
 }
 
@@ -1964,15 +2876,15 @@ typedef enum formName {
 - (NSString *) getYesNoFromOneZero: (id) value {
     if ([value isKindOfClass:[NSString class]]) {
         if ([value isEqualToString:@"1"])
-            return @"YES";
+            return @"Yes";
         else if ([value isEqualToString:@"0"])
-            return @"NO";
+            return @"No";
         
     } else if ([value isKindOfClass:[NSNumber class]]) {
         if ([value isEqual:@1])
-            return @"YES";
+            return @"Yes";
         else if ([value isEqual:@0])
-            return @"NO";
+            return @"No";
         
     }
     return @"";
@@ -2000,7 +2912,7 @@ typedef enum formName {
                 break;
             case Hypertension: fieldName = kCheckHypertension;
                 break;
-            case RiskStratification: fieldName = kCheckRiskStrat;
+            case RiskStratification: fieldName = kCheckRiskStratification;
                 break;
             default:
                 break;
@@ -2043,7 +2955,7 @@ typedef enum formName {
                 break;
             case Hypertension: fieldName = kCheckHypertension;
                 break;
-            case RiskStratification: fieldName = kCheckRiskStrat;
+            case RiskStratification: fieldName = kCheckRiskStratification;
                 break;
             default:
                 break;
@@ -2082,6 +2994,72 @@ typedef enum formName {
     }
     return @"";
 }
+
+- (NSString *) checkFreqGoingDocConsult {
+    NSDictionary *diabetesDict = _fullScreeningForm[SECTION_DIABETES];
+    NSDictionary *tensionDict = _fullScreeningForm[SECTION_HYPERTENSION];
+    NSDictionary *lipidDict = _fullScreeningForm[SECTION_HYPERLIPIDEMIA];
+    
+    NSArray *textArray = @[@"Regular", @"Occasionally", @"Seldom", @"Not at all"];
+    
+    
+    for (int i=0; i<4; i++) {       //check one section after another, from "Regular" all the way till "Not at all"
+        NSString *freq = diabetesDict[kSeeingDocRegularly];
+        if ([freq isKindOfClass:[NSString class]]) {
+            if ([freq containsString:textArray[i]]) {
+                if (i < 2) return @"going";
+                else if (i < 4) return @"not";
+                else return @"";
+            }
+        }
+        freq = tensionDict[kSeeingDocRegularly];
+        if ([freq isKindOfClass:[NSString class]]) {
+            if ([freq containsString:textArray[i]]) {
+                if (i < 2) return @"going";
+                else if (i < 4) return @"not";
+                else return @"";
+            }
+        }
+        freq = lipidDict[kSeeingDocRegularly];
+        if ([freq isKindOfClass:[NSString class]]) {
+            if ([freq containsString:textArray[i]]) {
+                if (i < 2) return @"going";
+                else if (i < 4) return @"not";
+                else return @"";
+            }
+        }
+    }
+    return @"";
+}
+
+- (void) postFamHistWithOptionName:(NSString *) option andValue: (NSString *) value {
+    NSString *fieldName;
+
+    if ([option containsString:@"pressure"]) fieldName = kFamHighBp;
+    else if ([option containsString:@"cholesterol"]) fieldName = kFamHighCholes;
+    else if ([option containsString:@"attack"]) fieldName = kFamChd;
+    else if ([option containsString:@"stroke"]) fieldName = kFamStroke;
+    else if ([option containsString:@"above"]) fieldName = kFamNone;
+    
+    [self postSingleFieldWithSection:SECTION_FAM_HIST andFieldName:fieldName andNewContent:value];
+}
+
+- (NSArray *) getFamHistArray: (NSDictionary *) dictionary {
+    if (dictionary == (id)[NSNull null] || dictionary == nil) {
+        return @[]; //return empty array;
+    }
+    
+    NSMutableArray *famHistArray = [[NSMutableArray alloc] init];
+    
+    if([[dictionary objectForKey:kFamHighBp] isEqual:@(1)]) [famHistArray addObject:@"High blood pressure"];
+    if([[dictionary objectForKey:kFamHighCholes] isEqual:@(1)]) [famHistArray addObject:@"High blood cholesterol"];
+    if([[dictionary objectForKey:kFamChd] isEqual:@(1)]) [famHistArray addObject:@"Heart attack or coronary heart disease (narrowed blood vessels supplying heart muscle)"];
+    if([[dictionary objectForKey:kFamStroke] isEqual:@(1)]) [famHistArray addObject:@"Stroke"];
+    if([[dictionary objectForKey:kFamNone] isEqual:@(1)]) [famHistArray addObject:@"No, they do not have any of the above"];
+    
+    return famHistArray;
+}
+
 
 
 #pragma mark - UIFont methods

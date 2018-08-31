@@ -27,18 +27,24 @@
     NetworkStatus status;
     XLFormRowDescriptor *dobRow;
     NSString *block, *street;
+    BOOL gotOldRecord;
 }
 
 @property (strong, nonatomic) NSNumber *resident_id;
+@property (strong, nonatomic) NSDictionary *oldRecordDictionary;
 
 @end
 
 @implementation NewScreeningResidentFormVC
 
 - (void)viewDidLoad {
-    
+    gotOldRecord = FALSE;
+    NSLog(@"%@", [[NSUserDefaults standardUserDefaults] objectForKey:kOldRecord]);
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:kOldRecord] != (id)[NSNull null] && [[NSUserDefaults standardUserDefaults] objectForKey:kOldRecord] != nil) {
+        _oldRecordDictionary = [[NSUserDefaults standardUserDefaults] objectForKey:kOldRecord];
+        gotOldRecord = TRUE;
+    }
     XLFormViewController *form;
-    
     
     neighbourhood = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
     
@@ -79,6 +85,7 @@
     
     // Name
     XLFormRowDescriptor *nameRow = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeName title:@"Resident Name"];
+    if (gotOldRecord) nameRow.value = [_oldRecordDictionary objectForKey:kName];
     nameRow.required = YES;
     [self setDefaultFontWithRow:nameRow];
     [nameRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
@@ -89,6 +96,12 @@
     row.selectorOptions = @[@"Male", @"Female"];
     [self setDefaultFontWithRow:row];
     row.required = YES;
+    if (gotOldRecord) {
+        if ([_oldRecordDictionary[kGender] isEqualToString:@"M"])
+            row.value = @"Male";
+        else
+            row.value = @"Female";
+    }
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
@@ -99,6 +112,7 @@
     nricRow.required = YES;
     [nricRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:nricRow];
+    if (gotOldRecord) nricRow.value = [_oldRecordDictionary objectForKey:kNRIC];
     [section addFormRow:nricRow];
     
     nricRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -112,6 +126,7 @@
     XLFormRowDescriptor *nric2Row = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC2 rowType:XLFormRowDescriptorTypeName title:@"Re-enter NRIC"];
     nric2Row.required = YES;
     [nric2Row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    if (gotOldRecord) nric2Row.value = [_oldRecordDictionary objectForKey:kNRIC];
     [self setDefaultFontWithRow:nric2Row];
     [section addFormRow:nric2Row];
     
@@ -127,6 +142,13 @@
     [formDescriptor addFormSection:section];
     
     dobRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBirthDate rowType:XLFormRowDescriptorTypeDate title:@"DOB"];
+    if (gotOldRecord) {
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"YYYY-MM-dd";
+        dateFormatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];  //otherwise 1st Jan will not be able to be read.
+        NSDate *date = [dateFormatter dateFromString:_oldRecordDictionary[kBirthDate]];
+        dobRow.value = date;
+    }
     dobRow.required = YES;
     [self setDefaultFontWithRow:dobRow];
     [section addFormRow:dobRow];
@@ -134,6 +156,17 @@
     XLFormRowDescriptor *ageRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAge rowType:XLFormRowDescriptorTypeNumber title:@"Age (auto-calculated)"];
     [ageRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     ageRow.value = @"N/A";
+    
+    if (gotOldRecord) {
+        // Calculate age
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy"];
+        NSString *yearOfBirth = [dateFormatter stringFromDate:dobRow.value];
+        NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
+        NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
+        NSLog(@"%li", (long)age);
+        ageRow.value = [NSNumber numberWithLong:age];
+    }
     ageRow.disabled = @1;
     [self setDefaultFontWithRow:ageRow];
     [section addFormRow:ageRow];
@@ -141,6 +174,7 @@
     XLFormRowDescriptor *citizenshipRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCitizenship rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Citizenship status"];
     citizenshipRow.required = YES;
     citizenshipRow.selectorOptions = @[@"Singaporean", @"PR", @"Foreigner"];
+    if (gotOldRecord) citizenshipRow.value = [_oldRecordDictionary objectForKey:kCitizenship];
     [self setDefaultFontWithRow:citizenshipRow];
     [section addFormRow:citizenshipRow];
     
@@ -149,6 +183,7 @@
     section.footerTitle = @"Please input 00000000 if the resident has no number available.";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHpNumber rowType:XLFormRowDescriptorTypePhone title:@"HP Number"];
+    if (gotOldRecord) row.value = [_oldRecordDictionary objectForKey:kHpNumber];
     row.required = YES;
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Please check that you have input the correct number" regex:@"^[0,6,8,9]\\d{7}$"]];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
@@ -161,6 +196,7 @@
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHouseNumber rowType:XLFormRowDescriptorTypePhone title:@"House Phone Number"];
     row.required = YES;
+    if (gotOldRecord) row.value = [_oldRecordDictionary objectForKey:kHouseNumber];
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Please check that you have input the correct number" regex:@"^[0,6,8,9]\\d{7}$"]];
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:row];
@@ -200,6 +236,7 @@
     row.required = YES;
     row.noValueDisplayText = @"Tap here for options";
     [self setDefaultFontWithRow:row];
+    if (gotOldRecord) row.value = [_oldRecordDictionary objectForKey:kEthnicity];
     [section addFormRow:row];
     
     XLFormRowDescriptor * spokenLangRow;
@@ -258,6 +295,7 @@
     addressOthersBlock.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", addressRow];
     [addressOthersBlock.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:addressOthersBlock];
+    if (gotOldRecord) addressOthersBlock.value = [_oldRecordDictionary objectForKey:kAddressOthersBlock];
     [section addFormRow:addressOthersBlock];
     
     XLFormRowDescriptor *addressOthersRoadName = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressOthersRoadName rowType:XLFormRowDescriptorTypeText title:@"Address (Others)-Road Name"];
@@ -271,6 +309,7 @@
     [self setDefaultFontWithRow:unitRow];
     [unitRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     unitRow.required = YES;
+    if (gotOldRecord) unitRow.value = [_oldRecordDictionary objectForKey:kAddressUnitNum];
     [section addFormRow:unitRow];
     
     unitRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -1181,7 +1220,20 @@
     return @"0";
 }
 
-
+- (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
+    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
+    
+    if([[dictionary objectForKey:kLangCanto] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
+    if([[dictionary objectForKey:kLangEng] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
+    if([[dictionary objectForKey:kLangHindi] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
+    if([[dictionary objectForKey:kLangHokkien] isEqual:@(1)]) [spokenLangArray addObject:@"Hokkien"];
+    if([[dictionary objectForKey:kLangMalay] isEqual:@(1)]) [spokenLangArray addObject:@"Malay"];
+    if([[dictionary objectForKey:kLangMandarin] isEqual:@(1)]) [spokenLangArray addObject:@"Mandarin"];
+    if([[dictionary objectForKey:kLangOthers] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
+    if([[dictionary objectForKey:kLangTamil] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
+    if([[dictionary objectForKey:kLangTeoChew] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
+    return spokenLangArray;
+}
 /*
  #pragma mark - Navigation
  

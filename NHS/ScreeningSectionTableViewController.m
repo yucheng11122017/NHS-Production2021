@@ -134,7 +134,7 @@ typedef enum sectionRowNumber {
 #endif
     
     //2018
-    self.rowTitles = @[@"1. Triage", @"2. Phlebotomy", @"3. Profiling (U/C)", @"4. Basic Vision", @"5. Advanced Geriatric (U/C)", @"6. Dental (U/C)", @"7. Hearing (U/C)", @"8. Advanced Vision", @"9. Doctor's Consultation", @"10. Additional Services", @"11. Social Work", @"Summary & Health Education (U/C)"];
+    self.rowTitles = @[@"1. Triage", @"2. Phlebotomy", @"3. Profiling", @"4. Basic Vision", @"5. Advanced Geriatric (U/C)", @"6. Dental (U/C)", @"7. Hearing (U/C)", @"8. Advanced Vision", @"9. Doctor's Consultation", @"10. Additional Services", @"11. Social Work", @"Summary & Health Education (U/C)"];
     
     //2017
 //    self.rowTitles = @[@"Phlebotomy", @"Mode of Screening",@"Profiling", @"Geriatric Depression Assessment", @"Social Work", @"Triage", @"4. Basic Vision", @"Additional Services", @"Doctor's Consultation", @"6. Dental", @"8. Advanced Vision", @"5. Advanced Geriatric", @"Geriatric Dementia Asssesment", @"Health Education"];
@@ -584,7 +584,7 @@ typedef enum sectionRowNumber {
     
     
     for (NSString *key in [checksDict allKeys]) {   //check through all 5 sub-sections
-        if ([key isEqualToString:kCheckDiabetes] || [key isEqualToString:kCheckHypertension] || [key isEqualToString:kCheckHyperlipidemia] || [key isEqualToString:kCheckProfiling] || [key isEqualToString:kCheckRiskStrat]) {
+        if ([key isEqualToString:kCheckDiabetes] || [key isEqualToString:kCheckHypertension] || [key isEqualToString:kCheckHyperlipidemia] || [key isEqualToString:kCheckProfiling] || [key isEqualToString:kCheckRiskStratification]) {
             if ([[checksDict objectForKey:key] isEqual:@1])
                 count++;
         }

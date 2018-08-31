@@ -78,6 +78,28 @@
       failure:[self checkForBadHTTP:failBlock]];
 }
 
+- (void)getResidentGivenNRIC: (NSString *) nric
+           withProgressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+      successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
+      andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock {
+    
+    NSInteger opCode = 1708;
+    NSDictionary *url = [[NSDictionary alloc]
+                          initWithObjectsAndKeys:[@(opCode) stringValue], @"op_code", nil];
+    
+    NSDictionary *dict;
+    NSDictionary *dataDict;
+    
+    dict = @{@"nric": nric};
+    dataDict = @{@"data": dict};
+    
+    [self POST:[url objectForKey:@"op_code"]
+    parameters:dataDict
+      progress:progressBlock
+       success:successBlock
+       failure:[self checkForBadHTTP:failBlock]];
+}
+
 - (void) deleteResidentWithResidentID: (NSNumber *) residentID
             progressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
             successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock

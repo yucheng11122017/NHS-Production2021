@@ -1,12 +1,12 @@
 //
-//  MedicalHistoryTableVC.m
+//  CancerScreeningEligibAssessTableVC.m
 //  NHS
 //
-//  Created by Nicholas Wong on 8/8/17.
-//  Copyright © 2017 NUS. All rights reserved.
+//  Created by Nicholas on 30/8/18.
+//  Copyright © 2018 NUS. All rights reserved.
 //
 
-#import "MedicalHistoryTableVC.h"
+#import "CancerScreeningEligibAssessTableVC.h"
 #import "AppConstants.h"
 #import "Reachability.h"
 #import "SVProgressHUD.h"
@@ -14,7 +14,7 @@
 #import "ProfilingFormVC.h"
 #import "ScreeningDictionary.h"
 
-@interface MedicalHistoryTableVC () {
+@interface CancerScreeningEligibAssessTableVC () {
     NSNumber *selectedRow;
     BOOL internetDCed;
     
@@ -29,33 +29,28 @@
 
 @end
 
-@implementation MedicalHistoryTableVC
+@implementation CancerScreeningEligibAssessTableVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.tableView setTableFooterView:[[UIView alloc] initWithFrame:CGRectZero]];
-
+    
     
     _residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId]; //need this for fetching data
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
-    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0, nil];       //altogether 8 rows
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0, nil];
     
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
     [self.hostReachability startNotifier];
     [self updateInterfaceWithReachability:self.hostReachability];
     
     
-    self.navigationItem.title = @"Medical History";
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Diabetes Mellitus",
-                     @"Hyperlipidemia",
-                     @"Hypertension",
-                     @"Others",
-                     @"Surgery",
-                     @"Barriers to Healthcare",
-                     @"Family History",
-                     @"Lipid Stratification",
+    self.navigationItem.title = @"3c. Cancer Screening Eligibility Assessment";
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"FIT test kit (Colon Cancer)",
+                     @"Mammogram (Breast Cancer)",
+                     @"Pap Smear (Cervical Cancer)",
                      nil];
     
     self.tableView.delegate = self;
@@ -68,7 +63,7 @@
         [self.tableView reloadData];    //put in the ticks
     }
     
-        // Uncomment the following line to preserve selection between presentations.
+    // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
@@ -126,14 +121,14 @@
         }
     }
     
-
+    
     return cell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 1)];
+    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 11)]; //because Medical History took up the first 8 numbers..
     
-    [self performSegueWithIdentifier:@"medHistToFormSegue" sender:self];
+    [self performSegueWithIdentifier:@"CancerEligibAssessToFormSegue" sender:self];
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -171,7 +166,7 @@
             case ReachableViaWWAN:
                 NSLog(@"Connected to server!");
                 
-//                [self getAllDataForOneResident];
+                //                [self getAllDataForOneResident];
                 
                 if (internetDCed) { //previously disconnected
                     [SVProgressHUD setMaximumDismissTimeInterval:1.0];
@@ -197,7 +192,7 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckDiabetes, kCheckHyperlipidemia, kCheckHypertension];
+    NSArray *lookupTable = @[kCheckDiet, kCheckExercise];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {
@@ -206,7 +201,7 @@
             
             NSNumber *doneNum = [checksDict objectForKey:key];
             [_completionCheck addObject:doneNum];
-        
+            
         }
     }
 }
@@ -223,18 +218,19 @@
 
 
 
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-     if ([segue.destinationViewController respondsToSelector:@selector(setFormID:)]) {    //view submitted form
-         [segue.destinationViewController performSelector:@selector(setFormID:)
-                                               withObject:selectedRow];
-     }
-     
- 
- }
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.destinationViewController respondsToSelector:@selector(setFormID:)]) {    //view submitted form
+        [segue.destinationViewController performSelector:@selector(setFormID:)
+                                              withObject:selectedRow];
+    }
+    
+    
+}
 
 
 
 @end
+

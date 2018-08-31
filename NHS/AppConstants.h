@@ -39,8 +39,15 @@
 #define SECTION_DIABETES                        @"diabetes"
 #define SECTION_HYPERLIPIDEMIA                  @"hyperlipidemia"
 #define SECTION_HYPERTENSION                    @"hypertension"
+#define SECTION_HEALTHCARE_BARRIERS             @"healthcare_barriers"
+#define SECTION_FAM_HIST                        @"fam_hist"
 #define SECTION_SW_DEPRESSION                   @"sw_depression"
 #define SECTION_RISK_STRATIFICATION             @"risk_stratification"
+#define SECTION_DIET                            @"diet"
+#define SECTION_EXERCISE                        @"exercise"
+#define SECTION_FALL_RISK_ELIGIBLE              @"fall_risk_eligible"
+#define SECTION_GERIATRIC_DEMENTIA_ELIGIBLE     @"geriatric_dementia_eligible"
+
 #define SECTION_CURRENT_SOCIOECO_SITUATION      @"current_socioeco_situation"
 #define SECTION_CURRENT_PHY_STATUS              @"current_phy_status"
 #define SECTION_SOCIAL_SUPPORT                  @"social_support"
@@ -98,6 +105,7 @@ extern NSString *const kNhsSerialId;
 
 #pragma mark - Resident Particulars
 
+extern NSString *const kOldRecord;
 extern NSString *const kName;
 extern NSString *const kNRIC;
 extern NSString *const kNRIC2;
@@ -232,26 +240,38 @@ extern NSString *const kSeeingDocRegularly;
 extern NSString *const kCurrentlyPrescribed;
 extern NSString *const kTakingRegularly;
 
-/* Diabetes Mellitus */
+/** Diabetes Mellitus */
 extern NSString *const kDMHasInformed;
 extern NSString *const kDMCheckedBlood;
 extern NSString *const kDMSeeingDocRegularly;
 extern NSString *const kDMCurrentlyPrescribed;
 extern NSString *const kDMTakingRegularly;
 
-/* Hyperlipidemia */
+/** Hyperlipidemia */
 extern NSString *const kLipidHasInformed;
 extern NSString *const kLipidCheckedBlood;
 extern NSString *const kLipidSeeingDocRegularly;
 extern NSString *const kLipidCurrentlyPrescribed;
 extern NSString *const kLipidTakingRegularly;
 
-/* Hypertension */
+/** Hypertension */
 extern NSString *const kHTHasInformed;
 extern NSString *const kHTCheckedBp;
 extern NSString *const kHTSeeingDocRegularly;
 extern NSString *const kHTCurrentlyPrescribed;
 extern NSString *const kHTTakingRegularly;
+
+/** Healthcare Barriers */
+extern NSString *const kExistingDoc;
+extern NSString *const kWhyNotFollowUp;
+extern NSString *const kOtherBarrier;
+
+/** Family History */
+extern NSString *const kFamHighBp;
+extern NSString *const kFamHighCholes;
+extern NSString *const kFamChd;
+extern NSString *const kFamStroke;
+extern NSString *const kFamNone;
 
 /** Risk Stratification */
 extern NSString *const kDiabeticFriend;
@@ -263,6 +283,31 @@ extern NSString *const kKidneyDisease;
 extern NSString *const kSmoke;
 extern NSString *const kSmokeYes;
 extern NSString *const kSmokeNo;
+
+/** Diet History */
+extern NSString *const kAlcohol;
+extern NSString *const kEatHealthy;
+extern NSString *const kVege;
+extern NSString *const kFruits;
+extern NSString *const kGrainsCereals;
+extern NSString *const kHighFats;
+extern NSString *const kProcessedFoods;
+
+/** Exercise History */
+extern NSString *const kEngagePhysical;
+extern NSString *const kNoTime;
+extern NSString *const kTooTired;
+extern NSString *const kTooLazy;
+extern NSString *const kNoInterest;
+
+/** Fall Risk Eligible */
+extern NSString *const kUndergoneAssmt;
+extern NSString *const kMobility;
+extern NSString *const kNumFalls;
+extern NSString *const kAssistLevel;
+extern NSString *const kSteadiness;
+extern NSString *const kFallRiskScore;
+extern NSString *const kFallRiskStatus;
 
 #pragma mark - Geriatric Depression Assessment
 
@@ -802,8 +847,19 @@ extern NSString *const kCheckProfiling;
 extern NSString *const kCheckDiabetes;
 extern NSString *const kCheckHyperlipidemia;
 extern NSString *const kCheckHypertension;
+extern NSString *const kCheckHealthcareBarriers;
+extern NSString *const kCheckFamilyHist;
 extern NSString *const kCheckSwDepress;
-extern NSString *const kCheckRiskStrat;
+extern NSString *const kCheckRiskStratification;
+extern NSString *const kCheckDiet;
+extern NSString *const kCheckExercise;
+extern NSString *const kCheckFitEligible;
+extern NSString *const kCheckMammogramEligible;
+extern NSString *const kCheckPapSmearEligible;
+extern NSString *const kCheckFallRiskEligible;
+extern NSString *const kCheckGeriatricDementiaEligible;
+
+
 extern NSString *const kCheckGeno;
 extern NSString *const kCheckSocioEco;
 extern NSString *const kCheckCurrentPhyStatus;

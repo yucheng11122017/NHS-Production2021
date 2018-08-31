@@ -449,15 +449,24 @@ typedef enum Category {
     UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Registration", nil)
                                                                               message:@""
                                                                        preferredStyle:UIAlertControllerStyleAlert];
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.placeholder = @"Key in NRIC of resident";
+    }];
+    
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Add new resident", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
-                                                          selectedResidentID = @(-1);
-                                                          _sampleResidentDict = @{};
-                                                          [self resetAllUserDefaults];
-                                                          [[NSUserDefaults standardUserDefaults] setObject:_neighbourhood forKey:kNeighbourhood];   //only keep neighbourhood
-                                                          [[NSUserDefaults standardUserDefaults] synchronize];
-                                                          [self performSegueWithIdentifier:@"addNewResidentSegue" sender:self];
+                                                          
+                                                          NSLog(@"NRIC: %@", [[alertController textFields][0] text]);
+                                                          NSString *nric = [[alertController textFields][0] text];
+                                                          [[ServerComm sharedServerCommInstance] getResidentGivenNRIC:nric withProgressBlock:[self progressBlock] successBlock:[self nricSuccessBlock] andFailBlock:[self errorBlock]];
+                                                          
+//                                                          selectedResidentID = @(-1);
+//                                                          _sampleResidentDict = @{};
+//                                                          [self resetAllUserDefaults];
+//                                                          [[NSUserDefaults standardUserDefaults] setObject:_neighbourhood forKey:kNeighbourhood];   //only keep neighbourhood
+//                                                          [[NSUserDefaults standardUserDefaults] synchronize];
+//                                                          [self performSegueWithIdentifier:@"addNewResidentSegue" sender:self];
                                                       }]];
     [self presentViewController:alertController animated:YES completion:^{
         UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
@@ -737,6 +746,54 @@ typedef enum Category {
         currentCategory = fullList;
         [self.tableView reloadData];
         [self.refreshControl endRefreshing];
+    };
+}
+
+- (void (^)(NSURLSessionDataTask *task, id responseObject)) nricSuccessBlock {
+    return ^(NSURLSessionDataTask *task, id responseObject){
+        
+        NSDictionary *retrievedDictionary = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
+        
+        NSLog(@"%@", retrievedDictionary);
+        
+        NSString *year2017 = [[retrievedDictionary objectForKey:@"2017"] objectForKey:@"year_2017"];
+        NSString *year2018 = [[retrievedDictionary objectForKey:@"2018"] objectForKey:@"year_2018"];
+        
+        if ([year2017 isEqualToString:@"not found"] && [year2018 isEqualToString:@"not found"]) {
+            // NEW RESIDENT
+            selectedResidentID = @(-1);
+            _sampleResidentDict = @{};
+            [self resetAllUserDefaults];
+            [[NSUserDefaults standardUserDefaults] setObject:_neighbourhood forKey:kNeighbourhood];   //only keep neighbourhood
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            [self performSegueWithIdentifier:@"addNewResidentSegue" sender:self];
+        } else if ([year2018 isEqualToString:@"found"]) {    // already registered
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Duplicate record" message:@"Resident has already been registered!" preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                //do nothing
+            }];
+            [alertController addAction:okAction];
+            [self presentViewController:alertController animated:YES completion:nil];
+        } else if ([year2017 isEqualToString:@"found"] && [year2018 isEqualToString:@"not found"]) {
+            // RESIDENT REGISTERED in 2017
+                
+            selectedResidentID = @(-1);
+            _sampleResidentDict = @{};
+            [self resetAllUserDefaults];
+            NSMutableDictionary *mutDict = [[retrievedDictionary objectForKey:@"2017"] mutableCopy];
+            
+            for (NSString *key in [[retrievedDictionary objectForKey:@"2017"] allKeys]) {
+                if ([mutDict objectForKey:key] == (id)[NSNull null]) {
+                    [mutDict removeObjectForKey:key];
+                }
+            }
+            
+            [[NSUserDefaults standardUserDefaults] setObject:mutDict forKey:kOldRecord];   //only keep neighbourhood
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            [self performSegueWithIdentifier:@"addNewResidentSegue" sender:self];
+        }
+        
+        
     };
 }
 

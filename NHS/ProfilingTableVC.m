@@ -18,6 +18,19 @@
 
 #define COMMENTS_TEXTVIEW_HEIGHT 100
 
+
+typedef enum sectionRowNumber {
+    MedHistRow,
+    DietExerciseHistRow,
+    CancerScreenEligibAssessRow,
+    BasicGeriatricRow,
+    FinancHistAssessRow,
+    SocHistAssessRow,
+    PsychHistAssessRow,
+    AdvancedVisionRow,
+} sectionRowNumber;
+
+
 @interface ProfilingTableVC () {
     NSNumber *destinationFormID;
     NSNumber *age;
@@ -54,8 +67,8 @@
     age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
                         stringForKey:kResidentAge];
     
-    self.navigationItem.title = @"Profiling";
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Eligibility Assessments",@"Medical History",@"Risk Stratification", nil];
+    self.navigationItem.title = @"3. Profiling";
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"3a. Medical History", @"3b. Diet & Exercise History", @"3c. Cancer Screening Eligibility Assessment", @"3d. Basic Geriatric", @"3e. Financial History & Assessment", @"3f. Social History & Assessment", @"3g. Psychological History & Assessment", nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -172,17 +185,40 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.section == 0) {
-        if (indexPath.row == 0) {   //Eligibility Assessments
-            [self performSegueWithIdentifier:@"ProfilingToFormSegue" sender:self];
-            destinationFormID = [NSNumber numberWithInteger:0];
+        
+        switch (indexPath.row) {
+            case MedHistRow:
+                destinationFormID = [NSNumber numberWithInteger:MedHistRow];
+                [self performSegueWithIdentifier:@"ProfilingToMedHistSegue" sender:self];
+                break;
+            case DietExerciseHistRow:
+                destinationFormID = [NSNumber numberWithInteger:DietExerciseHistRow];
+                [self performSegueWithIdentifier:@"ProfilingToDietHistSegue" sender:self];
+                break;
+            case CancerScreenEligibAssessRow:
+                destinationFormID = [NSNumber numberWithInteger:CancerScreenEligibAssessRow];
+                [self performSegueWithIdentifier:@"ProfilingToCancerEligibAssessSegue" sender:self];
+                break;
+            case BasicGeriatricRow:
+                destinationFormID = [NSNumber numberWithInteger:BasicGeriatricRow];
+                [self performSegueWithIdentifier:@"ProfilingToBasicGeriatricSegue" sender:self];
+                break;
+            default:
+                break;
+                
         }
-        else if (indexPath.row == 1)
-            [self performSegueWithIdentifier:@"ProfilingToMedHistSegue" sender:self];
-        else if (indexPath.row == 2) {
-            NSInteger targetRow = indexPath.row + 2;
-            destinationFormID = [NSNumber numberWithInteger:targetRow];
-            [self performSegueWithIdentifier:@"ProfilingToFormSegue" sender:self];
-        }
+        
+//        if (indexPath.row == 0) {   //Eligibility Assessments
+//            [self performSegueWithIdentifier:@"ProfilingToFormSegue" sender:self];
+//            destinationFormID = [NSNumber numberWithInteger:0];
+//        }
+//        else if (indexPath.row == 1)
+//            [self performSegueWithIdentifier:@"ProfilingToMedHistSegue" sender:self];
+//        else if (indexPath.row == 2) {
+//            NSInteger targetRow = indexPath.row + 2;
+//            destinationFormID = [NSNumber numberWithInteger:targetRow];
+//            [self performSegueWithIdentifier:@"ProfilingToFormSegue" sender:self];
+//        }
     } else {
         
     }
@@ -363,7 +399,7 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckProfiling,@"kCheckMedHistory", kCheckRiskStrat];
+    NSArray *lookupTable = @[kCheckProfiling,@"kCheckMedHistory", kCheckRiskStratification];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {
