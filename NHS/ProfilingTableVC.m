@@ -15,6 +15,7 @@
 #import "ProfilingFormVC.h"
 #import "ScreeningDictionary.h"
 #import "KAStatusBar.h"
+#import "ResidentProfile.h"
 
 #define COMMENTS_TEXTVIEW_HEIGHT 100
 
@@ -59,7 +60,7 @@ typedef enum sectionRowNumber {
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
-    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0, nil];
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0, nil];
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
     [self.hostReachability startNotifier];
     [self updateInterfaceWithReachability:self.hostReachability];
@@ -92,7 +93,7 @@ typedef enum sectionRowNumber {
 
 - (void) viewWillDisappear:(BOOL)animated {
     [[ScreeningDictionary sharedInstance] fetchFromServer];
-    
+
     [super viewWillDisappear:animated];
 }
 
@@ -152,6 +153,13 @@ typedef enum sectionRowNumber {
         
         [cell.textLabel setText:text];
         
+        if (indexPath.row == BasicGeriatricRow) {
+            if (![[ResidentProfile sharedManager] isEligibleFallRisk]) {  //not eligible
+                cell.userInteractionEnabled = NO;
+                [cell.textLabel setTextColor:[UIColor grayColor]];
+            }
+        }
+        
         // Put in the ticks if necessary
         if (indexPath.row < [self.completionCheck count]) {
             if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
@@ -160,6 +168,7 @@ typedef enum sectionRowNumber {
                 cell.accessoryType = UITableViewCellAccessoryNone;
             }
         }
+        
     } else {
         _commentTextView = [[UITextView alloc] initWithFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y, self.view.frame.size.width, COMMENTS_TEXTVIEW_HEIGHT)];
         _commentTextView.editable = YES;
@@ -168,7 +177,7 @@ typedef enum sectionRowNumber {
         cell.userInteractionEnabled = YES;
         _commentTextView.delegate = self;
         
-        NSDictionary *profilingComments = _fullScreeningForm[SECTION_PROFILING_COMMENTS];
+        NSDictionary *profilingComments = _fullScreeningForm[SECTION_PROFILING];
         
         //value
         if (profilingComments != (id)[NSNull null] && [profilingComments objectForKey:kProfilingComments] != (id)[NSNull null]) {
@@ -202,6 +211,18 @@ typedef enum sectionRowNumber {
             case BasicGeriatricRow:
                 destinationFormID = [NSNumber numberWithInteger:BasicGeriatricRow];
                 [self performSegueWithIdentifier:@"ProfilingToBasicGeriatricSegue" sender:self];
+                break;
+            case FinancHistAssessRow:
+                destinationFormID = [NSNumber numberWithInteger:FinancHistAssessRow];
+                [self performSegueWithIdentifier:@"ProfilingToFinanceHistAssessSegue" sender:self];
+                break;
+            case SocHistAssessRow:
+                destinationFormID = [NSNumber numberWithInteger:SocHistAssessRow];
+                [self performSegueWithIdentifier:@"ProfilingToSocialHistAssmtSegue" sender:self];
+                break;
+            case PsychHistAssessRow:
+                destinationFormID = [NSNumber numberWithInteger:PsychHistAssessRow];
+                [self performSegueWithIdentifier:@"ProfilingToPsychoHistAssmtSegue" sender:self];
                 break;
             default:
                 break;
@@ -249,7 +270,7 @@ typedef enum sectionRowNumber {
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView {
-    [self postSingleFieldWithSection:SECTION_PROFILING_COMMENTS andFieldName:kProfilingComments andNewContent:textView.text];
+    [self postSingleFieldWithSection:SECTION_PROFILING andFieldName:kProfilingComments andNewContent:textView.text];
 }
 
 #pragma mark - UIFont methods
@@ -399,28 +420,132 @@ typedef enum sectionRowNumber {
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckProfiling,@"kCheckMedHistory", kCheckRiskStratification];
-    
+    NSArray *lookupTable = @[@"medical_history_combined", @"diet_exercise_combined", @"cancer_screening_combined", @"basic_geriatric_combined", @"finance_hist_combined", @"soc_hist_combined", @"psychological_hist_combined"];
+
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {
-            
+
             NSString *key = lookupTable[i];
-            
-            if ([key containsString:@"MedHistory"]) {
+
+            if ([key containsString:@"medical_history"]) {
                 [self.completionCheck addObject:[self checkAllMedHistorySections:checksDict]];
-            } else {
+            } else if ([key containsString:@"diet_exercise"]) {
+                [self.completionCheck addObject:[self checkAllDietExeSections:checksDict]];
+            } else if ([key containsString:@"cancer_screening"]) {
+                [self.completionCheck addObject:[self checkAllCancerScreenSections:checksDict]];
+            } else if ([key containsString:@"basic_geriatric"]) {
+                if (![[ResidentProfile sharedManager] isEligibleFallRisk]) {    //if not eligible, set is as done
+                    [self.completionCheck addObject:@1];
+                } else{
+                    [self.completionCheck addObject:[self checkAllBasicGeriatricsSections:checksDict]];
+                }
+                
+            } else if ([key containsString:@"finance_hist"]) {
+                [self.completionCheck addObject:[self checkAllFinanceHistSections:checksDict]];
+            } else if ([key containsString:@"soc_hist"]) {
+                [self.completionCheck addObject:[self checkAllSocialHistSections:checksDict]];
+            } else if ([key containsString:@"psychological_hist"]) {
+                [self.completionCheck addObject:[self checkAllPsychoHistSections:checksDict]];
+            }
+            else {
+                if ([checksDict objectForKey:key] == nil) continue;
                 NSNumber *doneNum = [checksDict objectForKey:key];
                 [_completionCheck addObject:doneNum];
             }
-            
+
+        }
+        int count=0;
+        for (int i=0; i< [_completionCheck count]; i++) {
+            if ([_completionCheck[i] isEqualToNumber:@1]) count++;
+        }
+        if (count == [_completionCheck count]) {
+            NSLog(@"activate Profiling tick!");
+            [[ResidentProfile sharedManager] setProfilingDone:YES];
         }
     }
 }
 
+#pragma mark - Check sub-sections methods
+
 - (NSNumber *) checkAllMedHistorySections:(NSDictionary *) checksDict {
     int count=0;
     for (NSString *key in [checksDict allKeys]) {   //check through all 3 sub-sections
-        if ([key isEqualToString:kCheckDiabetes] || [key isEqualToString:kCheckHyperlipidemia] || [key isEqualToString:kCheckHypertension]) {
+        if ([key isEqualToString:kCheckDiabetes] ||
+            [key isEqualToString:kCheckHyperlipidemia] ||
+            [key isEqualToString:kCheckHypertension] ||
+            [key isEqualToString:kCheckMedicalHistory] ||
+            [key isEqualToString:kCheckSurgery] ||
+            [key isEqualToString:kCheckHealthcareBarriers] ||
+            [key isEqualToString:kCheckFamHist] ||
+            [key isEqualToString:kCheckRiskStratification]) {
+            
+            if ([[checksDict objectForKey:key] isEqual:@1])
+                count++;
+            else
+                return @0;
+        }
+    }
+    if (count == 8) return @1;
+    else return @0;
+}
+
+- (NSNumber *) checkAllDietExeSections:(NSDictionary *) checksDict {
+    int count=0;
+    for (NSString *key in [checksDict allKeys]) {   //check through all 3 sub-sections
+        if ([key isEqualToString:kCheckDiet] ||
+            [key isEqualToString:kCheckExercise]) {
+            
+            if ([[checksDict objectForKey:key] isEqual:@1])
+                count++;
+            else
+                return @0;
+        }
+    }
+    if (count == 2) return @1;
+    else return @0;
+}
+
+- (NSNumber *) checkAllCancerScreenSections:(NSDictionary *) checksDict {
+    int count=0;
+    for (NSString *key in [checksDict allKeys]) {   //check through all 3 sub-sections
+        if ([key isEqualToString:kCheckFitEligible] ||
+            [key isEqualToString:kCheckMammogramEligible] ||
+            [key isEqualToString:kCheckPapSmearEligible]) {
+            
+            if ([[checksDict objectForKey:key] isEqual:@1])
+                count++;
+        }
+    }
+    if (count == 3) return @1;
+    else if (count == 1 && ![[ResidentProfile sharedManager] isFemale]) //if it's a male, maybe only settle one section
+        return @1;
+    
+    return @0;
+}
+
+- (NSNumber *) checkAllBasicGeriatricsSections:(NSDictionary *) checksDict {
+    int count=0;
+    for (NSString *key in [checksDict allKeys]) {   //check through all 3 sub-sections
+        if ([key isEqualToString:kCheckFallRiskEligible] ||
+            [key isEqualToString:kCheckGeriatricDementiaEligible]) {
+            
+            if ([[checksDict objectForKey:key] isEqual:@1])
+                count++;
+            else
+                return @0;
+        }
+    }
+    if (count == 2) return @1;
+    else return @0;
+}
+
+- (NSNumber *) checkAllFinanceHistSections:(NSDictionary *) checksDict {
+    int count=0;
+    for (NSString *key in [checksDict allKeys]) {   //check through all 3 sub-sections
+        if ([key isEqualToString:kCheckProfilingSocioecon] ||
+            [key isEqualToString:kCheckFinAssmt] ||
+            [key isEqualToString:kCheckChasPrelim]) {
+            
             if ([[checksDict objectForKey:key] isEqual:@1])
                 count++;
             else
@@ -428,6 +553,38 @@ typedef enum sectionRowNumber {
         }
     }
     if (count == 3) return @1;
+    else return @0;
+}
+
+- (NSNumber *) checkAllSocialHistSections:(NSDictionary *) checksDict {
+    int count=0;
+    for (NSString *key in [checksDict allKeys]) {   //check through all 3 sub-sections
+        if ([key isEqualToString:kCheckSocialHistory] ||
+            [key isEqualToString:kCheckSocialAssmt]) {
+            
+            if ([[checksDict objectForKey:key] isEqual:@1])
+                count++;
+            else
+                return @0;
+        }
+    }
+    if (count == 2) return @1;
+    else return @0;
+}
+
+- (NSNumber *) checkAllPsychoHistSections:(NSDictionary *) checksDict {
+    int count=0;
+    for (NSString *key in [checksDict allKeys]) {   //check through all 3 sub-sections
+        if ([key isEqualToString:kCheckDepression] ||
+            [key isEqualToString:kCheckSuicideRisk]) {
+            
+            if ([[checksDict objectForKey:key] isEqual:@1])
+                count++;
+            else
+                return @0;
+        }
+    }
+    if (count == 2) return @1;
     else return @0;
 }
 

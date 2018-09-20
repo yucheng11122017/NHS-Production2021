@@ -86,6 +86,18 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
         forResident: (NSNumber *) residentID
            withNric:(NSString *) nric;
 
+#pragma mark - Consent Form
+-(void)saveConsentFormImage:(UIImage *) consentForm
+        forResident: (NSNumber *) residentID
+           withNric:(NSString *) nric;
+
+-(NSString *)getRetrievedConsentImagePath;
+
+-(void)retrieveConsentImageForResident:(NSNumber *) residentID
+                              withNric:(NSString *)nric;
+
+
+
 #pragma mark - PDF Report
 - (NSString *) getretrievedReportFilepath;
 -(void)retrievePdfReportForResident:(NSNumber *) residentID;

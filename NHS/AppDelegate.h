@@ -11,6 +11,9 @@
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+//@property(nonatomic, strong) ServerReachability *serverReachabilityModule;
+@property(nonatomic, strong) NSTimer *serverReachabilityTimer;
+
 
 
 @end

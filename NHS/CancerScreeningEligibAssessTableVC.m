@@ -13,6 +13,7 @@
 #import "ServerComm.h"
 #import "ProfilingFormVC.h"
 #import "ScreeningDictionary.h"
+#import "ResidentProfile.h"
 
 @interface CancerScreeningEligibAssessTableVC () {
     NSNumber *selectedRow;
@@ -112,9 +113,22 @@
     
     [cell.textLabel setText:text];
     
+    if ([text containsString:@"Mammogram"] || [text containsString:@"Pap"]) {
+        if ([[ResidentProfile sharedManager] isFemale]) {
+            //do nothing
+        } else {
+            cell.userInteractionEnabled = NO;
+            [cell.textLabel setTextColor:[UIColor grayColor]];
+        }
+    }
+    
+    
+    
     // Put in the ticks if necessary
     if (indexPath.row < [self.completionCheck count]) {
         if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        } else if (!cell.userInteractionEnabled) {
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         } else {
             cell.accessoryType = UITableViewCellAccessoryNone;
@@ -192,7 +206,7 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckDiet, kCheckExercise];
+    NSArray *lookupTable = @[kCheckFitEligible, kCheckMammogramEligible, kCheckPapSmearEligible];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {

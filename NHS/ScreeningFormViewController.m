@@ -15,6 +15,7 @@
 #import "ScreeningSectionTableViewController.h"
 #import "math.h"
 #import "ScreeningDictionary.h"
+#import "ResidentProfile.h"
 
 //XLForms stuffs
 #import "XLForm.h"
@@ -46,7 +47,7 @@ typedef enum formName {
     DocConsult,
     AddSvcs,
     SocialWk,
-    HealthEdu
+    SummaryNHealthEdu
 } formName;
 
 
@@ -126,6 +127,10 @@ NSString *const kQuestionFifteen = @"q15";
             break;
         case Phleb: form = [self initPhlebotomy];
             break;
+        case Dental: form = [self initDentalCheckup];
+            break;
+        case Hearing: form = [self initHearing];
+            break;
 //        case 2: form = [self initProfiling];
 //            break;
 //        case 3: form = [self initGeriaDepressAssess];
@@ -137,11 +142,11 @@ NSString *const kQuestionFifteen = @"q15";
             break;
         case DocConsult: form = [self initRefForDoctorConsult];
             break;
-        case 11: form = [self initFallRiskAssessment];
-            break;
-        case 12: form = [self initDementiaAssessment];
-            break;
-        case 13: form = [self initHealthEducation];
+//        case 11: form = [self initFallRiskAssessment];
+//            break;
+//        case 12: form = [self initDementiaAssessment];
+//            break;
+        case SummaryNHealthEdu: form = [self initSummaryAndHealthEdu];
             break;
     }
     
@@ -152,7 +157,9 @@ NSString *const kQuestionFifteen = @"q15";
     
     
     if (isFormFinalized) {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
+        if ([self.sectionID integerValue] != SummaryNHealthEdu) {
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
+        }
         [self.form setDisabled:YES];
         [self.tableView endEditing:YES];    //to really disable the table
         [self.tableView reloadData];
@@ -160,7 +167,9 @@ NSString *const kQuestionFifteen = @"q15";
     else {
         [self.form setDisabled:NO];
         [self.tableView reloadData];
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Finalize" style:UIBarButtonItemStyleDone target:self action:@selector(finalizeBtnPressed:)];
+        if ([self.sectionID integerValue] != SummaryNHealthEdu) {
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Finalize" style:UIBarButtonItemStyleDone target:self action:@selector(finalizeBtnPressed:)];
+        }
     }
     
     [super viewDidLoad];
@@ -467,7 +476,7 @@ NSString *const kQuestionFifteen = @"q15";
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
     
     if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckTriage];
+        NSNumber *check = checkDict[kCheckClinicalResults];
         if ([check isKindOfClass:[NSNumber class]]) {
             isFormFinalized = [check boolValue];
         }
@@ -476,7 +485,7 @@ NSString *const kQuestionFifteen = @"q15";
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
-    // Basic Information - Section
+    // BP1,2,3 - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
@@ -505,61 +514,246 @@ NSString *const kQuestionFifteen = @"q15";
     [self setDefaultFontWithRow:diastolic_1];
     [section addFormRow:diastolic_1];
     
-    XLFormRowDescriptor *height;
-    height = [XLFormRowDescriptor formRowDescriptorWithTag:kHeightCm rowType:XLFormRowDescriptorTypeDecimal title:@"Height (cm)"];
-    height.required = YES;
-
+    XLFormRowDescriptor *systolic_2;
+    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Sys rowType:XLFormRowDescriptorTypeDecimal title:@"BP 2 (Systolic)"];
+    systolic_2.required = YES;
+    
     //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kHeightCm] != (id)[NSNull null]) height.value = triageDict[kHeightCm];
-
-    
-    [self setDefaultFontWithRow:height];
-    [section addFormRow:height];
-    
-    XLFormRowDescriptor *weight;
-    weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeightKg rowType:XLFormRowDescriptorTypeDecimal title:@"Weight (kg)"];
-    weight.required = YES;
-
-    //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kWeightKg] != (id)[NSNull null]) weight.value = triageDict[kWeightKg];
-    
-    [self setDefaultFontWithRow:weight];
-    [section addFormRow:weight];
-    
-    XLFormRowDescriptor *bmi;
-    bmi = [XLFormRowDescriptor formRowDescriptorWithTag:kBmi rowType:XLFormRowDescriptorTypeText title:@"BMI"];
-
-    //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBmi] != (id)[NSNull null]) {
-        bmi.value = triageDict[kBmi];
-        [self updateAnswerColor:bmi];
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp2Sys] != (id)[NSNull null]) {
+        systolic_2.value = triageDict[kBp2Sys];
+        [self updateAnswerColor:systolic_2];
     }
     
-    bmi.disabled = @(1);
-    [self setDefaultFontWithRow:bmi];
-    [section addFormRow:bmi];
+    [self setDefaultFontWithRow:systolic_2];
+    [section addFormRow:systolic_2];
     
-    weight.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
-                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
-                
-                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:[self removePostfixIfAny:bmi.value]];
-                [self updateAnswerColor:bmi];
-                [self updateFormRow:bmi];
+    XLFormRowDescriptor *diastolic_2;
+    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Dias rowType:XLFormRowDescriptorTypeDecimal title:@"BP 2 (Diastolic)"];
+    diastolic_2.required = YES;
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp2Dias] != (id)[NSNull null]) diastolic_2.value = triageDict[kBp2Dias];
+    
+    [self setDefaultFontWithRow:diastolic_2];
+    [section addFormRow:diastolic_2];
+    
+    XLFormRowDescriptor *systolic_3;
+    systolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Sys rowType:XLFormRowDescriptorTypeDecimal title:@"BP 3 (Systolic)"];
+    systolic_3.required = NO;
+    //    [systolic_3.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
+    
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp3Sys] != (id)[NSNull null]) {
+        systolic_3.value = triageDict[kBp3Sys];
+        [self updateAnswerColor:systolic_3];
+    }
+    
+    [self setDefaultFontWithRow:systolic_3];
+    [section addFormRow:systolic_3];
+    
+    XLFormRowDescriptor *diastolic_3;
+    diastolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Dias rowType:XLFormRowDescriptorTypeDecimal title:@"BP 3 (Diastolic)"];
+    //    [diastolic_3.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
+    diastolic_3.required = NO;
+    
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp3Dias] != (id)[NSNull null]) diastolic_3.value = triageDict[kBp3Dias];
+    
+    [self setDefaultFontWithRow:diastolic_3];
+    [section addFormRow:diastolic_3];
+    
+    
+    //Make them coupled together, such that if one enabled, both enabled.
+    systolic_3.disabled = [NSNumber numberWithBool:![self checkDiffBetweenRow1:systolic_1 andRow2:systolic_2 withDiffOf:5]];
+    if ([systolic_3.disabled isEqual:@NO]) {
+        diastolic_3.disabled = @NO;
+        diastolic_3.required = YES;
+        systolic_3.required = YES;
+    } else {
+        diastolic_3.disabled = [NSNumber numberWithBool:![self checkDiffBetweenRow1:diastolic_1 andRow2:diastolic_2 withDiffOf:5]];
+        if ([diastolic_3.disabled isEqual:@NO]) {
+            systolic_3.disabled = @NO;
+            systolic_3.required = YES;
+            diastolic_3.required = YES;
+        }
+    }
+    
+    //    XLFormRowDescriptor *systolic_avg;
+    //    systolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgSys rowType:XLFormRowDescriptorTypeText title:@"Average BP (Systolic)"];
+    //    systolic_avg.required = YES;
+    //
+    //    //value
+    //    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgSys] != (id)[NSNull null]) {
+    //        systolic_avg.value = triageDict[kBp12AvgSys];
+    //        [self updateAnswerColor:systolic_avg];
+    //    }
+    //
+    //    systolic_avg.disabled = @(1);   //permanent
+    //    [self setDefaultFontWithRow:systolic_avg];
+    //
+    //    [section addFormRow:systolic_avg];
+    
+    systolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if ( oldValue != newValue) {
+            if (newValue != (id)[NSNull null] && systolic_2.value != (id)[NSNull null]) {
+                if ([newValue doubleValue] > 0 && [systolic_2.value doubleValue ]> 0) {     //both filled in
+                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:rowDescriptor andRow2:systolic_2 withDiffOf:5];
+                    
+                    if (diffMoreThan5) {
+                        systolic_3.disabled = @NO;
+                        diastolic_3.disabled = @NO;
+                    } else {
+                        if ([self checkDiffBetweenRow1:diastolic_1 andRow2:diastolic_2 withDiffOf:5]) {
+                            systolic_3.disabled = @NO;
+                            diastolic_3.disabled = @NO;
+                        } else {
+                            systolic_3.disabled = @YES;
+                            diastolic_3.disabled = @YES;
+                        }
+                    }
+                    
+                    //                    systolic_avg.value = @(([newValue doubleValue]+ [systolic_2.value doubleValue])/2);
+                } else if ([newValue doubleValue] > 0)  {//only Systolic_1
+                    //                    systolic_avg.value = newValue;
+                }
+            } else if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) { //only Systolic_1
+                //                systolic_avg.value = newValue;
             }
+            systolic_3.required = ![systolic_3.disabled boolValue];
+            diastolic_3.required = ![diastolic_3.disabled boolValue];
+            [self updateFormRow:systolic_3];
+            [self updateFormRow:diastolic_3];
         }
     };
-    height.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if (oldValue != newValue) {
-            if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
-                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
-                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:[self removePostfixIfAny:bmi.value]];
-                [self updateAnswerColor:bmi];
-                [self updateFormRow:bmi];
+    
+    systolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if ( oldValue != newValue) {
+            if (systolic_3.value > 0) {
+                //                systolic_avg.value = @(([systolic_3.value doubleValue]+ [systolic_2.value doubleValue])/2); //if BP3 is keyed in, take BP 2 and BP 3 instead.
+            } else {
+                if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) {
+                    //                    systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
+                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:systolic_1 andRow2:rowDescriptor withDiffOf:5];
+                    
+                    if (diffMoreThan5) {
+                        systolic_3.disabled = @NO;
+                        diastolic_3.disabled = @NO;
+                    } else {
+                        if ([self checkDiffBetweenRow1:diastolic_1 andRow2:diastolic_2 withDiffOf:5]) {
+                            systolic_3.disabled = @NO;
+                            diastolic_3.disabled = @NO;
+                        } else {
+                            systolic_3.disabled = @YES;
+                            diastolic_3.disabled = @YES;
+                        }
+                    }
+                }
+                else {
+                    //                    systolic_avg.value = systolic_1.value;
+                }
             }
+            //            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:[self removePostfixIfAny:systolic_avg.value]];
+            //            [self updateAnswerColor:systolic_avg];
+            //            [self updateFormRow:systolic_avg];
+            systolic_3.required = ![systolic_3.disabled boolValue];
+            diastolic_3.required = ![diastolic_3.disabled boolValue];
+            [self updateFormRow:systolic_3];
+            [self updateFormRow:diastolic_3];
+        }
+        
+    };
+    
+    
+    //    XLFormRowDescriptor *diastolic_avg;
+    //    diastolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgDias rowType:XLFormRowDescriptorTypeText title:@"Average BP (Diastolic)"];
+    //    diastolic_avg.required = YES;
+    //
+    //    //value
+    //    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgDias] != (id)[NSNull null]) diastolic_avg.value = triageDict[kBp12AvgDias];
+    //
+    //    [self setDefaultFontWithRow:diastolic_avg];
+    //    diastolic_avg.disabled = @(1);
+    //    [section addFormRow:diastolic_avg];
+    //
+    
+    
+    diastolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if ( oldValue != newValue) {
+            if (newValue != (id)[NSNull null] && diastolic_2.value != (id)[NSNull null]) {
+                if ([newValue doubleValue] > 0 && [diastolic_2.value doubleValue ]> 0) {     //both filled in
+                    //                    diastolic_avg.value = @(([newValue doubleValue]+ [diastolic_2.value doubleValue])/2);
+                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:rowDescriptor andRow2:diastolic_2 withDiffOf:5];
+                    
+                    if (diffMoreThan5) {
+                        systolic_3.disabled = @NO;
+                        diastolic_3.disabled = @NO;
+                    } else {
+                        if ([self checkDiffBetweenRow1:systolic_1 andRow2:systolic_2 withDiffOf:5]) {
+                            systolic_3.disabled = @NO;
+                            diastolic_3.disabled = @NO;
+                        } else {
+                            systolic_3.disabled = @YES;
+                            diastolic_3.disabled = @YES;
+                        }
+                    }
+                    
+                } else if ([newValue doubleValue] > 0)  {//only Diastolic_1
+                    //                    diastolic_avg.value = newValue;
+                }
+            } else if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) { //only Diastolic_1
+                //                diastolic_avg.value = newValue;
+            }
+            //            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
+            //            [self updateFormRow:diastolic_avg];
+            
+            systolic_3.required = ![systolic_3.disabled boolValue];
+            diastolic_3.required = ![diastolic_3.disabled boolValue];
+            [self updateFormRow:systolic_3];
+            [self updateFormRow:diastolic_3];
+        }
+        
+    };
+    
+    diastolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if ( oldValue != newValue) {
+            if (newValue != (id)[NSNull null] && diastolic_1.value != (id)[NSNull null]) {
+                if ([newValue doubleValue] > 0 && [diastolic_1.value doubleValue ]> 0) {     //both filled in
+                    //                    diastolic_avg.value = @(([newValue doubleValue]+ [diastolic_2.value doubleValue])/2);
+                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:diastolic_1 andRow2:rowDescriptor withDiffOf:5];
+                    
+                    if (diffMoreThan5) {
+                        systolic_3.disabled = @NO;
+                        diastolic_3.disabled = @NO;
+                    } else {
+                        if ([self checkDiffBetweenRow1:systolic_1 andRow2:systolic_2 withDiffOf:5]) {
+                            systolic_3.disabled = @NO;
+                            diastolic_3.disabled = @NO;
+                        } else {
+                            systolic_3.disabled = @YES;
+                            diastolic_3.disabled = @YES;
+                        }
+                    }
+                } else if ([newValue doubleValue] > 0)  {//only Diastolic_1
+                    //                    diastolic_avg.value = newValue;
+                }
+            } else if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) { //only Diastolic_1
+                //                diastolic_avg.value = newValue;
+            }
+            //            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
+            //            [self updateFormRow:diastolic_avg];
+            systolic_3.required = ![systolic_3.disabled boolValue];
+            diastolic_3.required = ![diastolic_3.disabled boolValue];
+            [self updateFormRow:systolic_3];
+            [self updateFormRow:diastolic_3];
         }
     };
+    
+    // Waist-Hip Ratio - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
     
     XLFormRowDescriptor *waist;
     waist = [XLFormRowDescriptor formRowDescriptorWithTag:kWaistCircum rowType:XLFormRowDescriptorTypeDecimal title:@"Waist Circumference (cm)"];
@@ -610,6 +804,11 @@ NSString *const kQuestionFifteen = @"q15";
             }
         }
     };
+
+    // Diabetic or not - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
     
     XLFormRowDescriptor *diabeticRow = [XLFormRowDescriptor formRowDescriptorWithTag:kIsDiabetic rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is resident diabetic?"];
     diabeticRow.selectorOptions = @[@"Yes", @"No"];
@@ -617,12 +816,22 @@ NSString *const kQuestionFifteen = @"q15";
     [self setDefaultFontWithRow:diabeticRow];
     
     //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kIsDiabetic] != (id)[NSNull null]) diabeticRow.value = [self getYesNofromOneZero:triageDict[kIsDiabetic]];
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kIsDiabetic] != (id)[NSNull null])
+        diabeticRow.value = [self getYesNofromOneZero:triageDict[kIsDiabetic]];
     
     [section addFormRow:diabeticRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeDecimal title:@"CBG (mmol/L)"];
-    row.required = NO;
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kIsDiabetic] != (id)[NSNull null]) {
+        diabeticRow.value = [self getYesNofromOneZero:triageDict[kIsDiabetic]];
+        if ([diabeticRow.value isEqualToString:@"Yes"]) {
+            row.required = YES;
+        } else {
+            row.required = NO;
+        }
+    }
     row.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", diabeticRow];
     [self setDefaultFontWithRow:row];
     
@@ -632,241 +841,78 @@ NSString *const kQuestionFifteen = @"q15";
         [self updateAnswerColor:row];
     }
     
+    diabeticRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqualToString:@"Yes"]) {
+                row.disabled = @NO;
+                row.required = YES;
+            } else {
+                row.disabled = @YES;
+                row.required = NO;
+            }
+            [self reloadFormRow:row];
+        }
+    };
+    
     [section addFormRow:row];
     
-    XLFormRowDescriptor *systolic_2;
-    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Sys rowType:XLFormRowDescriptorTypeDecimal title:@"BP 2 (Systolic)"];
-    systolic_2.required = YES;
-
+    // BMI calculation - Section
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *height;
+    height = [XLFormRowDescriptor formRowDescriptorWithTag:kHeightCm rowType:XLFormRowDescriptorTypeDecimal title:@"Height (cm)"];
+    height.required = YES;
+    
     //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp2Sys] != (id)[NSNull null]) {
-        systolic_2.value = triageDict[kBp2Sys];
-        [self updateAnswerColor:systolic_2];
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kHeightCm] != (id)[NSNull null]) height.value = triageDict[kHeightCm];
+    
+    
+    [self setDefaultFontWithRow:height];
+    [section addFormRow:height];
+    
+    XLFormRowDescriptor *weight;
+    weight = [XLFormRowDescriptor formRowDescriptorWithTag:kWeightKg rowType:XLFormRowDescriptorTypeDecimal title:@"Weight (kg)"];
+    weight.required = YES;
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kWeightKg] != (id)[NSNull null]) weight.value = triageDict[kWeightKg];
+    
+    [self setDefaultFontWithRow:weight];
+    [section addFormRow:weight];
+    
+    XLFormRowDescriptor *bmi;
+    bmi = [XLFormRowDescriptor formRowDescriptorWithTag:kBmi rowType:XLFormRowDescriptorTypeText title:@"BMI"];
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBmi] != (id)[NSNull null]) {
+        bmi.value = triageDict[kBmi];
+        [self updateAnswerColor:bmi];
     }
     
-    [self setDefaultFontWithRow:systolic_2];
-    [section addFormRow:systolic_2];
+    bmi.disabled = @(1);
+    [self setDefaultFontWithRow:bmi];
+    [section addFormRow:bmi];
     
-    XLFormRowDescriptor *diastolic_2;
-    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Dias rowType:XLFormRowDescriptorTypeDecimal title:@"BP 2 (Diastolic)"];
-    diastolic_2.required = YES;
-
-    //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp2Dias] != (id)[NSNull null]) diastolic_2.value = triageDict[kBp2Dias];
-    
-    [self setDefaultFontWithRow:diastolic_2];
-    [section addFormRow:diastolic_2];
-    
-    XLFormRowDescriptor *systolic_3;
-    systolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Sys rowType:XLFormRowDescriptorTypeDecimal title:@"BP 3 (Systolic)"];
-    systolic_3.required = NO;
-//    [systolic_3.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
-
-    
-    //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp3Sys] != (id)[NSNull null]) {
-        systolic_3.value = triageDict[kBp3Sys];
-        [self updateAnswerColor:systolic_3];
-    }
-    
-    [self setDefaultFontWithRow:systolic_3];
-    [section addFormRow:systolic_3];
-    
-    XLFormRowDescriptor *diastolic_3;
-    diastolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Dias rowType:XLFormRowDescriptorTypeDecimal title:@"BP 3 (Diastolic)"];
-//    [diastolic_3.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
-    diastolic_3.required = NO;
-    
-
-    //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp3Dias] != (id)[NSNull null]) diastolic_3.value = triageDict[kBp3Dias];
-    
-    [self setDefaultFontWithRow:diastolic_3];
-    [section addFormRow:diastolic_3];
-    
-    
-    //Make them coupled together, such that if one enabled, both enabled.
-    systolic_3.disabled = [NSNumber numberWithBool:![self checkDiffBetweenRow1:systolic_1 andRow2:systolic_2 withDiffOf:5]];
-    if ([systolic_3.disabled isEqual:@NO]) {
-        diastolic_3.disabled = @NO;
-        diastolic_3.required = YES;
-        systolic_3.required = YES;
-    } else {
-        diastolic_3.disabled = [NSNumber numberWithBool:![self checkDiffBetweenRow1:diastolic_1 andRow2:diastolic_2 withDiffOf:5]];
-        if ([diastolic_3.disabled isEqual:@NO]) {
-            systolic_3.disabled = @NO;
-            systolic_3.required = YES;
-            diastolic_3.required = YES;
-        }
-    }
-    
-//    XLFormRowDescriptor *systolic_avg;
-//    systolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgSys rowType:XLFormRowDescriptorTypeText title:@"Average BP (Systolic)"];
-//    systolic_avg.required = YES;
-//
-//    //value
-//    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgSys] != (id)[NSNull null]) {
-//        systolic_avg.value = triageDict[kBp12AvgSys];
-//        [self updateAnswerColor:systolic_avg];
-//    }
-//
-//    systolic_avg.disabled = @(1);   //permanent
-//    [self setDefaultFontWithRow:systolic_avg];
-//
-//    [section addFormRow:systolic_avg];
-    
-    systolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if ( oldValue != newValue) {
-            if (newValue != (id)[NSNull null] && systolic_2.value != (id)[NSNull null]) {
-                if ([newValue doubleValue] > 0 && [systolic_2.value doubleValue ]> 0) {     //both filled in
-                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:rowDescriptor andRow2:systolic_2 withDiffOf:5];
-                    
-                    if (diffMoreThan5) {
-                        systolic_3.disabled = @NO;
-                        diastolic_3.disabled = @NO;
-                    } else {
-                        if ([self checkDiffBetweenRow1:diastolic_1 andRow2:diastolic_2 withDiffOf:5]) {
-                            systolic_3.disabled = @NO;
-                            diastolic_3.disabled = @NO;
-                        } else {
-                            systolic_3.disabled = @YES;
-                            diastolic_3.disabled = @YES;
-                        }
-                    }
-                        
-//                    systolic_avg.value = @(([newValue doubleValue]+ [systolic_2.value doubleValue])/2);
-                } else if ([newValue doubleValue] > 0)  {//only Systolic_1
-//                    systolic_avg.value = newValue;
-                }
-            } else if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) { //only Systolic_1
-//                systolic_avg.value = newValue;
+    weight.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
+                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+                
+                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:[self removePostfixIfAny:bmi.value]];
+                [self updateAnswerColor:bmi];
+                [self updateFormRow:bmi];
             }
-            systolic_3.required = ![systolic_3.disabled boolValue];
-            diastolic_3.required = ![diastolic_3.disabled boolValue];
-            [self updateFormRow:systolic_3];
-            [self updateFormRow:diastolic_3];
         }
     };
-    
-    systolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if ( oldValue != newValue) {
-            if (systolic_3.value > 0) {
-//                systolic_avg.value = @(([systolic_3.value doubleValue]+ [systolic_2.value doubleValue])/2); //if BP3 is keyed in, take BP 2 and BP 3 instead.
-            } else {
-                if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) {
-//                    systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
-                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:systolic_1 andRow2:rowDescriptor withDiffOf:5];
-                    
-                    if (diffMoreThan5) {
-                        systolic_3.disabled = @NO;
-                        diastolic_3.disabled = @NO;
-                    } else {
-                        if ([self checkDiffBetweenRow1:diastolic_1 andRow2:diastolic_2 withDiffOf:5]) {
-                            systolic_3.disabled = @NO;
-                            diastolic_3.disabled = @NO;
-                        } else {
-                            systolic_3.disabled = @YES;
-                            diastolic_3.disabled = @YES;
-                        }
-                    }
-                }
-                else {
-//                    systolic_avg.value = systolic_1.value;
-                }
+    height.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
+        if (oldValue != newValue) {
+            if ([weight.value integerValue] != 0 && [height.value integerValue] != 0) {
+                bmi.value = [NSString stringWithFormat:@"%.2f", [weight.value doubleValue] / pow(([height.value doubleValue]/100.0), 2)];
+                [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBmi andNewContent:[self removePostfixIfAny:bmi.value]];
+                [self updateAnswerColor:bmi];
+                [self updateFormRow:bmi];
             }
-//            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:[self removePostfixIfAny:systolic_avg.value]];
-//            [self updateAnswerColor:systolic_avg];
-//            [self updateFormRow:systolic_avg];
-            systolic_3.required = ![systolic_3.disabled boolValue];
-            diastolic_3.required = ![diastolic_3.disabled boolValue];
-            [self updateFormRow:systolic_3];
-            [self updateFormRow:diastolic_3];
-        }
-        
-    };
-
-    
-//    XLFormRowDescriptor *diastolic_avg;
-//    diastolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgDias rowType:XLFormRowDescriptorTypeText title:@"Average BP (Diastolic)"];
-//    diastolic_avg.required = YES;
-//
-//    //value
-//    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgDias] != (id)[NSNull null]) diastolic_avg.value = triageDict[kBp12AvgDias];
-//
-//    [self setDefaultFontWithRow:diastolic_avg];
-//    diastolic_avg.disabled = @(1);
-//    [section addFormRow:diastolic_avg];
-//
-
-    
-    diastolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if ( oldValue != newValue) {
-            if (newValue != (id)[NSNull null] && diastolic_2.value != (id)[NSNull null]) {
-                if ([newValue doubleValue] > 0 && [diastolic_2.value doubleValue ]> 0) {     //both filled in
-//                    diastolic_avg.value = @(([newValue doubleValue]+ [diastolic_2.value doubleValue])/2);
-                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:rowDescriptor andRow2:diastolic_2 withDiffOf:5];
-                    
-                    if (diffMoreThan5) {
-                        systolic_3.disabled = @NO;
-                        diastolic_3.disabled = @NO;
-                    } else {
-                        if ([self checkDiffBetweenRow1:systolic_1 andRow2:systolic_2 withDiffOf:5]) {
-                            systolic_3.disabled = @NO;
-                            diastolic_3.disabled = @NO;
-                        } else {
-                            systolic_3.disabled = @YES;
-                            diastolic_3.disabled = @YES;
-                        }
-                    }
-                    
-                } else if ([newValue doubleValue] > 0)  {//only Diastolic_1
-//                    diastolic_avg.value = newValue;
-                }
-            } else if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) { //only Diastolic_1
-//                diastolic_avg.value = newValue;
-            }
-//            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
-//            [self updateFormRow:diastolic_avg];
-            
-            systolic_3.required = ![systolic_3.disabled boolValue];
-            diastolic_3.required = ![diastolic_3.disabled boolValue];
-            [self updateFormRow:systolic_3];
-            [self updateFormRow:diastolic_3];
-        }
-        
-    };
-    
-    diastolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-        if ( oldValue != newValue) {
-            if (newValue != (id)[NSNull null] && diastolic_1.value != (id)[NSNull null]) {
-                if ([newValue doubleValue] > 0 && [diastolic_1.value doubleValue ]> 0) {     //both filled in
-                    //                    diastolic_avg.value = @(([newValue doubleValue]+ [diastolic_2.value doubleValue])/2);
-                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:diastolic_1 andRow2:rowDescriptor withDiffOf:5];
-                    
-                    if (diffMoreThan5) {
-                        systolic_3.disabled = @NO;
-                        diastolic_3.disabled = @NO;
-                    } else {
-                        if ([self checkDiffBetweenRow1:systolic_1 andRow2:systolic_2 withDiffOf:5]) {
-                            systolic_3.disabled = @NO;
-                            diastolic_3.disabled = @NO;
-                        } else {
-                            systolic_3.disabled = @YES;
-                            diastolic_3.disabled = @YES;
-                        }
-                    }
-                } else if ([newValue doubleValue] > 0)  {//only Diastolic_1
-                    //                    diastolic_avg.value = newValue;
-                }
-            } else if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) { //only Diastolic_1
-                //                diastolic_avg.value = newValue;
-            }
-            //            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
-            //            [self updateFormRow:diastolic_avg];
-            systolic_3.required = ![systolic_3.disabled boolValue];
-            diastolic_3.required = ![diastolic_3.disabled boolValue];
-            [self updateFormRow:systolic_3];
-            [self updateFormRow:diastolic_3];
         }
     };
     
@@ -886,7 +932,7 @@ NSString *const kQuestionFifteen = @"q15";
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
     
     if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckSnellen];
+        NSNumber *check = checkDict[kCheckSnellenTest];
         if ([check isKindOfClass:[NSNumber class]]) {
             isFormFinalized = [check boolValue];
         }
@@ -897,19 +943,22 @@ NSString *const kQuestionFifteen = @"q15";
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
+    section.footerTitle = @"Please ask the resident if he/she uses spectables.";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpecs rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"1. Does the resident use spectacles?"];
     if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kSpecs] != (id)[NSNull null])
         row.value = [self getYesNofromOneZero:snellenTestDict[kSpecs]];
-    
     [self setDefaultFontWithRow:row];
     row.selectorOptions = @[@"Yes", @"No"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRightEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"2. Right Eye: 6/"];
-    row.required = YES;
-    row.selectorOptions = @[@"6",
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"SPECTACLES"];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *rightEye = [XLFormRowDescriptor formRowDescriptorWithTag:kRightEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"2. Right Eye: 6/"];
+    rightEye.required = YES;
+    rightEye.selectorOptions = @[@"6",
                             @"9",
                             @"12",
                             @"18",
@@ -917,13 +966,23 @@ NSString *const kQuestionFifteen = @"q15";
                             @"36",
                             @"60"
                             ];
+    [self setDefaultFontWithRow:rightEye];
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kRightEye] != (id)[NSNull null]) rightEye.value = snellenTestDict[kRightEye];
+    [section addFormRow:rightEye];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kRightEyePlus rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Adjustment (Right)"];
+    row.selectorOptions = @[@"-2", @"-1", @"0", @"+1", @"+2"];
+    row.required = NO;
     [self setDefaultFontWithRow:row];
-    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kRightEye] != (id)[NSNull null]) row.value = snellenTestDict[kRightEye];
+    
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kRightEyePlus] != (id)[NSNull null])
+        row.value = snellenTestDict[kRightEyePlus];
+    
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLeftEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"3. Left Eye: 6/"];
-    row.required = YES;
-    row.selectorOptions = @[@"6",
+    XLFormRowDescriptor *leftEye = [XLFormRowDescriptor formRowDescriptorWithTag:kLeftEye rowType:XLFormRowDescriptorTypeSelectorPickerView title:@"3. Left Eye: 6/"];
+    leftEye.required = YES;
+    leftEye.selectorOptions = @[@"6",
                             @"9",
                             @"12",
                             @"18",
@@ -931,16 +990,60 @@ NSString *const kQuestionFifteen = @"q15";
                             @"36",
                             @"60"
                             ];
+    [self setDefaultFontWithRow:leftEye];
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kLeftEye] != (id)[NSNull null]) leftEye.value = snellenTestDict[kLeftEye];
+    [section addFormRow:leftEye];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kLeftEyePlus rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Adjustment (Left)"];
+    row.selectorOptions = @[@"-2", @"-1", @"0", @"+1", @"+2"];
+    row.required = NO;
     [self setDefaultFontWithRow:row];
-    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kLeftEye] != (id)[NSNull null]) row.value = snellenTestDict[kLeftEye];
+    
+    if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kLeftEyePlus] != (id)[NSNull null])
+        row.value = snellenTestDict[kLeftEyePlus];
+    
     [section addFormRow:row];
     
     XLFormRowDescriptor *six12Row = [XLFormRowDescriptor formRowDescriptorWithTag:kSix12 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"4. Does either eye (or both) have vision poorer than 6/12?"];
+    six12Row.disabled = @YES;   //auto-generated
     six12Row.required = YES;
     six12Row.selectorOptions = @[@"Yes", @"No"];
     six12Row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:six12Row];
     
+    rightEye.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if (newValue != nil && newValue != (id)[NSNull null]) {
+                if ([newValue intValue] > 12) {
+                    six12Row.value = @"Yes";
+                } else {
+                    if (leftEye.value != nil && leftEye.value != (id)[NSNull null]) {
+                        if ([leftEye.value intValue] <= 12) {
+                            six12Row.value = @"No";
+                        }
+                     }
+                }
+                [self reloadFormRow:six12Row];
+            }
+        }
+    };
+
+    leftEye.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if (newValue != nil && newValue != (id)[NSNull null]) {
+                if ([newValue intValue] > 12) {
+                    six12Row.value = @"Yes";
+                } else {
+                    if (rightEye.value != nil && rightEye.value != (id)[NSNull null]) {
+                        if ([rightEye.value intValue] <= 12) {
+                            six12Row.value = @"No";
+                        }
+                    }
+                }
+                [self reloadFormRow:six12Row];
+            }
+        }
+    };
     //value
     if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kSix12] != (id)[NSNull null]) six12Row.value = [self getYesNofromOneZero:snellenTestDict[kSix12]];
     
@@ -956,7 +1059,7 @@ NSString *const kQuestionFifteen = @"q15";
     if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kTunnel] != (id)[NSNull null]) tunnelRow.value = [self getYesNofromOneZero:snellenTestDict[kTunnel]];
     [section addFormRow:tunnelRow];
     
-    XLFormRowDescriptor *visitEye12Mths = [XLFormRowDescriptor formRowDescriptorWithTag:kVisitEye12Mths rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"6. Resident has not visited eye specialist in 12 months"];
+    XLFormRowDescriptor *visitEye12Mths = [XLFormRowDescriptor formRowDescriptorWithTag:kVisitEye12Mths rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"6. Has the resident visited an eye specialist in the past 12 months?"];
     visitEye12Mths.required = YES;
     visitEye12Mths.cellConfig[@"textLabel.numberOfLines"] = @0;
     visitEye12Mths.selectorOptions = @[@"Yes", @"No"];
@@ -1011,12 +1114,16 @@ NSString *const kQuestionFifteen = @"q15";
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAppliedChas rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Applied for CHAS under NHS?"];
+    [self setDefaultFontWithRow:row];
     row.required = NO;
     row.selectorOptions = @[@"Yes", @"No"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    NSString *str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyCHAS];
+
+    NSString *str;
     
-    if ([str isEqualToString:@"1"]) {
+    BOOL chasEligibility = [[ResidentProfile sharedManager] isEligibleCHAS];
+    
+    if (chasEligibility) {
         row.disabled = @NO;
         row.required = YES;
     }
@@ -1030,19 +1137,18 @@ NSString *const kQuestionFifteen = @"q15";
     
     [section addFormRow:row];
     
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Colonoscopy"];
-    [formDescriptor addFormSection:section];
-    
     section = [XLFormSectionDescriptor formSectionWithTitle:@"FIT"];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kReceiveFit rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Receiving FIT kit from NHS?"];
     row.required = NO;
+    [self setDefaultFontWithRow:row];
     row.selectorOptions = @[@"Yes", @"No"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyFIT];
     
-    if ([str isEqualToString:@"1"]) {
+    BOOL fitEligibility = [[ResidentProfile sharedManager] isEligibleReceiveFIT];
+    
+    if (fitEligibility) {
         row.disabled = @NO;
         row.required = YES;
     }
@@ -1060,11 +1166,13 @@ NSString *const kQuestionFifteen = @"q15";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kReferMammo rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred for mammogram by NHS?"];
     row.required = NO;
+    [self setDefaultFontWithRow:row];
     row.selectorOptions = @[@"Yes", @"No"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyMammo];
     
-    if ([str isEqualToString:@"1"]) {
+    BOOL mammoEligibility = [[ResidentProfile sharedManager] isEligibleReferMammo];
+    
+    if (mammoEligibility) {
         row.disabled = @NO;
         row.required = YES;
     }
@@ -1083,11 +1191,13 @@ NSString *const kQuestionFifteen = @"q15";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kReferPapSmear rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred for PAP smear by NHS?"];
     row.required = NO;
+    [self setDefaultFontWithRow:row];
     row.selectorOptions = @[@"Yes", @"No"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    str = [[NSUserDefaults standardUserDefaults]objectForKey:kQualifyPapSmear];
     
-    if ([str isEqualToString:@"1"]) {
+    BOOL papSmearEligibility = [[ResidentProfile sharedManager] isEligibleReferPapSmear];
+    
+    if (papSmearEligibility) {
         row.disabled = @NO;
         row.required = YES;
     }
@@ -1135,7 +1245,7 @@ NSString *const kQuestionFifteen = @"q15";
     didDocConsultRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:didDocConsultRow];
 
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Doctor's Notes"];
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Doctor's Notes (Only doctor's to edit)"];
     [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocNotes
@@ -1183,7 +1293,7 @@ NSString *const kQuestionFifteen = @"q15";
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
     
     if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckDental];
+        NSNumber *check = checkDict[kCheckBasicDental];
         if ([check isKindOfClass:[NSNumber class]]) {
             isFormFinalized = [check boolValue];
         }
@@ -1195,6 +1305,7 @@ NSString *const kQuestionFifteen = @"q15";
     [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *dentalUndergoneRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDentalUndergone rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone dental check-up?"];
+    dentalUndergoneRow.required = YES;
     dentalUndergoneRow.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:dentalUndergoneRow];
     
@@ -1203,40 +1314,495 @@ NSString *const kQuestionFifteen = @"q15";
     
     [section addFormRow:dentalUndergoneRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDentistReferred
-                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Provided with Referral Letter?"];
-    row.selectorOptions = @[@"Yes", @"No"];
-    row.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", dentalUndergoneRow];
-    
-    if ([row.disabled isEqual:@YES]) {
-        row.required = NO;
-    } else {
-        row.required = YES;
-    }
-    
-    [self setDefaultFontWithRow:row];
+    XLFormRowDescriptor *usesDenturesRow = [XLFormRowDescriptor formRowDescriptorWithTag:kUsesDentures
+                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                  title:@"Does resident currently uses dentures?"];
+    usesDenturesRow.selectorOptions = @[@"Yes", @"No"];
+    usesDenturesRow.required = YES;
+    usesDenturesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    usesDenturesRow.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", dentalUndergoneRow];
+    [self setDefaultFontWithRow:usesDenturesRow];
     
     //value
-    if (dentalCheckDict != (id)[NSNull null] && [dentalCheckDict objectForKey:kDentistReferred] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:dentalCheckDict[kDentistReferred]];
+    if (dentalCheckDict != (id)[NSNull null] && [dentalCheckDict objectForKey:kUsesDentures] != (id)[NSNull null])
+        usesDenturesRow.value = [self getYesNofromOneZero:dentalCheckDict[kUsesDentures]];
+    [section addFormRow:usesDenturesRow];
     
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"oral_health_q"
+                                                rowType:XLFormRowDescriptorTypeInfo
+                                                  title:@"Oral health rating (ask dentist)"];
+//    row.selectorOptions = @[@"Yes", @"No"];
+//    row.required = YES;
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", dentalUndergoneRow];
+    [self setDefaultFontWithRow:row];
     [section addFormRow:row];
+    
+    
+    XLFormRowDescriptor *oralHealthRow = [XLFormRowDescriptor formRowDescriptorWithTag:kOralHealth
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@""];
+    oralHealthRow.selectorOptions = @[@"Healthy", @"Self-care advised", @"Unhealthy (referral required)"];
+    oralHealthRow.noValueDisplayText = @"Tap here for options";
+    oralHealthRow.required = YES;
+    oralHealthRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    
+    [section addFormRow:oralHealthRow];
+    
+    
+    XLFormRowDescriptor *dentistReferredRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDentistReferred
+                                                rowType:XLFormRowDescriptorTypeSelectorPush title:@"Referred to?"];
+    dentistReferredRow.selectorOptions = @[@"NIL", @"CHAS Dentist", @"NDCS Care Partners / Unity Denticare", @"NDCS via polyclinic referral"];
+    dentistReferredRow.required = YES;
+    
+    //value for Oral Health
+    if (dentalCheckDict != (id)[NSNull null] && [dentalCheckDict objectForKey:kOralHealth] != (id)[NSNull null]) {
+        oralHealthRow.value = dentalCheckDict[kOralHealth];
+        if ([oralHealthRow.value containsString:@"Unhealthy"]) {
+            dentistReferredRow.required = YES;
+        } else dentistReferredRow.required = NO;
+    }
+    
+    dentistReferredRow.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Unhealthy'", oralHealthRow];
+    [self setDefaultFontWithRow:dentistReferredRow];
+    
+    
+    
+    //value
+    if (dentalCheckDict != (id)[NSNull null] && [dentalCheckDict objectForKey:kDentistReferred] != (id)[NSNull null])
+        dentistReferredRow.value = dentalCheckDict[kDentistReferred];
+    
+    [section addFormRow:dentistReferredRow];
+    
+    oralHealthRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (oldValue != newValue) {
+            if ([newValue containsString:@"Unhealthy"]) {
+                dentistReferredRow.required = YES;
+            } else {
+                dentistReferredRow.required = NO;
+            }
+        }
+        [self reloadFormRow:dentistReferredRow];
+    };
     
     dentalUndergoneRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
-            if ([newValue isEqualToString:@"Yes"]) {
-                row.disabled = @NO;
-                row.required = YES;
+            if ([newValue isEqualToString:@"No"]) {
+                usesDenturesRow.disabled = @YES;
+                usesDenturesRow.required = NO;
+                oralHealthRow.disabled = @YES;
+                oralHealthRow.required = NO;
+                dentistReferredRow.disabled = @YES;
+                dentistReferredRow.required = NO;
+            } else {
+                usesDenturesRow.disabled = @NO;
+                usesDenturesRow.required = YES;
+                oralHealthRow.disabled = @NO;
+                oralHealthRow.required = YES;
+                dentistReferredRow.disabled = @NO;
+                dentistReferredRow.required = YES;
             }
-            else {
-                row.disabled = @YES;
-                row.required = NO;
-            }
-            [self updateFormRow:row];
         }
     };
     
     return [super initWithForm:formDescriptor];
 }
+
+
+- (id) initHearing {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"7. Hearing"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    NSDictionary *hearingDict = [_fullScreeningForm objectForKey:SECTION_HEARING];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckHearing];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Hearing Aid"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUsesAidRight rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does the resident use hearing aid for right ear?"];
+    row.required = YES;
+    row.selectorOptions = @[@"Yes", @"No"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kUsesAidRight] != (id)[NSNull null])
+        row.value = [self getYesNofromOneZero:hearingDict[kUsesAidRight]];
+    
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUsesAidLeft rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does the resident use hearing aid for left ear?"];
+    row.required = YES;
+    row.selectorOptions = @[@"Yes", @"No"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kUsesAidLeft] != (id)[NSNull null])
+        row.value = [self getYesNofromOneZero:hearingDict[kUsesAidLeft]];
+    
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"HHIE"];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *attendedHhieRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAttendedHhie rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Attended HHIE?"];
+    attendedHhieRow.required = YES;
+    attendedHhieRow.selectorOptions = @[@"Yes", @"No"];
+    [self setDefaultFontWithRow:attendedHhieRow];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAttendedHhie] != (id)[NSNull null])
+        attendedHhieRow.value = [self getYesNofromOneZero:hearingDict[kAttendedHhie]];
+    
+    [section addFormRow:attendedHhieRow];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHhieResult rowType:XLFormRowDescriptorTypeInteger title:@"HHIE Result:"];
+    row.required = YES;
+    [self setDefaultFontWithRow:row];
+    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedHhieRow];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kHhieResult] != (id)[NSNull null])
+        row.value = hearingDict[kHhieResult];
+    
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Tinnitus"];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *attendedTinnitusRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAttendedTinnitus rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Has Tinnitus? (continuous ringing, hissing or other sounds in ears or head)"];
+    attendedTinnitusRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    attendedTinnitusRow.required = YES;
+    attendedTinnitusRow.selectorOptions = @[@"Yes", @"No"];
+    [self setDefaultFontWithRow:attendedTinnitusRow];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAttendedTinnitus] != (id)[NSNull null])
+        attendedTinnitusRow.value = [self getYesNofromOneZero:hearingDict[kAttendedTinnitus]];
+    
+    [section addFormRow:attendedTinnitusRow];
+    
+    XLFormRowDescriptor *tinnitusResultQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"tinnitus_q"
+                                                                                   rowType:XLFormRowDescriptorTypeInfo
+                                                                                      title:@"How much of a problem is the tinnitus?"];
+    tinnitusResultQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    tinnitusResultQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedTinnitusRow];
+    [self setDefaultFontWithRow:tinnitusResultQRow];
+    [section addFormRow:tinnitusResultQRow];
+    
+    
+    XLFormRowDescriptor *tinnitusResultRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTinnitusResult
+                                                                                   rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                                                     title:@""];
+    tinnitusResultRow.noValueDisplayText = @"Tap here";
+    tinnitusResultRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedTinnitusRow];
+    tinnitusResultRow.required = YES;
+    tinnitusResultRow.selectorOptions = @[@"No problem", @"Small problem", @"Big problem", @"Very big problem"];
+    
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kTinnitusResult] != (id)[NSNull null])
+        tinnitusResultRow.value = hearingDict[kTinnitusResult];
+    
+    [section addFormRow:tinnitusResultRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Otoscopy"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kOtoscopyLeft
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@"Otoscopy Examination (Left ear)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.required = YES;
+    row.noValueDisplayText = @"Tap here";
+    row.selectorOptions = @[@"NA", @"Pass", @"Needs referral"];
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kOtoscopyLeft] != (id)[NSNull null])
+        row.value = hearingDict[kOtoscopyLeft];
+    
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kOtoscopyRight
+                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
+                                                  title:@"Otoscopy Examination (Right ear)"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.required = YES;
+    row.noValueDisplayText = @"Tap here";
+    row.selectorOptions = @[@"NA", @"Pass", @"Needs referral"];
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kOtoscopyRight] != (id)[NSNull null])
+        row.value = hearingDict[kOtoscopyRight];
+    
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Audioscope"];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *attendedAudioscopeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAttendedAudioscope rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Attended Audioscope?"];
+    attendedAudioscopeRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    attendedAudioscopeRow.required = YES;
+    attendedAudioscopeRow.selectorOptions = @[@"Yes", @"No"];
+    [self setDefaultFontWithRow:attendedAudioscopeRow];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAttendedAudioscope] != (id)[NSNull null])
+        attendedAudioscopeRow.value = [self getYesNofromOneZero:hearingDict[kAttendedAudioscope]];
+    
+    [section addFormRow:attendedAudioscopeRow];
+    
+    
+    XLFormRowDescriptor *row500hz60 = [XLFormRowDescriptor formRowDescriptorWithTag:kPractice500Hz60 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Practice Tone (500Hz at 60dB in “better ear”)"];
+    row500hz60.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row500hz60.required = YES;
+    row500hz60.selectorOptions = @[@"Pass", @"Fail"];
+    row500hz60.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row500hz60];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kPractice500Hz60] != (id)[NSNull null])
+        row500hz60.value = [self getPassFailfromOneZero:hearingDict[kPractice500Hz60]];
+    
+    [section addFormRow:row500hz60];
+    
+    XLFormRowDescriptor *row500hz25L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL500Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 500Hz at 25 dBHL Results"];
+    row500hz25L.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row500hz25L.required = YES;
+    row500hz25L.selectorOptions = @[@"Pass", @"Fail"];
+    row500hz25L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row500hz25L];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL500Hz25] != (id)[NSNull null])
+        row500hz25L.value = [self getPassFailfromOneZero:hearingDict[kAudioL500Hz25]];
+    
+    [section addFormRow:row500hz25L];
+    
+    XLFormRowDescriptor *row500hz25R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR500Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 500Hz at 25 dBHL Results"];
+    row500hz25R.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row500hz25R.required = YES;
+    row500hz25R.selectorOptions = @[@"Pass", @"Fail"];
+    row500hz25R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row500hz25R];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR500Hz25] != (id)[NSNull null])
+        row500hz25R.value = [self getPassFailfromOneZero:hearingDict[kAudioR500Hz25]];
+    
+    [section addFormRow:row500hz25R];
+    
+    XLFormRowDescriptor *row1000hz25L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL1000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 1000Hz at 25 dBHL Results"];
+    row1000hz25L.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row1000hz25L.required = YES;
+    row1000hz25L.selectorOptions = @[@"Pass", @"Fail"];
+    row1000hz25L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row1000hz25L];
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL1000Hz25] != (id)[NSNull null])
+        row1000hz25L.value = [self getPassFailfromOneZero:hearingDict[kAudioL1000Hz25]];
+    [section addFormRow:row1000hz25L];
+    
+    XLFormRowDescriptor *row1000hz25R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR1000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 1000Hz at 25 dBHL Results"];
+    row1000hz25R.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row1000hz25R.required = YES;
+    row1000hz25R.selectorOptions = @[@"Pass", @"Fail"];
+    row1000hz25R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row1000hz25R];
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR1000Hz25] != (id)[NSNull null])
+        row1000hz25R.value = [self getPassFailfromOneZero:hearingDict[kAudioR1000Hz25]];
+    
+    [section addFormRow:row1000hz25R];
+    
+    XLFormRowDescriptor *row2000hz25L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL2000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 2000Hz at 25 dBHL Results"];
+    row2000hz25L.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row2000hz25L.required = YES;
+    row2000hz25L.selectorOptions = @[@"Pass", @"Fail"];
+    row2000hz25L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row2000hz25L];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL2000Hz25] != (id)[NSNull null])
+        row2000hz25L.value = [self getPassFailfromOneZero:hearingDict[kAudioL2000Hz25]];
+    [section addFormRow:row2000hz25L];
+    
+    XLFormRowDescriptor *row2000hz25R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR2000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 2000Hz at 25 dBHL Results"];
+    row2000hz25R.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row2000hz25R.required = YES;
+    row2000hz25R.selectorOptions = @[@"Pass", @"Fail"];
+    row2000hz25R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row2000hz25R];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR2000Hz25] != (id)[NSNull null])
+        row2000hz25R.value = [self getPassFailfromOneZero:hearingDict[kAudioR2000Hz25]];
+    
+    [section addFormRow:row2000hz25R];
+    
+    XLFormRowDescriptor *row4000hz25L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL4000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 4000Hz at 25 dBHL Results"];
+    row4000hz25L.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row4000hz25L.required = YES;
+    row4000hz25L.selectorOptions = @[@"Pass", @"Fail"];
+    row4000hz25L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row4000hz25L];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL4000Hz25] != (id)[NSNull null])
+        row4000hz25L.value = [self getPassFailfromOneZero:hearingDict[kAudioL4000Hz25]];
+    [section addFormRow:row4000hz25L];
+    
+    XLFormRowDescriptor *row4000hz25R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR4000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 4000Hz at 25 dBHL Results"];
+    row4000hz25R.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row4000hz25R.required = YES;
+    row4000hz25R.selectorOptions = @[@"Pass", @"Fail"];
+    row4000hz25R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row4000hz25R];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR4000Hz25] != (id)[NSNull null])
+        row4000hz25R.value = [self getPassFailfromOneZero:hearingDict[kAudioR4000Hz25]];
+    
+    [section addFormRow:row4000hz25R];
+    
+    XLFormRowDescriptor *row500hz40L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL500Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 500Hz at 40 dBHL Results"];
+    row500hz40L.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row500hz40L.required = YES;
+    row500hz40L.selectorOptions = @[@"Pass", @"Fail"];
+    row500hz40L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row500hz40L];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL500Hz40] != (id)[NSNull null])
+        row500hz40L.value = [self getPassFailfromOneZero:hearingDict[kAudioL500Hz40]];
+    
+    [section addFormRow:row500hz40L];
+    
+    XLFormRowDescriptor *row500hz40R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR500Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 500Hz at 40 dBHL Results"];
+    row500hz40R.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row500hz40R.required = YES;
+    row500hz40R.selectorOptions = @[@"Pass", @"Fail"];
+    row500hz40R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row500hz40R];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR500Hz40] != (id)[NSNull null])
+        row500hz40R.value = [self getPassFailfromOneZero:hearingDict[kAudioR500Hz40]];
+    
+    [section addFormRow:row500hz40R];
+    
+    XLFormRowDescriptor *row1000hz40L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL1000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 1000Hz at 40 dBHL Results"];
+    row1000hz40L.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row1000hz40L.required = YES;
+    row1000hz40L.selectorOptions = @[@"Pass", @"Fail"];
+    row1000hz40L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row1000hz40L];
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL1000Hz40] != (id)[NSNull null])
+        row1000hz40L.value = [self getPassFailfromOneZero:hearingDict[kAudioL1000Hz40]];
+    [section addFormRow:row1000hz40L];
+    
+    XLFormRowDescriptor *row1000hz40R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR1000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 1000Hz at 40 dBHL Results"];
+    row1000hz40R.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row1000hz40R.required = YES;
+    row1000hz40R.selectorOptions = @[@"Pass", @"Fail"];
+    row1000hz40R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row1000hz40R];
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR1000Hz40] != (id)[NSNull null])
+        row1000hz40R.value = [self getPassFailfromOneZero:hearingDict[kAudioR1000Hz40]];
+    
+    [section addFormRow:row1000hz40R];
+    
+    XLFormRowDescriptor *row2000hz40L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL2000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 2000Hz at 40 dBHL Results"];
+    row2000hz40L.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row2000hz40L.required = YES;
+    row2000hz40L.selectorOptions = @[@"Pass", @"Fail"];
+    row2000hz40L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row2000hz40L];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL2000Hz40] != (id)[NSNull null])
+        row2000hz40L.value = [self getPassFailfromOneZero:hearingDict[kAudioL2000Hz40]];
+    [section addFormRow:row2000hz40L];
+    
+    XLFormRowDescriptor *row2000hz40R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR2000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 2000Hz at 40 dBHL Results"];
+    row2000hz40R.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row2000hz40R.required = YES;
+    row2000hz40R.selectorOptions = @[@"Pass", @"Fail"];
+    row2000hz40R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row2000hz40R];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR2000Hz40] != (id)[NSNull null])
+        row2000hz40R.value = [self getPassFailfromOneZero:hearingDict[kAudioR2000Hz40]];
+    
+    [section addFormRow:row2000hz40R];
+    
+    XLFormRowDescriptor *row4000hz40L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL4000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 4000Hz at 40 dBHL Results"];
+    row4000hz40L.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row4000hz40L.required = YES;
+    row4000hz40L.selectorOptions = @[@"Pass", @"Fail"];
+    row4000hz40L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row4000hz40L];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL4000Hz40] != (id)[NSNull null])
+        row4000hz40L.value = [self getPassFailfromOneZero:hearingDict[kAudioL4000Hz40]];
+    [section addFormRow:row4000hz40L];
+    
+    XLFormRowDescriptor *row4000hz40R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR4000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 4000Hz at 40 dBHL Results"];
+    row4000hz40R.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row4000hz40R.required = YES;
+    row4000hz40R.selectorOptions = @[@"Pass", @"Fail"];
+    row4000hz40R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
+    [self setDefaultFontWithRow:row4000hz40R];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR4000Hz40] != (id)[NSNull null])
+        row4000hz40R.value = [self getPassFailfromOneZero:hearingDict[kAudioR4000Hz40]];
+    
+    [section addFormRow:row4000hz40R];
+    
+//    NSArray *audioscopeVariables = @[row500hz60, row500hz25L, row500hz25R, row500hz40L, row500hz40R,
+//                                     row1000hz25L, row1000hz25R, row1000hz40L, row1000hz40R,
+//                                     row2000hz25L, row2000hz25R, row2000hz40L, row2000hz40R,
+//                                     row4000hz25L, row4000hz25R, row4000hz40L, row4000hz40R];
+ 
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *referredApptRow = [XLFormRowDescriptor formRowDescriptorWithTag:kApptReferred rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred for appointment with Mobile Hearing Bus (go back to waiting room booth)"];
+    referredApptRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    referredApptRow.required = YES;
+    referredApptRow.selectorOptions = @[@"Yes", @"No"];
+    [self setDefaultFontWithRow:referredApptRow];
+    
+    //value
+    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kApptReferred] != (id)[NSNull null])
+        referredApptRow.value = [self getYesNofromOneZero:hearingDict[kApptReferred]];
+    
+    [section addFormRow:referredApptRow];
+
+    
+    return [super initWithForm:formDescriptor];
+}
+
 
 - (id) initFallRiskAssessment {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"5. Advanced Geriatric"];
@@ -1364,83 +1930,84 @@ NSString *const kQuestionFifteen = @"q15";
     
     return [super initWithForm:formDescriptor];
 }
-
-- (id) initDementiaAssessment {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Geriatric Dementia Assessment"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    
-    NSDictionary *dementiaDict = _fullScreeningForm[SECTION_GERIATRIC_DEMENTIA_ASSMT];
-    
-    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
-    
-    if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckDementia];
-        if ([check isKindOfClass:[NSNumber class]]) {
-            isFormFinalized = [check boolValue];
-        }
-    }
-    
-    formDescriptor.assignFirstResponderOnShow = YES;
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPsfuFRA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"To be completed during PSFU"];
-    [self setDefaultFontWithRow:row];
-    
-    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kPsfuFRA] != (id)[NSNull null]) row.value = dementiaDict[kPsfuFRA];
-    
-    [section addFormRow:row];
-    
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    section.footerTitle = @"Range: 0-10";
-    [formDescriptor addFormSection:section];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAmtScore rowType:XLFormRowDescriptorTypeInteger title:@"Total score for AMT"];
-    [self setDefaultFontWithRow:row];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Score between 0 to 10" regex:@"^([0-9]|10)$"]];
-    
-    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if (newValue != [NSNull null]) {
-                if ([newValue intValue] < 0 || [newValue intValue] > 255) {
-                    [self showValidationError];
-                }
-            }
-        }
-    };
-    
-    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kAmtScore] != (id)[NSNull null]) row.value = dementiaDict[kAmtScore];
-    
-    [section addFormRow:row];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEduStatus rowType:XLFormRowDescriptorTypeSelectorPush title:@"Resident's education status"];
-    row.selectorOptions = @[@"1 year", @"2 years", @"3 years", @"4 years", @"5 years", @"6 years", @"more than 6 years", @"No formal education"];
-    [self setDefaultFontWithRow:row];
-    
-    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kEduStatus] != (id)[NSNull null]) row.value = dementiaDict[kEduStatus];
-    
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqFollowupGDA rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred for further follow-up?"];
-    row.selectorOptions = @[@"Yes", @"No"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [self setDefaultFontWithRow:row];
-    
-    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kReqFollowupGDA] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:dementiaDict[kReqFollowupGDA]];
-    
-    [section addFormRow:row];
-    
-    
-    
-    return [super initWithForm:formDescriptor];
-}
+//
+//- (id) initDementiaAssessment {
+//    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Geriatric Dementia Assessment"];
+//    XLFormSectionDescriptor * section;
+//    XLFormRowDescriptor * row;
+//    
+//    NSDictionary *dementiaDict = _fullScreeningForm[SECTION_GERIATRIC_DEMENTIA_ASSMT];
+//    
+//    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+//    
+//    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+//        NSNumber *check = checkDict[kCheckDementia];
+//        if ([check isKindOfClass:[NSNumber class]]) {
+//            isFormFinalized = [check boolValue];
+//        }
+//    }
+//    
+//    formDescriptor.assignFirstResponderOnShow = YES;
+//    
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+//    [formDescriptor addFormSection:section];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPsfuFRA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"To be completed during PSFU"];
+//    [self setDefaultFontWithRow:row];
+//    
+//    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kPsfuFRA] != (id)[NSNull null]) row.value = dementiaDict[kPsfuFRA];
+//    
+//    [section addFormRow:row];
+//    
+//    
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+//    section.footerTitle = @"Range: 0-10";
+//    [formDescriptor addFormSection:section];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAmtScore rowType:XLFormRowDescriptorTypeInteger title:@"Total score for AMT"];
+//    [self setDefaultFontWithRow:row];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Score between 0 to 10" regex:@"^([0-9]|10)$"]];
+//    
+//    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//        if (newValue != oldValue) {
+//            if (newValue != [NSNull null]) {
+//                if ([newValue intValue] < 0 || [newValue intValue] > 255) {
+//                    [self showValidationError];
+//                }
+//            }
+//        }
+//    };
+//    
+//    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kAmtScore] != (id)[NSNull null]) row.value = dementiaDict[kAmtScore];
+//    
+//    [section addFormRow:row];
+//    
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+//    [formDescriptor addFormSection:section];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEduStatus rowType:XLFormRowDescriptorTypeSelectorPush title:@"Resident's education status"];
+//    row.selectorOptions = @[@"1 year", @"2 years", @"3 years", @"4 years", @"5 years", @"6 years", @"more than 6 years", @"No formal education"];
+//    [self setDefaultFontWithRow:row];
+//    
+//    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kEduStatus] != (id)[NSNull null]) row.value = dementiaDict[kEduStatus];
+//    
+//    [section addFormRow:row];
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqFollowupGDA rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred for further follow-up?"];
+//    row.selectorOptions = @[@"Yes", @"No"];
+//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [self setDefaultFontWithRow:row];
+//    
+//    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kReqFollowupGDA] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:dementiaDict[kReqFollowupGDA]];
+//    
+//    [section addFormRow:row];
+//    
+//    
+//    
+//    return [super initWithForm:formDescriptor];
+//}
 
 
 
@@ -1876,6 +2443,97 @@ NSString *const kQuestionFifteen = @"q15";
     return [super initWithForm:formDescriptor];
 }
 
+- (id) initSummaryAndHealthEdu {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Summary & Health Education"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Instructions"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"instructions" rowType:XLFormRowDescriptorTypeInfo title:@"Collect these items:\n- Resident's Health Report\n- iPad\n- NHS Health Education Booklet"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [self setDefaultFontWithRow:row];
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Summary"];
+    [formDescriptor addFormSection:section];
+    
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1" rowType:XLFormRowDescriptorTypeInfo title:@"Counsel the resident on the following topics using the NHS Health Education Booklet.\n\nThese topics were auto-selected based on your resident's medical history.\n\nIf your resident has questions that you can't answer, PLEASE ASK an NHS committee member!"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"health_planning" rowType:XLFormRowDescriptorTypeInfo title:@"Health Planning"];
+    [self setDefaultFontWithRow:row];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"diabetes" rowType:XLFormRowDescriptorTypeInfo title:@"Diabetes"];
+    [self setDefaultFontWithRow:row];
+    BOOL diabetesShowHide = [[ResidentProfile sharedManager] diabetesCheck];
+    row.hidden = [NSNumber numberWithBool:!diabetesShowHide];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"hyperlipidemia" rowType:XLFormRowDescriptorTypeInfo title:@"Hyperlipidaemia"];
+    [self setDefaultFontWithRow:row];
+    BOOL hyperlipidShowHide = [[ResidentProfile sharedManager] hyperlipidemiaCheck];
+    row.hidden = [NSNumber numberWithBool:!hyperlipidShowHide];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"hypertension" rowType:XLFormRowDescriptorTypeInfo title:@"Hypertension"];
+    [self setDefaultFontWithRow:row];
+    BOOL hypertensionShowHide = [[ResidentProfile sharedManager] hypertensionCheck];
+    row.hidden = [NSNumber numberWithBool:!hypertensionShowHide];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"cardio_disease" rowType:XLFormRowDescriptorTypeInfo title:@"Cardiovascular disease"];
+    [self setDefaultFontWithRow:row];
+    BOOL cardioDiseaseShowHide = [[ResidentProfile sharedManager] cardiovascularDiseaseCheck];
+    row.hidden = [NSNumber numberWithBool:!cardioDiseaseShowHide];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"dental" rowType:XLFormRowDescriptorTypeInfo title:@"Dental"];
+    [self setDefaultFontWithRow:row];
+    BOOL dentalShowHide = [[ResidentProfile sharedManager] dentalCheck];
+    row.hidden = [NSNumber numberWithBool:!dentalShowHide];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"alcohol" rowType:XLFormRowDescriptorTypeInfo title:@"Alcohol"];
+    [self setDefaultFontWithRow:row];
+    BOOL alcoholShowHide = [[ResidentProfile sharedManager] alcoholCheck];
+    row.hidden = [NSNumber numberWithBool:!alcoholShowHide];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"smoking" rowType:XLFormRowDescriptorTypeInfo title:@"Smoking"];
+    [self setDefaultFontWithRow:row];
+    BOOL smokingShowHide = [[ResidentProfile sharedManager] smokingCheck];
+    row.hidden = [NSNumber numberWithBool:!smokingShowHide];
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"instructions_2" rowType:XLFormRowDescriptorTypeInfo title:@"Go through the resident's Health Report.\n\nTick the relevant items on the Action Plan and remind the resident."];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.hidden = @1;
+    [section addFormRow:row];
+    
+    
+    //Only show if it's door-to-door
+    NSDictionary *modeOfScreeningDict = [_fullScreeningForm objectForKey:SECTION_MODE_OF_SCREENING];
+    if (modeOfScreeningDict != (id)[NSNull null]) {
+        NSString *screenMode = [modeOfScreeningDict objectForKey:kScreenMode];
+        if (screenMode != (id)[NSNull null] && [screenMode containsString:@"Door"]) {
+            row.hidden = @0;
+        }
+    }
+
+    
+
+    return [super initWithForm:formDescriptor];
+}
 #pragma mark - Buttons
 
 -(void)editBtnPressed:(UIBarButtonItem * __unused)button
@@ -1891,14 +2549,20 @@ NSString *const kQuestionFifteen = @"q15";
         switch ([self.sectionID intValue]) {
             case Phleb: fieldName = kCheckPhleb;
                 break;
-            case Triage: fieldName = kCheckTriage;
+            case Triage: fieldName = kCheckClinicalResults;
                 break;
-            case AddSvcs: fieldName = kCheckAdd;
+            case BasicVision: fieldName = kCheckSnellenTest;
+                break;
+            case Dental: fieldName = kCheckBasicDental;
+                break;
+            case Hearing: fieldName = kCheckHearing;
+                break;
+            case AddSvcs: fieldName = kCheckAddServices;
                 break;
             case DocConsult: fieldName = kCheckDocConsult;
                 break;
-            case HealthEdu: fieldName = kCheckEd;
-                break;
+//            case SummaryNHealthEdu: fieldName = kCheckEd;
+//                break;
             default:
                 break;
                 
@@ -1932,14 +2596,20 @@ NSString *const kQuestionFifteen = @"q15";
         switch ([self.sectionID intValue]) {
             case Phleb: fieldName = kCheckPhleb;
                 break;
-            case Triage: fieldName = kCheckTriage;
+            case Triage: fieldName = kCheckClinicalResults;
                 break;
-            case AddSvcs: fieldName = kCheckAdd;
+            case BasicVision: fieldName = kCheckSnellenTest;
+                break;
+            case Dental: fieldName = kCheckBasicDental;
+                break;
+            case Hearing: fieldName = kCheckHearing;
+                break;
+            case AddSvcs: fieldName = kCheckAddServices;
                 break;
             case DocConsult: fieldName = kCheckDocConsult;
                 break;
-            case HealthEdu: fieldName = kCheckEd;
-                break;
+//            case HealthEdu: fieldName = kCheckEd;
+//                break;
             default:
                 break;
         }
@@ -1978,6 +2648,14 @@ NSString *const kQuestionFifteen = @"q15";
             ansFromYesNo = @"1";
         else if ([newValue isEqualToString:@"No"])
             ansFromYesNo = @"0";
+    }
+    
+    NSString* ansFromPassFail;
+    if (newValue != (id)[NSNull null] && [newValue isKindOfClass:[NSString class]]) {
+        if ([newValue isEqualToString:@"Pass"])
+            ansFromPassFail = @"1";
+        else if ([newValue isEqualToString:@"Fail"])
+            ansFromPassFail = @"0";
     }
     
     /* Mode of Screening */
@@ -2022,6 +2700,10 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kTunnel andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kVisitEye12Mths]) {
         [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kVisitEye12Mths andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kRightEyePlus]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kRightEyePlus andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kLeftEyePlus]) {
+        [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kLeftEyePlus andNewContent:newValue];
     }
     
     /* Additional Services */
@@ -2045,147 +2727,211 @@ NSString *const kQuestionFifteen = @"q15";
     /* Basic Dental Check-up */
     else if ([rowDescriptor.tag isEqualToString:kDentalUndergone]) {
         [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kDentalUndergone andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kUsesDentures]) {
+        [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kUsesDentures andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kOralHealth]) {
+        [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kOralHealth andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kDentistReferred]) {
-        [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kDentistReferred andNewContent:ansFromYesNo];
+        [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kDentistReferred andNewContent:newValue];
     }
     
-    /* Fall Risk Assessment */
-    else if ([rowDescriptor.tag isEqualToString:kPsfuFRA]) {
-        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kPsfuFRA andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kBalance]) {
-        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kBalance andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kGaitSpeed]) {
-        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kGaitSpeed andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kChairStand]) {
-        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kChairStand andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kReqFollowupFRA]) {
-        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kReqFollowupFRA andNewContent:ansFromYesNo];
-    } else if ([rowDescriptor.tag isEqualToString:kTotal]) {
-        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kTotal andNewContent:rowDescriptor.value];
+    /* 7. Hearing */
+    else if ([rowDescriptor.tag isEqualToString:kUsesAidRight]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kUsesAidRight andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kUsesAidLeft]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kUsesAidLeft andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kAttendedHhie]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAttendedHhie andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kAttendedTinnitus]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAttendedTinnitus andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kTinnitusResult]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kTinnitusResult andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kOtoscopyLeft]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kOtoscopyLeft andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kOtoscopyRight]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kOtoscopyRight andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kAttendedAudioscope]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAttendedAudioscope andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kPractice500Hz60]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kPractice500Hz60 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioR500Hz25]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR500Hz25 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioL500Hz25]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL500Hz25 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioL1000Hz25]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL1000Hz25 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioR1000Hz25]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR1000Hz25 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioL2000Hz25]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL2000Hz25 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioR2000Hz25]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR2000Hz25 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioL4000Hz25]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL4000Hz25 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioR4000Hz25]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR4000Hz25 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioL500Hz40]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL500Hz40 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioR500Hz40]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR500Hz40 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioL1000Hz40]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL1000Hz40 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioR1000Hz40]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR1000Hz40 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioL2000Hz40]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL2000Hz40 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioR2000Hz40]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR2000Hz40 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioL4000Hz40]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL4000Hz40 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kAudioR4000Hz40]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR4000Hz40 andNewContent:ansFromPassFail];
+    } else if ([rowDescriptor.tag isEqualToString:kApptReferred]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kApptReferred andNewContent:ansFromYesNo];
     }
+    
+    /* 9. Doctor's Consultation */
+     else if ([rowDescriptor.tag isEqualToString:kDidDocConsult]) {
+         [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDidDocConsult andNewContent:ansFromYesNo];
+     }
+    
+    /* Fall Risk Assessment */
+//    else if ([rowDescriptor.tag isEqualToString:kPsfuFRA]) {
+//        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kPsfuFRA andNewContent:rowDescriptor.value];
+//    } else if ([rowDescriptor.tag isEqualToString:kBalance]) {
+//        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kBalance andNewContent:rowDescriptor.value];
+//    } else if ([rowDescriptor.tag isEqualToString:kGaitSpeed]) {
+//        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kGaitSpeed andNewContent:rowDescriptor.value];
+//    } else if ([rowDescriptor.tag isEqualToString:kChairStand]) {
+//        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kChairStand andNewContent:rowDescriptor.value];
+//    } else if ([rowDescriptor.tag isEqualToString:kReqFollowupFRA]) {
+//        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kReqFollowupFRA andNewContent:ansFromYesNo];
+//    } else if ([rowDescriptor.tag isEqualToString:kTotal]) {
+//        [self postSingleFieldWithSection:SECTION_FALL_RISK_ASSMT andFieldName:kTotal andNewContent:rowDescriptor.value];
+//    }
     
     
     /* Geriatric Dementia Assessment */
-    else if ([rowDescriptor.tag isEqualToString:kPsfuGDA]) {
-        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kPsfuGDA andNewContent:rowDescriptor.value];
-    }     else if ([rowDescriptor.tag isEqualToString:kEduStatus]) {
-        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kEduStatus andNewContent:rowDescriptor.value];
-    }     else if ([rowDescriptor.tag isEqualToString:kReqFollowupGDA]) {
-        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kReqFollowupGDA andNewContent:ansFromYesNo];
-    }
+//    else if ([rowDescriptor.tag isEqualToString:kPsfuGDA]) {
+//        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kPsfuGDA andNewContent:rowDescriptor.value];
+//    }     else if ([rowDescriptor.tag isEqualToString:kEduStatus]) {
+//        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kEduStatus andNewContent:rowDescriptor.value];
+//    }     else if ([rowDescriptor.tag isEqualToString:kReqFollowupGDA]) {
+//        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kReqFollowupGDA andNewContent:ansFromYesNo];
+//    }
     
     
     /* Pre-Health Education */
-    else if ([rowDescriptor.tag isEqualToString:kPreEdu1]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu1 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu2]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu2 andNewContent:ansFromTF];
-    }else if ([rowDescriptor.tag isEqualToString:kPreEdu3]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu3 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu4]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu4 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu5]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu5 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu6]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu6 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu7]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu7 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu8]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu8 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu9]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu9 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu10]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu10 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu11]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu11 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu12]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu12 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu13]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu13 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu14]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu14 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu15]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu15 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu16]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu16 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu17]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu17 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu18]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu18 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu19]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu19 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu20]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu20 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu21]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu21 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu22]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu22 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu23]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu23 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu24]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu24 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdu25]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu25 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPreEdScore]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kPreEdScore andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kDateEd]) {
-        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kDateEd andNewContent:newValue];
-    }
+//    else if ([rowDescriptor.tag isEqualToString:kPreEdu1]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu1 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu2]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu2 andNewContent:ansFromTF];
+//    }else if ([rowDescriptor.tag isEqualToString:kPreEdu3]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu3 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu4]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu4 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu5]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu5 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu6]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu6 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu7]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu7 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu8]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu8 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu9]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu9 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu10]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu10 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu11]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu11 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu12]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu12 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu13]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu13 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu14]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu14 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu15]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu15 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu16]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu16 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu17]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu17 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu18]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu18 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu19]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu19 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu20]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu20 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu21]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu21 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu22]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu22 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu23]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu23 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu24]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu24 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdu25]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kEdu25 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPreEdScore]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kPreEdScore andNewContent:newValue];
+//    } else if ([rowDescriptor.tag isEqualToString:kDateEd]) {
+//        [self postSingleFieldWithSection:SECTION_PRE_HEALTH_EDU andFieldName:kDateEd andNewContent:newValue];
+//    }
     
     /* Post-Health Education */
-    else if ([rowDescriptor.tag isEqualToString:kPostEdu1]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu1 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu2]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu2 andNewContent:ansFromTF];
-    }else if ([rowDescriptor.tag isEqualToString:kPostEdu3]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu3 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu4]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu4 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu5]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu5 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu6]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu6 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu7]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu7 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu8]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu8 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu9]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu9 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu10]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu10 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu11]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu11 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu12]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu12 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu13]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu13 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu14]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu14 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu15]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu15 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu16]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu16 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu17]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu17 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu18]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu18 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu19]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu19 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu20]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu20 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu21]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu21 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu22]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu22 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu23]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu23 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu24]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu24 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdu25]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu25 andNewContent:ansFromTF];
-    } else if ([rowDescriptor.tag isEqualToString:kPostEdScore]) {
-        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kPostEdScore andNewContent:newValue];
-    }
+//    else if ([rowDescriptor.tag isEqualToString:kPostEdu1]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu1 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu2]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu2 andNewContent:ansFromTF];
+//    }else if ([rowDescriptor.tag isEqualToString:kPostEdu3]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu3 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu4]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu4 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu5]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu5 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu6]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu6 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu7]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu7 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu8]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu8 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu9]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu9 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu10]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu10 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu11]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu11 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu12]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu12 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu13]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu13 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu14]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu14 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu15]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu15 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu16]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu16 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu17]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu17 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu18]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu18 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu19]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu19 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu20]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu20 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu21]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu21 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu22]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu22 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu23]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu23 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu24]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu24 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdu25]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kEdu25 andNewContent:ansFromTF];
+//    } else if ([rowDescriptor.tag isEqualToString:kPostEdScore]) {
+//        [self postSingleFieldWithSection:SECTION_POST_HEALTH_EDU andFieldName:kPostEdScore andNewContent:newValue];
+//    }
 }
 
 -(void)beginEditing:(XLFormRowDescriptor *)rowDescriptor {
@@ -2275,7 +3021,11 @@ NSString *const kQuestionFifteen = @"q15";
     } else if ([rowDescriptor.tag isEqualToString:kBp3Dias]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp3Dias andNewContent:rowDescriptor.value];
     }
-
+    
+    /* 7. Hearing */
+    else if ([rowDescriptor.tag isEqualToString:kHhieResult]) {
+        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kHhieResult andNewContent:rowDescriptor.value];
+    }
     
     /* Doctor's Consult */
     else if ([rowDescriptor.tag isEqualToString:kDocNotes]) {
@@ -2675,6 +3425,23 @@ NSString *const kQuestionFifteen = @"q15";
             return @"Yes";
         } else {
             return @"No";
+        }
+    }
+    return @"";
+}
+
+- (NSString *) getPassFailfromOneZero: (id) value {
+    if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"1"]) {
+            return @"Pass";
+        } else {
+            return @"Fail";
+        }
+    } else if ([value isKindOfClass:[NSNumber class]]) {
+        if ([value isEqual:@1]) {
+            return @"Pass";
+        } else {
+            return @"Fail";
         }
     }
     return @"";

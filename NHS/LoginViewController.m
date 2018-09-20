@@ -13,6 +13,7 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "SVProgressHUD.h"
 #import "DeviceInfo.h"
+#import "ELCUIApplication.h"
 
 #define ERROR_MSG_DELAY 5.0f
 
@@ -60,6 +61,11 @@
 - (void)viewWillAppear:(BOOL)animated {
     
     [super viewWillAppear:animated];
+    
+    // turn-off auto-timeout
+    ELCUIApplication *application = (ELCUIApplication *)[UIApplication sharedApplication];
+    [application stopIdleTimer];
+    
     [self.navigationController setNavigationBarHidden:YES];
     
     // scale the NHS logo properly
@@ -216,15 +222,15 @@
 //    NSString *password = ;
     
     
-    if (![self isMatricNumberValid:matric_no]) {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Invalid Matric Number" message:@"Please check that you have input the correct number." preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            //do nothing for now;
-        }];
-        [alertController addAction:okAction];
-        [self presentViewController:alertController animated:YES completion:nil];
-        return;     //don't continue from here....
-    }
+//    if (![self isMatricNumberValid:matric_no]) {
+//        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Invalid Matric Number" message:@"Please check that you have input the correct number." preferredStyle:UIAlertControllerStyleAlert];
+//        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+//            //do nothing for now;
+//        }];
+//        [alertController addAction:okAction];
+//        [self presentViewController:alertController animated:YES completion:nil];
+//        return;     //don't continue from here....
+//    }
     
     [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
     [SVProgressHUD showWithStatus:@"Logging in..."];
@@ -296,6 +302,7 @@
               
               // show error msg for some time
               else {
+                  NSLog(@"%@", responseObject);
                   [self.errorMsgLabel setHidden:NO];
                   [self performSelector:@selector(hideErrorMsg)
                              withObject:nil
@@ -368,6 +375,9 @@
  #pragma mark - Navigation
  
  - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+     if ([segue.identifier isEqualToString:@"login segue"]) {
+         [(ELCUIApplication *)[UIApplication sharedApplication] resetIdleTimer];
+     }
  }
  
 @end

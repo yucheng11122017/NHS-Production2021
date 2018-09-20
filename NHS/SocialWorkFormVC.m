@@ -18,13 +18,9 @@
 
 
 typedef enum formName {
-    Unused0,
-    CurrentSocioeconomicSituation,
-    CurrentPhysicalStatus,
-    SocialSupportAssessment,
-    PsychologicalWellbeing,
-    AdditionalSvcs,
-    Summary
+    DepressionAssmt,
+    SocialWorkAdv,
+    SocialWorkRef
 } formName;
 
 
@@ -69,6 +65,12 @@ typedef enum formName {
             
         case 0:
             form = [self initDepressAssessPhq9];
+            break;
+        case 1:
+            form = [self initSocialWorkAdvAssmt];
+            break;
+        case 2:
+            form = [self initSwReferrals];
             break;
 //        case 1:
 //            form = [self initCurrentSocioSituation];
@@ -136,7 +138,7 @@ typedef enum formName {
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
     
     if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckSocioEco];
+        NSNumber *check = checkDict[kCheckProfilingSocioecon];
         if ([check isKindOfClass:[NSNumber class]]) {
             isFormFinalized = [check boolValue];
         }
@@ -252,15 +254,15 @@ typedef enum formName {
     
     [section addFormRow:cpfAmtRow];
     
-    XLFormRowDescriptor *receiveFinAssistRow = [XLFormRowDescriptor formRowDescriptorWithTag:kReceivingFinAssist rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Are you receiving any form of social/financial assistance?"];
+    XLFormRowDescriptor *receiveFinAssistRow = [XLFormRowDescriptor formRowDescriptorWithTag:kReceiveFinAssist rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Are you receiving any form of social/financial assistance?"];
     [self setDefaultFontWithRow:receiveFinAssistRow];
     receiveFinAssistRow.selectorOptions = @[@"Yes", @"No"];
     receiveFinAssistRow.required = YES;
     receiveFinAssistRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     
     //value
-    if (currentSocioSitDict != (id)[NSNull null] && [currentSocioSitDict objectForKey:kReceivingFinAssist] != (id)[NSNull null]) {
-        receiveFinAssistRow.value = [self getYesNofromOneZero:currentSocioSitDict[kReceivingFinAssist]];
+    if (currentSocioSitDict != (id)[NSNull null] && [currentSocioSitDict objectForKey:kReceiveFinAssist] != (id)[NSNull null]) {
+        receiveFinAssistRow.value = [self getYesNofromOneZero:currentSocioSitDict[kReceiveFinAssist]];
     }
     
     [section addFormRow:receiveFinAssistRow];
@@ -1055,7 +1057,7 @@ typedef enum formName {
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
     
     if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckSwAddServices];
+        NSNumber *check = checkDict[kCheckAddServices];
         if ([check isKindOfClass:[NSNumber class]]) {
             isFormFinalized = [check boolValue];
         }
@@ -1281,11 +1283,12 @@ typedef enum formName {
     self.phqQuestionsArray = [[NSMutableArray alloc] init];
 
     NSDictionary *geriaDepreAssmtDict = [self.fullScreeningForm objectForKey:SECTION_SW_DEPRESSION];
+    NSDictionary *depressionEligibDict = [self.fullScreeningForm objectForKey:SECTION_DEPRESSION];
 
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
 
     if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckSwDepress];
+        NSNumber *check = checkDict[kCheckSwDepression];
         if ([check isKindOfClass:[NSNumber class]]) {
             isFormFinalized = [check boolValue];
         }
@@ -1316,9 +1319,10 @@ typedef enum formName {
     XLFormRowDescriptor *phqQ1Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ1 rowType:XLFormRowDescriptorTypeSelectorAlertView title:@""];
     phqQ1Row.selectorOptions = phqOptions;
     phqQ1Row.noValueDisplayText = @"Tap here";
+    phqQ1Row.disabled = @1;
 
-    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ1] != (id)[NSNull null]) {
-        phqQ1Row.value = [self getSelectorOptionFromNumber:geriaDepreAssmtDict[kPhqQ1]];
+    if (depressionEligibDict != (id)[NSNull null] && [depressionEligibDict objectForKey:kPhqQ1] != (id)[NSNull null]) {
+        phqQ1Row.value = [self getSelectorOptionFromNumber:depressionEligibDict[kPhqQ1]];
     }
 
     [section addFormRow:phqQ1Row];
@@ -1333,9 +1337,10 @@ typedef enum formName {
     XLFormRowDescriptor *phqQ2Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ2 rowType:XLFormRowDescriptorTypeSelectorAlertView title:@""];
     phqQ2Row.selectorOptions = phqOptions;
     phqQ2Row.noValueDisplayText = @"Tap here";
+    phqQ2Row.disabled = @1;
 
-    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ2] != (id)[NSNull null]) {
-        phqQ2Row.value = [self getSelectorOptionFromNumber:geriaDepreAssmtDict[kPhqQ2]];
+    if (depressionEligibDict != (id)[NSNull null] && [depressionEligibDict objectForKey:kPhqQ2] != (id)[NSNull null]) {
+        phqQ2Row.value = [self getSelectorOptionFromNumber:depressionEligibDict[kPhqQ2]];
     }
 
     [section addFormRow:phqQ2Row];
@@ -1498,60 +1503,46 @@ typedef enum formName {
         }
     };
 
-//    XLFormRowDescriptor* phqQ1Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ1
-//                                                                          rowType:XLFormRowDescriptorTypeStepCounter
-//                                                                            title:@"PHQ-2 question 1 Score"];
-//    [self setDefaultFontWithRow:phqQ1Row];
-//    phqQ1Row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [phqQ1Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
-//    [phqQ1Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
-//    [phqQ1Row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
-//    [phqQ1Row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
-//
-//    //value
-//    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ1] != (id)[NSNull null]) {
-//        phqQ1Row.value = geriaDepreAssmtDict[kPhqQ1];
-//    }
-//
-//    [section addFormRow:phqQ1Row];
-//
-//    XLFormRowDescriptor* phqQ2Row = [XLFormRowDescriptor formRowDescriptorWithTag:kPhqQ2
-//                                                                          rowType:XLFormRowDescriptorTypeStepCounter
-//                                                                            title:@"PHQ-2 question 2 Score"];
-//    [self setDefaultFontWithRow:phqQ2Row];
-//    phqQ2Row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [phqQ2Row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
-//    [phqQ2Row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
-//    [phqQ2Row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
-//    [phqQ2Row.cellConfigAtConfigure setObject:@3 forKey:@"stepControl.maximumValue"];
-//
-//    //value
-//    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhqQ2] != (id)[NSNull null]) {
-//        phqQ2Row.value = geriaDepreAssmtDict[kPhqQ2];
-//    }
-//
-//    [section addFormRow:phqQ2Row];
-//
-//
-//
-//    XLFormRowDescriptor* phq9ScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhq9Score
-//                                                                              rowType:XLFormRowDescriptorTypeNumber
-//                                                                                title:@"Total score for PHQ-9"];
-//    [self setDefaultFontWithRow:phq9ScoreRow];
-//    phq9ScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    phq9ScoreRow.disabled = @(1);
-//
-//    if (phqQ1Row.value != (id) [NSNull null] && phqQ2Row.value != (id)[NSNull null]) {
-//        if ([phqQ1Row.value intValue] > 1 || [phqQ2Row.value intValue] >1) {
-//            phq9ScoreRow.disabled = @(0);
-//        }
-//    }
-//    //value
-//    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhq9Score] != (id)[NSNull null]) {
-//        phq9ScoreRow.value = geriaDepreAssmtDict[kPhq9Score];
-//    }
-//
-//    [section addFormRow:phq9ScoreRow];
+    XLFormSectionDescriptor *scoreSection = [XLFormSectionDescriptor formSectionWithTitle:@"Total Score (auto-calculate)"];
+    [formDescriptor addFormSection:scoreSection];
+    
+    phqTotalScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhq9Score rowType:XLFormRowDescriptorTypeInfo title:@"Total Score"];
+    
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhq9Score] != (id)[NSNull null]) {
+        phqTotalScoreRow.value = geriaDepreAssmtDict[kPhq9Score];
+    }
+    
+    
+    [scoreSection addFormRow:phqTotalScoreRow];
+    
+    XLFormSectionDescriptor *section4 = [XLFormSectionDescriptor formSectionWithTitle:@"Depression Severity (auto-calculate)"];
+    [formDescriptor addFormSection:section4];
+    
+    XLFormRowDescriptor* depressionSeverityRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDepressionSeverity
+                                                                                rowType:XLFormRowDescriptorTypeInfo
+                                                                                  title:@"Depression Severity"];
+//    [depressionSeverityRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    //value
+    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kDepressionSeverity] != (id)[NSNull null]) {
+        depressionSeverityRow.value = geriaDepreAssmtDict[kDepressionSeverity];
+    }
+    [section4 addFormRow:depressionSeverityRow];
+    
+    __weak __typeof(self)weakSelf = self;
+    phqTotalScoreRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if (newValue != nil && newValue != (id)[NSNull null]) {
+                if ([newValue intValue] < 5) depressionSeverityRow.value = @"(0-4) None";
+                else if ([newValue intValue] < 10) depressionSeverityRow.value = @"(5-9) Mild";
+                else if ([newValue intValue]< 15) depressionSeverityRow.value = @"(10-14) Moderate";
+                else if ([newValue intValue]< 20) depressionSeverityRow.value = @"(15-19) Moderately Severe";
+                else depressionSeverityRow.value = @"(20-27) Severe";
+                
+                [weakSelf reloadFormRow:depressionSeverityRow];
+            }
+        }
+    };
 
     XLFormSectionDescriptor *section3 = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section3];
@@ -1561,7 +1552,7 @@ typedef enum formName {
                                                                                   title:@"10. If you checked off any problems, how difficult have those problems made it for you to Do your work, take care of things at home, or get along with other people?"];
     [self setDefaultFontWithRow:q10Row];
     q10Row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    q10Row.disabled = @(1); //default disabled.
+//    q10Row.disabled = @(1); //default disabled.
 
     [section3 addFormRow:q10Row];
 
@@ -1571,7 +1562,7 @@ typedef enum formName {
                                                                                   title:@""];
     q10ResponseRow.selectorOptions = @[@"Not difficult at all", @"Somewhat difficult", @"Very difficult",@"Extremely difficult"];
     q10ResponseRow.noValueDisplayText = @"Tap here";
-    q10ResponseRow.disabled = @(1);
+//    q10ResponseRow.disabled = @(1);
 //    if (phqQ1Row.value != (id) [NSNull null] && phqQ2Row.value != (id)[NSNull null]) {
 //        if ([phqQ1Row.value intValue] > 1 || [phqQ2Row.value intValue] >1) {
 //            q10ResponseRow.disabled = @(0);
@@ -1633,36 +1624,19 @@ typedef enum formName {
         }
     };
 
-    XLFormSectionDescriptor *scoreSection = [XLFormSectionDescriptor formSectionWithTitle:@"Total Score (auto-calculate)"];
-    [formDescriptor addFormSection:scoreSection];
-
-    phqTotalScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhq9Score rowType:XLFormRowDescriptorTypeInfo title:@"Total Score"];
-
-    //value
-    if (geriaDepreAssmtDict != (id)[NSNull null] && [geriaDepreAssmtDict objectForKey:kPhq9Score] != (id)[NSNull null]) {
-        phqTotalScoreRow.value = geriaDepreAssmtDict[kPhq9Score];
-        if ([phqTotalScoreRow.value integerValue]>= 5) {
-            q10Row.disabled = @NO;  //enable this
-            q10ResponseRow.disabled = @NO;
-        }
-    }
-
-
-    [scoreSection addFormRow:phqTotalScoreRow];
-
-    phqTotalScoreRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([phqTotalScoreRow.value integerValue] >= 5) {
-                q10Row.disabled = @NO;  //enable this
-                q10ResponseRow.disabled = @NO;
-            } else {
-                q10Row.disabled = @YES;  //enable this
-                q10ResponseRow.disabled = @YES;
-            }
-            [self reloadFormRow:q10Row];
-            [self reloadFormRow:q10ResponseRow];
-        }
-    };
+//    phqTotalScoreRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//        if (newValue != oldValue) {
+//            if ([phqTotalScoreRow.value integerValue] >= 5) {
+//                q10Row.disabled = @NO;  //enable this
+//                q10ResponseRow.disabled = @NO;
+//            } else {
+//                q10Row.disabled = @YES;  //enable this
+//                q10ResponseRow.disabled = @YES;
+//            }
+//            [self reloadFormRow:q10Row];
+//            [self reloadFormRow:q10ResponseRow];
+//        }
+//    };
 
 //    XLFormSectionDescriptor *finalSection = [XLFormSectionDescriptor formSectionWithTitle:@""];
 //    [formDescriptor addFormSection:finalSection];
@@ -1683,6 +1657,257 @@ typedef enum formName {
     return [super initWithForm:formDescriptor];
 }
 
+- (id) initSocialWorkAdvAssmt {
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Social Work (Advanced) Assessment"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    NSDictionary *swAdvAssmtDict = [self.fullScreeningForm objectForKey:SECTION_SW_ADV_ASSMT];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckSwAdvAssmt];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor* questionRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1"
+                                                                        rowType:XLFormRowDescriptorTypeInfo
+                                                                          title:@"Which types of advanced social work screenings did resident undergo?"];
+    [self setDefaultFontWithRow:questionRow];
+    questionRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:questionRow];
+    
+    
+    XLFormRowDescriptor *swScreeningsRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_sw_screenings"
+                                                rowType:XLFormRowDescriptorTypeMultipleSelector
+                                                  title:@""];
+    swScreeningsRow.selectorOptions = @[@"Financial", @"Social", @"Psychological"];
+    swScreeningsRow.noValueDisplayText = @"Tap here";
+    
+    swScreeningsRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if (newValue != nil && newValue != (id) [NSNull null]) {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
+                    [oldSet addObjectsFromArray:oldValue];
+                    NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
+                    [newSet addObjectsFromArray:newValue];
+                    
+                    if ([newSet count] > [oldSet count]) {
+                        [newSet minusSet:oldSet];
+                        NSArray *array = [newSet allObjects];
+                        [self postSwScreeningWithOptionName:[array firstObject] andValue:@"1"];
+                    } else {
+                        [oldSet minusSet:newSet];
+                        NSArray *array = [oldSet allObjects];
+                        [self postSwScreeningWithOptionName:[array firstObject] andValue:@"0"];
+                    }
+                } else {
+                    [self postSwScreeningWithOptionName:[newValue firstObject] andValue:@"1"];
+                }
+            } else {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    [self postSwScreeningWithOptionName:[oldValue firstObject] andValue:@"0"];
+                }
+            }
+        }
+    };
+    
+    //value
+    if (swAdvAssmtDict != (id)[NSNull null]) {
+        swScreeningsRow.value = [self getSwScreeningArray:swAdvAssmtDict];
+    }
+    
+    [section addFormRow:swScreeningsRow];
+    
+    
+    return [super initWithForm:formDescriptor];
+}
+
+- (id) initSwReferrals {
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Social Work Referrals"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    NSDictionary *swReferralsDict = [self.fullScreeningForm objectForKey:SECTION_SW_REFERRALS];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckSwReferrals];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor* questionRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1"
+                                                                             rowType:XLFormRowDescriptorTypeInfo
+                                                                               title:@"What has the resident been referred to Social Service Office (SSO) for?"];
+    [self setDefaultFontWithRow:questionRow];
+    questionRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:questionRow];
+    
+    
+    XLFormRowDescriptor *referredSsoRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_sso_screenings"
+                                                                                 rowType:XLFormRowDescriptorTypeMultipleSelector
+                                                                                   title:@""];
+    referredSsoRow.required = YES;
+    referredSsoRow.selectorOptions = @[@"NIL", @"Financial Assistance"];
+    referredSsoRow.noValueDisplayText = @"Tap here";
+    
+    referredSsoRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if (newValue != nil && newValue != (id) [NSNull null]) {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
+                    [oldSet addObjectsFromArray:oldValue];
+                    NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
+                    [newSet addObjectsFromArray:newValue];
+                    
+                    if ([newSet count] > [oldSet count]) {
+                        [newSet minusSet:oldSet];
+                        NSArray *array = [newSet allObjects];
+                        [self postReferralSsoWithOptionName:[array firstObject] andValue:@"1"];
+                    } else {
+                        [oldSet minusSet:newSet];
+                        NSArray *array = [oldSet allObjects];
+                        [self postReferralSsoWithOptionName:[array firstObject] andValue:@"0"];
+                    }
+                } else {
+                    [self postReferralSsoWithOptionName:[newValue firstObject] andValue:@"1"];
+                }
+            } else {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    [self postReferralSsoWithOptionName:[oldValue firstObject] andValue:@"0"];
+                }
+            }
+        }
+    };
+    
+    //value
+    if (swReferralsDict != (id)[NSNull null]) {
+        referredSsoRow.value = [self getReferralSsoArray:swReferralsDict];
+    }
+    
+    [section addFormRow:referredSsoRow];
+    
+    XLFormRowDescriptor* question2Row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q2"
+                                                                             rowType:XLFormRowDescriptorTypeInfo
+                                                                               title:@"What has the resident been referred to Cluster Operator for?"];
+    [self setDefaultFontWithRow:question2Row];
+    question2Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:question2Row];
+    
+    
+    XLFormRowDescriptor *referredCoRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_co_screenings"
+                                                                                rowType:XLFormRowDescriptorTypeMultipleSelector
+                                                                                  title:@""];
+    referredCoRow.required = YES;
+    referredCoRow.selectorOptions = @[@"NIL", @"Depression / emotional support", @"Befriending", @"Support with ADLs"];
+    referredCoRow.noValueDisplayText = @"Tap here";
+    
+    referredCoRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if (newValue != nil && newValue != (id) [NSNull null]) {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
+                    [oldSet addObjectsFromArray:oldValue];
+                    NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
+                    [newSet addObjectsFromArray:newValue];
+                    
+                    if ([newSet count] > [oldSet count]) {
+                        [newSet minusSet:oldSet];
+                        NSArray *array = [newSet allObjects];
+                        [self postReferralCoWithOptionName:[array firstObject] andValue:@"1"];
+                    } else {
+                        [oldSet minusSet:newSet];
+                        NSArray *array = [oldSet allObjects];
+                        [self postReferralCoWithOptionName:[array firstObject] andValue:@"0"];
+                    }
+                } else {
+                    [self postReferralCoWithOptionName:[newValue firstObject] andValue:@"1"];
+                }
+            } else {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    [self postReferralCoWithOptionName:[oldValue firstObject] andValue:@"0"];
+                }
+            }
+        }
+    };
+    
+    //value
+    if (swReferralsDict != (id)[NSNull null]) {
+        referredCoRow.value = [self getReferralCoArray:swReferralsDict];
+    }
+    
+    [section addFormRow:referredCoRow];
+    
+    XLFormRowDescriptor* question3Row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q3"
+                                                                              rowType:XLFormRowDescriptorTypeInfo
+                                                                                title:@"What has the resident been referred to Family Service Centre (FSC) for?"];
+    [self setDefaultFontWithRow:question3Row];
+    question3Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:question3Row];
+    
+    
+    XLFormRowDescriptor *referredFscRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_co_screenings"
+                                                                               rowType:XLFormRowDescriptorTypeMultipleSelector
+                                                                                 title:@""];
+    referredFscRow.required = YES;
+    referredFscRow.selectorOptions = @[@"NIL", @"Depression / emotional support", @"Information & referral", @"Case management"];
+    referredFscRow.noValueDisplayText = @"Tap here";
+    
+    referredFscRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if (newValue != nil && newValue != (id) [NSNull null]) {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
+                    [oldSet addObjectsFromArray:oldValue];
+                    NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
+                    [newSet addObjectsFromArray:newValue];
+                    
+                    if ([newSet count] > [oldSet count]) {
+                        [newSet minusSet:oldSet];
+                        NSArray *array = [newSet allObjects];
+                        [self postReferralFscWithOptionName:[array firstObject] andValue:@"1"];
+                    } else {
+                        [oldSet minusSet:newSet];
+                        NSArray *array = [oldSet allObjects];
+                        [self postReferralFscWithOptionName:[array firstObject] andValue:@"0"];
+                    }
+                } else {
+                    [self postReferralFscWithOptionName:[newValue firstObject] andValue:@"1"];
+                }
+            } else {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    [self postReferralFscWithOptionName:[oldValue firstObject] andValue:@"0"];
+                }
+            }
+        }
+    };
+    
+    //value
+    if (swReferralsDict != (id)[NSNull null]) {
+        referredFscRow.value = [self getReferralFscArray:swReferralsDict];
+    }
+    
+    [section addFormRow:referredFscRow];
+    
+    
+    return [super initWithForm:formDescriptor];
+}
+
 
 #pragma mark - Buttons
 
@@ -1697,18 +1922,25 @@ typedef enum formName {
         NSString *fieldName;
         
         switch ([self.formNo intValue]) {
-            case CurrentSocioeconomicSituation: fieldName = kCheckSocioEco;
+//            case CurrentSocioeconomicSituation: fieldName = kCheckProfilingSocioecon;
+//                break;
+//            case CurrentPhysicalStatus: fieldName = kCheckCurrentPhyStatus;
+//                break;
+//            case SocialSupportAssessment: fieldName = kCheckSocialSupport;
+//                break;
+//            case PsychologicalWellbeing: fieldName = kCheckPsychWellbeing;
+//                break;
+//            case AdditionalSvcs: fieldName = kCheckAddServices;
+//                break;
+//            case Summary: fieldName = kCheckSocWorkSummary;
+//                break;
+            case DepressionAssmt: fieldName = kCheckSwDepression;
                 break;
-            case CurrentPhysicalStatus: fieldName = kCheckCurrentPhyStatus;
+            case SocialWorkAdv: fieldName = kCheckSwAdvAssmt;
                 break;
-            case SocialSupportAssessment: fieldName = kCheckSocialSupport;
+            case SocialWorkRef: fieldName = kCheckSwReferrals;
                 break;
-            case PsychologicalWellbeing: fieldName = kCheckPsychWellbeing;
-                break;
-            case AdditionalSvcs: fieldName = kCheckSwAddServices;
-                break;
-            case Summary: fieldName = kCheckSocWorkSummary;
-                break;
+
             default:
                 break;
                 
@@ -1743,17 +1975,23 @@ typedef enum formName {
         NSString *fieldName;
         
         switch ([self.formNo intValue]) {
-            case CurrentSocioeconomicSituation: fieldName = kCheckSocioEco;
+//            case CurrentSocioeconomicSituation: fieldName = kCheckProfilingSocioecon;
+//                break;
+//            case CurrentPhysicalStatus: fieldName = kCheckCurrentPhyStatus;
+//                break;
+//            case SocialSupportAssessment: fieldName = kCheckSocialSupport;
+//                break;
+//            case PsychologicalWellbeing: fieldName = kCheckPsychWellbeing;
+//                break;
+//            case AdditionalSvcs: fieldName = kCheckAddServices;
+//                break;
+//            case Summary: fieldName = kCheckSocWorkSummary;
+//                break;
+            case DepressionAssmt: fieldName = kCheckSwDepression;
                 break;
-            case CurrentPhysicalStatus: fieldName = kCheckCurrentPhyStatus;
+            case SocialWorkAdv: fieldName = kCheckSwAdvAssmt;
                 break;
-            case SocialSupportAssessment: fieldName = kCheckSocialSupport;
-                break;
-            case PsychologicalWellbeing: fieldName = kCheckPsychWellbeing;
-                break;
-            case AdditionalSvcs: fieldName = kCheckSwAddServices;
-                break;
-            case Summary: fieldName = kCheckSocWorkSummary;
+            case SocialWorkRef: fieldName = kCheckSwReferrals;
                 break;
             default:
                 break;
@@ -1845,10 +2083,10 @@ typedef enum formName {
             //code to be executed on the main queue after delay
             [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kPhq9Score andNewContent:newValue];
         });
-    }  else if ([rowDescriptor.tag isEqualToString:kQ10Response]) {
+    } else if ([rowDescriptor.tag isEqualToString:kDepressionSeverity]) {
+        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kDepressionSeverity andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kQ10Response]) {
         [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kQ10Response andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kFollowUpReq]) {
-        [self postSingleFieldWithSection:SECTION_SW_DEPRESSION andFieldName:kFollowUpReq andNewContent:ansFromYesNo];
     }
     
     
@@ -1860,8 +2098,8 @@ typedef enum formName {
         [self processDoYouHaveFollowingWithNewValue:newValue andOldValue:oldValue];
     } else if ([rowDescriptor.tag isEqualToString:kChasColor]) {
         [self postSingleFieldWithSection:SECTION_CURRENT_SOCIOECO_SITUATION andFieldName:kChasColor andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kReceivingFinAssist]) {
-        [self postSingleFieldWithSection:SECTION_CURRENT_SOCIOECO_SITUATION andFieldName:kReceivingFinAssist andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kReceiveFinAssist]) {
+        [self postSingleFieldWithSection:SECTION_CURRENT_SOCIOECO_SITUATION andFieldName:kReceiveFinAssist andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kFinAssistEnuf]) {
         [self postSingleFieldWithSection:SECTION_CURRENT_SOCIOECO_SITUATION andFieldName:kFinAssistEnuf andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kSocSvcAware]) {
@@ -2812,6 +3050,106 @@ typedef enum formName {
     else if ([value containsString:@"Nine"]) return 5;
     else return 0;
 }
+
+- (void) postSwScreeningWithOptionName:(NSString *) option andValue: (NSString *) value {
+    NSString *fieldName;
+    
+    if ([option containsString:@"Financial"]) fieldName = kUnderwentFin;
+    else if ([option containsString:@"Social"]) fieldName = kUnderwentSoc;
+    else if ([option containsString:@"Psychological"]) fieldName = kUnderwentPsyc;
+    
+    [self postSingleFieldWithSection:SECTION_SW_ADV_ASSMT andFieldName:fieldName andNewContent:value];
+}
+
+- (NSArray *) getSwScreeningArray: (NSDictionary *) dictionary {
+    if (dictionary == (id)[NSNull null] || dictionary == nil) {
+        return @[]; //return empty array;
+    }
+    
+    NSMutableArray *swScreeningArray = [[NSMutableArray alloc] init];
+    
+    if([[dictionary objectForKey:kUnderwentFin] isEqual:@(1)]) [swScreeningArray addObject:@"Financial"];
+    if([[dictionary objectForKey:kUnderwentSoc] isEqual:@(1)]) [swScreeningArray addObject:@"Social"];
+    if([[dictionary objectForKey:kUnderwentPsyc] isEqual:@(1)]) [swScreeningArray addObject:@"Psychological"];
+    
+    return swScreeningArray;
+}
+
+- (void) postReferralSsoWithOptionName:(NSString *) option andValue: (NSString *) value {
+    NSString *fieldName;
+    
+    if ([option containsString:@"NIL"]) fieldName = kReferredSsoNil;
+    else if ([option containsString:@"Financial"]) fieldName = kReferredSsoFinAssist;
+    
+    [self postSingleFieldWithSection:SECTION_SW_REFERRALS andFieldName:fieldName andNewContent:value];
+}
+
+- (NSArray *) getReferralSsoArray: (NSDictionary *) dictionary {
+    if (dictionary == (id)[NSNull null] || dictionary == nil) {
+        return @[]; //return empty array;
+    }
+    
+    NSMutableArray *refSsoArray = [[NSMutableArray alloc] init];
+    
+    if([[dictionary objectForKey:kReferredSsoNil] isEqual:@(1)]) [refSsoArray addObject:@"NIL"];
+    if([[dictionary objectForKey:kReferredSsoFinAssist] isEqual:@(1)]) [refSsoArray addObject:@"Financial Assistance"];
+    
+    return refSsoArray;
+}
+
+- (void) postReferralCoWithOptionName:(NSString *) option andValue: (NSString *) value {
+    NSString *fieldName;
+    
+    if ([option containsString:@"NIL"]) fieldName = kReferredCoNil;
+    else if ([option containsString:@"Depression"]) fieldName = kReferredCoDep;
+    else if ([option containsString:@"Befriending"]) fieldName = kReferredCoBefriend;
+    else if ([option containsString:@"Support"]) fieldName = kReferredCoAdls;
+    
+    [self postSingleFieldWithSection:SECTION_SW_REFERRALS andFieldName:fieldName andNewContent:value];
+}
+
+- (NSArray *) getReferralCoArray: (NSDictionary *) dictionary {
+    if (dictionary == (id)[NSNull null] || dictionary == nil) {
+        return @[]; //return empty array;
+    }
+    
+    NSMutableArray *refCoArray = [[NSMutableArray alloc] init];
+    
+    if([[dictionary objectForKey:kReferredCoNil] isEqual:@(1)]) [refCoArray addObject:@"NIL"];
+    if([[dictionary objectForKey:kReferredCoDep] isEqual:@(1)]) [refCoArray addObject:@"Depression / emotional support"];
+    if([[dictionary objectForKey:kReferredCoBefriend] isEqual:@(1)]) [refCoArray addObject:@"Befriending"];
+    if([[dictionary objectForKey:kReferredCoAdls] isEqual:@(1)]) [refCoArray addObject:@"Support with ADLs"];
+    
+    return refCoArray;
+}
+
+- (void) postReferralFscWithOptionName:(NSString *) option andValue: (NSString *) value {
+    NSString *fieldName;
+    
+    if ([option containsString:@"NIL"]) fieldName = kReferredFscNil;
+    else if ([option containsString:@"Depression"]) fieldName = kReferredFscDep;
+    else if ([option containsString:@"Information"]) fieldName = kReferredFscRef;
+    else if ([option containsString:@"Case"]) fieldName = kReferredFscCase;
+    
+    [self postSingleFieldWithSection:SECTION_SW_REFERRALS andFieldName:fieldName andNewContent:value];
+}
+
+- (NSArray *) getReferralFscArray: (NSDictionary *) dictionary {
+    if (dictionary == (id)[NSNull null] || dictionary == nil) {
+        return @[]; //return empty array;
+    }
+    
+    NSMutableArray *refFscArray = [[NSMutableArray alloc] init];
+    
+    if([[dictionary objectForKey:kReferredFscNil] isEqual:@(1)]) [refFscArray addObject:@"NIL"];
+    if([[dictionary objectForKey:kReferredFscDep] isEqual:@(1)]) [refFscArray addObject:@"Depression / emotional support"];
+    if([[dictionary objectForKey:kReferredFscRef] isEqual:@(1)]) [refFscArray addObject:@"Information & referral"];
+    if([[dictionary objectForKey:kReferredFscCase] isEqual:@(1)]) [refFscArray addObject:@"Case management"];
+    
+    return refFscArray;
+}
+
+
 
 #pragma mark - UIFont methods
 - (void) setDefaultFontWithRow: (XLFormRowDescriptor *) row {

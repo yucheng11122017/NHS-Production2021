@@ -47,7 +47,7 @@
     [self updateInterfaceWithReachability:self.hostReachability];
     
     
-    self.navigationItem.title = @"3c. Cancer Screening Eligibility Assessment";
+    self.navigationItem.title = @"3d. Basic Geriatric";
     _rowLabelsText= [[NSArray alloc] initWithObjects:@"Fall Risk Assessment (Basic)",
                      @"Dementia Assessment (Basic)",
                      nil];
@@ -190,16 +190,16 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckDiet, kCheckExercise];
-    
+    NSArray *lookupTable = @[kCheckFallRiskEligible, kCheckGeriatricDementiaEligible];
+
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {
-            
+
             NSString *key = lookupTable[i];
-            
+
             NSNumber *doneNum = [checksDict objectForKey:key];
             [_completionCheck addObject:doneNum];
-            
+
         }
     }
 }

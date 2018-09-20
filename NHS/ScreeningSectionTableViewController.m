@@ -14,6 +14,7 @@
 #import "Reachability.h"
 #import "ScreeningDictionary.h"
 #import "KAStatusBar.h"
+#import "ResidentProfile.h"
 
 #define DISABLE_SERVER_DATA_FETCH
 
@@ -75,7 +76,7 @@ typedef enum sectionRowNumber {
     
     self.navigationItem.hidesBackButton = YES;      //using back bar button is complicated...
     
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Logout" style:UIBarButtonItemStylePlain target:self action:@selector(backBtnPressed:)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Exit Profile" style:UIBarButtonItemStylePlain target:self action:@selector(backBtnPressed:)];
     self.navigationItem.leftBarButtonItem.tintColor = [UIColor redColor];
     
     if (alreadySubmitted) {
@@ -100,7 +101,7 @@ typedef enum sectionRowNumber {
     
     _residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId]; //need this for fetching data
 
-    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0, nil];
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0, nil];
     
     @synchronized (self) {
         [self updateCellAccessory];
@@ -134,7 +135,7 @@ typedef enum sectionRowNumber {
 #endif
     
     //2018
-    self.rowTitles = @[@"1. Triage", @"2. Phlebotomy", @"3. Profiling", @"4. Basic Vision", @"5. Advanced Geriatric (U/C)", @"6. Dental (U/C)", @"7. Hearing (U/C)", @"8. Advanced Vision", @"9. Doctor's Consultation", @"10. Additional Services", @"11. Social Work", @"Summary & Health Education (U/C)"];
+    self.rowTitles = @[@"1. Triage", @"2. Phlebotomy (no need to fill)", @"3. Profiling", @"4. Basic Vision", @"5. Advanced Geriatric", @"6. Dental", @"7. Hearing", @"8. Advanced Vision", @"9. Doctor's Consultation", @"10. Additional Services", @"11. Social Work", @"Summary & Health Education"];
     
     //2017
 //    self.rowTitles = @[@"Phlebotomy", @"Mode of Screening",@"Profiling", @"Geriatric Depression Assessment", @"Social Work", @"Triage", @"4. Basic Vision", @"Additional Services", @"Doctor's Consultation", @"6. Dental", @"8. Advanced Vision", @"5. Advanced Geriatric", @"Geriatric Dementia Asssesment", @"Health Education"];
@@ -176,6 +177,8 @@ typedef enum sectionRowNumber {
     static NSString *buttonTableIdentifier = @"SimpleTableButton";
     UITableViewCell *cell;
     
+    NSDictionary *modeOfScreeningDict = [_fullScreeningForm objectForKey:SECTION_MODE_OF_SCREENING];
+    
     if (indexPath.section == 0) {   //for the questionaires
          cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
         if (cell == nil) {
@@ -203,10 +206,66 @@ typedef enum sectionRowNumber {
             [cell.textLabel setTextColor:[UIColor blackColor]];
         }
         
-        if ([cell.textLabel.text containsString:@"U/C"]) {
-            cell.userInteractionEnabled = NO;
-            [cell.textLabel setTextColor:[UIColor grayColor]];
-            return cell;
+        
+        if (indexPath.row == Hearing) {
+            if (modeOfScreeningDict != (id)[NSNull null]) {
+                NSString *screenMode = [modeOfScreeningDict objectForKey:kScreenMode];
+                if (screenMode != (id)[NSNull null] && [screenMode containsString:@"Door"]) {
+                    cell.userInteractionEnabled = NO;
+                    [cell.textLabel setTextColor:[UIColor grayColor]];
+                }
+            }
+            else if (![[ResidentProfile sharedManager] isEligibleHearing]) {
+                cell.userInteractionEnabled = NO;
+                [cell.textLabel setTextColor:[UIColor grayColor]];
+                return cell;
+            }
+        } else if (indexPath.row == Dental) {
+            if (modeOfScreeningDict != (id)[NSNull null]) {
+                NSString *screenMode = [modeOfScreeningDict objectForKey:kScreenMode];
+                if (screenMode != (id)[NSNull null] && [screenMode containsString:@"Door"]) {
+                    cell.userInteractionEnabled = NO;
+                    [cell.textLabel setTextColor:[UIColor grayColor]];
+                }
+            }
+            
+        }
+        else if (indexPath.row == Phlebotomy) {
+//            if (![[ResidentProfile sharedManager] isEligiblePhleb]) {
+                cell.userInteractionEnabled = NO;
+                [cell.textLabel setTextColor:[UIColor grayColor]];
+                return cell;
+//            }
+        }else if (indexPath.row == AdvancedVision) {
+            if (modeOfScreeningDict != (id)[NSNull null]) {
+                NSString *screenMode = [modeOfScreeningDict objectForKey:kScreenMode];
+                if (screenMode != (id)[NSNull null] && [screenMode containsString:@"Door"]) {
+                    cell.userInteractionEnabled = NO;
+                    [cell.textLabel setTextColor:[UIColor grayColor]];
+                }
+                return cell;
+            }
+            else if (![[ResidentProfile sharedManager] isEligibleAdvancedVision]) {
+                cell.userInteractionEnabled = NO;
+                [cell.textLabel setTextColor:[UIColor grayColor]];
+                return cell;
+            }
+        } else if(indexPath.row == SocialWork) {
+            if (![[ResidentProfile sharedManager] isEligibleSocialWork]) {
+                cell.userInteractionEnabled = NO;
+                [cell.textLabel setTextColor:[UIColor grayColor]];
+                return cell;
+            }
+        }
+        else if (indexPath.row == AdditionalServices) {
+            if (![[ResidentProfile sharedManager] isEligibleCHAS] &&
+                ![[ResidentProfile sharedManager] isEligibleReceiveFIT] &&
+                ![[ResidentProfile sharedManager] isEligibleReferMammo] &&
+                ![[ResidentProfile sharedManager] isEligibleReferPapSmear]) {
+                cell.userInteractionEnabled = NO;
+                [cell.textLabel setTextColor:[UIColor grayColor]];
+            }
+            
         }
         
 //        if (indexPath.row == GeriatricDepressionAssess) {   //Geriatric Depression Assessment (Age < 65)
@@ -321,6 +380,9 @@ typedef enum sectionRowNumber {
             selectedRow = [NSNumber numberWithInteger:AdditionalServices];
         } else if (indexPath.row == AdvancedVision) {
             [self performSegueWithIdentifier:@"screeningSectionToSeriSubsectionSegue" sender:self];
+            return;
+        } else if (indexPath.row == AdvancedGeriatric) {
+            [self performSegueWithIdentifier:@"screeningSectionToAdvGeriatricsSectionSegue" sender:self];
             return;
         } else if (indexPath.row == DoctorsConsultation) {
             selectedRow = [NSNumber numberWithInteger:DoctorsConsultation];
@@ -516,24 +578,116 @@ typedef enum sectionRowNumber {
 
 - (void) updateCellAccessory {
     
+    
     if ([_completionCheck count] < 1) {
-        _completionCheck = [[NSMutableArray alloc] init];
+        _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0, nil];
     } else {
         [_completionCheck removeAllObjects];
     }
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
+    NSDictionary *modeOfScreeningDict = [_fullScreeningForm objectForKey:SECTION_MODE_OF_SCREENING];
     
-    NSArray *lookupTable = @[kCheckPhleb, kCheckScreenMode, @"profiling_overall",kCheckSwDepress,@"check_social_work", kCheckTriage, kCheckSnellen, kCheckAdd, kCheckDocConsult, kCheckDental, @"check_overall_seri", kCheckFall,kCheckDementia, kCheckEd];
+    NSArray *lookupTable = @[kCheckClinicalResults, kCheckPhleb, @"check_overall_profiling", kCheckSnellenTest, @"check_overall_adv_geriatric", kCheckBasicDental, kCheckHearing, @"check_overall_adv_vision", kCheckDocConsult, kCheckAddServices,@"check_overall_sw", kCheckEd];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
+        
         for (int i=0; i<[lookupTable count]; i++) {
             
             if (i == Profiling) {
                 [_completionCheck addObject:[self checkAllProfilingSections:checksDict]];
+            } else if (i == Phlebotomy) {
+//                if (![[ResidentProfile sharedManager] isEligiblePhleb]) {  //not eligible
+                    [_completionCheck addObject:@1];    //always completed
+//                }
+//                else {
+//                    NSString *key = lookupTable[i];
+                    
+//                    NSNumber *doneNum = [checksDict objectForKey:key];
+//                    [_completionCheck addObject:doneNum];
+//                }
+            }
+            else if (i == AdvancedGeriatric) {
+                if (![[ResidentProfile sharedManager] isEligibleAdvFallRisk]) {  //not eligible
+                    [_completionCheck addObject:@1];
+                }
+                else {
+                    //check all advanced geriatric
+                    [_completionCheck addObject:[self checkAllAdvGeriatricSections:checksDict]];
+                }
+            }
+            else if (i == Dental) {
+                if (modeOfScreeningDict != (id)[NSNull null]) {
+                    NSString *screenMode = [modeOfScreeningDict objectForKey:kScreenMode];
+                    if (screenMode != (id)[NSNull null] && [screenMode containsString:@"Door"]) {
+                        [_completionCheck addObject:@1];    // considered as completed
+                        continue;
+                    }
+                }
+                NSString *key = lookupTable[i];
+                
+                NSNumber *doneNum = [checksDict objectForKey:key];
+                [_completionCheck addObject:doneNum];
+            }
+            else if (i == Hearing) {
+                if (modeOfScreeningDict != (id)[NSNull null]) {
+                    NSString *screenMode = [modeOfScreeningDict objectForKey:kScreenMode];
+                    if (screenMode != (id)[NSNull null] && [screenMode containsString:@"Door"]) {
+                        [_completionCheck addObject:@1];    // considered as completed
+                        continue;
+                    }
+                }
+                
+                if (![[ResidentProfile sharedManager] isEligibleHearing]) {
+                    [_completionCheck addObject:@1];
+                } else {
+                    NSString *key = lookupTable[i];
+                    
+                    NSNumber *doneNum = [checksDict objectForKey:key];
+                    [_completionCheck addObject:doneNum];
+                }
+            }
+            else if (i == AdvancedVision) {
+                if (modeOfScreeningDict != (id)[NSNull null]) {
+                    NSString *screenMode = [modeOfScreeningDict objectForKey:kScreenMode];
+                    if (screenMode != (id)[NSNull null] && [screenMode containsString:@"Door"]) {
+                        [_completionCheck addObject:@1];    // considered as completed
+                        continue;
+                    }
+                }
+                
+                if (![[ResidentProfile sharedManager] isEligibleAdvancedVision]) {  //not eligible
+                    [_completionCheck addObject:@1];
+                } else {
+                    //check all advanced vision
+                    [_completionCheck addObject:[self checkAllSeriSections:checksDict]];
+                }
             }
             else if (i == SocialWork) {
-                [_completionCheck addObject:[self checkAllSocialWorkSections:checksDict]];
-            } else {
+                if (![[ResidentProfile sharedManager] isEligibleSocialWork]) {  //not eligible
+                    [_completionCheck addObject:@1];
+                } else {
+                    [_completionCheck addObject:[self checkAllSocialWorkSections:checksDict]];
+                }
+            }
+            else if (i == AdditionalServices) {
+                if (![[ResidentProfile sharedManager] isEligibleCHAS] &&    //if all also not eligible, considered as finished already!
+                    ![[ResidentProfile sharedManager] isEligibleReceiveFIT] &&
+                    ![[ResidentProfile sharedManager] isEligibleReferMammo] &&
+                    ![[ResidentProfile sharedManager] isEligibleReferPapSmear]) {
+                    [_completionCheck addObject:@1];
+                } else {
+                    NSString *key = lookupTable[i];
+                    
+                    NSNumber *doneNum = [checksDict objectForKey:key];
+                    [_completionCheck addObject:doneNum];
+                }
+            }
+            
+            
+            else if (i == Summary_HealthEducation) {
+                [_completionCheck addObject:@0];    //Summary don't need checklist
+            }
+            else {
                 NSString *key = lookupTable[i];
                 
                 NSNumber *doneNum = [checksDict objectForKey:key];
@@ -546,22 +700,25 @@ typedef enum sectionRowNumber {
 }
 
 - (void) checkReadyToSubmit {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
     NSMutableArray *arr = [_completionCheck mutableCopy];   //don't modify the original array!
     
+    if ([arr count] == 0) { //still no checks at all
+        readyToSubmit = false;
+        return;
+    }
+//    NSDictionary *modeOfScreeningDict = [_fullScreeningForm objectForKey:SECTION_MODE_OF_SCREENING];
+//    if (modeOfScreeningDict != (id)[NSNull null]) {
+//        NSString *screenMode = [modeOfScreeningDict objectForKey:kScreenMode];
+//        if (screenMode != (id)[NSNull null] && [screenMode containsString:@"Door"]) {
+//            // These are all optional for Door-to-Door
+//            [arr removeObjectAtIndex:Hearing];
+//            [arr removeObjectAtIndex:Dental];
+//            [arr removeObjectAtIndex:AdvancedGeriatric];
+//        }
+//    }
+    
     if ([_fullScreeningForm objectForKey:SECTION_CHECKS] != (id) [NSNull null]) {
-        if (![[defaults objectForKey:kQualifyDementia] isEqual:@"1"]) { //don't consider Dementia
-            [arr removeObjectAtIndex:12];
-        }
-        
-        if (![[defaults objectForKey:kQualifyFallAssess] isEqual:@"1"]) { //don't consider Fall Assess
-            [arr removeObjectAtIndex:11];
-        }
-        
-        if (![[defaults objectForKey:kQualifySeri] isEqual:@"1"]) { //don't consider SERI
-            [arr removeObjectAtIndex:10];
-        }
         
         int count =0;
         
@@ -570,7 +727,7 @@ typedef enum sectionRowNumber {
             if ([value isEqual:@1]) count++;
         }
         
-        if (count == [arr count])  readyToSubmit = true;
+        if (count == ([arr count]-1))  readyToSubmit = true;    //because summary & health edu can never be complete
         else readyToSubmit = false;
     } else {
         readyToSubmit = false;
@@ -582,17 +739,32 @@ typedef enum sectionRowNumber {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSInteger residentAge = [[defaults objectForKey:kResidentAge] integerValue];
     
+    if ([[ResidentProfile sharedManager] profilingDone]) return @1;
+    else return @0;
+//    for (NSString *key in [checksDict allKeys]) {   //check through all 5 sub-sections
+//        if ([key isEqualToString:kCheckDiabetes] || [key isEqualToString:kCheckHypertension] || [key isEqualToString:kCheckHyperlipidemia] || [key isEqualToString:kCheckProfiling] || [key isEqualToString:kCheckRiskStratification]) {
+//            if ([[checksDict objectForKey:key] isEqual:@1])
+//                count++;
+//        }
+//    }
+//    if (count == 5) return @1;
+//    else if (count == 4 && residentAge < 65) return @1;    //age less than 65 not qualified for Depression
+//    else return @0;
+}
+
+- (NSNumber *) checkAllAdvGeriatricSections:(NSDictionary *) checksDict {
+    int count=0;
     
     for (NSString *key in [checksDict allKeys]) {   //check through all 5 sub-sections
-        if ([key isEqualToString:kCheckDiabetes] || [key isEqualToString:kCheckHypertension] || [key isEqualToString:kCheckHyperlipidemia] || [key isEqualToString:kCheckProfiling] || [key isEqualToString:kCheckRiskStratification]) {
+        if ([key isEqualToString:kCheckAdvFallRiskAssmt] || [key isEqualToString:kCheckGeriatricDementiaAssmt]) {
             if ([[checksDict objectForKey:key] isEqual:@1])
                 count++;
         }
     }
-    if (count == 5) return @1;
-    else if (count == 4 && residentAge < 65) return @1;    //age less than 65 not qualified for Depression
+    if (count == 2) return @1;
     else return @0;
 }
+
 
 
 - (NSNumber *) checkAllSeriSections:(NSDictionary *) checksDict {
@@ -612,15 +784,20 @@ typedef enum sectionRowNumber {
 - (NSNumber *) checkAllSocialWorkSections:(NSDictionary *) checksDict {
     int count=0;
     for (NSString *key in [checksDict allKeys]) {   //check through all 7 sub-sections
-        if ([key isEqualToString:kCheckSocioEco] || [key isEqualToString:kCheckCurrentPhyStatus] || [key isEqualToString:kCheckSocialSupport] || [key isEqualToString:kCheckPsychWellbeing] || [key isEqualToString:kCheckSwAddServices] || [key isEqualToString:kCheckSocWorkSummary]) {    //removed genogram for the overall checklist
+        if ([key isEqualToString:kCheckSwAdvAssmt] || [key isEqualToString:kCheckSwDepression] || [key isEqualToString:kCheckSwReferrals]) {
             if ([[checksDict objectForKey:key] isEqual:@1])
                 count++;
-            else
-                return @0;
-        } 
+        }
     }
-    if (count == 6) return @1;  //changed to 6. Removed genogram
-    else return @0;
+    if (count == 3) {
+        return @1;
+    }
+    else if (count == 2) {  //all other two are finalized, except Depression
+        if (![[ResidentProfile sharedManager] isEligiblePHQ9]) {
+            return @1;
+        }
+    }
+    return @0;
 }
 #pragma mark - Navigation
 

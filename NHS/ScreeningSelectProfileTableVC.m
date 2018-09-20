@@ -33,9 +33,11 @@ typedef enum getDataState {
 
 @property (strong, nonatomic) NSArray *yearlyProfile;
 @property (strong, nonatomic) NSDictionary *residentParticulars;
+@property (strong, nonatomic) NSDictionary *phlebEligibDict;
+@property (strong, nonatomic) NSDictionary *modeOfScreeningDict;
 @property (strong, nonatomic) NSNumber *residentID;
 //@property (strong, nonatomic) NSString *reportFilePath;
-@property (strong, nonatomic) UIButton *reportButton;
+//@property (strong, nonatomic) UIButton *reportButton;
 
 @end
 
@@ -44,7 +46,7 @@ typedef enum getDataState {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    enableReportButton = false;
+//    enableReportButton = false;
     self.navigationItem.title = @"Integrated Profile";
     _yearlyProfile = [[NSArray alloc] initWithObjects:@"2017",@"2018",@"2019", nil];
     
@@ -53,7 +55,18 @@ typedef enum getDataState {
     
     [self.tableView reloadData];
     
-    _residentParticulars = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"resi_particulars"]];;
+    _residentParticulars = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"resi_particulars"]];
+    
+    if ([_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"] == (id)[NSNull null]) { //present crashes
+        _phlebEligibDict = @{};
+    } else
+        _phlebEligibDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"]];
+    
+    if ([_residentDetails objectForKey:@"mode_of_screening"] == (id)[NSNull null]) {    //present crashes
+        _modeOfScreeningDict = @{};
+    } else
+        _modeOfScreeningDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mode_of_screening"]];
+    
     _residentID = _residentParticulars[kResidentId];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshTable:) name:@"enableProfileEntry" object:nil];
@@ -153,7 +166,7 @@ typedef enum getDataState {
             if (serialNum != (id) [NSNull null]) {
                 if ([serialNum isKindOfClass:[NSNumber class]]) {  //as long as have value
 
-                    enableReportButton = true;
+//                    enableReportButton = true;
                     // NO EXTRA BUTTON FOR NOW
 //                    if (!_reportButton) {
 //                        CGRect cellSize = cell.layer.frame;
@@ -209,21 +222,29 @@ typedef enum getDataState {
                                                                               message:@""
                                                                        preferredStyle:UIAlertControllerStyleAlert];
     
+#warning Check if consent form already exist
+    
+    UIAlertAction *consentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Submit Consent Form", nil)
+                                                         style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * action) {
+                                                           [self performSegueWithIdentifier:@"ProfileToConsentFormSegue" sender:self];
+                                                       }];
+    
      UIAlertAction *formAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Screening Form", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
                                                           [self performSegueWithIdentifier:@"LoadScreeningFormSegue" sender:self];
                                                       }];
     
-    UIAlertAction *reportAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Post Screening Follow-up", nil)
+    UIAlertAction *reportAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"NHS Health Report", nil)
                                                      style:UIAlertActionStyleDefault
                                                    handler:^(UIAlertAction * _Nonnull action) {
 //                                                       [self downloadReport:nil];
                                                        [self performSegueWithIdentifier:@"ProfileToFollowUpSegue" sender:self];
                                                    }];
     
-    reportAction.enabled = enableReportButton;
-    
+//    reportAction.enabled = enableReportButton;
+    [alertController addAction:consentFormAction];
     [alertController addAction:formAction];
     [alertController addAction:reportAction];
     
@@ -241,6 +262,30 @@ typedef enum getDataState {
     
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+//
+//#pragma mark - Report Btn API
+//- (void) downloadReport: (UIButton *) sender {
+//    _reportFilePath = nil;  //don't keep the previously saved PDF file.
+//    NSUserDefaults *defaults =  [NSUserDefaults standardUserDefaults];
+//    [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
+//    [SVProgressHUD show];
+//    [[ServerComm sharedServerCommInstance] retrievePdfReportForResident:[defaults objectForKey:kResidentId]];
+//}
+//
+//- (void) reportExist: (NSNotification *) notification {
+//    NSArray *keys = [notification.userInfo allKeys];
+//    if ([keys containsObject:@"status"]) {
+//        [SVProgressHUD setMinimumDismissTimeInterval:1.0];
+//        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
+//        [SVProgressHUD showErrorWithStatus:@"Report could not be downloaded!"];
+//        return;
+//    }
+//
+//    _reportFilePath = [[ServerComm sharedServerCommInstance] getretrievedReportFilepath];
+//    [self performSegueWithIdentifier:@"ProfileToWebViewSegue" sender:self];
+//}
+
+
 
 #pragma mark - Server API
 - (void) processConnectionStatus {
@@ -277,6 +322,8 @@ typedef enum getDataState {
 - (void) reloadTable: (NSNotification *) notification {
     _residentDetails = [[ScreeningDictionary sharedInstance] dictionary];
     _residentParticulars = [_residentDetails objectForKey:@"resi_particulars"];
+    _phlebEligibDict = [_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"];
+    _modeOfScreeningDict = [_residentDetails objectForKey:@"mode_of_screening"];
     [self.tableView reloadData];    //put in the ticks
     [SVProgressHUD dismiss];
 }
@@ -291,6 +338,19 @@ typedef enum getDataState {
         [segue.destinationViewController performSelector:@selector(setResidentParticularsDict:)
                                               withObject:_residentParticulars];
     }
+    if ([segue.destinationViewController respondsToSelector:@selector(setPhlebEligibDict:)]) {
+        [segue.destinationViewController performSelector:@selector(setPhlebEligibDict:)
+                                              withObject:_phlebEligibDict];
+    }
+    if ([segue.destinationViewController respondsToSelector:@selector(setModeOfScreeningDict:)]) {
+        [segue.destinationViewController performSelector:@selector(setModeOfScreeningDict:)
+                                              withObject:_modeOfScreeningDict];
+    }
+//    if ([segue.destinationViewController respondsToSelector:@selector(setReportFilepath:)]) {
+//        [segue.destinationViewController performSelector:@selector(setReportFilepath:)
+//                                              withObject:_reportFilePath];
+//    }
+
     
 }
 

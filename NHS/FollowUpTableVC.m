@@ -10,9 +10,9 @@
 #import "AppConstants.h"
 #import "SVProgressHUD.h"
 #import "ServerComm.h"
-#import "ReportViewController.h"
 #import "Reachability.h"
 #import "ScreeningDictionary.h"
+#import "PdfReportViewController.h"
 
 #define PDFREPORT_LOADED_NOTIF @"Pdf report downloaded"
 
@@ -84,7 +84,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     
-    return 3;
+    return 1;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

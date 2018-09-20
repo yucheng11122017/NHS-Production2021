@@ -1,0 +1,46 @@
+//
+//  ResidentProfile.h
+//  NHS
+//
+//  Created by Nicholas Wong on 9/6/18.
+//  Copyright © 2018 NUS. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface ResidentProfile : NSObject
+
+
+@property (strong, nonatomic) NSDictionary *fullDict;
+@property BOOL profilingDone;
+
++(id) sharedManager;
+- (void) updateProfile: (NSDictionary *) fullDict;
+
+- (BOOL) isEligiblePhleb;
+- (BOOL) isEligibleFallRisk;
+- (BOOL) isEligibleAdvFallRisk;
+- (BOOL) isEligibleGeriatricDementiaAssmt;
+- (BOOL) isEligibleHearing;
+- (BOOL) isEligibleSmf;
+- (BOOL) isEligibleAdvancedVision;
+- (BOOL) isEligibleCHAS;
+- (BOOL) isEligibleReceiveFIT;
+- (BOOL) isEligibleReferMammo;
+- (BOOL) isEligibleReferPapSmear;
+- (BOOL) isEligibleSocialWork;
+- (BOOL) isEligiblePHQ9;
+- (BOOL) diabetesCheck;
+- (BOOL) hyperlipidemiaCheck;
+- (BOOL) hypertensionCheck;
+- (BOOL) cardiovascularDiseaseCheck;
+- (BOOL) dentalCheck;
+- (BOOL) alcoholCheck;
+- (BOOL) smokingCheck;
+- (BOOL) hasIncome;
+- (BOOL) canReceiveSpecVoucher;
+- (BOOL) isFemale;
+
+
+
+@end

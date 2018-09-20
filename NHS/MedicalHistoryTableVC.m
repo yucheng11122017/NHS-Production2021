@@ -197,7 +197,7 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckDiabetes, kCheckHyperlipidemia, kCheckHypertension];
+    NSArray *lookupTable = @[kCheckDiabetes, kCheckHyperlipidemia, kCheckHypertension, kCheckMedicalHistory, kCheckSurgery, kCheckHealthcareBarriers, kCheckFamHist, kCheckRiskStratification];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {

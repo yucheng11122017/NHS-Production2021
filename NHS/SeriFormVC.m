@@ -15,7 +15,7 @@
 #import "Reachability.h"
 #import "ScreeningDictionary.h"
 #import "KAStatusBar.h"
-
+#import "ResidentProfile.h"
 
 
 typedef enum formName {
@@ -49,6 +49,7 @@ typedef enum formName {
     
     XLFormViewController *form;
     _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
+    
     
     _pushPopTaskArray = [[NSMutableArray alloc] init];
 //    snellenIndexOptions = [[NSArray alloc] initWithObjects:@"6/3.8", @"6/3.8-1", @"6/3.8-2", @"6/5+2", @"6/5+1", @"6/5", @"6/5-1", @"6/5-2", @"6/6+2", @"6/6+1", @"6/6", @"6/6-1", @"6/6-2", @"6/7.5+2", @"6/7.5+1", @"6/7.5", @"6/7.5-1", @"6/7.5-2", @"6/9+2", @"6/9+1", @"6/9", @"6/9-1", @"6/9-2", @"6/12+2", @"6/12+1", @"6/12", @"6/12-1", @"6/12-2", @"6/15+2", @"6/15+1", @"6/15", @"6/15-1", @"6/15-2", @"6/18+2", @"6/18+1", @"6/18", @"6/18-1", @"6/18-2", @"6/24+2", @"6/24+1", @"6/24", @"6/24-1", @"6/24-2", @"6/30+2", @"6/30+1", @"6/30", @"6/30-1", @"6/30-2", @"6/36+2", @"6/36+1", @"6/36", @"6/36-1", @"6/36-2", @"6/48+2", @"6/48+1", @"6/48", @"6/48-1", @"6/48-2", @"6/60+2", @"6/60+1", @"6/60", @"6/120", nil];
@@ -85,6 +86,7 @@ typedef enum formName {
     }
     
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
+    [self.form setAddAsteriskToRequiredRowsTitle:YES];
     
     if (isFormFinalized) {
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStyleDone target:self action:@selector(editBtnPressed:)];
@@ -139,10 +141,13 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kUndergoneAdvSeri rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone Advanced SERI?"];
     [self setDefaultFontWithRow:row];
-    row.required = YES;
+//    row.required = YES;
     row.selectorOptions = @[@"Yes", @"No"];
-    [section addFormRow:row];
     
+    if (medHistoryDict != (id)[NSNull null] &&  [medHistoryDict objectForKey:kUndergoneAdvSeri] != (id)[NSNull null])
+        row.value = [self getYesNoFromOneZero:medHistoryDict[kUndergoneAdvSeri]];
+    
+    [section addFormRow:row];
     
     rowInfo = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1" rowType:XLFormRowDescriptorTypeInfo title:@"Chief Complaint"];
     [self setDefaultFontWithRow:rowInfo];
@@ -219,40 +224,42 @@ typedef enum formName {
     }
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kVaDone rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Done?"];
-    row.required = YES;
-    row.selectorOptions = @[@"Done", @"Not Done", @"Refused"];
-    [self setDefaultFontWithRow:row];
+    XLFormRowDescriptor *vaDoneRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVaDone rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Done?"];
+//    vaDoneRow.required = YES;
+    vaDoneRow.selectorOptions = @[@"Done", @"Not Done", @"Refused"];
+    [self setDefaultFontWithRow:vaDoneRow];
     
     //value
     if (vaDict != (id)[NSNull null] && [vaDict objectForKey:kVaDone] != (id)[NSNull null])
-        row.value = vaDict[kVaDone];
+        vaDoneRow.value = vaDict[kVaDone];
     
-    [section addFormRow:row];
+    [section addFormRow:vaDoneRow];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kVa rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Presenting VA"];
-    row.required = YES;
-    row.selectorOptions = @[@"With glasses", @"Without Glasses"];
-    [self setDefaultFontWithRow:row];
+    XLFormRowDescriptor *vaRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVa rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Presenting VA"];
+//    vaRow.required = YES;
+    vaRow.selectorOptions = @[@"With glasses", @"Without Glasses"];
+    [self setDefaultFontWithRow:vaRow];
     
     if (vaDict != (id)[NSNull null] && [vaDict objectForKey:kVa] != (id)[NSNull null])
-        row.value = vaDict[kVa];
+        vaRow.value = vaDict[kVa];
     
-    [section addFormRow:row];
+    [section addFormRow:vaRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kVaSnellenOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA Snellen OD: 6/"];
-    row.required = YES;
-    [self setDefaultFontWithRow:row];
+    XLFormRowDescriptor *vaSnellenOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVaSnellenOd rowType:XLFormRowDescriptorTypeText title:@"Presenting VA Snellen OD:"];
+    [vaSnellenOdRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+//    vaSnellenOdRow.required = YES;
+    [self setDefaultFontWithRow:vaSnellenOdRow];
     
     if (vaDict != (id)[NSNull null] && [vaDict objectForKey:kVaSnellenOd] != (id)[NSNull null])
-        row.value = [vaDict objectForKey:kVaSnellenOd];
+        vaSnellenOdRow.value = [vaDict objectForKey:kVaSnellenOd];
     
-    [section addFormRow:row];
+    [section addFormRow:vaSnellenOdRow];
     
-    vaLogmarOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVaLogmarOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA LogMAR OD:"];
+    vaLogmarOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVaLogmarOd rowType:XLFormRowDescriptorTypeText title:@"Presenting VA LogMAR OD:"];
+    [vaLogmarOdRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:vaLogmarOdRow];
     
     if (vaDict != (id)[NSNull null] && [vaDict objectForKey:kVaLogmarOd] != (id)[NSNull null])
@@ -260,18 +267,19 @@ typedef enum formName {
     
     [section addFormRow:vaLogmarOdRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kVaSnellenOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA Snellen OS: 6/"];
-    row.required = YES;
-    [self setDefaultFontWithRow:row];
+    XLFormRowDescriptor *vaSnellenOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVaSnellenOs rowType:XLFormRowDescriptorTypeText title:@"Presenting VA Snellen OS:"];
+    [vaSnellenOsRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+//    vaSnellenOsRow.required = YES;
+    [self setDefaultFontWithRow:vaSnellenOsRow];
     
     //value
     if (vaDict != (id)[NSNull null] && [vaDict objectForKey:kVaSnellenOs] != (id)[NSNull null])
-        row.value = [vaDict objectForKey:kVaSnellenOs];
+        vaSnellenOsRow.value = [vaDict objectForKey:kVaSnellenOs];
     
+    [section addFormRow:vaSnellenOsRow];
     
-    [section addFormRow:row];
-    
-    vaLogmarOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVaLogmarOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting VA LogMAR OS: +/-"];
+    vaLogmarOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kVaLogmarOs rowType:XLFormRowDescriptorTypeText title:@"Presenting VA LogMAR OS:"];
+    [vaLogmarOsRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:vaLogmarOsRow];
     
     //value
@@ -280,17 +288,19 @@ typedef enum formName {
     
     [section addFormRow:vaLogmarOsRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPinSnellenOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole Snellen OD: 6/"];
-    row.required = YES;
-    [self setDefaultFontWithRow:row];
+    XLFormRowDescriptor *pinSnellenOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPinSnellenOd rowType:XLFormRowDescriptorTypeText title:@"Presenting Pinhole Snellen OD:"];
+    [pinSnellenOdRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+//    pinSnellenOdRow.required = YES;
+    [self setDefaultFontWithRow:pinSnellenOdRow];
     
     //value
     if (vaDict != (id)[NSNull null] && [vaDict objectForKey:kPinSnellenOd] != (id)[NSNull null])
-        row.value = [vaDict objectForKey:kPinSnellenOd];
+        pinSnellenOdRow.value = [vaDict objectForKey:kPinSnellenOd];
     
-    [section addFormRow:row];
+    [section addFormRow:pinSnellenOdRow];
     
-    pinholeLogmarOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPinLogmarOd rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole LogMAR OD: +/-"];
+    pinholeLogmarOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPinLogmarOd rowType:XLFormRowDescriptorTypeText title:@"Presenting Pinhole LogMAR OD:"];
+    [pinholeLogmarOdRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:pinholeLogmarOdRow];
     
     //value
@@ -299,17 +309,19 @@ typedef enum formName {
     
     [section addFormRow:pinholeLogmarOdRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPinSnellenOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole Snellen OS: 6/"];
-    row.required = YES;
-    [self setDefaultFontWithRow:row];
+    XLFormRowDescriptor *pinSnellenOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPinSnellenOs rowType:XLFormRowDescriptorTypeText title:@"Presenting Pinhole Snellen OS:"];
+    [pinSnellenOsRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+//    pinSnellenOsRow.required = YES;
+    [self setDefaultFontWithRow:pinSnellenOsRow];
     
     //value
     if (vaDict != (id)[NSNull null] && [vaDict objectForKey:kPinSnellenOs] != (id)[NSNull null])
-        row.value = [vaDict objectForKey:kPinSnellenOs];
+        pinSnellenOsRow.value = [vaDict objectForKey:kPinSnellenOs];
     
-    [section addFormRow:row];
+    [section addFormRow:pinSnellenOsRow];
     
-    pinholeLogmarOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPinLogmarOs rowType:XLFormRowDescriptorTypeNumber title:@"Presenting Pinhole LogMAR OS: +/-"];
+    pinholeLogmarOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPinLogmarOs rowType:XLFormRowDescriptorTypeText title:@"Presenting Pinhole LogMAR OS:"];
+    [pinholeLogmarOsRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:pinholeLogmarOsRow];
     
     //value
@@ -318,7 +330,9 @@ typedef enum formName {
     
     [section addFormRow:pinholeLogmarOsRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearLogmarOd rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity LogMAR OD: +/-"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearLogmarOd rowType:XLFormRowDescriptorTypeText title:@"Near Visual Acuity LogMAR OD:"];
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     
     //value
@@ -327,7 +341,8 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearNxOd rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity Nx OD: +/-"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearNxOd rowType:XLFormRowDescriptorTypeText title:@"Near Visual Acuity Nx OD:"];
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:row];
     
     //value
@@ -336,7 +351,8 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearLogmarOs rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity LogMAR OS: +/-"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearLogmarOs rowType:XLFormRowDescriptorTypeText title:@"Near Visual Acuity LogMAR OS:"];
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:row];
     
     //value
@@ -345,7 +361,8 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearNxOs rowType:XLFormRowDescriptorTypeNumber title:@"Near Visual Acuity Nx OS: +/-"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNearNxOs rowType:XLFormRowDescriptorTypeText title:@"Near Visual Acuity Nx OS:"];
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:row];
     
     //value
@@ -367,6 +384,24 @@ typedef enum formName {
         row.value = vaDict[kVaComments];
     
     [section addFormRow:row];
+    
+//    vaDoneRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//        if (newValue != oldValue) {
+//            if ([newValue isEqualToString:@"Not Done"] || [newValue isEqualToString:@"Refused"]) {
+//                vaRow.required = NO;
+//                pinSnellenOdRow.required = NO;
+//                pinSnellenOsRow.required = NO;
+//                vaSnellenOdRow.required = NO;
+//                vaSnellenOsRow.required = NO;
+//            } else {
+//                vaRow.required = YES;
+//                pinSnellenOdRow.required = YES;
+//                pinSnellenOsRow.required = YES;
+//                vaSnellenOdRow.required = YES;
+//                vaSnellenOsRow.required = YES;
+//            }
+//        }
+//    };
     
     
     return [super initWithForm:formDescriptor];
@@ -395,6 +430,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAutoDone rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Done?"];
     row.selectorOptions = @[@"Done", @"Not Done", @"Refused"];
+//    row.required = YES;
     [self setDefaultFontWithRow:row];
     
     //value
@@ -408,7 +444,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR1 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kSpRightR1] != (id)[NSNull null])
@@ -418,7 +454,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR2 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kSpRightR2] != (id)[NSNull null])
@@ -428,7 +464,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR3 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kSpRightR3] != (id)[NSNull null])
@@ -438,7 +474,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR4 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kSpRightR4] != (id)[NSNull null])
@@ -448,7 +484,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR5 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kSpRightR5] != (id)[NSNull null])
@@ -458,7 +494,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR1 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylRightR1] != (id)[NSNull null])
@@ -468,7 +504,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR2 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylRightR2] != (id)[NSNull null])
@@ -478,7 +514,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR3 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylRightR3] != (id)[NSNull null])
@@ -488,7 +524,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR4 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylRightR4] != (id)[NSNull null])
@@ -497,7 +533,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR5 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylRightR5] != (id)[NSNull null])
@@ -507,7 +543,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR1 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kAxisRightR1] != (id)[NSNull null])
@@ -517,7 +553,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR2 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kAxisRightR2] != (id)[NSNull null])
@@ -527,7 +563,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR3 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Right Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kAxisRightR3] != (id)[NSNull null])
@@ -537,7 +573,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR4 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Right Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kAxisRightR4] != (id)[NSNull null])
@@ -547,7 +583,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR5 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Right Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kAxisRightR5] != (id)[NSNull null])
@@ -557,7 +593,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmRightR1 rowType:XLFormRowDescriptorTypeDecimal title:@"KER MM Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerMmRightR1] != (id)[NSNull null])
@@ -567,7 +603,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmRightR2 rowType:XLFormRowDescriptorTypeDecimal title:@"KER MM Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerMmRightR2] != (id)[NSNull null])
@@ -577,7 +613,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioRightR1 rowType:XLFormRowDescriptorTypeDecimal title:@"KER Dio Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerDioRightR1] != (id)[NSNull null])
@@ -587,7 +623,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioRightR2 rowType:XLFormRowDescriptorTypeDecimal title:@"KER Dio Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerDioRightR2] != (id)[NSNull null])
@@ -596,7 +632,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxRightR1 rowType:XLFormRowDescriptorTypeInteger title:@"KER Ax Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerAxRightR1] != (id)[NSNull null])
@@ -606,7 +642,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxRightR2 rowType:XLFormRowDescriptorTypeInteger title:@"KER Ax Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerAxRightR2] != (id)[NSNull null])
@@ -619,7 +655,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR1 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kSpLeftR1] != (id)[NSNull null])
@@ -629,7 +665,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR2 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kSpLeftR2] != (id)[NSNull null])
@@ -639,7 +675,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR3 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kSpLeftR3] != (id)[NSNull null])
@@ -649,7 +685,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR4 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kSpLeftR4] != (id)[NSNull null])
@@ -659,7 +695,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR5 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kSpLeftR5] != (id)[NSNull null])
@@ -669,7 +705,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR1 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylLeftR1] != (id)[NSNull null])
@@ -679,7 +715,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR2 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylLeftR2] != (id)[NSNull null])
@@ -689,7 +725,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR3 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylLeftR3] != (id)[NSNull null])
@@ -699,7 +735,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR4 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];    //value
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];    //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylLeftR4] != (id)[NSNull null])
         row.value = autoRefractorDict[kCylLeftR4];
     
@@ -707,7 +743,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR5 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylLeftR5] != (id)[NSNull null])
@@ -717,7 +753,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR1 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kAxisLeftR1] != (id)[NSNull null])
@@ -727,7 +763,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR2 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
 
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kAxisLeftR2] != (id)[NSNull null])
@@ -737,7 +773,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR3 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Left Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kAxisLeftR3] != (id)[NSNull null])
@@ -747,7 +783,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR4 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Left Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kAxisLeftR4] != (id)[NSNull null])
@@ -757,7 +793,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR5 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Left Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kAxisLeftR5] != (id)[NSNull null])
@@ -767,7 +803,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmLeftR1 rowType:XLFormRowDescriptorTypeDecimal title:@"KER MM Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerMmLeftR1] != (id)[NSNull null])
@@ -777,7 +813,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmLeftR2 rowType:XLFormRowDescriptorTypeDecimal title:@"KER MM Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerMmLeftR2] != (id)[NSNull null])
@@ -787,7 +823,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioLeftR1 rowType:XLFormRowDescriptorTypeDecimal title:@"KER Dio Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerDioLeftR1] != (id)[NSNull null])
@@ -797,7 +833,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioLeftR2 rowType:XLFormRowDescriptorTypeDecimal title:@"KER Dio Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerDioLeftR2] != (id)[NSNull null])
@@ -806,7 +842,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxLeftR1 rowType:XLFormRowDescriptorTypeInteger title:@"KER Ax Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerAxLeftR1] != (id)[NSNull null])
@@ -816,7 +852,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxLeftR2 rowType:XLFormRowDescriptorTypeInteger title:@"KER Ax Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
-    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
+//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
     //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kKerAxLeftR2] != (id)[NSNull null])
@@ -873,7 +909,7 @@ typedef enum formName {
     }
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kIopDone rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Done?"];
-    row.required = YES;
+//    row.required = YES;
     row.selectorOptions = @[@"Done", @"Not Done", @"Refused"];
     [self setDefaultFontWithRow:row];
     
@@ -1128,7 +1164,7 @@ typedef enum formName {
     
     
     XLFormRowDescriptor *diagOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiagnosisOd rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Diagnosis OD: "];
-    diagOdRow.required = YES;
+//    diagOdRow.required = YES;
     diagOdRow.selectorOptions = @[@"Normal", @"Refractive Error", @"Cataract", @"Glaucoma", @"Age-related macular degeneration", @"Diabetic Retinopathy/maculopathy", @"Others"];
     diagOdRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:diagOdRow];
@@ -1151,7 +1187,7 @@ typedef enum formName {
     [section addFormRow:row];
     
     XLFormRowDescriptor *diagOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiagnosisOs rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Diagnosis OS: "];
-    diagOsRow.required = YES;
+//    diagOsRow.required = YES;
     diagOsRow.selectorOptions = @[@"Normal", @"Refractive Error", @"Cataract", @"Glaucoma", @"Age-related macular degeneration", @"Diabetic Retinopathy/maculopathy", @"Others"];
     diagOsRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:diagOsRow];
@@ -1174,7 +1210,7 @@ typedef enum formName {
     [section addFormRow:row];
     
     XLFormRowDescriptor *followUpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUp rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Follow-up:"];
-    followUpRow.required = YES;
+//    followUpRow.required = YES;
     followUpRow.selectorOptions = @[@"No FU needed", @"Already on FU", @"Need spectacles", @"Referral to eye specialist", @"Cataract Surgery"];
     followUpRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:followUpRow];
@@ -1208,6 +1244,56 @@ typedef enum formName {
         row.value = diagFollowUpDict[kNonUrgentRefMths];
     
     [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    section.footerTitle = @"Only eligible if resident has financial need (based on previous questions) AND needs spectacles (advanced eye screening).";
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *givenVoucherRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGivenVoucher rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Was resident given NHS spectacles voucher?"];
+//    givenVoucherRow.required = YES;
+    givenVoucherRow.selectorOptions = @[@"Yes", @"No"];
+    givenVoucherRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    
+    if ([[ResidentProfile sharedManager] canReceiveSpecVoucher]) {
+        givenVoucherRow.disabled = @0;
+//        givenVoucherRow.required = YES;
+    } else {
+        givenVoucherRow.disabled = @1;
+        givenVoucherRow.required = NO;
+    }
+    
+    [self setDefaultFontWithRow:givenVoucherRow];
+    
+    //value
+    if (diagFollowUpDict != (id)[NSNull null] && [diagFollowUpDict objectForKey:kGivenVoucher] != (id)[NSNull null])
+        givenVoucherRow.value = [self getYesNoFromOneZero:diagFollowUpDict[kGivenVoucher]];
+    
+    [section addFormRow:givenVoucherRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    section.footerTitle = @"Only eligible for seniors Singaporean and ≥60 years old. Ask a Comm member if unsure.";
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *givenSmfRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGivenSmf rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Was resident assisted with application for the Seniors Mobility & Enabling Fund (SMF)?"];
+//    givenSmfRow.required = YES;
+    givenSmfRow.selectorOptions = @[@"Yes", @"No"];
+    givenSmfRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:givenSmfRow];
+    
+    //value
+    if (diagFollowUpDict != (id)[NSNull null] && [diagFollowUpDict objectForKey:kGivenSmf] != (id)[NSNull null])
+        givenSmfRow.value = [self getYesNoFromOneZero:diagFollowUpDict[kGivenSmf]];
+    
+    [section addFormRow:givenSmfRow];
+    
+    if ([[ResidentProfile sharedManager] isEligibleSmf]) {
+        givenSmfRow.disabled = @0;
+//        givenSmfRow.required = YES;
+    } else {
+        givenSmfRow.disabled = @1;
+        givenSmfRow.required = NO;
+    }
+    
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Comments"];
     [formDescriptor addFormSection:section];
@@ -1424,6 +1510,10 @@ typedef enum formName {
         [self postSingleFieldWithSection:SECTION_SERI_DIAG andFieldName:kFollowUp andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kEyeSpecRef]) {
         [self postSingleFieldWithSection:SECTION_SERI_DIAG andFieldName:kEyeSpecRef andNewContent:newValue];
+    } else if ([rowDescriptor.tag isEqualToString:kGivenVoucher]) {
+        [self postSingleFieldWithSection:SECTION_SERI_DIAG andFieldName:kGivenVoucher andNewContent:ansFromYesNo];
+    } else if ([rowDescriptor.tag isEqualToString:kGivenSmf]) {
+        [self postSingleFieldWithSection:SECTION_SERI_DIAG andFieldName:kGivenSmf andNewContent:ansFromYesNo];
     }
 }
 
@@ -1432,6 +1522,14 @@ typedef enum formName {
     
     if (rowDescriptor.value == nil) {
         rowDescriptor.value = @"";  //empty string
+    } else {
+        double number = [rowDescriptor.value doubleValue];
+        if (isnan(number)) {
+            [self showAlertControllerWithTitle:@"Error" andMessage:@"Only numbers and symbols are allowed."];
+            rowDescriptor.value = @"";
+            [self reloadFormRow:rowDescriptor];
+            return;
+        }
     }
     
     //Medical History
@@ -1870,6 +1968,22 @@ typedef enum formName {
     return returnArray;
 }
 
+- (NSString *) getYesNoFromOneZero: (id) value {
+    if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"1"])
+            return @"Yes";
+        else if ([value isEqualToString:@"0"])
+            return @"No";
+        
+    } else if ([value isKindOfClass:[NSNumber class]]) {
+        if ([value isEqual:@1])
+            return @"Yes";
+        else if ([value isEqual:@0])
+            return @"No";
+        
+    }
+    return @"";
+}
 
 #pragma mark - Snellen to LogMAR
 - (NSString *) snellenToLogMARWithRowValue: (NSString *) string {
@@ -1891,6 +2005,16 @@ typedef enum formName {
     UIFontDescriptor * fontD = [font.fontDescriptor
                                 fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     return [UIFont fontWithDescriptor:fontD size:0];
+}
+
+#pragma mark - AlertController Shortcut
+- (void) showAlertControllerWithTitle:(NSString *) title andMessage:(NSString *) message {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        //do nothing
+    }];
+    [alertController addAction:okAction];
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 

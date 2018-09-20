@@ -16,6 +16,7 @@
 #import "GenericTableViewCell.h"
 #import "ScreeningSelectProfileTableVC.h"
 #import "ScreeningDictionary.h"
+#import "ResidentProfile.h"
 
 
 //disable this if fetch data from server
@@ -602,6 +603,16 @@ typedef enum Category {
                           options:NSCaseInsensitivePredicateOption];
         [searchItemsPredicate addObject:finalPredicate];
         
+//        lhs = [NSExpression expressionForKeyPath:kResidentId];
+//        rhs = [NSExpression expressionForConstantValue:searchString];
+//        finalPredicate = [NSComparisonPredicate
+//                          predicateWithLeftExpression:lhs
+//                          rightExpression:rhs
+//                          modifier:NSDirectPredicateModifier
+//                          type:NSContainsPredicateOperatorType
+//                          options:NSCaseInsensitivePredicateOption];
+//        [searchItemsPredicate addObject:finalPredicate];
+        
         // at this OR predicate to our master AND predicate
         NSCompoundPredicate *orMatchPredicates = [NSCompoundPredicate orPredicateWithSubpredicates:searchItemsPredicate];
         [andMatchPredicates addObject:orMatchPredicates];
@@ -768,18 +779,21 @@ typedef enum Category {
             [[NSUserDefaults standardUserDefaults] synchronize];
             [self performSegueWithIdentifier:@"addNewResidentSegue" sender:self];
         } else if ([year2018 isEqualToString:@"found"]) {    // already registered
+            NSNumber *resident_id = [[retrievedDictionary objectForKey:@"2018"] objectForKey:kResidentId];
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Duplicate record" message:@"Resident has already been registered!" preferredStyle:UIAlertControllerStyleAlert];
             UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                //do nothing
+                selectedResidentID = resident_id;
+                [self getAllDataForOneResident];
             }];
             [alertController addAction:okAction];
             [self presentViewController:alertController animated:YES completion:nil];
         } else if ([year2017 isEqualToString:@"found"] && [year2018 isEqualToString:@"not found"]) {
             // RESIDENT REGISTERED in 2017
-                
             selectedResidentID = @(-1);
             _sampleResidentDict = @{};
             [self resetAllUserDefaults];
+            [[NSUserDefaults standardUserDefaults] setObject:_neighbourhood forKey:kNeighbourhood];   //only keep neighbourhood
+            [[NSUserDefaults standardUserDefaults] synchronize];
             NSMutableDictionary *mutDict = [[retrievedDictionary objectForKey:@"2017"] mutableCopy];
             
             for (NSString *key in [[retrievedDictionary objectForKey:@"2017"] allKeys]) {
@@ -802,6 +816,7 @@ typedef enum Category {
         
         self.retrievedResidentData = [[NSMutableDictionary alloc] initWithDictionary:responseObject];
         [[ScreeningDictionary sharedInstance] setDictionary:self.retrievedResidentData];
+        [[ResidentProfile sharedManager] updateProfile:self.retrievedResidentData];
         
         [self saveCoreData];
         [[ScreeningDictionary sharedInstance] prepareAdditionalSvcs];   //prepare all the qualifySections

@@ -1,23 +1,23 @@
 //
-//  SocialWorkTableVC.m
+//  SocialHistAssmtTableVC.m
 //  NHS
 //
-//  Created by Nicholas Wong on 8/9/17.
-//  Copyright © 2017 NUS. All rights reserved.
+//  Created by Nicholas Wong on 9/4/18.
+//  Copyright © 2018 NUS. All rights reserved.
 //
 
-#import "SocialWorkTableVC.h"
-#import "SocialWorkFormVC.h"
+#import "SocialHistAssmtTableVC.h"
 #import "AppConstants.h"
 #import "Reachability.h"
 #import "SVProgressHUD.h"
 #import "ServerComm.h"
+#import "ProfilingFormVC.h"
 #import "ScreeningDictionary.h"
-#import "ResidentProfile.h"
 
-@interface SocialWorkTableVC () {
+@interface SocialHistAssmtTableVC () {
     NSNumber *selectedRow;
     BOOL internetDCed;
+    
 }
 
 @property (strong, nonatomic) NSArray *rowLabelsText;
@@ -29,44 +29,44 @@
 
 @end
 
-@implementation SocialWorkTableVC
+@implementation SocialHistAssmtTableVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     [self.tableView setTableFooterView:[[UIView alloc] initWithFrame:CGRectZero]];
     
+    
     _residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId]; //need this for fetching data
-    _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
-    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0, nil];
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0, nil];
     
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
     [self.hostReachability startNotifier];
     [self updateInterfaceWithReachability:self.hostReachability];
     
     
-    
-    self.navigationItem.title = @"Social Work";
-    
-    //2017
-//    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Demographics",@"Current Socioeconomic Situation",@"Current Physical Status", @"Social Support Assessment", @"Psychological Well-being", @"Additional Services", @"Summary",  nil];
-    
-    //2018
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Depression Assessment (Adv) - PHQ-9", @"Social Work (Adv) Assessments", @"Social Work Referrals",  nil];
+    self.navigationItem.title = @"3f. Social History & Assessment";
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Social History",
+                     @"Social Assessment (Basic)",
+                     nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     
+    _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
     
     @synchronized (self) {
         [self updateCellAccessory];
         [self.tableView reloadData];    //put in the ticks
     }
     
-    [self.tableView reloadData];
+    // Uncomment the following line to preserve selection between presentations.
+    // self.clearsSelectionOnViewWillAppear = NO;
+    
+    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
+    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -76,7 +76,6 @@
     
 }
 
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -85,6 +84,7 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    
     return 1;
 }
 
@@ -95,6 +95,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return DEFAULT_ROW_HEIGHT_FOR_SECTIONS;
 }
+
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
@@ -110,13 +111,6 @@
     
     [cell.textLabel setText:text];
     
-    if ([text containsString:@"Depression"]) {
-        if (![[ResidentProfile sharedManager] isEligiblePHQ9]) {
-            cell.userInteractionEnabled = NO;
-            [cell.textLabel setTextColor:[UIColor grayColor]];  //disable it!
-        }
-    }
-    
     // Put in the ticks if necessary
     if (indexPath.row < [self.completionCheck count]) {
         if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
@@ -128,17 +122,11 @@
     
     return cell;
 }
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    selectedRow = [NSNumber numberWithInteger:indexPath.row];
+    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 19)]; //because until Finance History Assessment took up the first 18 numbers..
     
-//    if (indexPath.row == 0) {
-//        [self performSegueWithIdentifier:@"socialWorkToDemographicsSegue" sender:self];
-//    }
-//    else
-//    {
-    [self performSegueWithIdentifier:@"socialWorkToFormVC" sender:self];
-//    }
+    [self performSegueWithIdentifier:@"SocialHistAssmtToFormSegue" sender:self];
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -176,7 +164,7 @@
             case ReachableViaWWAN:
                 NSLog(@"Connected to server!");
                 
-                
+                //                [self getAllDataForOneResident];
                 
                 if (internetDCed) { //previously disconnected
                     [SVProgressHUD setMaximumDismissTimeInterval:1.0];
@@ -202,31 +190,19 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckSwDepression, kCheckSwAdvAssmt, kCheckSwReferrals];
+    NSArray *lookupTable = @[kCheckSocialHistory, kCheckSocialAssmt];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {
             
             NSString *key = lookupTable[i];
             
-            if ([key isEqualToString:kCheckSwDepression]) {
-                if (![[ResidentProfile sharedManager] isEligiblePHQ9]) {
-                    [_completionCheck addObject:@1];    //just assume it's done, because not eligible.
-                    continue;
-                }
-            }
-            
             NSNumber *doneNum = [checksDict objectForKey:key];
-            if ([doneNum isKindOfClass:[NSNumber class]]) {
-                [_completionCheck addObject:doneNum];   //just in case it's NULL for no reason
-            } else {
-                [_completionCheck addObject:@0];
-            }
+            [_completionCheck addObject:doneNum];
             
         }
     }
 }
-
 
 #pragma mark - NSNotification Methods
 
@@ -239,14 +215,21 @@
 }
 
 
+
 #pragma mark - Navigation
 
+// In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.destinationViewController respondsToSelector:@selector(setFormNo:)]) {    //view submitted form
-        [segue.destinationViewController performSelector:@selector(setFormNo:)
+    if ([segue.destinationViewController respondsToSelector:@selector(setFormID:)]) {    //view submitted form
+        [segue.destinationViewController performSelector:@selector(setFormID:)
                                               withObject:selectedRow];
     }
     
+    
 }
 
+
+
 @end
+
+

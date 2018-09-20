@@ -10,6 +10,7 @@
 #import "ServerComm.h"
 #import "AppConstants.h"
 #import "SVProgressHUD.h"
+#import "ResidentProfile.h"
 
 @implementation ScreeningDictionary
 
@@ -75,6 +76,7 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_RELOAD_TABLE object:self];
         NSLog(@"fetched!");
         [self saveCoreData];
+        [[ResidentProfile sharedManager] updateProfile:_dictionary];
         [self prepareAdditionalSvcs];
         // save all the qualify stuffs for additional services
         
@@ -140,8 +142,8 @@
     
     if (chasDict != (id)[NSNull null]) {
         
-        if (chasDict[kDoesntOwnChasPioneer] != (id)[NSNull null])
-            noChas = [chasDict[kDoesntOwnChasPioneer] boolValue];
+        if (chasDict[kDoesNotOwnChasPioneer] != (id)[NSNull null])
+            noChas = [chasDict[kDoesNotOwnChasPioneer] boolValue];
         if (chasDict[kLowHouseIncome] != (id)[NSNull null])
             lowIncome = [chasDict[kLowHouseIncome] boolValue];
         if (chasDict[kWantChas] != (id)[NSNull null])

@@ -7,7 +7,12 @@
 //
 
 #import "AppDelegate.h"
+#import "ELCUIApplication.h"
 #import "AppConstants.h"
+#import "SVProgressHUD.h"
+
+#define serverReachabilityCheckIntervalSecs 2.0
+
 
 @interface AppDelegate ()
 
@@ -16,13 +21,62 @@
 @implementation AppDelegate
 
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+//- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+//
+//
+//
+//    return YES;
+//}
+
+- (BOOL)application:(UIApplication *)application
+didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
     // To silent all the layout constraints warnings at console
     [[NSUserDefaults standardUserDefaults] setValue:@(NO) forKey:@"_UIConstraintBasedLayoutLogUnsatisfiable"];
-
+    // Override point for customization after application launch.
+    
+    // Auto-timeout feature: set listener to Idle Timer
+    NSLog(@"adding observer to observe for kApplicationDidTimeoutNotification");
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(applicationDidTimeout:)
+     name:kApplicationDidTimeoutNotification
+     object:nil];
+    ((ELCUIApplication *)[UIApplication sharedApplication]).didIdleTimerTimeout = NO; // initial value
+    
+    // Initiate timer to check server reachability
+//    self.serverReachabilityTimer =
+//    [NSTimer timerWithTimeInterval:serverReachabilityCheckIntervalSecs
+//                            target:self
+//                          selector:@selector(checkReachabilityInBackground)
+//                          userInfo:nil
+//                           repeats:YES];
+//
+//    [[NSRunLoop mainRunLoop] addTimer:self.serverReachabilityTimer
+//                              forMode:NSRunLoopCommonModes];
+    
+    // disable swipe back gesture to pop view controller stack
+    UINavigationController *rootVC =  (UINavigationController *)self.window.rootViewController;
+    [rootVC.interactivePopGestureRecognizer setEnabled:NO];
+    
+    // set up progress HUD
+    [SVProgressHUD setMinimumDismissTimeInterval:0.2];
+    [SVProgressHUD setDefaultMaskType:(SVProgressHUDMaskTypeBlack)];
+    
     return YES;
 }
+
+- (void)applicationDidTimeout:(NSNotification *)notification {
+    NSLog(@"received kApplicationDidTimeoutNotification notification");
+    
+    // log out
+    UINavigationController *navController =
+    (UINavigationController *)self.window.rootViewController;
+    [navController popToRootViewControllerAnimated:YES];
+}
+
+
+
 
 #pragma mark - UIStateRestoration
 

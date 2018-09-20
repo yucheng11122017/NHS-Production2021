@@ -1,21 +1,20 @@
 //
-//  SocialWorkTableVC.m
+//  AdvancedGeriatricsTableVC.m
 //  NHS
 //
-//  Created by Nicholas Wong on 8/9/17.
-//  Copyright © 2017 NUS. All rights reserved.
+//  Created by Nicholas Wong on 9/7/18.
+//  Copyright © 2018 NUS. All rights reserved.
 //
 
-#import "SocialWorkTableVC.h"
+#import "AdvancedGeriatricsTableVC.h"
 #import "SocialWorkFormVC.h"
 #import "AppConstants.h"
 #import "Reachability.h"
 #import "SVProgressHUD.h"
 #import "ServerComm.h"
 #import "ScreeningDictionary.h"
-#import "ResidentProfile.h"
 
-@interface SocialWorkTableVC () {
+@interface AdvancedGeriatricsTableVC () {
     NSNumber *selectedRow;
     BOOL internetDCed;
 }
@@ -29,7 +28,7 @@
 
 @end
 
-@implementation SocialWorkTableVC
+@implementation AdvancedGeriatricsTableVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -41,7 +40,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
-    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0, nil];
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0, nil];
     
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
     [self.hostReachability startNotifier];
@@ -49,13 +48,10 @@
     
     
     
-    self.navigationItem.title = @"Social Work";
-    
-    //2017
-//    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Demographics",@"Current Socioeconomic Situation",@"Current Physical Status", @"Social Support Assessment", @"Psychological Well-being", @"Additional Services", @"Summary",  nil];
-    
+    self.navigationItem.title = @"5. Advanced Geriatrics";
+
     //2018
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Depression Assessment (Adv) - PHQ-9", @"Social Work (Adv) Assessments", @"Social Work Referrals",  nil];
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Fall Risk Assessment (Advanced)", @"Dementia Assessment (Advanced – AMT)", nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -75,7 +71,6 @@
     [self updateInterfaceWithReachability:self.hostReachability];
     
 }
-
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -110,13 +105,6 @@
     
     [cell.textLabel setText:text];
     
-    if ([text containsString:@"Depression"]) {
-        if (![[ResidentProfile sharedManager] isEligiblePHQ9]) {
-            cell.userInteractionEnabled = NO;
-            [cell.textLabel setTextColor:[UIColor grayColor]];  //disable it!
-        }
-    }
-    
     // Put in the ticks if necessary
     if (indexPath.row < [self.completionCheck count]) {
         if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
@@ -132,13 +120,9 @@
 {
     selectedRow = [NSNumber numberWithInteger:indexPath.row];
     
-//    if (indexPath.row == 0) {
-//        [self performSegueWithIdentifier:@"socialWorkToDemographicsSegue" sender:self];
-//    }
-//    else
-//    {
-    [self performSegueWithIdentifier:@"socialWorkToFormVC" sender:self];
-//    }
+
+    [self performSegueWithIdentifier:@"AdvancedGeriatricsToFormVCSegue" sender:self];
+    //    }
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -202,19 +186,12 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckSwDepression, kCheckSwAdvAssmt, kCheckSwReferrals];
+    NSArray *lookupTable = @[kCheckAdvFallRiskAssmt, kCheckGeriatricDementiaAssmt];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {
             
             NSString *key = lookupTable[i];
-            
-            if ([key isEqualToString:kCheckSwDepression]) {
-                if (![[ResidentProfile sharedManager] isEligiblePHQ9]) {
-                    [_completionCheck addObject:@1];    //just assume it's done, because not eligible.
-                    continue;
-                }
-            }
             
             NSNumber *doneNum = [checksDict objectForKey:key];
             if ([doneNum isKindOfClass:[NSNumber class]]) {
@@ -226,7 +203,6 @@
         }
     }
 }
-
 
 #pragma mark - NSNotification Methods
 
