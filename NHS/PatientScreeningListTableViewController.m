@@ -53,6 +53,8 @@ typedef enum Category {
 @property (strong, nonatomic) NSDictionary *sampleResidentDict;
 @property (nonatomic) Reachability *hostReachability;
 
+@property BOOL consentImgExist;
+
 @end
 
 
@@ -75,6 +77,7 @@ typedef enum Category {
     [super viewDidLoad];
     
     internetDCed = false;
+    
     //For hiding credentials from Apple Testers
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     appTesting = [defaults boolForKey:@"AppleTesting"];
@@ -344,6 +347,7 @@ typedef enum Category {
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     NSDictionary *selectedResident = Nil;
+    _consentImgExist = false;
 
     [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
     [SVProgressHUD showWithStatus:@"Loading..."];
@@ -360,6 +364,13 @@ typedef enum Category {
         selectedResidentID = [selectedResident objectForKey:kResidentId];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    
+    NSString *consentImgName = [selectedResident objectForKey:@"consent_img"];
+    if (consentImgName && consentImgName != (id)[NSNull null]) {
+        [[ResidentProfile sharedManager] setConsentImgExists:YES];
+    } else {
+        [[ResidentProfile sharedManager] setConsentImgExists:NO];
+    }
     
 #ifndef DISABLE_SERVER_DATA_FETCH
     [self getAllDataForOneResident];

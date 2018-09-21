@@ -12,6 +12,7 @@
 #import "AppConstants.h"
 #import "KAStatusBar.h"
 #import "ScreeningDictionary.h"
+#import "ResidentProfile.h"
 
 //Change this value to toggle between custom camera or standard camera
 #define CUSTOM_CAMERA 0;
@@ -41,8 +42,14 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageExist:) name:CONSENT_LOADED_NOTIF object:nil];
-    [self getConsentImageFromServer];
-//    [self launchCameraView];
+    
+    if ([[ResidentProfile sharedManager] hasConsentImage]) {
+        [self getConsentImageFromServer];
+    } else {
+        [self launchCameraView];
+    }
+    
+
 }
 
 - (void)didReceiveMemoryWarning {

@@ -1661,7 +1661,6 @@ typedef enum formName {
     
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Social Work (Advanced) Assessment"];
     XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
     
     NSDictionary *swAdvAssmtDict = [self.fullScreeningForm objectForKey:SECTION_SW_ADV_ASSMT];
     
@@ -1735,7 +1734,6 @@ typedef enum formName {
     
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Social Work Referrals"];
     XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
     
     NSDictionary *swReferralsDict = [self.fullScreeningForm objectForKey:SECTION_SW_REFERRALS];
     

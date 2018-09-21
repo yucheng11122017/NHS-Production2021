@@ -141,8 +141,6 @@ typedef enum formName {
 - (id) initDementiaAssmt {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Dementia Assessment (Advanced-AMT)"];
     XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
     NSDictionary *dementiaAssmtDict = [_fullScreeningForm objectForKey:SECTION_GERIATRIC_DEMENTIA_ASSMT];
     

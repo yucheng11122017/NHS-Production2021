@@ -213,7 +213,7 @@ NSString *const kQuestionFifteen = @"q15";
     
     sporeanPr = age40 = false;
     
-    NSDictionary *phlebotomyEligibDict = _fullScreeningForm[SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT];
+//    NSDictionary *phlebotomyEligibDict = _fullScreeningForm[SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT];
     NSDictionary *phlebotomyDict = _fullScreeningForm[SECTION_PHLEBOTOMY];
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
     
@@ -1118,8 +1118,6 @@ NSString *const kQuestionFifteen = @"q15";
     row.required = NO;
     row.selectorOptions = @[@"Yes", @"No"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
-
-    NSString *str;
     
     BOOL chasEligibility = [[ResidentProfile sharedManager] isEligibleCHAS];
     
@@ -1802,213 +1800,6 @@ NSString *const kQuestionFifteen = @"q15";
     
     return [super initWithForm:formDescriptor];
 }
-
-
-- (id) initFallRiskAssessment {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"5. Advanced Geriatric"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    
-    NSDictionary *fallRiskDict = _fullScreeningForm[SECTION_FALL_RISK_ASSMT];
-    
-    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
-    
-    if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckFall];
-        if ([check isKindOfClass:[NSNumber class]]) {
-            isFormFinalized = [check boolValue];
-        }
-    }
-    
-    formDescriptor.assignFirstResponderOnShow = YES;
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDidFallRiskAssess rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone Fall Risk Assessment?"];
-//    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kDidFallRiskAssess] != (id)[NSNull null])
-//        row.value = [self getYesNofromOneZero:fallRiskDict[kDidFallRiskAssess]];
-//
-//    [self setDefaultFontWithRow:row];
-//    row.selectorOptions = @[@"Yes", @"No"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:row];
-//
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPsfuFRA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"To be completed during PSFU"];
-//    [self setDefaultFontWithRow:row];
-//
-//    //value
-//    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kPsfuFRA] != (id)[NSNull null]) row.value = fallRiskDict[kPsfuFRA];
-//
-//    [section addFormRow:row];
-//
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//
-//    XLFormRowDescriptor *balanceRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBalance
-//                                                rowType:XLFormRowDescriptorTypeStepCounter title:@"Balance Test"];
-//    balanceRow.value = @(0);
-//    [balanceRow.cellConfigAtConfigure setObject:@(4) forKey:@"stepControl.maximumValue"];
-//    [balanceRow.cellConfigAtConfigure setObject:@(0) forKey:@"stepControl.minimumValue"];
-//    [balanceRow.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
-//    [self setDefaultFontWithRow:balanceRow];
-//
-//    //value
-//    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kBalance] != (id)[NSNull null]) balanceRow.value = fallRiskDict[kBalance];
-//
-//    [section addFormRow:balanceRow];
-//
-//    XLFormRowDescriptor *GaitSpeedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGaitSpeed
-//                                                rowType:XLFormRowDescriptorTypeStepCounter title:@"Gait Speed Test"];
-//    GaitSpeedRow.value = @(0);
-//    [GaitSpeedRow.cellConfigAtConfigure setObject:@(4) forKey:@"stepControl.maximumValue"];
-//    [GaitSpeedRow.cellConfigAtConfigure setObject:@(0) forKey:@"stepControl.minimumValue"];
-//    [GaitSpeedRow.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
-//    [self setDefaultFontWithRow:GaitSpeedRow];
-//
-//    //value
-//    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kGaitSpeed] != (id)[NSNull null]) GaitSpeedRow.value = fallRiskDict[kGaitSpeed];
-//
-//    [section addFormRow:GaitSpeedRow];
-//
-//    XLFormRowDescriptor *chairStandRow = [XLFormRowDescriptor formRowDescriptorWithTag:kChairStand
-//                                                rowType:XLFormRowDescriptorTypeStepCounter title:@"Chair Stand Test"];
-//    chairStandRow.value = @(0);
-//    [chairStandRow.cellConfigAtConfigure setObject:@(4) forKey:@"stepControl.maximumValue"];
-//    [chairStandRow.cellConfigAtConfigure setObject:@(0) forKey:@"stepControl.minimumValue"];
-//    [chairStandRow.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
-//    [self setDefaultFontWithRow:chairStandRow];
-//
-//    //value
-//    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kChairStand] != (id)[NSNull null]) chairStandRow.value = fallRiskDict[kChairStand];
-//
-//    [section addFormRow:chairStandRow];
-//
-//    XLFormRowDescriptor *totalRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTotal rowType:XLFormRowDescriptorTypeInfo title:@"Total Score for SPPB"];
-//    [self setDefaultFontWithRow:totalRow];
-//
-//    balanceRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-//        if (newValue != oldValue) {
-//            int total = [newValue intValue] + [GaitSpeedRow.value intValue] + [chairStandRow.value intValue];
-//            totalRow.value = [NSNumber numberWithInt:total];
-//            [self reloadFormRow:totalRow];
-//        }
-//    };
-//
-//    GaitSpeedRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-//        if (newValue != oldValue) {
-//            int total = [balanceRow.value intValue] + [newValue intValue] + [chairStandRow.value intValue];
-//            totalRow.value = [NSNumber numberWithInt:total];
-//            [self reloadFormRow:totalRow];
-//        }
-//    };
-//
-//    chairStandRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-//        if (newValue != oldValue) {
-//            int total = [balanceRow.value intValue] + [GaitSpeedRow.value intValue] + [newValue intValue];
-//            totalRow.value = [NSNumber numberWithInt:total];
-//            [self reloadFormRow:totalRow];
-//        }
-//    };
-//
-//    //value
-//    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kTotal] != (id)[NSNull null]) totalRow.value = fallRiskDict[kTotal];
-//
-//    [section addFormRow:totalRow];
-//
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqFollowupFRA
-//                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred for further follow-up?"];
-//    row.selectorOptions = @[@"Yes", @"No"];
-//    [self setDefaultFontWithRow:row];
-//
-//    if (fallRiskDict != (id)[NSNull null] && [fallRiskDict objectForKey:kReqFollowupFRA] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:fallRiskDict[kReqFollowupFRA]];
-//
-//    [section addFormRow:row];
-    
-    return [super initWithForm:formDescriptor];
-}
-//
-//- (id) initDementiaAssessment {
-//    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Geriatric Dementia Assessment"];
-//    XLFormSectionDescriptor * section;
-//    XLFormRowDescriptor * row;
-//    
-//    NSDictionary *dementiaDict = _fullScreeningForm[SECTION_GERIATRIC_DEMENTIA_ASSMT];
-//    
-//    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
-//    
-//    if (checkDict != nil && checkDict != (id)[NSNull null]) {
-//        NSNumber *check = checkDict[kCheckDementia];
-//        if ([check isKindOfClass:[NSNumber class]]) {
-//            isFormFinalized = [check boolValue];
-//        }
-//    }
-//    
-//    formDescriptor.assignFirstResponderOnShow = YES;
-//    
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPsfuFRA rowType:XLFormRowDescriptorTypeBooleanCheck title:@"To be completed during PSFU"];
-//    [self setDefaultFontWithRow:row];
-//    
-//    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kPsfuFRA] != (id)[NSNull null]) row.value = dementiaDict[kPsfuFRA];
-//    
-//    [section addFormRow:row];
-//    
-//    
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    section.footerTitle = @"Range: 0-10";
-//    [formDescriptor addFormSection:section];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAmtScore rowType:XLFormRowDescriptorTypeInteger title:@"Total score for AMT"];
-//    [self setDefaultFontWithRow:row];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Score between 0 to 10" regex:@"^([0-9]|10)$"]];
-//    
-//    row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-//        if (newValue != oldValue) {
-//            if (newValue != [NSNull null]) {
-//                if ([newValue intValue] < 0 || [newValue intValue] > 255) {
-//                    [self showValidationError];
-//                }
-//            }
-//        }
-//    };
-//    
-//    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kAmtScore] != (id)[NSNull null]) row.value = dementiaDict[kAmtScore];
-//    
-//    [section addFormRow:row];
-//    
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kEduStatus rowType:XLFormRowDescriptorTypeSelectorPush title:@"Resident's education status"];
-//    row.selectorOptions = @[@"1 year", @"2 years", @"3 years", @"4 years", @"5 years", @"6 years", @"more than 6 years", @"No formal education"];
-//    [self setDefaultFontWithRow:row];
-//    
-//    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kEduStatus] != (id)[NSNull null]) row.value = dementiaDict[kEduStatus];
-//    
-//    [section addFormRow:row];
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kReqFollowupGDA rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred for further follow-up?"];
-//    row.selectorOptions = @[@"Yes", @"No"];
-//    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [self setDefaultFontWithRow:row];
-//    
-//    if (dementiaDict != (id)[NSNull null] && [dementiaDict objectForKey:kReqFollowupGDA] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:dementiaDict[kReqFollowupGDA]];
-//    
-//    [section addFormRow:row];
-//    
-//    
-//    
-//    return [super initWithForm:formDescriptor];
-//}
-
 
 
 - (id) initHealthEducation {
@@ -3370,11 +3161,11 @@ NSString *const kQuestionFifteen = @"q15";
                 
                 if ([newSet count] > [oldSet count]) {
                     [newSet minusSet:oldSet];
-                    NSArray *array = [newSet allObjects];
+//                    NSArray *array = [newSet allObjects];
 //                    [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:[self getFieldNameFromApptTime:[array firstObject]] andNewContent:@"1"];
                 } else {
                     [oldSet minusSet:newSet];
-                    NSArray *array = [oldSet allObjects];
+//                    NSArray *array = [oldSet allObjects];
 //                    [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:[self getFieldNameFromApptTime:[array firstObject]] andNewContent:@"0"];
                 }
             } else {

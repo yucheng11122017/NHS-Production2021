@@ -18,7 +18,7 @@
 
 // Public Methods
 - (void) setResidentParticularsDict:(NSDictionary *)residentParticularsDict;
-- (void) setphlebEligibDict:(NSDictionary *)phlebEligibDict;
+//- (void) setphlebEligibDict:(NSDictionary *)phlebEligibDict;
 - (void) setModeOfScreeningDict:(NSDictionary *)modeOfScreeningDict;
 - (void) setLoadDataFlag:(NSNumber*) loadDataFlag;
 

@@ -13,6 +13,7 @@
 #import "Reachability.h"
 #import "SVProgressHUD.h"
 #import "ScreeningDictionary.h"
+#import "ResidentProfile.h"
 
 #define PDFREPORT_LOADED_NOTIF @"Pdf report downloaded"
 #define CELL_RIGHT_MARGIN_OFFSET 64
@@ -218,18 +219,12 @@ typedef enum getDataState {
 }
 
 - (void) showPopUpBox {
+    
     UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"2018 Screening Profile", nil)
                                                                               message:@""
                                                                        preferredStyle:UIAlertControllerStyleAlert];
     
-#warning Check if consent form already exist
-    
-    UIAlertAction *consentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Submit Consent Form", nil)
-                                                         style:UIAlertActionStyleDefault
-                                                       handler:^(UIAlertAction * action) {
-                                                           [self performSegueWithIdentifier:@"ProfileToConsentFormSegue" sender:self];
-                                                       }];
-    
+    UIAlertAction *consentFormAction;
      UIAlertAction *formAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Screening Form", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
@@ -242,6 +237,24 @@ typedef enum getDataState {
 //                                                       [self downloadReport:nil];
                                                        [self performSegueWithIdentifier:@"ProfileToFollowUpSegue" sender:self];
                                                    }];
+    
+    if ([[ResidentProfile sharedManager] hasConsentImage]) {
+        consentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Show Consent Form", nil)
+                                                     style:UIAlertActionStyleDefault
+                                                   handler:^(UIAlertAction * action) {
+                                                       [self performSegueWithIdentifier:@"ProfileToConsentFormSegue" sender:self];
+                                                   }];
+    } else {
+        consentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Submit Consent Form", nil)
+                                                     style:UIAlertActionStyleDefault
+                                                   handler:^(UIAlertAction * action) {
+                                                       [self performSegueWithIdentifier:@"ProfileToConsentFormSegue" sender:self];
+                                                   }];
+        
+
+        formAction.enabled = NO;
+        reportAction.enabled = NO;
+    }
     
 //    reportAction.enabled = enableReportButton;
     [alertController addAction:consentFormAction];

@@ -13,6 +13,7 @@
 #import "SVProgressHUD.h"
 #import "ServerComm.h"
 #import "ScreeningDictionary.h"
+#import "ResidentProfile.h"
 
 @interface AdvancedGeriatricsTableVC () {
     NSNumber *selectedRow;
@@ -81,6 +82,10 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
+}
+
+- (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    return [NSString stringWithFormat:@"Fall Risk Status: %@", [[ResidentProfile sharedManager] getFallRiskStatus]];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

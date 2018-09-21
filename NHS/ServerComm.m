@@ -9,6 +9,7 @@
 #import "ServerComm.h"
 #import "AppConstants.h"
 #import "SVProgressHUD.h"
+#import "ResidentProfile.h"
 
 //#define baseURL @"https://nus-nhs.ml/"        //for Development
 #define baseURL @"https://nhs-som.nus.edu.sg/"
@@ -546,7 +547,7 @@
 }
 
 
-- (void (^)(NSURLResponse *response, id responseObject, NSError *error))completionBlock {
+- (void (^)(NSURLResponse *response, id responseObject, NSError *error))completionBlock {   //now that I'm not using it for genogram anymore, it's only for consent
     return ^(NSURLResponse *response, NSDictionary *responseObject, NSError *error) {
         if (error) {
             NSLog(@"Error: %@", error);
@@ -558,6 +559,7 @@
             [SVProgressHUD setMinimumDismissTimeInterval:1.0];
             [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
             [SVProgressHUD showSuccessWithStatus:@"Upload successful!"];
+            [[ResidentProfile sharedManager] setConsentImgExists:YES];
         }
     };
 }

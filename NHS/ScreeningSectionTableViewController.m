@@ -735,9 +735,8 @@ typedef enum sectionRowNumber {
 }
 
 - (NSNumber *) checkAllProfilingSections:(NSDictionary *) checksDict {
-    int count=0;
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSInteger residentAge = [[defaults objectForKey:kResidentAge] integerValue];
+//    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+//    NSInteger residentAge = [[defaults objectForKey:kResidentAge] integerValue];
     
     if ([[ResidentProfile sharedManager] profilingDone]) return @1;
     else return @0;

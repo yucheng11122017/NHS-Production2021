@@ -1952,7 +1952,6 @@ typedef enum formName {
 - (id) initDietHistory {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Diet History"];
     XLFormSectionDescriptor * section;
-    XLFormRowDescriptor *row;
     
     NSDictionary *dietHistDict = [self.fullScreeningForm objectForKey:SECTION_DIET];
     
@@ -2456,7 +2455,6 @@ typedef enum formName {
     
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Eligibility for Pap Smear"];
     XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
@@ -3589,8 +3587,6 @@ typedef enum formName {
     
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Suicide Risk Assessment (Basic)"];
     XLFormSectionDescriptor * section;
-    XLFormRowDescriptor *row;
-    
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
@@ -3953,7 +3949,6 @@ typedef enum formName {
         [self calculatePhqScore];
     } else if ([rowDescriptor.tag isEqualToString:kPhqQ2Score]) {
         [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhqQ2Score andNewContent:newValue];
-#warning if >= 3, ACTIVATE PHQ-9 in Social Work Booth!
     }
 
     /* Suicide Risk Assessment (Basic) */

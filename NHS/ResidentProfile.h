@@ -13,6 +13,7 @@
 
 @property (strong, nonatomic) NSDictionary *fullDict;
 @property BOOL profilingDone;
+@property BOOL consentImgExists;
 
 +(id) sharedManager;
 - (void) updateProfile: (NSDictionary *) fullDict;
@@ -40,7 +41,8 @@
 - (BOOL) hasIncome;
 - (BOOL) canReceiveSpecVoucher;
 - (BOOL) isFemale;
-
+- (BOOL) hasConsentImage;
+- (NSString *) getFallRiskStatus;
 
 
 @end

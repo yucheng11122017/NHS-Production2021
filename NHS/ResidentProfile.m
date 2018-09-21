@@ -29,6 +29,7 @@
 -(id)init {
     if (self = [super init]) {
         _profilingDone = false;
+        _consentImgExists = false;
     }
     
     return self;
@@ -519,7 +520,23 @@
     else return NO;
 }
 
+- (BOOL) hasConsentImage {
+    return _consentImgExists;
+}
 
+- (NSString *) getFallRiskStatus {
+    if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
+        if ([_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE] != (id)[NSNull null]) { //if the section has at least one entry...
+            NSDictionary *fallRiskDict = [_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE];
+            NSString *fallRiskStatus = [fallRiskDict objectForKey:kFallRiskStatus];
+            
+            if (fallRiskStatus != nil && fallRiskStatus != (id)[NSNull null])
+                return fallRiskStatus;
+        }
+    }
+    
+    return @"Undetermined";
+}
 
 
 @end

@@ -295,7 +295,51 @@
     if ([neighbourhood isEqualToString:@"Kampong Glam"])
         addressRow.selectorOptions = @[@"Blk 4 Beach Road", @"Blk 5 Beach Road", @"Blk 6 Beach Road", @"Blk 7 North Bridge Road", @"Blk 8 North Bridge Road", @"Blk 9 North Bridge Road", @"Blk 10 North Bridge Road", @"Blk 18 Jalan Sultan", @"Blk 19 Jalan Sultan", @"Others"];
     else
-        addressRow.selectorOptions = @[@"Blk 55 Lengkok Bahru", @"Blk 56 Lengkok Bahru", @"Blk 57 Lengkok Bahru", @"Blk 58 Lengkok Bahru", @"Blk 59 Lengkok Bahru", @"Blk 61 Lengkok Bahru", @"Blk 3 Jln Bt Merah", @"Others"];
+//        addressRow.selectorOptions = @[@"Blk 55 Lengkok Bahru", @"Blk 56 Lengkok Bahru", @"Blk 57 Lengkok Bahru", @"Blk 58 Lengkok Bahru", @"Blk 59 Lengkok Bahru", @"Blk 61 Lengkok Bahru", @"Blk 3 Jln Bt Merah", @"Others"];
+        addressRow.selectorOptions = @[@"1 Jln Bt Merah",
+                                       @"2 Jln Bt Merah",
+                                       @"3 Jln Bt Merah",
+                                       @"7 Jln Bt Merah",
+                                       @"11 Jln Bt Merah",
+                                       @"12 Jln Bt Merah",
+                                       @"13 Jln Bt Merah",
+                                       @"14 Jln Bt Merah",
+                                       @"28 Jln Bt Merah",
+                                       @"8 Jln Rumah Tinggi",
+                                       @"9 Jln Rumah Tinggi",
+                                       @"10 Jln Rumah Tinggi",
+                                       @"35 Jln Rumah Tinggi",
+                                       @"36 Jln Rumah Tinggi",
+                                       @"37 Jln Rumah Tinggi",
+                                       @"39 Jln Rumah Tinggi",
+                                       @"40 Jln Rumah Tinggi",
+                                       @"43 Lengkok Bahru",
+                                       @"44 Lengkok Bahru",
+                                       @"45 Lengkok Bahru",
+                                       @"46 Lengkok Bahru",
+                                       @"47 Lengkok Bahru",
+                                       @"48 Lengkok Bahru",
+                                       @"51 Lengkok Bahru",
+                                       @"52 Lengkok Bahru",
+                                       @"53 Lengkok Bahru",
+                                       @"54 Lengkok Bahru",
+                                       @"55 Lengkok Bahru",
+                                       @"56 Lengkok Bahru",
+                                       @"57 Lengkok Bahru",
+                                       @"58 Lengkok Bahru",
+                                       @"59 Lengkok Bahru",
+                                       @"61 Lengkok Bahru",
+                                       @"63A Lengkok Bahru",
+                                       @"63B Lengkok Bahru",
+                                       @"28 Hoy Fatt Rd",
+                                       @"49 Hoy Fatt Rd",
+                                       @"50 Hoy Fatt Rd",
+                                       @"119 Bt Merah Lane 1",
+                                       @"121 Bt Merah Lane 1",
+                                       @"122 Bt Merah Lane 1",
+                                       @"124 Bt Merah Lane 1",
+                                       @"125 Bt Merah Lane 1",
+                                       @"127 Bt Merah Lane 1"];
     [self setDefaultFontWithRow:addressRow];
     [section addFormRow:addressRow];
     
@@ -315,7 +359,7 @@
     addressRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
             street = [self getStreetFromAddress:newValue];
-            block  = [self getBlockFromAddress:newValue];
+            block  = [self getBlockFromStreetName:street];
             
             if ([newValue containsString:@"Others"]) {
                 addressOthersBlock.required = YES;
@@ -922,7 +966,6 @@
     
     else if ([rowDescriptor.tag isEqualToString:kAddressPostCode]) {
         [self checkIfPostCodeIsValid:rowDescriptor];
-        [self checkPostcodeWithRefTable:rowDescriptor];
     }
 }
 
@@ -1226,31 +1269,34 @@
         else return @"Others";
     } else {
         if ([string containsString:@"Lengkok"]) return @"Lengkok Bahru";
-        else if ([string containsString:@"Bt"]) return @"Jln Bt Merah";
+        else if ([string containsString:@"Jln Bt"]) return @"Jln Bt Merah";
+        else if ([string containsString:@"Jln Rumah"]) return @"Jln Rumah Tinggi";
+        else if ([string containsString:@"Hoy Fatt"]) return @"Hoy Fatt";
+        else if ([string containsString:@"Merah Lane"]) return @"Bt Merah Lane 1";
         else return @"Others";
     }
 }
 
-- (NSString *) getBlockFromAddress: (NSString *) string {
+- (NSString *) getBlockFromStreetName: (NSString *) street {
     
     NSMutableString *subString;
     NSString* result;
     
-    if ([string containsString:@"Others"]) {
+    if ([street containsString:@"Others"]) {
         return @"0";
     }
     
     if ([neighbourhood isEqualToString:@"Kampong Glam"]) {
-        subString = [[string substringWithRange:NSMakeRange(0, 6)] mutableCopy];
+        NSString *addressOption = [[self.form formValues] objectForKey:@"address_block_street"];
+        subString = [[addressOption substringWithRange:NSMakeRange(0, 6)] mutableCopy];
         result = [subString stringByReplacingOccurrencesOfString:@"Blk " withString:@""];
     } else {        //Lengkok Bahru / Queenstown
-        if ([string containsString:@"Lengkok"]) {
-            subString = [[string substringWithRange:NSMakeRange(0, 6)] mutableCopy];
-        } else {    //Jln Bukit Merah
-            subString = [[string substringWithRange:NSMakeRange(0, 5)] mutableCopy];
-        }
+        NSString *addressOption = [[self.form formValues] objectForKey:@"address_block_street"];
+        if ([addressOption containsString:@"63A"]) return @"63A";
+        else if ([addressOption containsString:@"63B"]) return @"63B";
+        
+        result = [addressOption stringByReplacingOccurrencesOfString:street withString:@""];
     }
-    result = [subString stringByReplacingOccurrencesOfString:@"Blk " withString:@""];
     
     int blkNo = [result intValue];   //to remove whitespace
     return [NSString stringWithFormat:@"%d", blkNo];
@@ -1358,54 +1404,52 @@
                   [[NSString alloc] initWithData:errorData
                                         encoding:NSUTF8StringEncoding];
                   NSLog(@"error: %@", errorString);
-                  
-                  
               }];
     }
     
 }
 
-- (void) checkPostcodeWithRefTable: (XLFormRowDescriptor *) rowDescriptor {
-    NSString *blkNo, *roadName, *supposedPostcode;
-    if ([street isEqualToString:@"Others"]) {
-        blkNo = [[self.form formValues] objectForKey:kAddressOthersBlock];
-        roadName = [[self.form formValues] objectForKey:kAddressOthersRoadName];
-    } else {
-        blkNo = block;
-        roadName = street;
-    }
-        
-    if ([[roadName uppercaseString] containsString:@"JLN BT MERAH"] || [[roadName uppercaseString] containsString:@"JALAN BUKIT MERAH"]) {
-        if (blkNo.length == 1) supposedPostcode = [@"15000" stringByAppendingString:blkNo];
-        if (blkNo.length == 2) supposedPostcode = [@"1500" stringByAppendingString:blkNo];
-    } else if ([[roadName uppercaseString] containsString:@"RUMAH TINGGI"]) {
-        if (blkNo.length == 1) supposedPostcode = [@"15000" stringByAppendingString:blkNo];
-        if (blkNo.length == 2) supposedPostcode = [@"1500" stringByAppendingString:blkNo];
-        
-        if ([blkNo isEqualToString:@"39"] || [blkNo isEqualToString:@"40"]) supposedPostcode = [supposedPostcode stringByReplacingOccurrencesOfString:@"150" withString:@"151"];
-    } else if ([[roadName uppercaseString] containsString:@"LENGKOK BAHRU"]) {
-        if (blkNo.length == 2) supposedPostcode = [@"1500" stringByAppendingString:blkNo];
-        else if ([blkNo containsString:@"63A"]) supposedPostcode = @"151063";
-        else if ([blkNo containsString:@"63B"]) supposedPostcode = @"152063";
-        
-        if ([blkNo isEqualToString:@"47"] || [blkNo isEqualToString:@"48"] || [blkNo isEqualToString:@"55"] || [blkNo isEqualToString:@"57"]) supposedPostcode = [supposedPostcode stringByReplacingOccurrencesOfString:@"150" withString:@"151"];
-    } else if ([[roadName uppercaseString] containsString:@"HOY FATT ROAD"]) {
-        if ([blkNo containsString:@"28"]) supposedPostcode = @"151028";
-        else if ([blkNo containsString:@"49"]) supposedPostcode = @"150049";
-        else if ([blkNo containsString:@"50"]) supposedPostcode = @"150050";
-    } else if ([[roadName uppercaseString] containsString:@"BT MERAH LANE 1"] || [[roadName uppercaseString] containsString:@"BUKIT MERAH LANE 1"]) {
-        if ([blkNo containsString:@"119"]) supposedPostcode = @"151119";
-        else {
-            supposedPostcode = [@"150" stringByAppendingString:blkNo];
-        }
-    }
-    
-    if ([rowDescriptor.value isEqualToString:supposedPostcode]) {
-        NSLog(@"Correct postcode!");
-    } else {
-        NSLog(@"Please verify that the postcode is CORRECT!");
-    }
-}
+//- (void) checkPostcodeWithRefTable: (XLFormRowDescriptor *) rowDescriptor {
+//    NSString *blkNo, *roadName, *supposedPostcode;
+//    if ([street isEqualToString:@"Others"]) {
+//        blkNo = [[self.form formValues] objectForKey:kAddressOthersBlock];
+//        roadName = [[self.form formValues] objectForKey:kAddressOthersRoadName];
+//    } else {
+//        blkNo = block;
+//        roadName = street;
+//    }
+//
+//    if ([[roadName uppercaseString] containsString:@"JLN BT MERAH"] || [[roadName uppercaseString] containsString:@"JALAN BUKIT MERAH"]) {
+//        if (blkNo.length == 1) supposedPostcode = [@"15000" stringByAppendingString:blkNo];
+//        if (blkNo.length == 2) supposedPostcode = [@"1500" stringByAppendingString:blkNo];
+//    } else if ([[roadName uppercaseString] containsString:@"RUMAH TINGGI"]) {
+//        if (blkNo.length == 1) supposedPostcode = [@"15000" stringByAppendingString:blkNo];
+//        if (blkNo.length == 2) supposedPostcode = [@"1500" stringByAppendingString:blkNo];
+//
+//        if ([blkNo isEqualToString:@"39"] || [blkNo isEqualToString:@"40"]) supposedPostcode = [supposedPostcode stringByReplacingOccurrencesOfString:@"150" withString:@"151"];
+//    } else if ([[roadName uppercaseString] containsString:@"LENGKOK BAHRU"]) {
+//        if (blkNo.length == 2) supposedPostcode = [@"1500" stringByAppendingString:blkNo];
+//        else if ([blkNo containsString:@"63A"]) supposedPostcode = @"151063";
+//        else if ([blkNo containsString:@"63B"]) supposedPostcode = @"152063";
+//
+//        if ([blkNo isEqualToString:@"47"] || [blkNo isEqualToString:@"48"] || [blkNo isEqualToString:@"55"] || [blkNo isEqualToString:@"57"]) supposedPostcode = [supposedPostcode stringByReplacingOccurrencesOfString:@"150" withString:@"151"];
+//    } else if ([[roadName uppercaseString] containsString:@"HOY FATT ROAD"]) {
+//        if ([blkNo containsString:@"28"]) supposedPostcode = @"151028";
+//        else if ([blkNo containsString:@"49"]) supposedPostcode = @"150049";
+//        else if ([blkNo containsString:@"50"]) supposedPostcode = @"150050";
+//    } else if ([[roadName uppercaseString] containsString:@"BT MERAH LANE 1"] || [[roadName uppercaseString] containsString:@"BUKIT MERAH LANE 1"]) {
+//        if ([blkNo containsString:@"119"]) supposedPostcode = @"151119";
+//        else {
+//            supposedPostcode = [@"150" stringByAppendingString:blkNo];
+//        }
+//    }
+//
+//    if ([rowDescriptor.value isEqualToString:supposedPostcode]) {
+//        NSLog(@"Correct postcode!");
+//    } else {
+//        NSLog(@"Please verify that the postcode is CORRECT!");
+//    }
+//}
 
 - (NSString *) replaceShortForms: (NSString *) originalString {
     NSString *pattern_rd = @"\\bRD\\b";

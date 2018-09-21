@@ -47,7 +47,7 @@ typedef enum rowTypes {
 
 @interface ResidentParticularsVC () {
     NSString *neighbourhood;
-    XLFormRowDescriptor* dobRow;
+    XLFormRowDescriptor* dobRow, *ageRow, *age40aboveRow;;
     int successCounter, failCounter;
     NetworkStatus status;
     int fetchDataState;
@@ -170,26 +170,30 @@ typedef enum rowTypes {
         }
     };
     
-    dobRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBirthDate rowType:XLFormRowDescriptorTypeDateInline title:@"DOB"];
-    dobRow.required = YES;
-
+    dobRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBirthDate rowType:XLFormRowDescriptorTypeText title:@"DOB (DDMMYYYY)"];
+    
     if ([_residentParticularsDict count] > 0) {
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"YYYY-MM-dd";
         dateFormatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];  //otherwise 1st Jan will not be able to be read.
         NSDate *date = [dateFormatter dateFromString:_residentParticularsDict[kBirthDate]];
-        dobRow.value = date;
+        // change to new format
+        dateFormatter.dateFormat = @"ddMMYYYY";
+        dobRow.value = [dateFormatter stringFromDate:date];
+        
     }
-    [dobRow.cellConfig setObject:[UIFont boldSystemFontOfSize:DEFAULT_FONT_SIZE] forKey:@"textLabel.font"];
+    dobRow.required = YES;
+    [dobRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [self setDefaultFontWithRow:dobRow];
     [section addFormRow:dobRow];
     
-    XLFormRowDescriptor *ageRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAge rowType:XLFormRowDescriptorTypeNumber title:@"Age (auto-calculated)"];
+    ageRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAge rowType:XLFormRowDescriptorTypeNumber title:@"Age (auto-calculated)"];
     [ageRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     ageRow.value = @"N/A";
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy"];
-    NSString *yearOfBirth = [dateFormatter stringFromDate:dobRow.value];
+    NSString *yearOfBirth = [dobRow.value substringFromIndex:4];
     NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
     NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
     NSLog(@"%li", (long)age);
@@ -343,7 +347,50 @@ typedef enum rowTypes {
     if ([neighbourhood isEqualToString:@"Kampong Glam"])
         addressRow.selectorOptions = @[@"Blk 4 Beach Road", @"Blk 5 Beach Road", @"Blk 6 Beach Road", @"Blk 7 North Bridge Road", @"Blk 8 North Bridge Road", @"Blk 9 North Bridge Road", @"Blk 10 North Bridge Road", @"Blk 18 Jalan Sultan", @"Blk 19 Jalan Sultan", @"Others"];
     else
-        addressRow.selectorOptions = @[@"Blk 55 Lengkok Bahru", @"Blk 56 Lengkok Bahru", @"Blk 57 Lengkok Bahru", @"Blk 58 Lengkok Bahru", @"Blk 59 Lengkok Bahru", @"Blk 61 Lengkok Bahru", @"Blk 3 Jalan Bukit Merah", @"Others"];
+        addressRow.selectorOptions = @[@"1 Jln Bt Merah",
+                                       @"2 Jln Bt Merah",
+                                       @"3 Jln Bt Merah",
+                                       @"7 Jln Bt Merah",
+                                       @"11 Jln Bt Merah",
+                                       @"12 Jln Bt Merah",
+                                       @"13 Jln Bt Merah",
+                                       @"14 Jln Bt Merah",
+                                       @"28 Jln Bt Merah",
+                                       @"8 Jln Rumah Tinggi",
+                                       @"9 Jln Rumah Tinggi",
+                                       @"10 Jln Rumah Tinggi",
+                                       @"35 Jln Rumah Tinggi",
+                                       @"36 Jln Rumah Tinggi",
+                                       @"37 Jln Rumah Tinggi",
+                                       @"39 Jln Rumah Tinggi",
+                                       @"40 Jln Rumah Tinggi",
+                                       @"43 Lengkok Bahru",
+                                       @"44 Lengkok Bahru",
+                                       @"45 Lengkok Bahru",
+                                       @"46 Lengkok Bahru",
+                                       @"47 Lengkok Bahru",
+                                       @"48 Lengkok Bahru",
+                                       @"51 Lengkok Bahru",
+                                       @"52 Lengkok Bahru",
+                                       @"53 Lengkok Bahru",
+                                       @"54 Lengkok Bahru",
+                                       @"55 Lengkok Bahru",
+                                       @"56 Lengkok Bahru",
+                                       @"57 Lengkok Bahru",
+                                       @"58 Lengkok Bahru",
+                                       @"59 Lengkok Bahru",
+                                       @"61 Lengkok Bahru",
+                                       @"63A Lengkok Bahru",
+                                       @"63B Lengkok Bahru",
+                                       @"28 Hoy Fatt Rd",
+                                       @"49 Hoy Fatt Rd",
+                                       @"50 Hoy Fatt Rd",
+                                       @"119 Bt Merah Lane 1",
+                                       @"121 Bt Merah Lane 1",
+                                       @"122 Bt Merah Lane 1",
+                                       @"124 Bt Merah Lane 1",
+                                       @"125 Bt Merah Lane 1",
+                                       @"127 Bt Merah Lane 1"];
     [self setDefaultFontWithRow:addressRow];
     
     addressRow.value = [self getAddressFromStreetAndBlock];
@@ -353,13 +400,15 @@ typedef enum rowTypes {
     addressRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
             street = [self getStreetFromAddress:newValue];
-            block  = [self getBlockFromAddress:newValue];
-            
-            if ([newValue containsString:@"Others"]) {
-                //                addrOthersRow.required = YES;  //force to fill in address if selected 'Others'
-            } else {
-                //                addrOthersRow.required = NO;
-            }
+            block  = [self getBlockFromStreetName:street];
+
+            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kAddressStreet andNewContent:street];
+            double delayInSeconds = 1.0;
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                //code to be executed on the main queue after delay
+                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kAddressBlock andNewContent:block];
+            });
         }
     };
     
@@ -412,62 +461,6 @@ typedef enum rowTypes {
     }
     [section addFormRow:row];
     
-    
-//    XLFormRowDescriptor *addressRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAddress rowType:XLFormRowDescriptorTypeSelectorPush title:@"Address"];
-//    if ([neighbourhood isEqualToString:@"Kampong Glam"])
-//        addressRow.selectorOptions = @[@"Blk 4 Beach Rd",@"Blk 5 Beach Rd",@"Blk 6 Beach Rd", @"Blk 7 North Bridge Rd", @"Blk 8 North Bridge Rd", @"Blk 9 North Bridge Rd", @"Blk 10 North Bridge Rd", @"Blk 18 Jln Sultan", @"Blk 19 Jln Sultan", @"Others"];
-//    else
-//        addressRow.selectorOptions = @[@"1 Eunos Crescent", @"2 Eunos Crescent", @"12 Eunos Crescent", @"2 Upper Aljunied Lane", @"3 Upper Aljunied Lane", @"4 Upper Aljunied Lane", @"5 Upper Aljunied Lane", @"Others"];
-//    addressRow.value = [self getAddressFromStreetAndBlock];
-//    addressRow.required = YES;
-//    [self setDefaultFontWithRow:addressRow];
-//    [section addFormRow:addressRow];
-//    
-//    addressRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-//        if (newValue != oldValue) {
-//            NSString *street = [self getStreetFromAddress:newValue];
-//            NSString *block  = [self getBlockFromAddress:newValue];
-//            
-//            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kAddressStreet andNewContent:street];
-//            double delayInSeconds = 1.0;
-//            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-//            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-//                //code to be executed on the main queue after delay
-//                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kAddressBlock andNewContent:block];
-//            });
-//            
-//            if ([newValue containsString:@"Others"]) {
-////                addrOthersRow.required = YES;  //force to fill in address if selected 'Others'
-//            } else {
-////                addrOthersRow.required = NO;
-//            }
-//        }
-//    };
-//    
-//    XLFormRowDescriptor *unitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressUnitNum rowType:XLFormRowDescriptorTypeText title:@"Unit No"];
-//    unitRow.value = _residentParticularsDict[kAddressUnitNum];
-//    [self setDefaultFontWithRow:unitRow];
-//    [unitRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-//    unitRow.required = YES;
-//    [section addFormRow:unitRow];
-//    
-//    unitRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
-//        
-//        if (![oldValue isEqual:newValue]) { //otherwise this segment will crash
-//            NSString *CAPSed = [rowDescriptor.editTextValue uppercaseString];
-//            rowDescriptor.value = CAPSed;
-//        }
-//    };
-//    
-//    
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressPostCode rowType:XLFormRowDescriptorTypePhone title:@"Postal Code"];
-//    row.value = _residentParticularsDict[kAddressPostCode];
-//    row.required = YES;
-//    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
-//    [self setDefaultFontWithRow:row];
-//    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Postal Code must be 6 digits" regex:@"^(?=.*\\d).{6}$"]];
-//    [section addFormRow:row];
-    
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Consent"];   /// NEW SECTION
     section.footerTitle = @"I consent to NHS directly disclosing the Information and my past screening and follow-up information (participant’s past screening and follow-up information under NHS’ Screening and Follow-Up Programme) to NHS’ collaborators (refer to organisations/institutions that work in partnership with NHS for the provision of screening and follow-up related services, such as but not limited to: MOH, HPB, Regional Health Systems, Senior Cluster Network Operators, etc. where necessary) for the purposes of checking if I require re-screening, further tests, follow-up action and/or referral to community programmes/activities.";
     [formDescriptor addFormSection:section];
@@ -482,27 +475,22 @@ typedef enum rowTypes {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Consent to Research"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kConsentToResearch rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Consent to research"];
-    row.required = YES;
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kConsentToResearch rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Consent to research"];
+    row.required = NO;
+    row.selectorOptions = @[@"Yes", @"No"];
     if ([_residentParticularsDict objectForKey:kConsentToResearch] != (id)[NSNull null])
-        row.value = [_residentParticularsDict objectForKey:kConsentToResearch];
+        row.value = [self getYesNoFromOneZero:[_residentParticularsDict objectForKey:kConsentToResearch]];
     [self setDefaultFontWithRow:row];
     [section addFormRow:row];
     
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Phlebotomy Eligibility Assessment"];   /// NEW SECTION
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"INDICATORS"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
-    
-    XLFormRowDescriptor *wantFreeBtRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantFreeBt rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does resident want a free blood test?"];
-    [self setDefaultFontWithRow:wantFreeBtRow];
-    wantFreeBtRow.value = [self getYesNoFromOneZero:[_phlebEligibDict objectForKey:kWantFreeBt]];
-    wantFreeBtRow.selectorOptions = @[@"Yes", @"No"];
-    wantFreeBtRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:wantFreeBtRow];
     
     XLFormRowDescriptor *sporeanRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr
                                                                             rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                                               title:@"Singaporean?"];
     [self setDefaultFontWithRow:sporeanRow];
+    [sporeanRow.cellConfigAtConfigure setObject:[UIColor purpleColor] forKey:@"tintColor"];
     sporeanRow.selectorOptions = @[@"Yes",@"No"];
     sporeanRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     sporeanRow.disabled = @1;
@@ -513,6 +501,7 @@ typedef enum rowTypes {
                                                                        rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                                          title:@"PR?"];
     [self setDefaultFontWithRow:prRow];
+    [prRow.cellConfigAtConfigure setObject:[UIColor purpleColor] forKey:@"tintColor"];
     prRow.selectorOptions = @[@"Yes",@"No"];
     prRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     prRow.disabled = @1;
@@ -560,10 +549,11 @@ typedef enum rowTypes {
         }
     };
     
-    XLFormRowDescriptor *age40aboveRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeCheck
-                                                                               rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                                                 title:@"Age 40 and above?"];
+    age40aboveRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAgeCheck
+                                                          rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                            title:@"Age 40 and above?"];
     [self setDefaultFontWithRow:age40aboveRow];
+    [age40aboveRow.cellConfigAtConfigure setObject:[UIColor purpleColor] forKey:@"tintColor"];
     age40aboveRow.disabled = @YES;
     age40aboveRow.selectorOptions = @[@"Yes",@"No"];
     
@@ -572,34 +562,19 @@ typedef enum rowTypes {
     } else {
         age40aboveRow.value = @"No";
     }
-    
-    __weak __typeof(self)weakSelf = self;
-    dobRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            // Calculate age
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            [dateFormatter setDateFormat:@"yyyy"];
-            NSString *yearOfBirth = [dateFormatter stringFromDate:newValue];
-            NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
-            NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
-            NSLog(@"%li", (long)age);
-            ageRow.value = [NSNumber numberWithLong:age];
-            [weakSelf reloadFormRow:ageRow];
-            
-            if (age >= 40) {
-                age40aboveRow.value = @"Yes";
-                age40aboveRow.disabled = @YES;
-                [weakSelf updateFormRow:age40aboveRow];
-            } else {
-                age40aboveRow.value = @"No";
-                age40aboveRow.disabled = @YES;
-                [weakSelf updateFormRow:age40aboveRow];
-            }
-        }
-    };
-    
     age40aboveRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:age40aboveRow];
+    
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Phlebotomy Eligibility Assessment"];   /// NEW SECTION
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *wantFreeBtRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWantFreeBt rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does resident want a free blood test?"];
+    [self setDefaultFontWithRow:wantFreeBtRow];
+    wantFreeBtRow.value = [self getYesNoFromOneZero:[_phlebEligibDict objectForKey:kWantFreeBt]];
+    wantFreeBtRow.selectorOptions = @[@"Yes", @"No"];
+    wantFreeBtRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:wantFreeBtRow];
     
     XLFormRowDescriptor *chronicCondRow;
     
@@ -635,6 +610,7 @@ typedef enum rowTypes {
                                                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                                                  title:@"Is resident eligible for a blood test? (auto-calculated)"];
     [self setDefaultFontWithRow:eligibleBTRow];
+    [eligibleBTRow.cellConfigAtConfigure setObject:[UIColor purpleColor] forKey:@"tintColor"];
     eligibleBTRow.disabled = @YES;
     eligibleBTRow.selectorOptions = @[@"Yes",@"No"];
     eligibleBTRow.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -655,7 +631,12 @@ typedef enum rowTypes {
                     [self reloadFormRow:eligibleBTRow];
                     return;
                 }
-                if (([[dict objectForKey:kChronicCond] isEqualToString:@"No"] || [[dict objectForKey:kRegFollowup] isEqualToString:@"No"])&& ([[dict objectForKey:kSporeanPr] isEqualToString:@"Yes"]||[[dict objectForKey:kIsPr] isEqualToString:@"Yes"]) && [[dict objectForKey:kAgeCheck] isEqualToString:@"Yes"] && [[dict objectForKey:kNoBloodTest] isEqualToString:@"No"]) {
+                if (([[dict objectForKey:kChronicCond] isEqualToString:@"No"] ||
+                     ([[dict objectForKey:kChronicCond] isEqualToString:@"Yes"] && [[dict objectForKey:kRegFollowup] isEqualToString:@"No"]))
+                    && ([[dict objectForKey:kSporeanPr] isEqualToString:@"Yes"] ||
+                        [[dict objectForKey:kIsPr] isEqualToString:@"Yes"]) &&
+                    [[dict objectForKey:kAgeCheck] isEqualToString:@"Yes"] &&
+                    [[dict objectForKey:kNoBloodTest] isEqualToString:@"No"]) {
                     eligibleBTRow.value = @"Yes";
                 } else {
                     eligibleBTRow.value = @"No";
@@ -679,15 +660,34 @@ typedef enum rowTypes {
                     [self reloadFormRow:eligibleBTRow];
                     return;
                 }
-                if ([[dict objectForKey:kWantFreeBt] isEqualToString:@"Yes"] && ([[dict objectForKey:kSporeanPr] isEqualToString:@"Yes"]||[[dict objectForKey:kIsPr] isEqualToString:@"Yes"]) && [[dict objectForKey:kAgeCheck] isEqualToString:@"Yes"] && [[dict objectForKey:kNoBloodTest] isEqualToString:@"No"]) {
+                if ([[dict objectForKey:kWantFreeBt] isEqualToString:@"Yes"] &&
+                    ([[dict objectForKey:kSporeanPr] isEqualToString:@"Yes"] || [[dict objectForKey:kIsPr] isEqualToString:@"Yes"]) &&
+                    [[dict objectForKey:kAgeCheck] isEqualToString:@"Yes"] &&
+                    [[dict objectForKey:kNoBloodTest] isEqualToString:@"No"]) {
                     eligibleBTRow.value = @"Yes";
                 } else {
                     eligibleBTRow.value = @"No";
                 }
                 [self reloadFormRow:eligibleBTRow];
             } else {
+                NSDictionary *dict =  [self.form formValues];
+                if ([dict objectForKey:kWantFreeBt] == (id)[NSNull null] || [dict objectForKey:kSporeanPr] == (id)[NSNull null] || [dict objectForKey:kIsPr] == (id)[NSNull null] || [dict objectForKey:kAgeCheck] == (id)[NSNull null] || [dict objectForKey:kNoBloodTest] == (id)[NSNull null] || [dict objectForKey:kRegFollowup] == (id)[NSNull null]) {
+                    eligibleBTRow.value = @"No";
+                    [self reloadFormRow:eligibleBTRow];
+                    return;
+                }
                 
-                eligibleBTRow.value = @"No";
+                if ([[dict objectForKey:kWantFreeBt] isEqualToString:@"Yes"] &&
+                    [[dict objectForKey:kRegFollowup] isEqualToString:@"No"] &&
+                    ([[dict objectForKey:kSporeanPr] isEqualToString:@"Yes"] || [[dict objectForKey:kIsPr] isEqualToString:@"Yes"]) &&
+                    [[dict objectForKey:kAgeCheck] isEqualToString:@"Yes"] &&
+                    [[dict objectForKey:kNoBloodTest] isEqualToString:@"No"]) {
+                    
+                    eligibleBTRow.value = @"Yes";
+                    
+                } else {
+                    eligibleBTRow.value = @"No";
+                }
                 [self reloadFormRow:eligibleBTRow];
             }
             
@@ -703,17 +703,19 @@ typedef enum rowTypes {
                     [self reloadFormRow:eligibleBTRow];
                     return;
                 }
-                if ([[dict objectForKey:kWantFreeBt] isEqualToString:@"Yes"] && ([[dict objectForKey:kSporeanPr] isEqualToString:@"Yes"]||[[dict objectForKey:kIsPr] isEqualToString:@"Yes"]) && [[dict objectForKey:kAgeCheck] isEqualToString:@"Yes"] && [[dict objectForKey:kNoBloodTest] isEqualToString:@"No"]) {
+                if ([[dict objectForKey:kChronicCond] isEqualToString:@"Yes"] &&
+                    [[dict objectForKey:kWantFreeBt] isEqualToString:@"Yes"] &&
+                    ([[dict objectForKey:kSporeanPr] isEqualToString:@"Yes"]||[[dict objectForKey:kIsPr] isEqualToString:@"Yes"]) &&
+                    [[dict objectForKey:kAgeCheck] isEqualToString:@"Yes"] &&
+                    [[dict objectForKey:kNoBloodTest] isEqualToString:@"No"]) {
                     eligibleBTRow.value = @"Yes";
                 } else {
                     eligibleBTRow.value = @"No";
                 }
                 [self reloadFormRow:eligibleBTRow];
             } else {
-                if ([chronicCondRow.value isEqualToString:@"Yes"]) {  //if both are false
-                    eligibleBTRow.value = @"No";
-                    [self reloadFormRow:eligibleBTRow];
-                }
+                eligibleBTRow.value = @"No";
+                [self reloadFormRow:eligibleBTRow];
             }
             
         }
@@ -721,7 +723,7 @@ typedef enum rowTypes {
     
     noBloodTestRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
-            if ([newValue isEqualToString:@"Yes"]) {
+            if ([newValue isEqualToString:@"No"]) {
                 NSDictionary *dict =  [self.form formValues];
                 
                 if ([dict objectForKey:kWantFreeBt] == (id)[NSNull null] || [dict objectForKey:kSporeanPr] == (id)[NSNull null] || [dict objectForKey:kIsPr] == (id)[NSNull null] || [dict objectForKey:kAgeCheck] == (id)[NSNull null] || [dict objectForKey:kChronicCond] == (id)[NSNull null]) {
@@ -730,13 +732,17 @@ typedef enum rowTypes {
                     return;
                 }
                 
-                if ([[dict objectForKey:kWantFreeBt] isEqualToString:@"Yes"] && ([[dict objectForKey:kSporeanPr] isEqualToString:@"Yes"]||[[dict objectForKey:kIsPr] isEqualToString:@"Yes"]) && [[dict objectForKey:kAgeCheck] isEqualToString:@"Yes"] && [[dict objectForKey:kChronicCond] isEqualToString:@"True"]) {
+                if (([[dict objectForKey:kChronicCond] isEqualToString:@"No"] ||
+                     ([[dict objectForKey:kChronicCond] isEqualToString:@"Yes"] && [[dict objectForKey:kRegFollowup] isEqualToString:@"No"]))
+                    && ([[dict objectForKey:kSporeanPr] isEqualToString:@"Yes"] || [[dict objectForKey:kIsPr] isEqualToString:@"Yes"]) &&
+                    [[dict objectForKey:kAgeCheck] isEqualToString:@"Yes"] &&
+                    [[dict objectForKey:kWantFreeBt] isEqualToString:@"Yes"]) {
                     eligibleBTRow.value = @"Yes";
                 } else {
                     eligibleBTRow.value = @"No";
                 }
                 [self reloadFormRow:eligibleBTRow];
-            } else {
+            } else {    //if has already taken blood test in past 3 years
                 eligibleBTRow.value = @"No";
                 [self reloadFormRow:eligibleBTRow];
             }
@@ -808,6 +814,16 @@ typedef enum rowTypes {
     }
     apptDateRow.noValueDisplayText = @"Tap here";
     apptDateRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
+    
+    if (!apptDateRow.isHidden) {    //which means that screen mode is D2D
+        if (eligibleBTRow.value != nil && eligibleBTRow.value != (id)[NSNull null]) {
+            if ([eligibleBTRow.value isEqualToString:@"Yes"]) {
+                apptDateQRow.hidden = @YES;
+                apptDateRow.hidden = @YES;
+            }
+        }
+    }
+    
     apptDateRow.required = YES;
     [self setDefaultFontWithRow:apptDateRow];
     if (_modeOfScreeningDict != (id)[NSNull null] && [_modeOfScreeningDict objectForKey:kApptDate] != (id)[NSNull null]) {
@@ -815,6 +831,7 @@ typedef enum rowTypes {
     }
     [section addFormRow:apptDateRow];
     
+    /** ONLY IF ELIGIBLE FOR PHLEB */
     XLFormRowDescriptor *phlebApptQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"phleb_appt_q" rowType:XLFormRowDescriptorTypeInfo title:@"Phleb door-to-door Date (only available from 9-11am)"];
     phlebApptQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     phlebApptQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
@@ -829,6 +846,16 @@ typedef enum rowTypes {
     }
     phlebApptRow.noValueDisplayText = @"Tap here";
     phlebApptRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
+    
+    if (!phlebApptRow.isHidden) {    //which means that screen mode is D2D
+        if (eligibleBTRow.value != nil && eligibleBTRow.value != (id)[NSNull null]) {
+            if ([eligibleBTRow.value isEqualToString:@"No"]) {
+                phlebApptQRow.hidden = @YES;
+                phlebApptRow.hidden = @YES;
+            }
+        }
+    }
+    
     phlebApptRow.required = YES;
     [self setDefaultFontWithRow:phlebApptRow];
     if (_modeOfScreeningDict != (id)[NSNull null] && [_modeOfScreeningDict objectForKey:kPhlebAppt] != (id)[NSNull null]) {
@@ -947,11 +974,81 @@ typedef enum rowTypes {
     
     if (rowDescriptor.value != (id)[NSNull null] && rowDescriptor.value != nil) {
         if (rowDescriptor.tag == kBirthDate) {
-            NSString *birthDate = [self getDateStringFromFormValue:rowDescriptor.value];
-            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:birthDate];
-            return;
+            
+            if (rowDescriptor.value == nil || rowDescriptor.value == (id)[NSNull null]) {
+                ageRow.value = @"N/A";
+                [self reloadFormRow:ageRow];
+                return; //do nothing
+            }
+            
+            if (![self isDobValid:rowDescriptor.value]) {
+                [rowDescriptor.cellConfig setObject:[UIColor colorWithRed:240/255.0 green:128/255.0 blue:128/255.0 alpha:1.0] forKey:@"backgroundColor"]; //PINK
+                [self reloadFormRow:rowDescriptor];
+                ageRow.value = @"N/A";
+                [self reloadFormRow:ageRow];
+                
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Invalid DOB" message:@"Please check if you have keyed in correctly." preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                    //do nothing;
+                }];
+                [alertController addAction:okAction];
+                [self presentViewController:alertController animated:YES completion:nil];
+                return;      //check if DOB Is Valid first
+            } else {
+                [rowDescriptor.cellConfig setObject:[UIColor whiteColor] forKey:@"backgroundColor"]; //CLEAR
+                [self reloadFormRow:rowDescriptor];
+                
+                NSString *dobString = [NSString stringWithFormat:@"%@", rowDescriptor.value];
+                NSString *birthDate = [self reorderDateString:dobString];
+                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:birthDate];
+                
+                NSString *yearOfBirth = [NSString stringWithFormat:@"%@", [dobString substringFromIndex:4]];  //format: DDMMYYYY
+                NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                [dateFormatter setDateFormat:@"yyyy"];
+                NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
+                NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
+                NSLog(@"%li", (long)age);
+                ageRow.value = [NSNumber numberWithLong:age];
+                [self reloadFormRow:ageRow];
+                
+                if (age >= 40) {
+                    age40aboveRow.value = @"Yes";
+                    age40aboveRow.disabled = @YES;
+                    [self updateFormRow:age40aboveRow];
+                } else {
+                    age40aboveRow.value = @"No";
+                    age40aboveRow.disabled = @YES;
+                    [self updateFormRow:age40aboveRow];
+                }
+                return; //do not need to proceed from here.
+            }
+            
         } else if (rowDescriptor.tag == kNotes) {
             [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
+            return;
+        } else if ([rowDescriptor.tag isEqualToString:kAddressOthersBlock])  {
+            NSString *blkNumber = rowDescriptor.value;
+            if ([rowDescriptor.value containsString:@"Blk "]) {
+                blkNumber  = [[rowDescriptor.value mutableCopy] stringByReplacingOccurrencesOfString:@"Blk " withString:@""];
+            } else if ([rowDescriptor.value containsString:@"BLK "]) {
+                blkNumber = [[rowDescriptor.value mutableCopy] stringByReplacingOccurrencesOfString:@"BLK " withString:@""];
+            } else if ([rowDescriptor.value containsString:@"Block "]) {
+                blkNumber = [[rowDescriptor.value mutableCopy] stringByReplacingOccurrencesOfString:@"Block " withString:@""];
+            } else if ([rowDescriptor.value containsString:@"BLOCK "]) {
+                blkNumber = [[rowDescriptor.value mutableCopy] stringByReplacingOccurrencesOfString:@"BLOCK " withString:@""];
+            }
+            rowDescriptor.value = [blkNumber uppercaseString];
+            [self updateFormRow:rowDescriptor];
+        } else if ([rowDescriptor.tag isEqualToString:kAddressOthersRoadName]) {
+            NSString *roadName = [rowDescriptor.value uppercaseString];
+            if (roadName) {
+                rowDescriptor.value = [self replaceShortForms:roadName];
+                [self reloadFormRow:rowDescriptor];
+            }
+        }
+        
+        else if ([rowDescriptor.tag isEqualToString:kAddressPostCode]) {
+            [self checkIfPostCodeIsValid:rowDescriptor];
             return;
         }
         
@@ -979,7 +1076,7 @@ typedef enum rowTypes {
         [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kConsent andNewContent:newValue];
     }
     else if ([rowDescriptor.tag isEqualToString:kConsentToResearch]) {
-        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kConsentToResearch andNewContent:newValue];
+        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kConsentToResearch andNewContent:[self getOneZerofromYesNo:newValue]];
     }
     else if ([rowDescriptor.tag isEqualToString:kWantFreeBt]) {
         [self postSingleFieldWithSection:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT andFieldName:kWantFreeBt andNewContent:[self getOneZerofromYesNo:newValue]];
@@ -1102,11 +1199,40 @@ typedef enum rowTypes {
     return returnValue;
 }
 
-- (NSString *) getDateStringFromFormValue: (NSDate *) date{
+- (BOOL) isDobValid: (NSString *) dobString {
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"ddMMYYYY";
+    dateFormatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];  //otherwise 1st Jan will not be able to be read.
+    NSDate *date = [dateFormatter dateFromString:dobString];
+    
+    if (date != nil)  {
+        return YES;
+    }
+    
+    return NO;
+    
+    
+}
+
+- (NSString *) getDateStringFromFormValue: (NSDictionary *) formValues andRowTag: (NSString *) rowTag {
+    NSDate *date;
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd"];
     
+    date = [formValues objectForKey:rowTag];
     return [dateFormatter stringFromDate:date];
+}
+
+- (NSString *) reorderDateString: (NSString *) originalDateString {
+
+    NSString *newDate = [NSString stringWithFormat:@"%@-%@-%@",
+                         [originalDateString substringFromIndex:4],
+                         [originalDateString substringWithRange:NSMakeRange(2, 2)],
+                         [originalDateString substringWithRange:NSMakeRange(0, 2)]];
+    
+    
+    return newDate;
 }
 
 - (NSString *) getEthnicityString: (NSString *) number {
@@ -1114,25 +1240,26 @@ typedef enum rowTypes {
     return [array objectAtIndex:[number integerValue]];
 }
 
-- (NSString *) getMaritalStatusString: (NSString *) number {
-    NSArray *array = @[@"Divorced", @"Married", @"Separated", @"Single", @"Widowed"];
-    return [array objectAtIndex:[number integerValue]];
-}
-
-- (NSString *) getHighestEduLvlString: (NSString *) number {
-    NSArray *array = @[@"ITE/Pre-U/JC", @"No formal qualifications", @"Primary", @"Secondary", @"University"];
-    return [array objectAtIndex:[number integerValue]];
-}
-
-- (NSString *) getBlockFromAddress: (NSString *) string {
+- (NSString *) getBlockFromStreetName: (NSString *) street {
     
     NSMutableString *subString;
     NSString* result;
+    
+    if ([street containsString:@"Others"]) {
+        return @"0";
+    }
+    
     if ([neighbourhood isEqualToString:@"Kampong Glam"]) {
-        subString = [[string substringWithRange:NSMakeRange(0, 6)] mutableCopy];
+        NSString *addressOption = [[self.form formValues] objectForKey:@"address_block_street"];
+        subString = [[addressOption substringWithRange:NSMakeRange(0, 6)] mutableCopy];
         result = [subString stringByReplacingOccurrencesOfString:@"Blk " withString:@""];
-    } else
-        result = [string substringWithRange:NSMakeRange(0, 2)];
+    } else {        //Lengkok Bahru / Queenstown
+        NSString *addressOption = [[self.form formValues] objectForKey:@"address_block_street"];
+        if ([addressOption containsString:@"63A"]) return @"63A";
+        else if ([addressOption containsString:@"63B"]) return @"63B";
+        
+        result = [addressOption stringByReplacingOccurrencesOfString:street withString:@""];
+    }
     
     int blkNo = [result intValue];   //to remove whitespace
     return [NSString stringWithFormat:@"%d", blkNo];
@@ -1146,11 +1273,15 @@ typedef enum rowTypes {
         else if ([string containsString:@"Sultan"]) return @"Jln Sultan";
         else return @"Others";
     } else {
-        if ([string containsString:@"Eunos"]) return @"Eunos Crescent";
-        else if ([string containsString:@"Aljunied"]) return @"Upper Aljunied Lane";
+        if ([string containsString:@"Lengkok"]) return @"Lengkok Bahru";
+        else if ([string containsString:@"Jln Bt"]) return @"Jln Bt Merah";
+        else if ([string containsString:@"Jln Rumah"]) return @"Jln Rumah Tinggi";
+        else if ([string containsString:@"Hoy Fatt"]) return @"Hoy Fatt Rd";
+        else if ([string containsString:@"Merah Lane"]) return @"Bt Merah Lane 1";
         else return @"Others";
     }
 }
+
 
 - (NSString *) getAddressFromStreetAndBlock {
     if (_residentParticularsDict[kAddressStreet] != (id) [NSNull null]) {
@@ -1161,7 +1292,10 @@ typedef enum rowTypes {
             return @"Others";
         }
         
-        return [NSString stringWithFormat:@"Blk %@ %@", block, street];
+        if ([neighbourhood isEqualToString:@"Kampong Glam"])
+            return [NSString stringWithFormat:@"Blk %@ %@", block, street];
+        else
+            return [NSString stringWithFormat:@"%@ %@", block, street];
         
     }
     return @"";
@@ -1224,6 +1358,117 @@ typedef enum rowTypes {
     [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:fieldName andNewContent:value];
 }
 
+
+- (NSString *) replaceShortForms: (NSString *) originalString {
+    NSString *pattern_rd = @"\\bRD\\b";
+    NSString *pattern_ave = @"\\bAVE\\b";
+    NSString *pattern_st = @"\\bST\\b";
+    NSRange range_rd = [originalString rangeOfString:pattern_rd options:NSRegularExpressionSearch|NSCaseInsensitiveSearch];
+    NSString *newString = [originalString mutableCopy];
+    
+    if (range_rd.location != NSNotFound) {
+        newString = [newString stringByReplacingCharactersInRange:range_rd withString:@"ROAD"];
+    }
+    NSRange range_ave = [originalString rangeOfString:pattern_ave options:NSRegularExpressionSearch|NSCaseInsensitiveSearch];
+    if (range_ave.location != NSNotFound) {
+        newString = [newString stringByReplacingCharactersInRange:range_ave withString:@"AVENUE"];
+    }
+    NSRange range_st = [originalString rangeOfString:pattern_st options:NSRegularExpressionSearch|NSCaseInsensitiveSearch];
+    if (range_st.location != NSNotFound) {
+        newString = [newString stringByReplacingCharactersInRange:range_st withString:@"STREET"];
+    }
+    return newString;
+}
+
+
+- (NSString *) getYesNoFromOneZero: (id) value {
+    if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"1"]) {
+            return @"Yes";
+        } else {
+            return @"No";
+        }
+    } else if ([value isKindOfClass:[NSNumber class]]) {
+        if ([value isEqual:@1]) {
+            return @"Yes";
+        } else {
+            return @"No";
+        }
+    }
+    return @"";
+}
+
+- (NSString *) getOneZerofromYesNo: (id) answer {
+    if ([answer isKindOfClass:[NSString class]]) {
+        if ([answer isEqualToString:@"Yes"] || [answer isEqualToString:@"True"]) {
+            return @"1";
+        } else {
+            return @"0";
+        }
+    } else if ([answer isKindOfClass:[NSNumber class]]) {
+        if ([answer isEqual:@1]) {
+            return @"1";
+        } else {
+            return @"0";
+        }
+    }
+    return @"0";
+}
+
+
+- (void) checkIfPostCodeIsValid: (XLFormRowDescriptor *) rowDescriptor {
+    if (rowDescriptor.value) {
+        NSString *url = @"https://nhs-som.nus.edu.sg/addressFromPostalCode";
+        NSDictionary *dict = @{@"postalcode": rowDescriptor.value};
+        NSDictionary *dataDict = @{ @"data" : dict };
+        
+        AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+        manager.responseSerializer = [AFJSONResponseSerializer serializer];
+        manager.requestSerializer = [AFJSONRequestSerializer serializer];
+        
+        [SVProgressHUD show];
+        
+        [manager POST:url
+           parameters:dataDict
+             progress:nil
+              success:^(NSURLSessionDataTask *_Nonnull task,
+                        id _Nullable responseObject) {
+                  
+                  [SVProgressHUD dismiss];
+                  
+                  NSString *postalCode = [responseObject objectForKey:@"postalcode"];
+                  NSString *address = [responseObject objectForKey:@"address"];
+                  
+                  if ([postalCode isEqual:address]) { // if not valid
+                      
+                      [rowDescriptor.cellConfig setObject:[UIColor colorWithRed:240/255.0 green:128/255.0 blue:128/255.0 alpha:1.0] forKey:@"backgroundColor"]; //PINK
+                      [self reloadFormRow:rowDescriptor];
+                      
+                      UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Invalid Postcode" message:@"The postal code entered is not valid." preferredStyle:UIAlertControllerStyleAlert];
+                      UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                          //do nothing;
+                      }];
+                      [alertController addAction:okAction];
+                      [self presentViewController:alertController animated:YES completion:nil];
+                  } else {
+                      NSLog(@"%@", [responseObject objectForKey:@"address"]);
+                      [rowDescriptor.cellConfig setObject:[UIColor whiteColor] forKey:@"backgroundColor"]; //CLEAR
+                      [self reloadFormRow:rowDescriptor];
+                      // VALID
+                      [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
+                  }
+              }
+              failure:^(NSURLSessionDataTask *_Nullable task, NSError *_Nonnull error) {
+                  [SVProgressHUD dismiss];
+                  NSData *errorData = [[error userInfo] objectForKey:ERROR_INFO];
+                  NSString *errorString =
+                  [[NSString alloc] initWithData:errorData
+                                        encoding:NSUTF8StringEncoding];
+                  NSLog(@"error: %@", errorString);
+              }];
+    }
+    
+}
 
 #pragma mark - UIBarButtonItem methods
 - (void) editBtnPressed: (UIBarButtonItem * __unused)button {
@@ -1437,40 +1682,6 @@ typedef enum rowTypes {
                                     andFailBlock:[self errorBlock]];
         
     };
-}
-
-- (NSString *) getYesNoFromOneZero: (id) value {
-    if ([value isKindOfClass:[NSString class]]) {
-        if ([value isEqualToString:@"1"]) {
-            return @"Yes";
-        } else {
-            return @"No";
-        }
-    } else if ([value isKindOfClass:[NSNumber class]]) {
-        if ([value isEqual:@1]) {
-            return @"Yes";
-        } else {
-            return @"No";
-        }
-    }
-    return @"";
-}
-
-- (NSString *) getOneZerofromYesNo: (id) answer {
-    if ([answer isKindOfClass:[NSString class]]) {
-        if ([answer isEqualToString:@"Yes"] || [answer isEqualToString:@"True"]) {
-            return @"1";
-        } else {
-            return @"0";
-        }
-    } else if ([answer isKindOfClass:[NSNumber class]]) {
-        if ([answer isEqual:@1]) {
-            return @"1";
-        } else {
-            return @"0";
-        }
-    }
-    return @"0";
 }
 
 #pragma mark - UIFont methods
