@@ -43,6 +43,7 @@
 - (BOOL) isFemale;
 - (BOOL) hasConsentImage;
 - (NSString *) getFallRiskStatus;
+- (BOOL) hasValidCHAS;
 
 
 @end

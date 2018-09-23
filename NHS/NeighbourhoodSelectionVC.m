@@ -12,7 +12,10 @@
 
 @interface NeighbourhoodSelectionVC () {
     NSString *selectedNeighbourhood;
+    
 }
+@property (weak, nonatomic) IBOutlet UIButton *lengKeeBtn;
+@property (weak, nonatomic) IBOutlet UIButton *kampongGlamBtn;
 
 @end
 
@@ -20,13 +23,21 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    [_kampongGlamBtn setBackgroundImage:[UIImage imageNamed:@"kampong glam color"] forState:UIControlStateHighlighted];
+    
+    [_lengKeeBtn setBackgroundImage:[UIImage imageNamed:@"leng kee"] forState:UIControlStateHighlighted];
 }
 
+- (void) viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    self.navigationItem.title = @"Select Neighbourhood";
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 - (IBAction)lengkokBahruBtnPressed:(id)sender {
     selectedNeighbourhood = @"Lengkok Bahru";
     [[NSUserDefaults standardUserDefaults] setObject:@"Lengkok Bahru" forKey:kNeighbourhood];

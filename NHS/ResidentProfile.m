@@ -539,4 +539,18 @@
 }
 
 
+#warning eventually need to change because the CHAS Card question changing to multiple selector
+- (BOOL) hasValidCHAS {
+    if ([_fullDict objectForKey:SECTION_CHAS_PRELIM] != (id)[NSNull null]) { //if the section has at least one entry...
+        NSDictionary *chasPrelimDict = [_fullDict objectForKey:SECTION_CHAS_PRELIM];
+        NSString *haveChasCard = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
+        
+        if (haveChasCard == (id)[NSNull null]) return NO;
+        
+        if (![haveChasCard containsString:@"None"]) return YES; //have some kind of cards
+    }
+    
+    return NO;
+}
+
 @end

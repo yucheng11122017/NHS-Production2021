@@ -251,7 +251,7 @@ typedef enum getDataState {
                                                        [self performSegueWithIdentifier:@"ProfileToConsentFormSegue" sender:self];
                                                    }];
         
-
+//#warning Just to make testing faster, remove for official App release!
         formAction.enabled = NO;
         reportAction.enabled = NO;
     }

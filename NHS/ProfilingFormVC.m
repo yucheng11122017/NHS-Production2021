@@ -2221,6 +2221,21 @@ typedef enum formName {
         }
     }
     
+    XLFormRowDescriptor *sporeanPrRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSporeanPr rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Singaporean/PR"];
+    [self setDefaultFontWithRow:sporeanPrRow];
+    sporeanPrRow.selectorOptions = @[@"Yes", @"No"];
+    sporeanPrRow.required = NO;
+    sporeanPrRow.disabled = @(1);
+    if ([citizenship isEqualToString:@"Singaporean"] || [citizenship isEqualToString:@"PR"]) {
+        sporeanPr = YES;
+        sporeanPrRow.value = @"Yes";
+    }
+    else {
+        sporeanPr = NO;
+        sporeanPrRow.value = @"No";
+    }
+    [section addFormRow:sporeanPrRow];
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"age_50" rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Age 50 and above"];
     [self setDefaultFontWithRow:row];
     row.selectorOptions = @[@"Yes", @"No"];
@@ -2384,6 +2399,20 @@ typedef enum formName {
         row.value = @"No";
         age5069 = NO;
         [[NSUserDefaults standardUserDefaults]setObject:@"0" forKey:kQualifyMammo];
+    }
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"has_valid_chas" rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Has a valid CHAS card (auto-calculated)"];
+    
+    [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
+    row.selectorOptions = @[@"Yes", @"No"];
+    row.disabled = @(1);
+    if ([[ResidentProfile sharedManager] hasValidCHAS]) {
+        row.value = @"Yes";
+    }
+    else {
+        row.value = @"No";
     }
     [section addFormRow:row];
     
