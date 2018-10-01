@@ -252,8 +252,10 @@ typedef enum getDataState {
                                                    }];
         
 //#warning Just to make testing faster, remove for official App release!
-        formAction.enabled = NO;
-        reportAction.enabled = NO;
+        if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood] containsString:@"Lengkok"]) {
+            formAction.enabled = NO;
+            reportAction.enabled = NO;
+        }
     }
     
 //    reportAction.enabled = enableReportButton;

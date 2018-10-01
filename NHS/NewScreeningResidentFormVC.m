@@ -339,7 +339,8 @@
                                        @"122 Bt Merah Lane 1",
                                        @"124 Bt Merah Lane 1",
                                        @"125 Bt Merah Lane 1",
-                                       @"127 Bt Merah Lane 1"];
+                                       @"127 Bt Merah Lane 1",
+                                       @"Others"];
     [self setDefaultFontWithRow:addressRow];
     [section addFormRow:addressRow];
     

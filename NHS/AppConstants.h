@@ -355,8 +355,14 @@ extern NSString *const kReceiveFinAssist;
 extern NSString *const kSeekFinAssist;
 
 /** CHAS Preliminary Eligibility Assessment */
+extern NSString *const kBlueChas;
+extern NSString *const kOrangeChas;
+extern NSString *const kPgCard;
+extern NSString *const kPaCard;
+extern NSString *const kOwnsNoCard;
+extern NSString *const kDoesOwnChas;
 extern NSString *const kDoesNotOwnChasPioneer;
-extern NSString *const kExpiringSoon;
+extern NSString *const kChasExpiringSoon;
 extern NSString *const kLowHouseIncome;
 extern NSString *const kLowHomeValue;
 extern NSString *const kWantChas;

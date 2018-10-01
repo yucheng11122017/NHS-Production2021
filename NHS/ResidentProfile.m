@@ -181,21 +181,25 @@
     if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
         if ([_fullDict objectForKey:SECTION_CHAS_PRELIM] != (id)[NSNull null]) { //if the section has at least one entry...
             NSDictionary *chasPrelimDict = [_fullDict objectForKey:SECTION_CHAS_PRELIM];
-            NSString *haveChasCard = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
-            NSNumber *expiringSoon = [chasPrelimDict objectForKey:kExpiringSoon];
+//            NSString *haveChasCard = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
+//            NSNumber *expiringSoon = [chasPrelimDict objectForKey:kExpiringSoon];
+            NSNumber *hasChasCard = [chasPrelimDict objectForKey:kDoesOwnChas];
             NSNumber *wantChas = [chasPrelimDict objectForKey:kWantChas];
             
-            if (haveChasCard == (id)[NSNull null] || wantChas == (id)[NSNull null]) return NO;
+            if (hasChasCard == (id)[NSNull null] || wantChas == (id)[NSNull null]) return NO;
             
             BOOL req1 = false;
             BOOL req2 = false;
             
-            if ([haveChasCard containsString:@"None"]) req1 = true;
-            else {  //already have CHAS card
-                if (expiringSoon == (id)[NSNull null]) return NO;
-                if ([expiringSoon boolValue]) req1 = true;
-                else req1 = false;
-            }
+//            if ([haveChasCard containsString:@"None"]) req1 = true;
+//            else {  //already have CHAS card
+//                if (expiringSoon == (id)[NSNull null]) return NO;
+//                if ([expiringSoon boolValue]) req1 = true;
+//                else req1 = false;
+//            }
+            if ([hasChasCard boolValue]) req1 = true;
+            else req1 = false;
+            
             if ([wantChas boolValue]) req2 = true;
             else req2 = false;
             
@@ -243,7 +247,8 @@
                 
                 
                 NSNumber *mammo2Years = [mammogramEligible objectForKey:kMammo2Yrs];
-                NSString *hasChas = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
+//                NSString *hasChas = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
+                NSString *hasChas = [chasPrelimDict objectForKey:kDoesOwnChas];
                 NSNumber *wantMammo = [mammogramEligible objectForKey:kWantMammo];
                 
                 if (mammo2Years == (id)[NSNull null] || hasChas == (id)[NSNull null] || wantMammo == (id)[NSNull null]) return NO;
@@ -251,7 +256,8 @@
                 if ([citizenship isEqualToString:@"Singaporean"] &&                 //Singaporean
                     [age integerValue] >= 50 && [age integerValue] < 70 &&          //age 50-69
                     ![mammo2Years boolValue] &&                                   // didn't do Mammogram in 2 years
-                    ![hasChas containsString:@"None"] &&                            // owns a CHAS card
+                    [hasChas boolValue] &&      //owns a CHAS card (1st Oct 2018)
+//                    ![hasChas containsString:@"None"] &&                            // owns a CHAS card
                     [wantMammo boolValue])                                        // want mammogram
                     return YES;
             }
@@ -539,15 +545,18 @@
 }
 
 
-#warning eventually need to change because the CHAS Card question changing to multiple selector
+//#warning eventually need to change because the CHAS Card question changing to multiple selector
 - (BOOL) hasValidCHAS {
     if ([_fullDict objectForKey:SECTION_CHAS_PRELIM] != (id)[NSNull null]) { //if the section has at least one entry...
         NSDictionary *chasPrelimDict = [_fullDict objectForKey:SECTION_CHAS_PRELIM];
-        NSString *haveChasCard = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
+//        NSString *haveChasCard = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
+        NSNumber *hasChasCard = [chasPrelimDict objectForKey:kDoesOwnChas];
         
-        if (haveChasCard == (id)[NSNull null]) return NO;
+//        if (haveChasCard == (id)[NSNull null]) return NO;
+        if (hasChasCard == (id)[NSNull null]) return NO;
         
-        if (![haveChasCard containsString:@"None"]) return YES; //have some kind of cards
+        return [hasChasCard boolValue];
+//        if (![haveChasCard containsString:@"None"]) return YES; //have some kind of cards
     }
     
     return NO;

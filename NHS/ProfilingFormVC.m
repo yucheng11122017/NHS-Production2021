@@ -3115,9 +3115,18 @@ typedef enum formName {
                                     @"None of the above"];
     [section addFormRow:whatChasRow];
     
-    XLFormRowDescriptor *chasExpiringRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExpiringSoon rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does not own a CHAS card\nOR\nexpiring in 3 months?"];
-    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kExpiringSoon] != (id)[NSNull null])
-        chasExpiringRow.value = [self getTrueFalseFromOneZero:chasPrelimDict[kExpiringSoon]];
+    XLFormRowDescriptor *chasOwnRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDoesOwnChas rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does the resident own CHAS card?"];
+    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kDoesOwnChas] != (id)[NSNull null])
+        chasOwnRow.value = [self getTrueFalseFromOneZero:chasPrelimDict[kDoesOwnChas]];
+    [self setDefaultFontWithRow:chasOwnRow];
+    chasOwnRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    chasOwnRow.required = NO;
+    chasOwnRow.selectorOptions = @[@"True", @"False"];
+    [section addFormRow:chasOwnRow];
+    
+    XLFormRowDescriptor *chasExpiringRow = [XLFormRowDescriptor formRowDescriptorWithTag:kChasExpiringSoon rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is the CHAS card expiring in 3 months?"];
+    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kChasExpiringSoon] != (id)[NSNull null])
+        chasExpiringRow.value = [self getTrueFalseFromOneZero:chasPrelimDict[kChasExpiringSoon]];
     [self setDefaultFontWithRow:chasExpiringRow];
     chasExpiringRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     chasExpiringRow.required = NO;
@@ -3919,8 +3928,10 @@ typedef enum formName {
     /* CHAS Preliminary Eligibility Assessment */
     else if ([rowDescriptor.tag isEqualToString:kDoesNotOwnChasPioneer]) {
         [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kDoesNotOwnChasPioneer andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kExpiringSoon]) {
-        [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kExpiringSoon andNewContent:ansFromTrueFalse];
+    } else if ([rowDescriptor.tag isEqualToString:kDoesOwnChas]) {
+        [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kDoesOwnChas andNewContent:ansFromTrueFalse];
+    } else if ([rowDescriptor.tag isEqualToString:kChasExpiringSoon]) {
+        [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kChasExpiringSoon andNewContent:ansFromTrueFalse];
     } else if ([rowDescriptor.tag isEqualToString:kLowHouseIncome]) {
         [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:kLowHouseIncome andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kLowHomeValue]) {

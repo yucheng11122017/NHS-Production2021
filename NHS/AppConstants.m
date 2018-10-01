@@ -258,8 +258,14 @@ NSString *const kReceiveFinAssist = @"receive_fin_assist";
 NSString *const kSeekFinAssist = @"seek_fin_assist";
 
 /** CHAS Preliminary Eligibility Assessment */
+NSString *const kBlueChas = @"blue_chas";
+NSString *const kOrangeChas = @"orange_chas";
+NSString *const kPgCard = @"pg_card";
+NSString *const kPaCard = @"pa_card";
+NSString *const kOwnsNoCard = @"owns_no_card";
+NSString *const kDoesOwnChas = @"does_own_chas";
 NSString *const kDoesNotOwnChasPioneer = @"does_not_own_chas_pioneer";
-NSString *const kExpiringSoon = @"expiring_soon";
+NSString *const kChasExpiringSoon = @"chas_expiring_soon";
 NSString *const kLowHouseIncome= @"low_house_income";
 NSString *const kLowHomeValue= @"low_home_value";
 NSString *const kWantChas= @"want_chas";
