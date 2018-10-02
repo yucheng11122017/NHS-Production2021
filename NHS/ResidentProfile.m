@@ -30,6 +30,8 @@
     if (self = [super init]) {
         _profilingDone = false;
         _consentImgExists = false;
+        _researchConsentImgExists = false;
+        
     }
     
     return self;
@@ -530,6 +532,10 @@
     return _consentImgExists;
 }
 
+- (BOOL) hasResearchConsentImage {
+    return _researchConsentImgExists;
+}
+
 - (NSString *) getFallRiskStatus {
     if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
         if ([_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE] != (id)[NSNull null]) { //if the section has at least one entry...
@@ -557,6 +563,18 @@
         
         return [hasChasCard boolValue];
 //        if (![haveChasCard containsString:@"None"]) return YES; //have some kind of cards
+    }
+    
+    return NO;
+}
+
+- (BOOL) consentForResearch {
+    if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
+        NSDictionary *residentParticularsDict = [_fullDict objectForKey:kResiParticulars];
+        if (residentParticularsDict != nil && residentParticularsDict != (id)[NSNull null]) {
+            NSNumber *consentForResearchBool = [residentParticularsDict objectForKey:kConsentToResearch];
+            return [consentForResearchBool boolValue];
+        }
     }
     
     return NO;

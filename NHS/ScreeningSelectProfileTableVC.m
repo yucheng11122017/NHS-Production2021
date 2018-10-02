@@ -224,7 +224,7 @@ typedef enum getDataState {
                                                                               message:@""
                                                                        preferredStyle:UIAlertControllerStyleAlert];
     
-    UIAlertAction *consentFormAction;
+    UIAlertAction *consentFormAction, *researchConsentFormAction;
      UIAlertAction *formAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Screening Form", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
@@ -258,8 +258,41 @@ typedef enum getDataState {
         }
     }
     
+    if ([[ResidentProfile sharedManager] consentForResearch]) {
+        if ([[ResidentProfile sharedManager] hasResearchConsentImage]) {
+            researchConsentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Show Research Consent Form", nil)
+                                                         style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * action) {
+                                                           [self performSegueWithIdentifier:@"ProfileToResearchConsentFormSegue" sender:self];
+                                                       }];
+        } else {
+            researchConsentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Submit Research Consent Form", nil)
+                                                         style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * action) {
+                                                           [self performSegueWithIdentifier:@"ProfileToResearchConsentFormSegue" sender:self];
+                                                       }];
+            
+            //In this case, disable only if they consented for research, yet haven't submit the form
+            if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood] containsString:@"Lengkok"]) {
+                formAction.enabled = NO;
+                reportAction.enabled = NO;
+            }
+        }
+        
+    } else {    //didn't give approval for research
+        researchConsentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Submit Research Consent Form", nil)
+                                                             style:UIAlertActionStyleDefault
+                                                           handler:^(UIAlertAction * action) {
+                                                               [self performSegueWithIdentifier:@"ProfileToResearchConsentFormSegue" sender:self];
+                                                           }];
+        researchConsentFormAction.enabled = NO; //don't need to submit
+    }
+    
 //    reportAction.enabled = enableReportButton;
-    [alertController addAction:consentFormAction];
+    if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood] containsString:@"Lengkok"]) {  //for kampong glam, don't need to show the other two buttons
+        [alertController addAction:consentFormAction];
+        [alertController addAction:researchConsentFormAction];
+    }
     [alertController addAction:formAction];
     [alertController addAction:reportAction];
     

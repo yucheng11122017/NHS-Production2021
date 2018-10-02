@@ -14,6 +14,7 @@
 @property (strong, nonatomic) NSDictionary *fullDict;
 @property BOOL profilingDone;
 @property BOOL consentImgExists;
+@property BOOL researchConsentImgExists;
 
 +(id) sharedManager;
 - (void) updateProfile: (NSDictionary *) fullDict;
@@ -42,8 +43,9 @@
 - (BOOL) canReceiveSpecVoucher;
 - (BOOL) isFemale;
 - (BOOL) hasConsentImage;
+- (BOOL) consentForResearch;
+- (BOOL) hasResearchConsentImage;
 - (NSString *) getFallRiskStatus;
 - (BOOL) hasValidCHAS;
-
 
 @end

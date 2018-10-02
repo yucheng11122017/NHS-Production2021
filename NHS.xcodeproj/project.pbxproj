@@ -20,6 +20,7 @@
 		015831411DB4D2F80049F16C /* GenericTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0158313F1DB4D2F80049F16C /* GenericTableViewCell.xib */; };
 		015F682A1F4A7F4E000B6D5E /* SeriSubsectionTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 015F68291F4A7F4E000B6D5E /* SeriSubsectionTableVC.m */; };
 		015F682D1F4A846B000B6D5E /* SeriFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 015F682C1F4A846B000B6D5E /* SeriFormVC.m */; };
+		015FD7A52163709D0042CC50 /* ResearchConsentFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 015FD7A42163709D0042CC50 /* ResearchConsentFormVC.m */; };
 		0166E05B21534EAA00FC2D02 /* ConsentFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 0166E05A21534EAA00FC2D02 /* ConsentFormVC.m */; };
 		0166E05E2153509000FC2D02 /* OverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0166E05C2153508F00FC2D02 /* OverlayView.m */; };
 		016A27F61F5FDB8F0074C36A /* SearchResultsTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 016A27F51F5FDB8F0074C36A /* SearchResultsTableController.m */; };
@@ -117,6 +118,8 @@
 		015F68291F4A7F4E000B6D5E /* SeriSubsectionTableVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SeriSubsectionTableVC.m; sourceTree = "<group>"; };
 		015F682B1F4A846B000B6D5E /* SeriFormVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SeriFormVC.h; sourceTree = "<group>"; };
 		015F682C1F4A846B000B6D5E /* SeriFormVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SeriFormVC.m; sourceTree = "<group>"; };
+		015FD7A32163709D0042CC50 /* ResearchConsentFormVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ResearchConsentFormVC.h; sourceTree = "<group>"; };
+		015FD7A42163709D0042CC50 /* ResearchConsentFormVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ResearchConsentFormVC.m; sourceTree = "<group>"; };
 		0166E05921534EAA00FC2D02 /* ConsentFormVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConsentFormVC.h; sourceTree = "<group>"; };
 		0166E05A21534EAA00FC2D02 /* ConsentFormVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConsentFormVC.m; sourceTree = "<group>"; };
 		0166E05C2153508F00FC2D02 /* OverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OverlayView.m; path = Models/OverlayView.m; sourceTree = "<group>"; };
@@ -294,6 +297,15 @@
 			name = "SERI Eye Screening";
 			sourceTree = "<group>";
 		};
+		015FD7A22163707A0042CC50 /* ResearchConsentForm VC */ = {
+			isa = PBXGroup;
+			children = (
+				015FD7A32163709D0042CC50 /* ResearchConsentFormVC.h */,
+				015FD7A42163709D0042CC50 /* ResearchConsentFormVC.m */,
+			);
+			name = "ResearchConsentForm VC";
+			sourceTree = "<group>";
+		};
 		0166E05821534E8500FC2D02 /* Consent Form VC */ = {
 			isa = PBXGroup;
 			children = (
@@ -418,6 +430,7 @@
 				01E622F71F6D2CD500E05FA8 /* New Resident VC */,
 				01E622F81F6D2CE600E05FA8 /* Select Profile VC */,
 				0166E05821534E8500FC2D02 /* Consent Form VC */,
+				015FD7A22163707A0042CC50 /* ResearchConsentForm VC */,
 				018B237F1F726C5F0046F9ED /* ReportViewController */,
 				01E622F91F6D2CF700E05FA8 /* Resident Particulars VC */,
 				01E622FA1F6D2D0200E05FA8 /* Screening Section VC */,
@@ -889,6 +902,7 @@
 				01D48ECE1F39CD2C002C3928 /* MedicalHistoryTableVC.m in Sources */,
 				01D7BCF11F6D38E2000FDDED /* DeviceInfo.m in Sources */,
 				018D8C3F213E67AC00B13595 /* SocialHistAssmtTableVC.m in Sources */,
+				015FD7A52163709D0042CC50 /* ResearchConsentFormVC.m in Sources */,
 				01137E901F7BAF7B002A0A48 /* ProfilingFormVC.m in Sources */,
 				8EC56F871D60C16300938C2A /* ScreeningSectionTableViewController.m in Sources */,
 				01087AE41F6041700046838E /* ScreeningDictionary.m in Sources */,

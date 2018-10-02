@@ -15,12 +15,14 @@
 #define baseURL @"https://nhs-som.nus.edu.sg/"
 #define GENOGRAM_LOADED_NOTIF @"Genogram image downloaded"
 #define CONSENT_LOADED_NOTIF @"Consent image downloaded"
+#define RESEARCH_CONSENT_LOADED_NOTIF @"Research Consent image downloaded"
 #define PDFREPORT_LOADED_NOTIF @"Pdf report downloaded"
 
 @interface ServerComm ()
 
 @property (strong, nonatomic) NSString *retrievedGenogramImagePath;
 @property (strong, nonatomic) NSString *retrievedConsentImagePath;
+@property (strong, nonatomic) NSString *retrievedResearchConsentImagePath;
 @property (strong, nonatomic) NSString *retrievedPdfReportFilepath;
 
 
@@ -464,6 +466,126 @@
     
 }
 
+#pragma mark - Research Consent Form
+-(void)saveResearchConsentFormImage:(UIImage *) consentForm
+                        forResident:(NSNumber *) residentID
+                           withNric:(NSString *)nric {
+    
+    // Create path.
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *filePath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"Image.png"];
+    
+    // Save image.
+    BOOL writeSuccess = [UIImagePNGRepresentation(consentForm) writeToFile:filePath atomically:YES];
+    
+    if(!writeSuccess)
+        NSLog(@"error writing to file");
+    
+    //upload image to server
+    NSURL *URL = [NSURL URLWithString:@"https://nhs-som.nus.edu.sg/uploadConsentResearch"];
+    
+    NSURL *filePathUrl = [NSURL fileURLWithPath:filePath];
+    
+    NSDictionary *input = @{@"resident_id": residentID, @"nric": nric};
+    NSDictionary *data = @{@"data": input};
+    
+    //initialize upload manager (AFNetworking)
+    self.uploadManager = [AFHTTPSessionManager manager];
+    self.uploadManager.responseSerializer.acceptableContentTypes = [NSSet setWithArray:@[@"text/html",@"application/json"]];
+    [self.uploadManager.operationQueue setMaxConcurrentOperationCount:2];
+    self.uploadManager.securityPolicy.allowInvalidCertificates = NO;
+    
+    
+    AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
+    NSMutableURLRequest *req = [serializer multipartFormRequestWithMethod:@"POST"
+                                                                URLString:[URL absoluteString]
+                                                               parameters:data
+                                                constructingBodyWithBlock:
+                                ^(id<AFMultipartFormData>  _Nonnull formData) {
+                                    [formData appendPartWithFileURL:filePathUrl name:@"userfile" error:nil];
+                                }
+                                                                    error:nil];
+    
+    NSURLSessionUploadTask *uploadTask = [self.uploadManager uploadTaskWithStreamedRequest:req
+                                                                                  progress:[self uploadProgressBlock]
+                                                                         completionHandler:[self researchCompletionBlock]];
+    [uploadTask resume];
+}
+
+-(NSString *)getRetrievedResearchConsentImagePath{
+    return [self.retrievedResearchConsentImagePath copy];
+}
+
+-(void)retrieveResearchConsentImageForResident:(NSNumber *) residentID
+                                      withNric:(NSString *)nric {
+    
+    //setup input parameters
+    NSDictionary *input = @{kResidentId: residentID, kNRIC:nric};
+    NSDictionary *data = @{@"data": input};
+    NSError *error;
+    
+    //prep download manager
+    self.downloadManager = [AFHTTPSessionManager manager];
+    self.uploadManager.responseSerializer.acceptableContentTypes = [NSSet setWithArray:@[@"text/html",@"application/json"]];
+    self.downloadManager.securityPolicy.allowInvalidCertificates = NO;
+    
+    //send req
+    AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
+    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://nhs-som.nus.edu.sg/downloadConsentResearch" parameters:data error:&error];
+    
+    NSURLSessionDownloadTask *dwlTsk = [self.downloadManager downloadTaskWithRequest:req
+                                                                            progress:[self downloadResearchConsentProgressBlock]
+                                                                         destination:
+                                        ^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
+                                            NSURL *documentsDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory
+                                                                                                                  inDomain:NSUserDomainMask
+                                                                                                         appropriateForURL:nil
+                                                                                                                    create:NO
+                                                                                                                     error:nil];
+                                            
+                                            NSURL *fileUrl = [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+                                            
+                                            /** Delete existing file if any! */
+                                            BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:[fileUrl relativePath]];
+                                            
+                                            if (fileExists) {
+                                                NSError *error;
+                                                BOOL success = [[NSFileManager defaultManager] removeItemAtPath:[fileUrl relativePath] error:&error];
+                                                
+                                                if (success)
+                                                    NSLog(@"Deleted existing file!");
+                                                else
+                                                    NSLog(@"Could not delete file -:%@ ",[error localizedDescription]);
+                                            }
+                                            
+                                            return fileUrl;
+                                        }
+                                                                   completionHandler:
+                                        ^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
+                                            
+                                            [SVProgressHUD dismiss];
+                                            NSLog(@"Filepath: %@", filePath.path);
+                                            self.retrievedResearchConsentImagePath = filePath.path;
+                                            if (error) {
+                                                NSLog(@"Error: %@", error);
+                                            } else {
+                                                //                                                NSLog(@"Success: %@ genodownloaded at: %@", response, [filePath absoluteString]);
+                                                
+                                                NSDictionary *userInfo = NSDictionaryOfVariableBindings(response, filePath);
+                                                
+                                                // send out notification!
+                                                [[NSNotificationCenter defaultCenter] postNotificationName:RESEARCH_CONSENT_LOADED_NOTIF
+                                                                                                    object:self
+                                                                                                  userInfo:userInfo];
+                                            }
+                                        }];
+    
+    [dwlTsk resume];
+    
+}
+
+
+
 #pragma mark - PDF File
 -(void)retrievePdfReportForResident:(NSNumber *) residentID {
     
@@ -546,6 +668,13 @@
     };
 }
 
+- (void (^)(NSProgress *downloadProgress))downloadResearchConsentProgressBlock {
+    return ^(NSProgress *downloadProgress) {
+        [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
+        [SVProgressHUD showProgress:downloadProgress.fractionCompleted status:@"Downloading Research Consent Form..."];
+    };
+}
+
 
 - (void (^)(NSURLResponse *response, id responseObject, NSError *error))completionBlock {   //now that I'm not using it for genogram anymore, it's only for consent
     return ^(NSURLResponse *response, NSDictionary *responseObject, NSError *error) {
@@ -560,6 +689,23 @@
             [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
             [SVProgressHUD showSuccessWithStatus:@"Upload successful!"];
             [[ResidentProfile sharedManager] setConsentImgExists:YES];
+        }
+    };
+}
+
+- (void (^)(NSURLResponse *response, id responseObject, NSError *error))researchCompletionBlock {   //now that I'm not using it for genogram anymore, it's only for consent
+    return ^(NSURLResponse *response, NSDictionary *responseObject, NSError *error) {
+        if (error) {
+            NSLog(@"Error: %@", error);
+            [SVProgressHUD setMinimumDismissTimeInterval:1.0];
+            [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
+            [SVProgressHUD showErrorWithStatus:@"Upload failed!"];
+        } else {
+            NSLog(@"Success: %@ %@", response, responseObject);
+            [SVProgressHUD setMinimumDismissTimeInterval:1.0];
+            [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
+            [SVProgressHUD showSuccessWithStatus:@"Upload successful!"];
+            [[ResidentProfile sharedManager] setResearchConsentImgExists:YES];
         }
     };
 }
