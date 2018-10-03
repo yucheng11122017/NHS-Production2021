@@ -98,17 +98,18 @@
             NSString *fallRiskStatus = [fallRiskDict objectForKey:kFallRiskStatus];
             if (fallRiskStatus != (id)[NSNull null] && [fallRiskStatus isEqualToString:@"High Risk"]) return YES;
         }
-        if ([_fullDict objectForKey:SECTION_GERIATRIC_DEMENTIA_ELIGIBLE] != (id)[NSNull null]) {
-            NSDictionary *dementiaEligibleDict = _fullDict[SECTION_GERIATRIC_DEMENTIA_ELIGIBLE];
-            NSNumber *cognitiveImpair = dementiaEligibleDict[kCognitiveImpair];
-            NSNumber *age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
-                                               stringForKey:kResidentAge];
-            
-            if (cognitiveImpair == (id)[NSNull null]) return NO;
-            if ([cognitiveImpair integerValue] != 0 && [age integerValue] >= 60) {  // 2 conditions must be met
-                return YES;
-            }
-        }
+        // Edited on 3rd Oct 2018
+//        if ([_fullDict objectForKey:SECTION_GERIATRIC_DEMENTIA_ELIGIBLE] != (id)[NSNull null]) {
+//            NSDictionary *dementiaEligibleDict = _fullDict[SECTION_GERIATRIC_DEMENTIA_ELIGIBLE];
+//            NSNumber *cognitiveImpair = dementiaEligibleDict[kCognitiveImpair];
+//            NSNumber *age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
+//                                               stringForKey:kResidentAge];
+//
+//            if (cognitiveImpair == (id)[NSNull null]) return NO;
+//            if ([cognitiveImpair integerValue] != 0 && [age integerValue] >= 60) {  // 2 conditions must be met
+//                return YES;
+//            }
+//        }
     }
     
     
