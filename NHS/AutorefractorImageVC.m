@@ -31,7 +31,7 @@
 
 @interface AutorefractorImageVC ()
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
-@property (strong, nonatomic) UIImage *consentImage;
+@property (strong, nonatomic) UIImage *scannedImage;
 @property (strong, nonatomic) UIToolbar *toolbar;
 
 @end
@@ -43,11 +43,13 @@
     // Do any additional setup after loading the view.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageExist:) name:AUTOREFRACTOR_LOADED_NOTIF object:nil];
     
-//    if ([[ResidentProfile sharedManager] hasConsentImage]) {
-//        [self getConsentImageFromServer];
-//    } else {
+    NSLog(@"**** **** **** ***\n THIS IS THE DICTIONARY\n\n %@", _imageDict);
+    
+    if (_imageDict != nil && _imageDict != (id)[NSNull null]) {
+        [self getAutorefractorImageFromServer];
+    } else {
         [self launchCameraView];
-//    }
+    }
     
     
 }
@@ -107,14 +109,14 @@
 
 - (void) getAutorefractorImageFromServer {
     NSUserDefaults *defaults =  [NSUserDefaults standardUserDefaults];
-    [[ServerComm sharedServerCommInstance] retrieveConsentImageForResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
+    [[ServerComm sharedServerCommInstance] retrieveAutorefractorFormImageForResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
 }
 
 
 #pragma mark - NSNotificationCenter
 - (void) imageExist: (NSNotification *) notification {
-    NSString *consentImagePath = [[ServerComm sharedServerCommInstance] getRetrievedConsentImagePath];
-    _consentImage = [UIImage imageWithContentsOfFile:consentImagePath];
+    NSString *scannedImagePath = [[ServerComm sharedServerCommInstance] getRetrievedAutorefractorFormImagePath];
+    _scannedImage = [UIImage imageWithContentsOfFile:scannedImagePath];
     
     [self setupImageViewAndNavigationController];
 }
@@ -165,10 +167,10 @@
 #pragma mark - Layout Stuffs
 - (void) setupImageViewAndNavigationController {
     
-    if (_consentImage.size.width > _consentImage.size.height) {   //portrait image
-        _consentImage = [self rotateImage:_consentImage byDegree:90];
+    if (_scannedImage.size.width > _scannedImage.size.height) {   //portrait image
+        _scannedImage = [self rotateImage:_scannedImage byDegree:90];
     }
-    [self.imageView setImage:_consentImage];
+    [self.imageView setImage:_scannedImage];
     
     self.imageView.hidden = NO;
     self.imageView.contentMode = UIViewContentModeScaleToFill;

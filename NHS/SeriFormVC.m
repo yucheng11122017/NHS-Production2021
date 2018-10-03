@@ -16,6 +16,7 @@
 #import "ScreeningDictionary.h"
 #import "KAStatusBar.h"
 #import "ResidentProfile.h"
+#import "AutorefractorImageVC.h"
 
 
 typedef enum formName {
@@ -39,6 +40,7 @@ typedef enum formName {
 @property (nonatomic) Reachability *hostReachability;
 @property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
 @property (strong, nonatomic) NSDictionary *fullScreeningForm;
+@property (strong, nonatomic) NSDictionary *seriArImageDict;
 
 
 @end
@@ -441,11 +443,19 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"SCAN HARDCOPY FORM"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"kImageBtn" rowType:XLFormRowDescriptorTypeButton title:@"Launch camera 📸"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"kImageBtn" rowType:XLFormRowDescriptorTypeButton title:@"View/Scan Form"];
     row.action.formSelector = @selector(goToAutorefractorImageVC:);
     row.cellConfigAtConfigure[@"backgroundColor"] = [UIColor colorWithRed:35/255.0 green:22/255.0 blue:120/255.0 alpha:1.0];
     row.cellConfig[@"textLabel.textColor"] = [UIColor whiteColor];
     [section addFormRow:row];
+    
+    NSDictionary *autorefractorImageDict = [_fullScreeningForm objectForKey:SECTION_SERI_AR_IMAGES];
+    if (autorefractorImageDict != (id)[NSNull null] && autorefractorImageDict != nil) {
+        NSLog(@"%@", autoRefractorDict);
+        _seriArImageDict = autorefractorImageDict;
+    }
+    
+    
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Right Eye"];
     [formDescriptor addFormSection:section];
@@ -2030,14 +2040,16 @@ typedef enum formName {
 }
 
 
-/*
+
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+    if ([segue.destinationViewController respondsToSelector:@selector(setImageDict:)]) {    //view submitted form
+        [segue.destinationViewController performSelector:@selector(setImageDict:)
+                                              withObject:_seriArImageDict];
+    }
 }
-*/
+
 
 @end

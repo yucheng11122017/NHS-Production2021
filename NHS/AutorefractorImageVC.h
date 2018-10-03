@@ -12,5 +12,7 @@
 
 @interface AutorefractorImageVC : UIViewController <UIImagePickerControllerDelegate>
 
+@property (strong, nonatomic) NSDictionary *imageDict;
+
 @end
 
