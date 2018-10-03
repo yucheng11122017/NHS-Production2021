@@ -365,13 +365,6 @@ typedef enum Category {
     }
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     
-    NSString *consentImgName = [selectedResident objectForKey:@"consent_img"];
-    if (consentImgName && consentImgName != (id)[NSNull null]) {
-        [[ResidentProfile sharedManager] setConsentImgExists:YES];
-    } else {
-        [[ResidentProfile sharedManager] setConsentImgExists:NO];
-    }
-    
 #ifndef DISABLE_SERVER_DATA_FETCH
     [self getAllDataForOneResident];
 #endif

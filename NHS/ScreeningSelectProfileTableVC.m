@@ -58,6 +58,8 @@ typedef enum getDataState {
     
     _residentParticulars = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"resi_particulars"]];
     
+    [self checkConsentFormsSubmission];
+    
     if ([_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"] == (id)[NSNull null]) { //present crashes
         _phlebEligibDict = @{};
     } else
@@ -215,6 +217,22 @@ typedef enum getDataState {
         } else {    //only for 2018 profile
             [self showPopUpBox];
         }
+    }
+}
+
+- (void) checkConsentFormsSubmission {
+    NSDictionary *consentDictionary = [_residentDetails objectForKey:@"consents"];
+    NSDictionary *researchConsentDictionary = [_residentDetails objectForKey:@"consent_research"];
+    if (consentDictionary != (id)[NSNull null] && consentDictionary) {
+        [[ResidentProfile sharedManager] setConsentImgExists:YES];
+    } else {
+        [[ResidentProfile sharedManager] setConsentImgExists:NO];
+    }
+    
+    if (researchConsentDictionary != (id)[NSNull null] && researchConsentDictionary) {
+        [[ResidentProfile sharedManager] setResearchConsentImgExists:YES];
+    } else {
+        [[ResidentProfile sharedManager] setResearchConsentImgExists:NO];
     }
 }
 
