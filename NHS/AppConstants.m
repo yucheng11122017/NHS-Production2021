@@ -263,6 +263,7 @@ NSString *const kOrangeChas = @"orange_chas";
 NSString *const kPgCard = @"pg_card";
 NSString *const kPaCard = @"pa_card";
 NSString *const kOwnsNoCard = @"owns_no_card";
+
 NSString *const kDoesOwnChas = @"does_own_chas";
 NSString *const kDoesNotOwnChasPioneer = @"does_not_own_chas_pioneer";
 NSString *const kChasExpiringSoon = @"chas_expiring_soon";
@@ -627,7 +628,7 @@ NSString *const kKerDioLeftR2 = @"ker_dio_left_r2";
 NSString *const kKerAxLeftR1 = @"ker_ax_left_r1";
 NSString *const kKerAxLeftR2 = @"ker_ax_left_r2";
 NSString *const kPupilDist = @"pupil_dist";
-NSString *const kAutorefractorComment = @"autorefractor_comment";
+NSString *const kAutorefractorComment  = @"autorefractor_comment";
 
 /** Intra-ocular Pressure */
 NSString *const kIopDone = @"iop_done";

@@ -361,6 +361,7 @@ extern NSString *const kOrangeChas;
 extern NSString *const kPgCard;
 extern NSString *const kPaCard;
 extern NSString *const kOwnsNoCard;
+
 extern NSString *const kDoesOwnChas;
 extern NSString *const kDoesNotOwnChasPioneer;
 extern NSString *const kChasExpiringSoon;

@@ -2232,25 +2232,81 @@ typedef enum formName {
     whatChasQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:whatChasQRow];
     
-    XLFormRowDescriptor *whatChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDoesNotOwnChasPioneer rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
-    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer] != (id)[NSNull null])
-        whatChasRow.value = chasPrelimDict[kDoesNotOwnChasPioneer];
+    XLFormRowDescriptor *whatChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"multi_owns_card" rowType:XLFormRowDescriptorTypeMultipleSelector title:@""];
     whatChasRow.required = YES;
-    whatChasRow.noValueDisplayText = @"Tap Here";
     whatChasRow.selectorOptions = @[@"Blue CHAS card",
                                     @"Orange CHAS card",
                                     @"Pioneer Generation (PG) card",
                                     @"Public Assistance (PA) card",
                                     @"None of the above"];
+    
+    whatChasRow.noValueDisplayText = @"Tap here";
+    
+    //value
+    if (chasPrelimDict != (id)[NSNull null]) {
+        whatChasRow.value = [self getMultiCardsArray:chasPrelimDict];
+    }
+    
+    
     [section addFormRow:whatChasRow];
     
+    // Just an indicator
     XLFormRowDescriptor *chasOwnRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDoesOwnChas rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does the resident own CHAS card?"];
-    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kDoesOwnChas] != (id)[NSNull null])
-        chasOwnRow.value = [self getTrueFalseFromOneZero:chasPrelimDict[kDoesOwnChas]];
+//    if (chasPrelimDict != (id)[NSNull null] && [chasPrelimDict objectForKey:kDoesOwnChas] != (id)[NSNull null])
+//        chasOwnRow.value = [self getTrueFalseFromOneZero:chasPrelimDict[kDoesOwnChas]];
     [self setDefaultFontWithRow:chasOwnRow];
     chasOwnRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    chasOwnRow.required = NO;
-    chasOwnRow.selectorOptions = @[@"True", @"False"];
+    chasOwnRow.disabled = @YES;
+    [chasOwnRow.cellConfigAtConfigure setObject:[UIColor purpleColor] forKey:@"tintColor"];
+    chasOwnRow.selectorOptions = @[@"Yes", @"No"];
+    
+    if (whatChasRow.value != nil && whatChasRow.value != (id)[NSNull null]) {
+        if ([whatChasRow.value containsObject:@"Blue CHAS card"] || [whatChasRow.value containsObject:@"Orange CHAS card"]) {
+            chasOwnRow.value = @"Yes";
+        } else {
+            chasOwnRow.value = @"No";
+        }
+    }
+    
+    whatChasRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if (newValue != nil && newValue != (id) [NSNull null]) {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
+                    [oldSet addObjectsFromArray:oldValue];
+                    NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
+                    [newSet addObjectsFromArray:newValue];
+                    
+                    if ([newSet count] > [oldSet count]) {
+                        [newSet minusSet:oldSet];
+                        NSArray *array = [newSet allObjects];
+                        [self postMultiCardsWithOptionName:[array firstObject] andValue:@"1"];
+                    } else {
+                        [oldSet minusSet:newSet];
+                        NSArray *array = [oldSet allObjects];
+                        [self postMultiCardsWithOptionName:[array firstObject] andValue:@"0"];
+                    }
+                } else {
+                    [self postMultiCardsWithOptionName:[newValue firstObject] andValue:@"1"];
+                }
+            } else {
+                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+                    [self postMultiCardsWithOptionName:[oldValue firstObject] andValue:@"0"];
+                }
+            }
+            
+            if (newValue != (id)[NSNull null] && newValue != nil) {
+                if ([newValue containsObject:@"Blue CHAS card"] || [newValue containsObject:@"Orange CHAS card"])
+                    chasOwnRow.value = @"Yes";
+                else
+                    chasOwnRow.value = @"No";
+            } else chasOwnRow.value = @"No";
+            [self reloadFormRow:chasOwnRow];
+        }
+    };
+    
+    
+    
     [section addFormRow:chasOwnRow];
     
     XLFormRowDescriptor *chasExpiringRow = [XLFormRowDescriptor formRowDescriptorWithTag:kChasExpiringSoon rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is the CHAS card expiring in 3 months?"];
@@ -3713,6 +3769,36 @@ typedef enum formName {
     
     return @"";
 }
+
+
+- (void) postMultiCardsWithOptionName:(NSString *) option andValue: (NSString *) value {
+    NSString *fieldName;
+    
+    if ([option containsString:@"Blue"]) fieldName = kBlueChas;
+    else if ([option containsString:@"Orange"]) fieldName = kOrangeChas;
+    else if ([option containsString:@"Pioneer"]) fieldName = kPgCard;
+    else if ([option containsString:@"Public"]) fieldName = kPaCard;
+    else if ([option containsString:@"None"]) fieldName = kOwnsNoCard;
+    
+    [self postSingleFieldWithSection:SECTION_CHAS_PRELIM andFieldName:fieldName andNewContent:value];
+}
+
+- (NSArray *) getMultiCardsArray: (NSDictionary *) dict {
+    NSArray *keyArray = @[kBlueChas, kOrangeChas, kPgCard, kPaCard, kOwnsNoCard];
+    NSArray *textArray = @[@"Blue CHAS card", @"Orange CHAS card", @"Pioneer Generation (PG) card", @"Public Assistance (PA) card", @"None of the above"];
+    NSMutableArray *returnArray = [[NSMutableArray alloc]init];
+    
+    for (int i=0; i<[keyArray count]; i++) {
+        NSString *key = keyArray[i];
+        if (dict[key] != (id)[NSNull null]) {
+            if ([dict[key] isEqual:@1])
+                [returnArray addObject:textArray[i]];
+        }
+    }
+    
+    return returnArray;
+}
+
 
 
 #pragma mark - Methods for Social Assessment

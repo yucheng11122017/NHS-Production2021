@@ -557,12 +557,21 @@
     if ([_fullDict objectForKey:SECTION_CHAS_PRELIM] != (id)[NSNull null]) { //if the section has at least one entry...
         NSDictionary *chasPrelimDict = [_fullDict objectForKey:SECTION_CHAS_PRELIM];
 //        NSString *haveChasCard = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
-        NSNumber *hasChasCard = [chasPrelimDict objectForKey:kDoesOwnChas];
+//        NSNumber *hasChasCard = [chasPrelimDict objectForKey:kDoesOwnChas];
+        
+        NSNumber *ownsOrangeCard = [chasPrelimDict objectForKey:kOrangeChas];
+        NSNumber *ownsBlueCard = [chasPrelimDict objectForKey:kBlueChas];
         
 //        if (haveChasCard == (id)[NSNull null]) return NO;
-        if (hasChasCard == (id)[NSNull null]) return NO;
+//        if (hasChasCard == (id)[NSNull null]) return NO;
         
-        return [hasChasCard boolValue];
+        if (ownsOrangeCard != nil && ownsOrangeCard != (id)[NSNull null]) {
+            if ([ownsOrangeCard boolValue]) return YES;
+        }
+        
+        if (ownsBlueCard != nil && ownsBlueCard != (id)[NSNull null]) {
+            if ([ownsBlueCard boolValue]) return YES;
+        }
 //        if (![haveChasCard containsString:@"None"]) return YES; //have some kind of cards
     }
     
