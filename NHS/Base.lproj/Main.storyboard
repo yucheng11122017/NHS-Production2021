@@ -906,10 +906,45 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
+                    <connections>
+                        <segue destination="aoA-kG-9oJ" kind="show" identifier="SeriFormToAutorefractorSegue" id="0wI-gU-fKb"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2Nc-wq-crU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="4843" y="1334"/>
+        </scene>
+        <!--Autorefractor ImageVC-->
+        <scene sceneID="zHI-ML-nV1">
+            <objects>
+                <viewController id="aoA-kG-9oJ" customClass="AutorefractorImageVC" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="1rO-nC-8nl"/>
+                        <viewControllerLayoutGuide type="bottom" id="7mB-QC-3sn"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="UoB-ZQ-w6r">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cQY-L9-tMU">
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="cQY-L9-tMU" firstAttribute="leading" secondItem="UoB-ZQ-w6r" secondAttribute="leading" id="0Os-cS-fjL"/>
+                            <constraint firstItem="cQY-L9-tMU" firstAttribute="bottom" secondItem="7mB-QC-3sn" secondAttribute="top" id="NA3-aF-a5Z"/>
+                            <constraint firstAttribute="trailing" secondItem="cQY-L9-tMU" secondAttribute="trailing" id="gVE-Dh-lkU"/>
+                            <constraint firstItem="cQY-L9-tMU" firstAttribute="top" secondItem="1rO-nC-8nl" secondAttribute="bottom" id="nRb-yI-MB3"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="imageView" destination="cQY-L9-tMU" id="xld-bU-BkQ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="f0Z-6N-4Kt" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5573.6000000000004" y="1358.7706146926537"/>
         </scene>
         <!--Profiling TableVC-->
         <scene sceneID="dYc-Z1-thX">

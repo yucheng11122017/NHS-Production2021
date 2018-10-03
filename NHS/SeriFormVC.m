@@ -427,7 +427,6 @@ typedef enum formName {
         }
     }
     
-    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kAutoDone rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Done?"];
     row.selectorOptions = @[@"Done", @"Not Done", @"Refused"];
 //    row.required = YES;
@@ -437,6 +436,15 @@ typedef enum formName {
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kAutoDone] != (id)[NSNull null])
         row.value = autoRefractorDict[kAutoDone];
     
+    [section addFormRow:row];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"SCAN HARDCOPY FORM"];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"kImageBtn" rowType:XLFormRowDescriptorTypeButton title:@"Launch camera 📸"];
+    row.action.formSelector = @selector(goToAutorefractorImageVC:);
+    row.cellConfigAtConfigure[@"backgroundColor"] = [UIColor colorWithRed:35/255.0 green:22/255.0 blue:120/255.0 alpha:1.0];
+    row.cellConfig[@"textLabel.textColor"] = [UIColor whiteColor];
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Right Eye"];
@@ -888,6 +896,10 @@ typedef enum formName {
     
     return [super initWithForm:formDescriptor];
     
+}
+
+- (void) goToAutorefractorImageVC: (XLFormRowDescriptor *)sender {
+    [self performSegueWithIdentifier:@"SeriFormToAutorefractorSegue" sender:self];
 }
 
 - (id) initIntraOcularPressure {

@@ -106,6 +106,16 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
 -(void)retrieveResearchConsentImageForResident:(NSNumber *) residentID
                                       withNric:(NSString *)nric;
 
+#pragma mark - Autorefractor Image
+-(void)saveAutorefractorFormImage:(UIImage *) consentForm
+                      forResident:(NSNumber *) residentID
+                         withNric:(NSString *)nric;
+
+-(NSString *)getRetrievedAutorefractorFormImagePath;
+
+-(void)retrieveAutorefractorFormImageForResident:(NSNumber *) residentID
+                                        withNric:(NSString *)nric;
+
 
 #pragma mark - PDF Report
 - (NSString *) getretrievedReportFilepath;

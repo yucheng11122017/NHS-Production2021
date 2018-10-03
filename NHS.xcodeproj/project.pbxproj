@@ -21,6 +21,7 @@
 		015F682A1F4A7F4E000B6D5E /* SeriSubsectionTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 015F68291F4A7F4E000B6D5E /* SeriSubsectionTableVC.m */; };
 		015F682D1F4A846B000B6D5E /* SeriFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 015F682C1F4A846B000B6D5E /* SeriFormVC.m */; };
 		015FD7A52163709D0042CC50 /* ResearchConsentFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 015FD7A42163709D0042CC50 /* ResearchConsentFormVC.m */; };
+		015FD7A821638CA60042CC50 /* AutorefractorImageVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 015FD7A721638CA60042CC50 /* AutorefractorImageVC.m */; };
 		0166E05B21534EAA00FC2D02 /* ConsentFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 0166E05A21534EAA00FC2D02 /* ConsentFormVC.m */; };
 		0166E05E2153509000FC2D02 /* OverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0166E05C2153508F00FC2D02 /* OverlayView.m */; };
 		016A27F61F5FDB8F0074C36A /* SearchResultsTableController.m in Sources */ = {isa = PBXBuildFile; fileRef = 016A27F51F5FDB8F0074C36A /* SearchResultsTableController.m */; };
@@ -120,6 +121,8 @@
 		015F682C1F4A846B000B6D5E /* SeriFormVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SeriFormVC.m; sourceTree = "<group>"; };
 		015FD7A32163709D0042CC50 /* ResearchConsentFormVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ResearchConsentFormVC.h; sourceTree = "<group>"; };
 		015FD7A42163709D0042CC50 /* ResearchConsentFormVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ResearchConsentFormVC.m; sourceTree = "<group>"; };
+		015FD7A621638CA60042CC50 /* AutorefractorImageVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutorefractorImageVC.h; sourceTree = "<group>"; };
+		015FD7A721638CA60042CC50 /* AutorefractorImageVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutorefractorImageVC.m; sourceTree = "<group>"; };
 		0166E05921534EAA00FC2D02 /* ConsentFormVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConsentFormVC.h; sourceTree = "<group>"; };
 		0166E05A21534EAA00FC2D02 /* ConsentFormVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConsentFormVC.m; sourceTree = "<group>"; };
 		0166E05C2153508F00FC2D02 /* OverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OverlayView.m; path = Models/OverlayView.m; sourceTree = "<group>"; };
@@ -293,6 +296,8 @@
 				012630441F8323C000065B1E /* SegmentedCell.xib */,
 				015F682B1F4A846B000B6D5E /* SeriFormVC.h */,
 				015F682C1F4A846B000B6D5E /* SeriFormVC.m */,
+				015FD7A621638CA60042CC50 /* AutorefractorImageVC.h */,
+				015FD7A721638CA60042CC50 /* AutorefractorImageVC.m */,
 			);
 			name = "SERI Eye Screening";
 			sourceTree = "<group>";
@@ -924,6 +929,7 @@
 				018D8C4621417D8D00B13595 /* ResidentProfile.m in Sources */,
 				E1A4F0DC1D61CB8A00EE9BBB /* Reachability.m in Sources */,
 				E110035A2137BCA10074034E /* BasicGeriatricTableVC.m in Sources */,
+				015FD7A821638CA60042CC50 /* AutorefractorImageVC.m in Sources */,
 				8E25276A1D5766C400ACEE92 /* HomeViewController.m in Sources */,
 				01100BF821426FA600F179F5 /* PdfReportViewController.m in Sources */,
 				01FF80C11F53AF62002C7ADD /* NewScreeningResidentFormVC.m in Sources */,
