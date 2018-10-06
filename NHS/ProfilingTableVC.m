@@ -463,6 +463,8 @@ typedef enum sectionRowNumber {
         if (count == [_completionCheck count]) {
             NSLog(@"activate Profiling tick!");
             [[ResidentProfile sharedManager] setProfilingDone:YES];
+        } else {
+            [[ResidentProfile sharedManager] setProfilingDone:NO];  //just added 6th Oct 2018
         }
     }
 }

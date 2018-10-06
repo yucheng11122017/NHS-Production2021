@@ -1236,7 +1236,7 @@ typedef enum formName {
     NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
     
     if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckDiet];
+        NSNumber *check = checkDict[kCheckExercise];
         if ([check isKindOfClass:[NSNumber class]]) {
             isFormFinalized = [check boolValue];
         }
@@ -3173,7 +3173,13 @@ typedef enum formName {
         [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhqQ2 andNewContent:[self getNumberFromPhqOption:newValue]];
         [self calculatePhqScore];
     } else if ([rowDescriptor.tag isEqualToString:kPhqQ2Score]) {
-        [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhqQ2Score andNewContent:newValue];
+        
+        double delayInSeconds = 0.5;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            //code to be executed on the main queue after delay
+            [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhqQ2Score andNewContent:newValue];
+        });
     }
 
     /* Suicide Risk Assessment (Basic) */
