@@ -1186,7 +1186,7 @@ typedef enum formName {
     
     
     XLFormRowDescriptor *diagOdRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiagnosisOd rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Diagnosis OD: "];
-//    diagOdRow.required = YES;
+    diagOdRow.required = YES;
     diagOdRow.selectorOptions = @[@"Normal", @"Refractive Error", @"Cataract", @"Glaucoma", @"Age-related macular degeneration", @"Diabetic Retinopathy/maculopathy", @"Others"];
     diagOdRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:diagOdRow];
@@ -1209,7 +1209,7 @@ typedef enum formName {
     [section addFormRow:row];
     
     XLFormRowDescriptor *diagOsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiagnosisOs rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Diagnosis OS: "];
-//    diagOsRow.required = YES;
+    diagOsRow.required = YES;
     diagOsRow.selectorOptions = @[@"Normal", @"Refractive Error", @"Cataract", @"Glaucoma", @"Age-related macular degeneration", @"Diabetic Retinopathy/maculopathy", @"Others"];
     diagOsRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:diagOsRow];
@@ -1232,7 +1232,7 @@ typedef enum formName {
     [section addFormRow:row];
     
     XLFormRowDescriptor *followUpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFollowUp rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Follow-up:"];
-//    followUpRow.required = YES;
+    followUpRow.required = YES;
     followUpRow.selectorOptions = @[@"No FU needed", @"Already on FU", @"Need spectacles", @"Referral to eye specialist", @"Cataract Surgery"];
     followUpRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:followUpRow];

@@ -447,6 +447,8 @@ typedef enum sectionRowNumber {
             } else if ([key containsString:@"psychological_hist"]) {
                 [self.completionCheck addObject:[self checkAllPsychoHistSections:checksDict]];
             }
+            
+#warning not sure what this "else" part is for...
             else {
                 if ([checksDict objectForKey:key] == nil) continue;
                 NSNumber *doneNum = [checksDict objectForKey:key];

@@ -778,7 +778,7 @@ typedef enum rowTypes {
     }
     [section addFormRow:screenModeRow];
     
-    XLFormRowDescriptor *centralDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"central_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date will the resident be coming down (centralised)?"];
+    XLFormRowDescriptor *centralDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"central_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date did the resident attend screening?"];
     centralDateQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     centralDateQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Centralised'", screenModeRow];
     [self setDefaultFontWithRow:centralDateQRow];
@@ -801,7 +801,7 @@ typedef enum rowTypes {
     }
     [section addFormRow:centralDateRow];
     
-    XLFormRowDescriptor *apptDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"appt_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Non-Phleb door-to-door Date (only available from 1-3pm)"];
+    XLFormRowDescriptor *apptDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"appt_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date did the resident attend screening?"];
     apptDateQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     apptDateQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
     [self setDefaultFontWithRow:apptDateQRow];
@@ -833,7 +833,7 @@ typedef enum rowTypes {
     [section addFormRow:apptDateRow];
     
     /** ONLY IF ELIGIBLE FOR PHLEB */
-    XLFormRowDescriptor *phlebApptQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"phleb_appt_q" rowType:XLFormRowDescriptorTypeInfo title:@"Phleb door-to-door Date (only available from 9-11am)"];
+    XLFormRowDescriptor *phlebApptQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"phleb_appt_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date did the resident attend screening?"];
     phlebApptQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     phlebApptQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
     [self setDefaultFontWithRow:phlebApptQRow];
@@ -1072,6 +1072,9 @@ typedef enum rowTypes {
     
     if ([rowDescriptor.tag isEqualToString:kGender]) {
         [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kGender andNewContent:newValue];
+    }
+    else if ([rowDescriptor.tag isEqualToString:kWrittenLang]) {
+        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kWrittenLang andNewContent:newValue];
     }
     else if ([rowDescriptor.tag isEqualToString:kConsent]) {
         [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kConsent andNewContent:newValue];

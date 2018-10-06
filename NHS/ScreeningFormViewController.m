@@ -738,7 +738,7 @@ NSString *const kQuestionFifteen = @"q15";
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
-    section.footerTitle = @"Please ask the resident if he/she uses spectables.";
+    section.footerTitle = @"Please ask the resident if he/she uses spectacles.";
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpecs rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"1. Does the resident use spectacles?"];
     if (snellenTestDict != (id)[NSNull null] && [snellenTestDict objectForKey:kSpecs] != (id)[NSNull null])
@@ -1581,7 +1581,7 @@ NSString *const kQuestionFifteen = @"q15";
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
-    XLFormRowDescriptor *referredApptRow = [XLFormRowDescriptor formRowDescriptorWithTag:kApptReferred rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Referred for appointment with Mobile Hearing Bus (go back to waiting room booth)"];
+    XLFormRowDescriptor *referredApptRow = [XLFormRowDescriptor formRowDescriptorWithTag:kApptReferred rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Need referral?"];
     referredApptRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     referredApptRow.required = YES;
     referredApptRow.selectorOptions = @[@"Yes", @"No"];

@@ -171,7 +171,7 @@
             NSNumber *visitEye12mths = [snellenTestDict objectForKey:kVisitEye12Mths];
             
             if (six12 == (id)[NSNull null] || tunnel == (id)[NSNull null] || visitEye12mths == (id)[NSNull null]) return NO;
-            if (([six12 boolValue] || [tunnel boolValue]) && ![visitEye12mths boolValue])
+            if (([six12 boolValue] || [tunnel boolValue]) && ![visitEye12mths boolValue])   // (YES || YES) && !NO
                 return YES;
         }
     }

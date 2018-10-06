@@ -113,6 +113,8 @@
     [nricRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:nricRow];
     if (gotOldRecord) nricRow.value = [_oldRecordDictionary objectForKey:kNRIC];
+    else
+        nricRow.value = [[NSUserDefaults standardUserDefaults] objectForKey:kNRIC];
     [section addFormRow:nricRow];
     
     nricRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
@@ -693,7 +695,7 @@
     [self setDefaultFontWithRow:screenModeRow];
     [section addFormRow:screenModeRow];
     
-    XLFormRowDescriptor *centralDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"central_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date will the resident be coming down (centralised)?"];
+    XLFormRowDescriptor *centralDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"central_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date did the resident attend screening?"];
     centralDateQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     centralDateQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Centralised'", screenModeRow];
     [self setDefaultFontWithRow:centralDateQRow];
@@ -713,7 +715,7 @@
     centralDateRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Centralised'", screenModeRow];
     [section addFormRow:centralDateRow];
     
-    XLFormRowDescriptor *apptDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"appt_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Non-Phleb door-to-door Date (only available from 1-3pm)"];
+    XLFormRowDescriptor *apptDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"appt_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date did the resident attend screening?"];
     apptDateQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     apptDateQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
     [self setDefaultFontWithRow:apptDateQRow];
@@ -731,7 +733,7 @@
     [self setDefaultFontWithRow:apptDateRow];
     [section addFormRow:apptDateRow];
     
-    XLFormRowDescriptor *phlebApptQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"phleb_appt_q" rowType:XLFormRowDescriptorTypeInfo title:@"Phleb door-to-door Date (only available from 9-11am)"];
+    XLFormRowDescriptor *phlebApptQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"phleb_appt_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date did the resident attend screening?"];
     phlebApptQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     phlebApptQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
     [self setDefaultFontWithRow:phlebApptQRow];

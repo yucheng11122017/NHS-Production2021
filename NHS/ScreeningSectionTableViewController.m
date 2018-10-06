@@ -215,7 +215,8 @@ typedef enum sectionRowNumber {
                     [cell.textLabel setTextColor:[UIColor grayColor]];
                 }
             }
-            else if (![[ResidentProfile sharedManager] isEligibleHearing]) {
+            
+            if (![[ResidentProfile sharedManager] isEligibleHearing]) {
                 cell.userInteractionEnabled = NO;
                 [cell.textLabel setTextColor:[UIColor grayColor]];
                 return cell;
@@ -242,10 +243,11 @@ typedef enum sectionRowNumber {
                 if (screenMode != (id)[NSNull null] && [screenMode containsString:@"Door"]) {
                     cell.userInteractionEnabled = NO;
                     [cell.textLabel setTextColor:[UIColor grayColor]];
+                    return cell;
                 }
-                return cell;
             }
-            else if (![[ResidentProfile sharedManager] isEligibleAdvancedVision]) {
+            
+            if (![[ResidentProfile sharedManager] isEligibleAdvancedVision]) {
                 cell.userInteractionEnabled = NO;
                 [cell.textLabel setTextColor:[UIColor grayColor]];
                 return cell;

@@ -51,6 +51,7 @@ typedef enum Category {
 @property (strong, nonatomic) NSMutableDictionary *retrievedResidentData;
 
 @property (strong, nonatomic) NSDictionary *sampleResidentDict;
+@property (strong, nonatomic) NSString *nricNewEntry;
 @property (nonatomic) Reachability *hostReachability;
 
 @property BOOL consentImgExist;
@@ -463,8 +464,8 @@ typedef enum Category {
                                                       handler:^(UIAlertAction * action) {
                                                           
                                                           NSLog(@"NRIC: %@", [[alertController textFields][0] text]);
-                                                          NSString *nric = [[alertController textFields][0] text];
-                                                          [[ServerComm sharedServerCommInstance] getResidentGivenNRIC:nric withProgressBlock:[self progressBlock] successBlock:[self nricSuccessBlock] andFailBlock:[self errorBlock]];
+                                                          _nricNewEntry = [[alertController textFields][0] text];
+                                                          [[ServerComm sharedServerCommInstance] getResidentGivenNRIC:_nricNewEntry withProgressBlock:[self progressBlock] successBlock:[self nricSuccessBlock] andFailBlock:[self errorBlock]];
                                                           
 //                                                          selectedResidentID = @(-1);
 //                                                          _sampleResidentDict = @{};
@@ -780,6 +781,7 @@ typedef enum Category {
             _sampleResidentDict = @{};
             [self resetAllUserDefaults];
             [[NSUserDefaults standardUserDefaults] setObject:_neighbourhood forKey:kNeighbourhood];   //only keep neighbourhood
+            [[NSUserDefaults standardUserDefaults] setObject:_nricNewEntry forKey:kNRIC];   //only keep neighbourhood
             [[NSUserDefaults standardUserDefaults] synchronize];
             [self performSegueWithIdentifier:@"addNewResidentSegue" sender:self];
         } else if ([year2018 isEqualToString:@"found"]) {    // already registered

@@ -1309,7 +1309,7 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
 
-    NSArray *phqOptions = @[@"Not at all [0]", @"Several days [1]", @"More than half the days [2]", @"Nearly Every day [3]"];
+    NSArray *phqOptions = @[@"Not at all [0]", @"Several days [1]", @"More than half the days [2]", @"Nearly every day [3]"];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"q1" rowType:XLFormRowDescriptorTypeInfo title:@"1. Little interest or pleasure in doing things"];
     [self setDefaultFontWithRow:row];
@@ -1487,19 +1487,19 @@ typedef enum formName {
         if (!hasShownDepressAlertBox) {
             int totalScore = [self calculateTotalPhqScore];
 
-            if (totalScore >= 5) {
-                hasShownDepressAlertBox = true;
-                UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Take note", nil)
-                                                                                          message:@"Please bring resident to the geriatric assessments booth at the multi-purpose hall for referral"
-                                                                                   preferredStyle:UIAlertControllerStyleAlert];
-
-                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
-                                                                    style:UIAlertActionStyleDefault
-                                                                  handler:^(UIAlertAction * okAction) {
-                                                                      //do nothing for now
-                                                                  }]];
-                [self presentViewController:alertController animated:YES completion:nil];
-            }
+//            if (totalScore >= 5) {
+//                hasShownDepressAlertBox = true;
+//                UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Take note", nil)
+//                                                                                          message:@"Please bring resident to the geriatric assessments booth at the multi-purpose hall for referral"
+//                                                                                   preferredStyle:UIAlertControllerStyleAlert];
+//
+//                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+//                                                                    style:UIAlertActionStyleDefault
+//                                                                  handler:^(UIAlertAction * okAction) {
+//                                                                      //do nothing for now
+//                                                                  }]];
+//                [self presentViewController:alertController animated:YES completion:nil];
+//            }
         }
     };
 
@@ -2962,6 +2962,7 @@ typedef enum formName {
     else if ([number isEqualToNumber:@2]) return @"More than half the days [2]";
     else return @"Nearly every day [3]";
 }
+
 
 - (NSString *) getNumberFromPhqOption: (NSString *) str {
     if ([str containsString:@"0"]) return @"0";
