@@ -242,7 +242,7 @@
         if ([_fullDict objectForKey:SECTION_MAMMOGRAM_ELIGIBLE] != (id)[NSNull null]) { //if the section has at least one entry...
             if ([_fullDict objectForKey:SECTION_CHAS_PRELIM] != (id)[NSNull null]) {
                 NSDictionary *mammogramEligible = [_fullDict objectForKey:SECTION_MAMMOGRAM_ELIGIBLE];
-                NSDictionary *chasPrelimDict =[_fullDict objectForKey:SECTION_CHAS_PRELIM];
+//                NSDictionary *chasPrelimDict =[_fullDict objectForKey:SECTION_CHAS_PRELIM];
                 NSNumber *age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
                                               stringForKey:kResidentAge];
                 NSString *citizenship = [[NSUserDefaults standardUserDefaults]
@@ -251,15 +251,14 @@
                 
                 NSNumber *mammo2Years = [mammogramEligible objectForKey:kMammo2Yrs];
 //                NSString *hasChas = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
-                NSString *hasChas = [chasPrelimDict objectForKey:kDoesOwnChas];
                 NSNumber *wantMammo = [mammogramEligible objectForKey:kWantMammo];
                 
-                if (mammo2Years == (id)[NSNull null] || hasChas == (id)[NSNull null] || wantMammo == (id)[NSNull null]) return NO;
+                if (mammo2Years == (id)[NSNull null] || wantMammo == (id)[NSNull null]) return NO;
                 // NO NO YES
                 if ([citizenship isEqualToString:@"Singaporean"] &&                 //Singaporean
                     [age integerValue] >= 50 && [age integerValue] < 70 &&          //age 50-69
                     ![mammo2Years boolValue] &&                                   // didn't do Mammogram in 2 years
-                    [hasChas boolValue] &&      //owns a CHAS card (1st Oct 2018)
+                    [self hasValidCHAS] &&      //owns a CHAS card (6st Oct 2018)
 //                    ![hasChas containsString:@"None"] &&                            // owns a CHAS card
                     [wantMammo boolValue])                                        // want mammogram
                     return YES;
