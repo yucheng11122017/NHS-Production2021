@@ -62,6 +62,20 @@ DEPENDENCIES:
   - SVProgressHUD (~> 2.1)
   - XLForm (from `https://github.com/xmartlabs/XLForm.git`)
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - ACEDrawingView
+    - AFNetworking
+    - FontAwesomeKit
+    - HTPressableButton
+    - HYPImagePicker
+    - KAStatusBar
+    - MBProgressHUD
+    - NSDate-HYPString
+    - NSDictionary-HYPImmutable
+    - RNCryptor
+    - SVProgressHUD
+
 EXTERNAL SOURCES:
   XLForm:
     :git: https://github.com/xmartlabs/XLForm.git
@@ -77,7 +91,7 @@ SPEC CHECKSUMS:
   FontAwesomeKit: 3614979b3dbb0ec3f7fac1bd760b91f66c31db67
   HTPressableButton: 3109ba7972247ddbd387c8a22b0341b02369b31e
   HYPImagePicker: 5c6e463ec15ae6b647355eb11f3f310342616fbf
-  KAStatusBar: 52e00335280c8e5da1c5d715f1e45c459ed91692
+  KAStatusBar: 2c3239d0f7410f53ef95b806bfe73e2ef00c7414
   MBProgressHUD: 4890f671c94e8a0f3cf959aa731e9de2f036d71a
   NSDate-HYPString: b87cf854edd44ec1e186b32526c601502180846d
   NSDictionary-HYPImmutable: 5ab45ed9d8127636467736b51700d886bfcc48db
@@ -87,4 +101,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: ee1b10ed88c08ebb8f9342a5d9a4f0d214ed4fd9
 
-COCOAPODS: 1.1.1
+COCOAPODS: 1.7.0

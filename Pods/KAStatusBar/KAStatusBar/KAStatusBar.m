@@ -37,7 +37,7 @@ static KAStatusBar *sharedView;
     dispatch_once(&once, ^ {
         UIApplication *app = [UIApplication sharedApplication];
         sharedView = [[KAStatusBar alloc] initWithFrame:CGRectMake(0, 0, app.statusBarFrame.size.width, app.statusBarFrame.size.height)];
-    }); //44 is added to push the bar to below navigationbar
+    });
     return sharedView;
 }
 
@@ -121,9 +121,7 @@ static KAStatusBar *sharedView;
         
     if(!delay){
         // Place activity indicator based on text length
-//        CGSize textSize = [status sizeWithFont:[self.messageLabel font]];     //deprecated
-        CGSize textSize = [status sizeWithAttributes:@{NSFontAttributeName: [self.messageLabel font]}];
-        
+        CGSize textSize = [status sizeWithFont:[self.messageLabel font]];
         float xOffset = (self.messageLabel.frame.size.width - textSize.width)/2;
         self.activityIndicator.transform = CGAffineTransformMakeTranslation(xOffset, 0);
         
