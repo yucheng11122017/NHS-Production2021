@@ -71,7 +71,7 @@
 
 - (void) createButtons {
     // Rounded rectangular default color button
-    int yPos1 = (self.view.frame.size.height - (self.navigationController.navigationBar.frame.size.height + 60 + 40))/5;
+    int yPos1 = (self.view.frame.size.height - (self.navigationController.navigationBar.frame.size.height + 60 + 40))/2;
     CGRect frame1 = CGRectMake(30, yPos1, self.view.frame.size.width - 60, 100);
     self.screeningBtn = [[HTPressableButton alloc] initWithFrame:frame1 buttonStyle:HTPressableButtonStyleRounded];
     [self.screeningBtn setTitle:@"Screening" forState:UIControlStateNormal];
@@ -97,15 +97,15 @@
 //    [self.followUpBtn addTarget:self action:@selector(followUpBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
 //    [self.view addSubview:self.followUpBtn];
 
-    int yPos3 = yPos1*3;
-    CGRect frame3 = CGRectMake(30, yPos3, self.view.frame.size.width - 60, 100);
-    self.drawingBtn = [[HTPressableButton alloc] initWithFrame:frame3 buttonStyle:HTPressableButtonStyleRounded];
-    [self.drawingBtn setButtonColor:[UIColor ht_amethystColor]];
-    [self.drawingBtn setShadowColor:[UIColor ht_wisteriaColor]];
-    [self.drawingBtn setTitle:@"Download CamScanner" forState:UIControlStateNormal];
-    [self.drawingBtn setTitleFont:[UIFont systemFontOfSize:23]];
-    [self.drawingBtn addTarget:self action:@selector(drawingBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:self.drawingBtn];
+//    int yPos3 = yPos1*3;
+//    CGRect frame3 = CGRectMake(30, yPos3, self.view.frame.size.width - 60, 100);
+//    self.drawingBtn = [[HTPressableButton alloc] initWithFrame:frame3 buttonStyle:HTPressableButtonStyleRounded];
+//    [self.drawingBtn setButtonColor:[UIColor ht_amethystColor]];
+//    [self.drawingBtn setShadowColor:[UIColor ht_wisteriaColor]];
+//    [self.drawingBtn setTitle:@"Download CamScanner" forState:UIControlStateNormal];
+//    [self.drawingBtn setTitleFont:[UIFont systemFontOfSize:23]];
+//    [self.drawingBtn addTarget:self action:@selector(drawingBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
+//    [self.view addSubview:self.drawingBtn];
     
 //    int yPos4 = yPos1*4;
 //    CGRect frame4 = CGRectMake(30, yPos4, self.view.frame.size.width - 60, 50);

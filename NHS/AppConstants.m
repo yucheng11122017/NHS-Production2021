@@ -55,17 +55,18 @@ NSString *const kNokContact = @"nok_contact";
 // 1700
 NSString *const kNhsSerialId = @"nhs_serial_id";
 
-NSString *const kSpokenLang = @"spoken_lang";
-NSString *const kLangCanto = @"lang_canto";
-NSString *const kLangEng = @"lang_english";
-NSString *const kLangHindi = @"lang_hindi";
-NSString *const kLangHokkien = @"lang_hokkien";
-NSString *const kLangMalay = @"lang_malay";
-NSString *const kLangMandarin = @"lang_mandarin";
-NSString *const kLangTamil = @"lang_tamil";
-NSString *const kLangTeoChew = @"lang_teochew";
-NSString *const kLangOthers = @"lang_others";
-NSString *const kLangOthersText  = @"lang_others_text";
+NSString *const kSpokenLang = @"spoken_language";
+NSString *const kBackupSpokenLang = @"backup_spoken_language";
+//NSString *const kLangCanto = @"lang_canto";
+//NSString *const kLangEng = @"lang_english";
+//NSString *const kLangHindi = @"lang_hindi";
+//NSString *const kLangHokkien = @"lang_hokkien";
+//NSString *const kLangMalay = @"lang_malay";
+//NSString *const kLangMandarin = @"lang_mandarin";
+//NSString *const kLangTamil = @"lang_tamil";
+//NSString *const kLangTeoChew = @"lang_teochew";
+//NSString *const kLangOthers = @"lang_others";
+//NSString *const kLangOthersText  = @"lang_others_text";
 
 NSString *const kEthnicity = @"ethnicity";
 NSString *const kWrittenLang = @"written_lang";
@@ -107,6 +108,7 @@ NSString *const kNoBloodTest = @"no_blood_test";
 NSString *const kWantFreeBt = @"want_free_bt";
 NSString *const kDidPhleb = @"did_phleb";
 NSString *const kIsPr = @"is_pr";
+NSString *const kMammoInterest = @"mammo_interest";
 
 #pragma mark - Phlebotomy (not in registration fields)
 NSString *const kFastingBloodGlucose = @"fasting_blood_glu";

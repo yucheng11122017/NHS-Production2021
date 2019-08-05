@@ -277,42 +277,51 @@ typedef enum rowTypes {
     
     
     XLFormRowDescriptor * spokenLangRow;
-    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Languages"];
-    spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"Others"];
+    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeSelectorPush title:@"Preferred Spoken Languages"];
+    spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew"];
     [self setDefaultFontWithRow:spokenLangRow];
     spokenLangRow.required = YES;
 
-    spokenLangRow.value = [self getSpokenLangArray:_residentParticularsDict];
+//    spokenLangRow.value = [self getSpokenLangArray:_residentParticularsDict];
+    spokenLangRow.value = [_residentParticularsDict objectForKey:kSpokenLang];
     [section addFormRow:spokenLangRow];
     
-    spokenLangRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if (newValue != nil && newValue != (id) [NSNull null]) {
-                if (oldValue != nil && oldValue != (id) [NSNull null]) {
-                    NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
-                    [oldSet addObjectsFromArray:oldValue];
-                    NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
-                    [newSet addObjectsFromArray:newValue];
-                    
-                    if ([newSet count] > [oldSet count]) {
-                        [newSet minusSet:oldSet];
-                        NSArray *array = [newSet allObjects];
-                        [self postSpokenLangWithLangName:[array firstObject] andValue:@"1"];
-                    } else {
-                        [oldSet minusSet:newSet];
-                        NSArray *array = [oldSet allObjects];
-                        [self postSpokenLangWithLangName:[array firstObject] andValue:@"0"];
-                    }
-                } else {
-                    [self postSpokenLangWithLangName:[newValue firstObject] andValue:@"1"];
-                }
-            } else {
-                if (oldValue != nil && oldValue != (id) [NSNull null]) {
-                    [self postSpokenLangWithLangName:[oldValue firstObject] andValue:@"0"];
-                }
-            }
-        }
-    };
+    XLFormRowDescriptor *backupSpokenLangRow;
+    backupSpokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBackupSpokenLang rowType:XLFormRowDescriptorTypeSelectorPush title:@"Backup Spoken Languages"];
+    backupSpokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"None"];
+    [self setDefaultFontWithRow:backupSpokenLangRow];
+    backupSpokenLangRow.required = YES;
+    backupSpokenLangRow.value = [_residentParticularsDict objectForKey:kBackupSpokenLang];
+    [section addFormRow:backupSpokenLangRow];
+    
+//    spokenLangRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//        if (newValue != oldValue) {
+//            if (newValue != nil && newValue != (id) [NSNull null]) {
+//                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+//                    NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
+//                    [oldSet addObjectsFromArray:oldValue];
+//                    NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
+//                    [newSet addObjectsFromArray:newValue];
+//
+//                    if ([newSet count] > [oldSet count]) {
+//                        [newSet minusSet:oldSet];
+//                        NSArray *array = [newSet allObjects];
+//                        [self postSpokenLangWithLangName:[array firstObject] andValue:@"1"];
+//                    } else {
+//                        [oldSet minusSet:newSet];
+//                        NSArray *array = [oldSet allObjects];
+//                        [self postSpokenLangWithLangName:[array firstObject] andValue:@"0"];
+//                    }
+//                } else {
+//                    [self postSpokenLangWithLangName:[newValue firstObject] andValue:@"1"];
+//                }
+//            } else {
+//                if (oldValue != nil && oldValue != (id) [NSNull null]) {
+//                    [self postSpokenLangWithLangName:[oldValue firstObject] andValue:@"0"];
+//                }
+//            }
+//        }
+//    };
     
     XLFormRowDescriptor *writtenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWrittenLang rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Written Language"];
     writtenLangRow.required = YES;
@@ -1073,6 +1082,12 @@ typedef enum rowTypes {
     if ([rowDescriptor.tag isEqualToString:kGender]) {
         [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kGender andNewContent:newValue];
     }
+    else if ([rowDescriptor.tag isEqualToString:kSpokenLang]) {
+        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kSpokenLang andNewContent:newValue];
+    }
+    else if ([rowDescriptor.tag isEqualToString:kBackupSpokenLang]) {
+        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kBackupSpokenLang andNewContent:newValue];
+    }
     else if ([rowDescriptor.tag isEqualToString:kWrittenLang]) {
         [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kWrittenLang andNewContent:newValue];
     }
@@ -1305,20 +1320,20 @@ typedef enum rowTypes {
     return @"";
 }
 
-- (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
-    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
-
-    if([[dictionary objectForKey:kLangCanto] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
-    if([[dictionary objectForKey:kLangEng] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
-    if([[dictionary objectForKey:kLangHindi] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
-    if([[dictionary objectForKey:kLangHokkien] isEqual:@(1)]) [spokenLangArray addObject:@"Hokkien"];
-    if([[dictionary objectForKey:kLangMalay] isEqual:@(1)]) [spokenLangArray addObject:@"Malay"];
-    if([[dictionary objectForKey:kLangMandarin] isEqual:@(1)]) [spokenLangArray addObject:@"Mandarin"];
-    if([[dictionary objectForKey:kLangOthers] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
-    if([[dictionary objectForKey:kLangTamil] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
-    if([[dictionary objectForKey:kLangTeoChew] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
-    return spokenLangArray;
-}
+//- (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
+//    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
+//
+//    if([[dictionary objectForKey:kLangCanto] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
+//    if([[dictionary objectForKey:kLangEng] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
+//    if([[dictionary objectForKey:kLangHindi] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
+//    if([[dictionary objectForKey:kLangHokkien] isEqual:@(1)]) [spokenLangArray addObject:@"Hokkien"];
+//    if([[dictionary objectForKey:kLangMalay] isEqual:@(1)]) [spokenLangArray addObject:@"Malay"];
+//    if([[dictionary objectForKey:kLangMandarin] isEqual:@(1)]) [spokenLangArray addObject:@"Mandarin"];
+//    if([[dictionary objectForKey:kLangOthers] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
+//    if([[dictionary objectForKey:kLangTamil] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
+//    if([[dictionary objectForKey:kLangTeoChew] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
+//    return spokenLangArray;
+//}
 
 - (NSString *) getTimeNowInString {
     // get current date/time
@@ -1347,20 +1362,20 @@ typedef enum rowTypes {
 //    return @"";
 //}
 
-- (void) postSpokenLangWithLangName:(NSString *) language andValue: (NSString *) value {
-    NSString *fieldName;
-    if ([language isEqualToString:@"Cantonese"]) fieldName = kLangCanto;
-    else if ([language isEqualToString:@"English"]) fieldName = kLangEng;
-    else if ([language isEqualToString:@"Hindi"]) fieldName = kLangHindi;
-    else if ([language isEqualToString:@"Hokkien"]) fieldName = kLangHokkien;
-    else if ([language isEqualToString:@"Malay"]) fieldName = kLangMalay;
-    else if ([language isEqualToString:@"Mandarin"]) fieldName = kLangMandarin;
-    else if ([language isEqualToString:@"Tamil"]) fieldName = kLangTamil;
-    else if ([language isEqualToString:@"Teochew"]) fieldName = kLangTeoChew;
-    else if ([language isEqualToString:@"Others"]) fieldName = kLangOthers;
-    
-    [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:fieldName andNewContent:value];
-}
+//- (void) postSpokenLangWithLangName:(NSString *) language andValue: (NSString *) value {
+//    NSString *fieldName;
+//    if ([language isEqualToString:@"Cantonese"]) fieldName = kLangCanto;
+//    else if ([language isEqualToString:@"English"]) fieldName = kLangEng;
+//    else if ([language isEqualToString:@"Hindi"]) fieldName = kLangHindi;
+//    else if ([language isEqualToString:@"Hokkien"]) fieldName = kLangHokkien;
+//    else if ([language isEqualToString:@"Malay"]) fieldName = kLangMalay;
+//    else if ([language isEqualToString:@"Mandarin"]) fieldName = kLangMandarin;
+//    else if ([language isEqualToString:@"Tamil"]) fieldName = kLangTamil;
+//    else if ([language isEqualToString:@"Teochew"]) fieldName = kLangTeoChew;
+//    else if ([language isEqualToString:@"Others"]) fieldName = kLangOthers;
+//
+//    [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:fieldName andNewContent:value];
+//}
 
 
 - (NSString *) replaceShortForms: (NSString *) originalString {

@@ -156,16 +156,18 @@
 //    [self setDefaultFontWithRow:dobRow];
 //    [section addFormRow:dobRow];
     
-    dobRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBirthDate rowType:XLFormRowDescriptorTypeText title:@"DOB (DDMMYYYY)"];
+    dobRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBirthDate rowType:XLFormRowDescriptorTypeText title:@"DOB (YYYY-MM-DD)"];
     if (gotOldRecord) {
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"YYYY-MM-dd";
         dateFormatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];  //otherwise 1st Jan will not be able to be read.
         NSDate *date = [dateFormatter dateFromString:_oldRecordDictionary[kBirthDate]];
         
-        // need to change it back to DDMMYYYY
-        dateFormatter.dateFormat = @"ddMMYYYY";
+        //2019
         dobRow.value = [dateFormatter stringFromDate:date];
+        // need to change it back to DDMMYYYY
+//        dateFormatter.dateFormat = @"ddMMYYYY";
+//        dobRow.value = [dateFormatter stringFromDate:date];
 //        dobRow.value = date;
     }
     dobRow.required = YES;
@@ -184,7 +186,8 @@
         NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
         
         if (dobRow.value != nil && dobRow.value != (id)[NSNull null]) {
-            NSString *yearOfBirth = [dobRow.value substringFromIndex:4];
+            NSString *yearOfBirth = [dobRow.value substringWithRange:NSMakeRange(0, 4)];        //to match YYYY-MM-dd
+//            NSString *yearOfBirth = [dobRow.value substringFromIndex:4];
             NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
             NSLog(@"%li", (long)age);
             ageRow.value = [NSNumber numberWithLong:age];
@@ -263,11 +266,20 @@
     [section addFormRow:row];
     
     XLFormRowDescriptor * spokenLangRow;
-    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Languages"];
+//    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Languages"];
+    //2019
+    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeSelectorPush title:@"Preferred Spoken Language"];
     spokenLangRow.selectorOptions = @[@"English", @"Mandarin", @"Malay", @"Tamil", @"Hindi", @"Cantonese", @"Hokkien", @"Teochew"];
     [self setDefaultFontWithRow:spokenLangRow];
     spokenLangRow.required = YES;
     [section addFormRow:spokenLangRow];
+    
+    XLFormRowDescriptor *backupSpokenLangRow;
+    backupSpokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBackupSpokenLang rowType:XLFormRowDescriptorTypeSelectorPush title:@"Backup Spoken Language"];
+    backupSpokenLangRow.selectorOptions = @[@"English", @"Mandarin", @"Malay", @"Tamil", @"Hindi", @"Cantonese", @"Hokkien", @"Teochew", @"None"];
+    [self setDefaultFontWithRow:backupSpokenLangRow];
+    backupSpokenLangRow.required = YES;
+    [section addFormRow:backupSpokenLangRow];
     
     XLFormRowDescriptor *writtenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWrittenLang rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Written Language"];
     writtenLangRow.required = YES;
@@ -295,53 +307,63 @@
     XLFormRowDescriptor *addressRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"address_block_street" rowType:XLFormRowDescriptorTypeSelectorPush title:@"Address"];
     addressRow.required = YES;
     if ([neighbourhood isEqualToString:@"Kampong Glam"])
-        addressRow.selectorOptions = @[@"Blk 4 Beach Road", @"Blk 5 Beach Road", @"Blk 6 Beach Road", @"Blk 7 North Bridge Road", @"Blk 8 North Bridge Road", @"Blk 9 North Bridge Road", @"Blk 10 North Bridge Road", @"Blk 18 Jalan Sultan", @"Blk 19 Jalan Sultan", @"Others"];
+        addressRow.selectorOptions = @[@"Blk 4 Beach Road",
+                                       @"Blk 5 Beach Road",
+                                       @"Blk 6 Beach Road",
+                                       @"Blk 7 North Bridge Road",
+                                       @"Blk 8 North Bridge Road",
+                                       @"Blk 9 North Bridge Road",
+                                       @"Blk 10 North Bridge Road",
+                                       @"Blk 18 Jalan Sultan",
+                                       @"Blk 19 Jalan Sultan",
+                                       @"Others"];
     else
 //        addressRow.selectorOptions = @[@"Blk 55 Lengkok Bahru", @"Blk 56 Lengkok Bahru", @"Blk 57 Lengkok Bahru", @"Blk 58 Lengkok Bahru", @"Blk 59 Lengkok Bahru", @"Blk 61 Lengkok Bahru", @"Blk 3 Jln Bt Merah", @"Others"];
-        addressRow.selectorOptions = @[@"1 Jln Bt Merah",
-                                       @"2 Jln Bt Merah",
-                                       @"3 Jln Bt Merah",
-                                       @"7 Jln Bt Merah",
-                                       @"11 Jln Bt Merah",
-                                       @"12 Jln Bt Merah",
-                                       @"13 Jln Bt Merah",
-                                       @"14 Jln Bt Merah",
-                                       @"28 Jln Bt Merah",
-                                       @"8 Jln Rumah Tinggi",
-                                       @"9 Jln Rumah Tinggi",
-                                       @"10 Jln Rumah Tinggi",
-                                       @"35 Jln Rumah Tinggi",
-                                       @"36 Jln Rumah Tinggi",
-                                       @"37 Jln Rumah Tinggi",
-                                       @"39 Jln Rumah Tinggi",
-                                       @"40 Jln Rumah Tinggi",
-                                       @"43 Lengkok Bahru",
-                                       @"44 Lengkok Bahru",
-                                       @"45 Lengkok Bahru",
-                                       @"46 Lengkok Bahru",
-                                       @"47 Lengkok Bahru",
-                                       @"48 Lengkok Bahru",
-                                       @"51 Lengkok Bahru",
-                                       @"52 Lengkok Bahru",
-                                       @"53 Lengkok Bahru",
-                                       @"54 Lengkok Bahru",
+        addressRow.selectorOptions = @[
+//                                       @"1 Jln Bt Merah",
+//                                       @"2 Jln Bt Merah",
+                                       @"Blk 3 Jln Bukit Merah",
+//                                       @"7 Jln Bt Merah",
+//                                       @"11 Jln Bt Merah",
+//                                       @"12 Jln Bt Merah",
+//                                       @"13 Jln Bt Merah",
+//                                       @"14 Jln Bt Merah",
+//                                       @"28 Jln Bt Merah",
+//                                       @"8 Jln Rumah Tinggi",
+//                                       @"9 Jln Rumah Tinggi",
+//                                       @"10 Jln Rumah Tinggi",
+//                                       @"35 Jln Rumah Tinggi",
+//                                       @"36 Jln Rumah Tinggi",
+//                                       @"37 Jln Rumah Tinggi",
+//                                       @"39 Jln Rumah Tinggi",
+//                                       @"40 Jln Rumah Tinggi",
+//                                       @"43 Lengkok Bahru",
+//                                       @"44 Lengkok Bahru",
+//                                       @"45 Lengkok Bahru",
+//                                       @"46 Lengkok Bahru",
+//                                       @"47 Lengkok Bahru",
+//                                       @"48 Lengkok Bahru",
+//                                       @"51 Lengkok Bahru",
+//                                       @"52 Lengkok Bahru",
+//                                       @"53 Lengkok Bahru",
+//                                       @"54 Lengkok Bahru",
                                        @"55 Lengkok Bahru",
                                        @"56 Lengkok Bahru",
                                        @"57 Lengkok Bahru",
                                        @"58 Lengkok Bahru",
                                        @"59 Lengkok Bahru",
                                        @"61 Lengkok Bahru",
-                                       @"63A Lengkok Bahru",
-                                       @"63B Lengkok Bahru",
-                                       @"28 Hoy Fatt Rd",
-                                       @"49 Hoy Fatt Rd",
-                                       @"50 Hoy Fatt Rd",
-                                       @"119 Bt Merah Lane 1",
-                                       @"121 Bt Merah Lane 1",
-                                       @"122 Bt Merah Lane 1",
-                                       @"124 Bt Merah Lane 1",
-                                       @"125 Bt Merah Lane 1",
-                                       @"127 Bt Merah Lane 1",
+//                                       @"63A Lengkok Bahru",
+//                                       @"63B Lengkok Bahru",
+//                                       @"28 Hoy Fatt Rd",
+//                                       @"49 Hoy Fatt Rd",
+//                                       @"50 Hoy Fatt Rd",
+//                                       @"119 Bt Merah Lane 1",
+//                                       @"121 Bt Merah Lane 1",
+//                                       @"122 Bt Merah Lane 1",
+//                                       @"124 Bt Merah Lane 1",
+//                                       @"125 Bt Merah Lane 1",
+//                                       @"127 Bt Merah Lane 1",
                                        @"Others"];
     [self setDefaultFontWithRow:addressRow];
     [section addFormRow:addressRow];
@@ -387,6 +409,7 @@
     unitRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         
         if (![oldValue isEqual:newValue]) { //otherwise this segment will crash
+            
             NSString *CAPSed = [rowDescriptor.editTextValue uppercaseString];
             rowDescriptor.value = CAPSed;
         }
@@ -471,30 +494,30 @@
     age40aboveRow.disabled = @YES;
     age40aboveRow.selectorOptions = @[@"Yes",@"No"];
     
-    //    __weak __typeof(self)weakSelf = self;
-    //    dobRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-    //        if (newValue != oldValue) {
-    //            // Calculate age
-    //            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    //            [dateFormatter setDateFormat:@"yyyy"];
-    //            NSString *yearOfBirth = [dateFormatter stringFromDate:newValue];
-    //            NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
-    //            NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
-    //            NSLog(@"%li", (long)age);
-    //            ageRow.value = [NSNumber numberWithLong:age];
-    //            [weakSelf reloadFormRow:ageRow];
-    //
-    //            if (age >= 40) {
-    //                age40aboveRow.value = @"Yes";
-    //                age40aboveRow.disabled = @YES;
-    //                [weakSelf updateFormRow:age40aboveRow];
-    //            } else {
-    //                age40aboveRow.value = @"No";
-    //                age40aboveRow.disabled = @YES;
-    //                [weakSelf updateFormRow:age40aboveRow];
-    //            }
-    //        }
-    //    };
+//    __weak __typeof(self)weakSelf = self;
+//    dobRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//        if (newValue != oldValue) {
+//            // Calculate age
+//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//            [dateFormatter setDateFormat:@"yyyy"];
+//            NSString *yearOfBirth = [dateFormatter stringFromDate:newValue];
+//            NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
+//            NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
+//            NSLog(@"%li", (long)age);
+//            rowDescriptor.value = [NSNumber numberWithLong:age];
+//            [weakSelf reloadFormRow:rowDescriptor];
+//
+//            if (age >= 40) {
+//                age40aboveRow.value = @"Yes";
+//                age40aboveRow.disabled = @YES;
+//                [weakSelf updateFormRow:age40aboveRow];
+//            } else {
+//                age40aboveRow.value = @"No";
+//                age40aboveRow.disabled = @YES;
+//                [weakSelf updateFormRow:age40aboveRow];
+//            }
+//        }
+//    };
     
     age40aboveRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:age40aboveRow];
@@ -686,6 +709,15 @@
     didPhlebRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:didPhlebRow];
     
+    XLFormRowDescriptor *mammoInterestRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammoInterest
+                                                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                                  title:@"Are you interested in taking a mammogram on Saturday 10am-1pm?"];
+    [self setDefaultFontWithRow:mammoInterestRow];
+    mammoInterestRow.required = YES;
+    mammoInterestRow.selectorOptions = @[@"Yes",@"No"];
+    mammoInterestRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:mammoInterestRow];
+    
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Mode of Screening"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
     
@@ -715,7 +747,7 @@
     centralDateRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Centralised'", screenModeRow];
     [section addFormRow:centralDateRow];
     
-    XLFormRowDescriptor *apptDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"appt_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date did the resident attend screening?"];
+    XLFormRowDescriptor *apptDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"appt_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Non-Phleb door-to-door Date (only available from 1-3pm)"];
     apptDateQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     apptDateQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
     [self setDefaultFontWithRow:apptDateQRow];
@@ -733,7 +765,7 @@
     [self setDefaultFontWithRow:apptDateRow];
     [section addFormRow:apptDateRow];
     
-    XLFormRowDescriptor *phlebApptQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"phleb_appt_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date did the resident attend screening?"];
+    XLFormRowDescriptor *phlebApptQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"phleb_appt_q" rowType:XLFormRowDescriptorTypeInfo title:@"Phleb door-to-door Date (only available from 9-11am)"];
     phlebApptQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     phlebApptQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
     [self setDefaultFontWithRow:phlebApptQRow];
@@ -786,12 +818,12 @@
     screenModeRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
             if ([newValue isEqualToString:@"Door-to-door"]) {
-                if ([eligibleBTRow.value isEqualToString:@"No"]) {
+                if ([eligibleBTRow.value isEqualToString:@"No"] || eligibleBTRow.value == nil) {
                     apptDateRow.hidden = @NO;
                     apptDateQRow.hidden = @NO;
                     phlebApptQRow.hidden = @YES;
                     phlebApptRow.hidden = @YES;
-                } else {
+                } else {    
                     apptDateRow.hidden = @YES;
                     apptDateQRow.hidden = @YES;
                     phlebApptQRow.hidden = @NO;
@@ -850,7 +882,7 @@
             [self reloadFormRow:rowDescriptor];
             
             NSString *dobString = [NSString stringWithFormat:@"%@", rowDescriptor.value];
-            NSString *yearOfBirth = [NSString stringWithFormat:@"%@", [dobString substringFromIndex:4]];  //format: DDMMYYYY
+            NSString *yearOfBirth = [NSString stringWithFormat:@"%@", [dobString substringWithRange:NSMakeRange(0, 4)]];  //format: YYYY-MM-dd
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             [dateFormatter setDateFormat:@"yyyy"];
             NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
@@ -1026,8 +1058,10 @@
         nric = fields[kNRIC];
         
         /** Replaced after 2.0.3093 */
-//        birthDate = [self getDateStringFromFormValue:fields andRowTag:kBirthDate];
-        birthDate = [self reorderDateString:fields andRowTag:kBirthDate];
+        birthDate = fields[kBirthDate];
+
+        // 2019 (don't need anymore)
+        //        birthDate = [self reorderDateString:fields andRowTag:kBirthDate];
         
         NSString *timeNow = [self getTimeNowInString];
         
@@ -1046,7 +1080,8 @@
                                kNokRelationship: [fields objectForKey:kNokRelationship],
                                kNokContact: [fields objectForKey:kNokContact],
                                kEthnicity: [fields objectForKey:kEthnicity],
-                               //skip language for now
+                               kSpokenLang: [fields objectForKey:kSpokenLang],
+                               kBackupSpokenLang: [fields objectForKey:kBackupSpokenLang],
                                kWrittenLang: [fields objectForKey:kWrittenLang],
                                kAddressBlock: block,
                                kAddressStreet: street,
@@ -1059,7 +1094,7 @@
                                @"prereg_completed":@"1"
                                };
         
-        dict = [self addLangFieldsIfAny:dict];
+//        dict = [self addLangFieldsIfAny:dict];
         dict = [self addAddressOthersIfAny:dict];
         
         NSString *didPhlebEntry = [fields objectForKey:kDidPhleb];
@@ -1121,9 +1156,12 @@
 }
 
 - (BOOL) isDobValid: (NSString *) dobString {
+    
+    if ([dobString length] != 10)
+        return NO;
 
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"ddMMYYYY";
+    dateFormatter.dateFormat = @"yyyy-MM-dd";
     dateFormatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];  //otherwise 1st Jan will not be able to be read.
     NSDate *date = [dateFormatter dateFromString:dobString];
     
@@ -1305,41 +1343,41 @@
     return [NSString stringWithFormat:@"%d", blkNo];
 }
 
-- (void) postSpokenLangWithLangName:(NSString *) language andValue: (NSString *) value {
-    NSString *fieldName;
-    if ([language isEqualToString:@"Cantonese"]) fieldName = kLangCanto;
-    else if ([language isEqualToString:@"English"]) fieldName = kLangEng;
-    else if ([language isEqualToString:@"Hindi"]) fieldName = kLangHindi;
-    else if ([language isEqualToString:@"Hokkien"]) fieldName = kLangHokkien;
-    else if ([language isEqualToString:@"Malay"]) fieldName = kLangMalay;
-    else if ([language isEqualToString:@"Mandarin"]) fieldName = kLangMandarin;
-    else if ([language isEqualToString:@"Tamil"]) fieldName = kLangTamil;
-    else if ([language isEqualToString:@"Teochew"]) fieldName = kLangTeoChew;
-    else if ([language isEqualToString:@"Others"]) fieldName = kLangOthers;
-    
+//- (void) postSpokenLangWithLangName:(NSString *) language andValue: (NSString *) value {
+//    NSString *fieldName;
+//    if ([language isEqualToString:@"Cantonese"]) fieldName = kLangCanto;
+//    else if ([language isEqualToString:@"English"]) fieldName = kLangEng;
+//    else if ([language isEqualToString:@"Hindi"]) fieldName = kLangHindi;
+//    else if ([language isEqualToString:@"Hokkien"]) fieldName = kLangHokkien;
+//    else if ([language isEqualToString:@"Malay"]) fieldName = kLangMalay;
+//    else if ([language isEqualToString:@"Mandarin"]) fieldName = kLangMandarin;
+//    else if ([language isEqualToString:@"Tamil"]) fieldName = kLangTamil;
+//    else if ([language isEqualToString:@"Teochew"]) fieldName = kLangTeoChew;
+//    else if ([language isEqualToString:@"Others"]) fieldName = kLangOthers;
+//
     //    [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:fieldName andNewContent:value];
-}
+//}
 
-- (NSDictionary *) addLangFieldsIfAny: (NSDictionary *) dict {
-    
-    NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] init];
-    mutDict = [dict mutableCopy];
-    
-    NSArray *languageArr = [[self.form formValues] objectForKey:kSpokenLang];
-    
-    if (languageArr != nil && [languageArr count] > 0) {
-        if ([languageArr containsObject:@"Cantonese"]) [mutDict setObject:@"1" forKey:kLangCanto];
-        if ([languageArr containsObject:@"English"]) [mutDict setObject:@"1" forKey:kLangEng];
-        if ([languageArr containsObject:@"Hindi"]) [mutDict setObject:@"1" forKey:kLangHindi];
-        if ([languageArr containsObject:@"Hokkien"]) [mutDict setObject:@"1" forKey:kLangHokkien];
-        if ([languageArr containsObject:@"Malay"]) [mutDict setObject:@"1" forKey:kLangMalay];
-        if ([languageArr containsObject:@"Mandarin"]) [mutDict setObject:@"1" forKey:kLangMandarin];
-        if ([languageArr containsObject:@"Tamil"]) [mutDict setObject:@"1" forKey:kLangTamil];
-        if ([languageArr containsObject:@"Teochew"]) [mutDict setObject:@"1" forKey:kLangTeoChew];
-    }
-    
-    return mutDict;
-}
+//- (NSDictionary *) addLangFieldsIfAny: (NSDictionary *) dict {
+//
+//    NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] init];
+//    mutDict = [dict mutableCopy];
+//
+//    NSArray *languageArr = [[self.form formValues] objectForKey:kSpokenLang];
+//
+//    if (languageArr != nil && [languageArr count] > 0) {
+//        if ([languageArr containsObject:@"Cantonese"]) [mutDict setObject:@"1" forKey:kLangCanto];
+//        if ([languageArr containsObject:@"English"]) [mutDict setObject:@"1" forKey:kLangEng];
+//        if ([languageArr containsObject:@"Hindi"]) [mutDict setObject:@"1" forKey:kLangHindi];
+//        if ([languageArr containsObject:@"Hokkien"]) [mutDict setObject:@"1" forKey:kLangHokkien];
+//        if ([languageArr containsObject:@"Malay"]) [mutDict setObject:@"1" forKey:kLangMalay];
+//        if ([languageArr containsObject:@"Mandarin"]) [mutDict setObject:@"1" forKey:kLangMandarin];
+//        if ([languageArr containsObject:@"Tamil"]) [mutDict setObject:@"1" forKey:kLangTamil];
+//        if ([languageArr containsObject:@"Teochew"]) [mutDict setObject:@"1" forKey:kLangTeoChew];
+//    }
+//
+//    return mutDict;
+//}
 
 - (NSDictionary *) addAddressOthersIfAny: (NSDictionary *) dict {
     
@@ -1492,20 +1530,20 @@
     return @"0";
 }
 
-- (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
-    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
-    
-    if([[dictionary objectForKey:kLangCanto] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
-    if([[dictionary objectForKey:kLangEng] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
-    if([[dictionary objectForKey:kLangHindi] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
-    if([[dictionary objectForKey:kLangHokkien] isEqual:@(1)]) [spokenLangArray addObject:@"Hokkien"];
-    if([[dictionary objectForKey:kLangMalay] isEqual:@(1)]) [spokenLangArray addObject:@"Malay"];
-    if([[dictionary objectForKey:kLangMandarin] isEqual:@(1)]) [spokenLangArray addObject:@"Mandarin"];
-    if([[dictionary objectForKey:kLangOthers] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
-    if([[dictionary objectForKey:kLangTamil] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
-    if([[dictionary objectForKey:kLangTeoChew] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
-    return spokenLangArray;
-}
+//- (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
+//    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
+//
+//    if([[dictionary objectForKey:kLangCanto] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
+//    if([[dictionary objectForKey:kLangEng] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
+//    if([[dictionary objectForKey:kLangHindi] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
+//    if([[dictionary objectForKey:kLangHokkien] isEqual:@(1)]) [spokenLangArray addObject:@"Hokkien"];
+//    if([[dictionary objectForKey:kLangMalay] isEqual:@(1)]) [spokenLangArray addObject:@"Malay"];
+//    if([[dictionary objectForKey:kLangMandarin] isEqual:@(1)]) [spokenLangArray addObject:@"Mandarin"];
+//    if([[dictionary objectForKey:kLangOthers] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
+//    if([[dictionary objectForKey:kLangTamil] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
+//    if([[dictionary objectForKey:kLangTeoChew] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
+//    return spokenLangArray;
+//}
 /*
  #pragma mark - Navigation
  

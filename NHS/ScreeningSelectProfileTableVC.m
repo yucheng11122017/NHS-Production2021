@@ -158,13 +158,16 @@ typedef enum getDataState {
         NSNumber *serialNum = [[NSUserDefaults standardUserDefaults] objectForKey:kNhsSerialNum];
         
         if ([text containsString:@"2018"]) {
-            if ([preRegDone isEqual:@0]) {
-                [cell setUserInteractionEnabled:NO];
-                [cell.textLabel setTextColor:[UIColor grayColor]];
-            } else {
-                [cell setUserInteractionEnabled:YES];
-                cell.textLabel.textColor = [UIColor blackColor];
-            }
+//            if ([preRegDone isEqual:@0]) {
+//                [cell setUserInteractionEnabled:NO];
+//                [cell.textLabel setTextColor:[UIColor grayColor]];
+//            } else {
+//                [cell setUserInteractionEnabled:YES];
+//                cell.textLabel.textColor = [UIColor blackColor];
+//            }
+#warning PERMANENT DISABLE FOR NOW
+            [cell setUserInteractionEnabled:NO];
+            [cell.textLabel setTextColor:[UIColor grayColor]];
             
             if (serialNum != (id) [NSNull null]) {
                 if ([serialNum isKindOfClass:[NSNumber class]]) {  //as long as have value

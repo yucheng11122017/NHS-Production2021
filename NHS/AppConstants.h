@@ -149,16 +149,17 @@ extern NSString *const kNokRelationship;
 extern NSString *const kNokContact;
 
 extern NSString *const kSpokenLang;
-extern NSString *const kLangCanto;
-extern NSString *const kLangEng;
-extern NSString *const kLangHindi;
-extern NSString *const kLangHokkien;
-extern NSString *const kLangMalay;
-extern NSString *const kLangMandarin;
-extern NSString *const kLangTamil;
-extern NSString *const kLangTeoChew;
-extern NSString *const kLangOthers;
-extern NSString *const kLangOthersText;
+extern NSString *const kBackupSpokenLang;
+//extern NSString *const kLangCanto;
+//extern NSString *const kLangEng;
+//extern NSString *const kLangHindi;
+//extern NSString *const kLangHokkien;
+//extern NSString *const kLangMalay;
+//extern NSString *const kLangMandarin;
+//extern NSString *const kLangTamil;
+//extern NSString *const kLangTeoChew;
+//extern NSString *const kLangOthers;
+//extern NSString *const kLangOthersText;
 
 extern NSString *const kEthnicity;
 extern NSString *const kWrittenLang;
@@ -200,6 +201,7 @@ extern NSString *const kNoBloodTest;
 extern NSString *const kWantFreeBt;
 extern NSString *const kDidPhleb;
 extern NSString *const kIsPr;
+extern NSString *const kMammoInterest;
 
 #pragma mark - Phlebotomy (not in registration fields)
 extern NSString *const kFastingBloodGlucose;
