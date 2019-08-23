@@ -12,6 +12,8 @@
 
 #define NOTIFICATION_RELOAD_TABLE @"notif_reload_table"
 
+#define SCREENING_PARTICIPANT_SIGNATURE  @"user_signature_path1"
+#define SCREENING_CONSENT_TAKER_SIGNATURE  @"user_signature_path2"
 
 #define REMOTE_HOST_NAME @"www.apple.com"
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"

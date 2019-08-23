@@ -61,6 +61,11 @@
 		B7FF558E02EF2C333752A688 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 976D2C7502590B08EE5BAFD4 /* CoreTelephony.framework */; };
 		B932B92D80F966731F0F568C /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 474665EE4826B151279871A1 /* CoreText.framework */; };
 		C3C2F30AA2C4B174444C3807 /* Pods_NHSUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 209345AB6DD8B9F1E078D209 /* Pods_NHSUITests.framework */; };
+		DB769014230EC73600E20A19 /* ResearchConsent.pdf in Resources */ = {isa = PBXBuildFile; fileRef = DB769013230EC73500E20A19 /* ResearchConsent.pdf */; };
+		DB7690162310492B00E20A19 /* ScreeningConsent.pdf in Resources */ = {isa = PBXBuildFile; fileRef = DB7690152310492B00E20A19 /* ScreeningConsent.pdf */; };
+		DBB7B9FD230DA3B60059574F /* UviSignatureView.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB7B9FB230DA3B60059574F /* UviSignatureView.m */; };
+		DBB7BA02230DA3C40059574F /* CaptureSignatureVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB7B9FE230DA3C30059574F /* CaptureSignatureVC.m */; };
+		DBB7BA03230DA3C40059574F /* ViewSignatureVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB7BA01230DA3C40059574F /* ViewSignatureVC.m */; };
 		E110035A2137BCA10074034E /* BasicGeriatricTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E11003592137BCA10074034E /* BasicGeriatricTableVC.m */; };
 		E120E4081D431E9B002DBC7E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E4071D431E9B002DBC7E /* main.m */; };
 		E120E40B1D431E9B002DBC7E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E120E40A1D431E9B002DBC7E /* AppDelegate.m */; };
@@ -195,6 +200,14 @@
 		BDD52E2A045B91149705069E /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		D4C8AA7ED6BECF1390F4A15E /* Pods-NHSUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NHSUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-NHSUITests/Pods-NHSUITests.release.xcconfig"; sourceTree = "<group>"; };
 		D6D48DA6CEA8B44D498464D0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		DB769013230EC73500E20A19 /* ResearchConsent.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ResearchConsent.pdf; sourceTree = "<group>"; };
+		DB7690152310492B00E20A19 /* ScreeningConsent.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ScreeningConsent.pdf; sourceTree = "<group>"; };
+		DBB7B9FB230DA3B60059574F /* UviSignatureView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UviSignatureView.m; path = Models/UviSignatureView/UviSignatureView.m; sourceTree = "<group>"; };
+		DBB7B9FC230DA3B60059574F /* UviSignatureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UviSignatureView.h; path = Models/UviSignatureView/UviSignatureView.h; sourceTree = "<group>"; };
+		DBB7B9FE230DA3C30059574F /* CaptureSignatureVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaptureSignatureVC.m; sourceTree = "<group>"; };
+		DBB7B9FF230DA3C30059574F /* ViewSignatureVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewSignatureVC.h; sourceTree = "<group>"; };
+		DBB7BA00230DA3C40059574F /* CaptureSignatureVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CaptureSignatureVC.h; sourceTree = "<group>"; };
+		DBB7BA01230DA3C40059574F /* ViewSignatureVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewSignatureVC.m; sourceTree = "<group>"; };
 		E11003582137BCA10074034E /* BasicGeriatricTableVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BasicGeriatricTableVC.h; sourceTree = "<group>"; };
 		E11003592137BCA10074034E /* BasicGeriatricTableVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BasicGeriatricTableVC.m; sourceTree = "<group>"; };
 		E120E4031D431E9A002DBC7E /* NHS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NHS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -388,6 +401,10 @@
 			children = (
 				01FF80BF1F53AF62002C7ADD /* NewScreeningResidentFormVC.h */,
 				01FF80C01F53AF62002C7ADD /* NewScreeningResidentFormVC.m */,
+				DBB7B9FF230DA3C30059574F /* ViewSignatureVC.h */,
+				DBB7BA01230DA3C40059574F /* ViewSignatureVC.m */,
+				DBB7BA00230DA3C40059574F /* CaptureSignatureVC.h */,
+				DBB7B9FE230DA3C30059574F /* CaptureSignatureVC.m */,
 			);
 			name = "New Resident VC";
 			sourceTree = "<group>";
@@ -461,6 +478,24 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		DB769012230EC71900E20A19 /* PDF Forms */ = {
+			isa = PBXGroup;
+			children = (
+				DB7690152310492B00E20A19 /* ScreeningConsent.pdf */,
+				DB769013230EC73500E20A19 /* ResearchConsent.pdf */,
+			);
+			name = "PDF Forms";
+			sourceTree = "<group>";
+		};
+		DBB7B9F0230D9A5A0059574F /* UviSignatureView */ = {
+			isa = PBXGroup;
+			children = (
+				DBB7B9FC230DA3B60059574F /* UviSignatureView.h */,
+				DBB7B9FB230DA3B60059574F /* UviSignatureView.m */,
+			);
+			name = UviSignatureView;
+			sourceTree = "<group>";
+		};
 		DE085EC8EB60C609DC0B563E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -504,6 +539,7 @@
 		E120E4051D431E9B002DBC7E /* NHS */ = {
 			isa = PBXGroup;
 			children = (
+				DB769012230EC71900E20A19 /* PDF Forms */,
 				8EC56F881D60CDBB00938C2A /* AppConstants.h */,
 				8EC56F891D60CDBB00938C2A /* AppConstants.m */,
 				8E0852571D6DCCD7006E68FE /* blankScreeningForm.json */,
@@ -566,6 +602,7 @@
 		E1FCF92F1D45B76100478F7B /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				DBB7B9F0230D9A5A0059574F /* UviSignatureView */,
 				E1A4F0DA1D61CB8A00EE9BBB /* Reachability.h */,
 				E1A4F0DB1D61CB8A00EE9BBB /* Reachability.m */,
 				018D8C4421417D8D00B13595 /* ResidentProfile.h */,
@@ -702,7 +739,9 @@
 				015831411DB4D2F80049F16C /* GenericTableViewCell.xib in Resources */,
 				8E0852581D6DCCD7006E68FE /* blankScreeningForm.json in Resources */,
 				E120E4111D431E9B002DBC7E /* Main.storyboard in Resources */,
+				DB7690162310492B00E20A19 /* ScreeningConsent.pdf in Resources */,
 				012630451F8323C000065B1E /* SegmentedCell.xib in Resources */,
+				DB769014230EC73600E20A19 /* ResearchConsent.pdf in Resources */,
 				E1A4F0E11D66BE2000EE9BBB /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -839,6 +878,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBB7B9FD230DA3B60059574F /* UviSignatureView.m in Sources */,
 				018C04271F3F4A1300582E82 /* NeighbourhoodSelectionVC.m in Sources */,
 				01D48EC41F346C36002C3928 /* ResidentParticularsVC.m in Sources */,
 				018D8C422140DA0500B13595 /* PsychoHistAssmtTableVC.m in Sources */,
@@ -848,6 +888,7 @@
 				E1EFB0931D433C3400510532 /* PatientScreeningListTableViewController.m in Sources */,
 				013BE6201F83283500E16EFC /* SegmentedCell.m in Sources */,
 				01D48ED51F3B5F40002C3928 /* SocialWorkFormVC.m in Sources */,
+				DBB7BA03230DA3C40059574F /* ViewSignatureVC.m in Sources */,
 				E16C41DB213781AD00E05419 /* CancerScreeningEligibAssessTableVC.m in Sources */,
 				01B893FE1F3E05CC00201995 /* PageGuideVC.m in Sources */,
 				01D48ED21F3A1839002C3928 /* SocialWorkTableVC.m in Sources */,
@@ -875,6 +916,7 @@
 				01137E8D1F7BADA4002A0A48 /* ProfilingTableVC.m in Sources */,
 				01F3CC401F983E3D0033ECDE /* QuestionnaireFormVC.m in Sources */,
 				01D48EC11F3327B5002C3928 /* ScreeningSelectProfileTableVC.m in Sources */,
+				DBB7BA02230DA3C40059574F /* CaptureSignatureVC.m in Sources */,
 				015F682D1F4A846B000B6D5E /* SeriFormVC.m in Sources */,
 				0166E05B21534EAA00FC2D02 /* ConsentFormVC.m in Sources */,
 				01137E891F7B6970002A0A48 /* HealthEduFormVC.m in Sources */,

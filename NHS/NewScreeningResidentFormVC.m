@@ -32,6 +32,7 @@
 
 @property (strong, nonatomic) NSNumber *resident_id;
 @property (strong, nonatomic) NSDictionary *oldRecordDictionary;
+@property (strong, nonatomic) NSString *neighbourhood;
 
 @end
 
@@ -44,6 +45,8 @@
         _oldRecordDictionary = [[NSUserDefaults standardUserDefaults] objectForKey:kOldRecord];
         gotOldRecord = TRUE;
     }
+    neighbourhood = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
+    
     XLFormViewController *form;
     
     neighbourhood = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
@@ -53,6 +56,7 @@
     
     status = [reachability currentReachabilityStatus];
     [self processConnectionStatus];
+    
     
     //must init first before [super viewDidLoad]
     form = [self initNewResidentForm];
@@ -92,17 +96,17 @@
     [section addFormRow:nameRow];
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Gender"];
-    row.selectorOptions = @[@"Male", @"Female"];
-    [self setDefaultFontWithRow:row];
-    row.required = YES;
+    XLFormRowDescriptor *genderRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Gender"];
+    genderRow.selectorOptions = @[@"Male", @"Female"];
+    [self setDefaultFontWithRow:genderRow];
+    genderRow.required = YES;
     if (gotOldRecord) {
         if ([_oldRecordDictionary[kGender] isEqualToString:@"M"])
-            row.value = @"Male";
+            genderRow.value = @"Male";
         else
-            row.value = @"Female";
+            genderRow.value = @"Female";
     }
-    [section addFormRow:row];
+    [section addFormRow:genderRow];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     section.footerTitle = @"Only Singaporeans/PRs (with a valid NRIC/FIN) are eligible for screening.";
@@ -426,21 +430,92 @@
     section.footerTitle = @"I consent to NHS directly disclosing the Information and my past screening and follow-up information (participant’s past screening and follow-up information under NHS’ Screening and Follow-Up Programme) to NHS’ collaborators (refer to organisations/institutions that work in partnership with NHS for the provision of screening and follow-up related services, such as but not limited to: MOH, HPB, Regional Health Systems, Senior Cluster Network Operators, etc. where necessary) for the purposes of checking if I require re-screening, further tests, follow-up action and/or referral to community programmes/activities.";
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kConsent rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Consent to disclosure of information"];
-    row.required = YES;
-    [self setDefaultFontWithRow:row];
-    [section addFormRow:row];
+//    XLFormRowDescriptor *showScreenConsentFormBtnRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"show_screening_consent" rowType:XLFormRowDescriptorTypeButton title:@"Show Screening Consent Form"];
+//    showScreenConsentFormBtnRow.required = NO;
+//    showScreenConsentFormBtnRow.action.formSelector = @selector(goToShowConsentForm:);
+//    showScreenConsentFormBtnRow.cellConfigAtConfigure[@"backgroundColor"] = [UIColor colorWithRed:35/255.0 green:22/255.0 blue:120/255.0 alpha:1.0];
+//    showScreenConsentFormBtnRow.cellConfig[@"textLabel.textColor"] = [UIColor whiteColor];
+//    [section addFormRow:showScreenConsentFormBtnRow];
+    
+    XLFormRowDescriptor *consentInfoRow = [XLFormRowDescriptor formRowDescriptorWithTag:kConsent rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Consent to disclosure of information"];
+    consentInfoRow.selectorOptions = @[@"Yes", @"No"];
+    consentInfoRow.required = YES;
+    [self setDefaultFontWithRow:consentInfoRow];
+    [section addFormRow:consentInfoRow];
+    
+    XLFormRowDescriptor *consentScreeningBtn = [XLFormRowDescriptor formRowDescriptorWithTag:@"sign_screening_btn" rowType:XLFormRowDescriptorTypeButton title:@"Sign Screening Consent"];
+    consentScreeningBtn.required = NO;
+    consentScreeningBtn.action.formSelector = @selector(goToViewSignatureVC:);
+    consentScreeningBtn.cellConfigAtConfigure[@"backgroundColor"] = [UIColor colorWithRed:243/255.0 green:156/255.0 blue:18/255.0 alpha:1.0];
+    consentScreeningBtn.cellConfig[@"textLabel.textColor"] = [UIColor whiteColor];
+    [section addFormRow:consentScreeningBtn];
+    
+
+    XLFormRowDescriptor *langExplainedRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"lang_explained" rowType:XLFormRowDescriptorTypeSelectorPush title:@"Language explained in"];
+    langExplainedRow.selectorOptions = @[@"English", @"Malay", @"Chinese", @"Tamil", @"Others"];
+    [self setDefaultFontWithRow:langExplainedRow];
+    langExplainedRow.required = YES;
+    langExplainedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentInfoRow];
+    [section addFormRow:langExplainedRow];
+    
+    XLFormRowDescriptor *langExplainedOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"lang_explained_others" rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    langExplainedOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", langExplainedRow];
+    [langExplainedOthersRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [self setDefaultFontWithRow:langExplainedOthersRow];
+    [section addFormRow:langExplainedOthersRow];
+    
+    XLFormRowDescriptor *consentTakerNameRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"consent_taker_name" rowType:XLFormRowDescriptorTypeName title:@"Consent Taker Full Name"];
+    consentTakerNameRow.required = YES;
+    [consentTakerNameRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [self setDefaultFontWithRow:consentTakerNameRow];
+    consentTakerNameRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentInfoRow];
+    [section addFormRow:consentTakerNameRow];
+    
+    XLFormRowDescriptor *matricNoRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"matric_no" rowType:XLFormRowDescriptorTypeName title:@"Matriculation Number"];
+    matricNoRow.required = YES;
+    [matricNoRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [self setDefaultFontWithRow:matricNoRow];
+    matricNoRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentInfoRow];
+    [section addFormRow:matricNoRow];
+    
+    XLFormRowDescriptor *orgRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"org_name" rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Organisation"];
+    orgRow.selectorOptions = @[@"NUS Medicine", @"NUS Nursing", @"NTU Medicine", @"NUS Social Work", @"Others"];
+    [self setDefaultFontWithRow:orgRow];
+    orgRow.required = YES;
+    orgRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentInfoRow];
+    [section addFormRow:orgRow];
+    
+    XLFormRowDescriptor *orgOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"org_others" rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    orgOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", orgRow];
+    [orgOthersRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [self setDefaultFontWithRow:orgOthersRow];
+    [section addFormRow:orgOthersRow];
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Consent to Research"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
     section.footerTitle = @"Select no during prepubs. Ask ONLY during screening.";
+    
+//    XLFormRowDescriptor *showResearchConsentFormBtnRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"show_research_consent" rowType:XLFormRowDescriptorTypeButton title:@"Show Research Consent Form"];
+//    showResearchConsentFormBtnRow.required = NO;
+//    showResearchConsentFormBtnRow.action.formSelector = @selector(goToShowConsentForm:);
+//    showResearchConsentFormBtnRow.cellConfigAtConfigure[@"backgroundColor"] = [UIColor colorWithRed:35/255.0 green:22/255.0 blue:120/255.0 alpha:1.0];
+//    showResearchConsentFormBtnRow.cellConfig[@"textLabel.textColor"] = [UIColor whiteColor];
+//    [section addFormRow:showResearchConsentFormBtnRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kConsentToResearch rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Consent to research"];
     row.selectorOptions = @[@"Yes", @"No"];
     row.required = NO;
     [self setDefaultFontWithRow:row];
     [section addFormRow:row];
-    
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"INDICATORS"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
@@ -709,15 +784,27 @@
     didPhlebRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:didPhlebRow];
     
-    XLFormRowDescriptor *mammoInterestRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammoInterest
-                                                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                                                  title:@"Are you interested in taking a mammogram on Saturday 10am-1pm?"];
-    [self setDefaultFontWithRow:mammoInterestRow];
-    mammoInterestRow.required = YES;
-    mammoInterestRow.selectorOptions = @[@"Yes",@"No"];
-    mammoInterestRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:mammoInterestRow];
+    if (![neighbourhood containsString:@"Kampong"]) {
+        XLFormRowDescriptor *mammoInterestRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammoInterest
+                                                                                      rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                                        title:@"Are you interested in taking a mammogram on Saturday 10am-1pm?"];
+        [self setDefaultFontWithRow:mammoInterestRow];
+        mammoInterestRow.required = YES;
+        mammoInterestRow.selectorOptions = @[@"Yes",@"No"];
+        mammoInterestRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+        mammoInterestRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Female'", genderRow];
+        [section addFormRow:mammoInterestRow];
+    }
     
+//
+//    genderRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//        if (newValue != oldValue) {
+//            if ([newValue isEqualToString:@"Female"]) {
+//                mammo
+//            }
+//        }
+//    }
+//
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Mode of Screening"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
     
@@ -852,8 +939,36 @@
     return [super initWithForm:formDescriptor];
 }
 
+#pragma mark - XLFormButton Segue
+- (void) goToViewSignatureVC: (XLFormRowDescriptor *) sender {
+    [self performSegueWithIdentifier:@"RegistrationFormToViewSignatureSegue" sender:self];
+}
+
+- (void) goToShowConsentForm: (XLFormRowDescriptor *) sender {
+    
+    NSString *formName;
+    if ([sender.tag containsString:@"research"]) {
+        formName = @"ResearchConsent";
+    } else {
+        formName = @"ScreeningConsent";
+    }
+    UIViewController *webVC = [[UIViewController alloc] init];
+    
+    UIWebView *webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, webVC.view.frame.size.width, webVC.view.frame.size.height)];
+    
+    NSURL *targetURL = [[NSBundle mainBundle] URLForResource:formName withExtension:@"pdf"];
+    NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
+    [webView setScalesPageToFit:YES];
+    [webView loadRequest:request];
+    
+    [webVC.view addSubview:webView];
+    [self.navigationController pushViewController:webVC animated:YES];
+}
+
+
 #pragma mark - XLFormViewControllerDelegate
--(void)endEditing:(XLFormRowDescriptor *)rowDescriptor {
+-(void)endEditing:(XLFormRowDescriptor *) rowDescriptor{
+
     
     if ([rowDescriptor.tag isEqualToString:kBirthDate] ) {
         // Calculate age
