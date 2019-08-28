@@ -40,7 +40,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
-    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0, nil];
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0, nil];
     
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
     [self.hostReachability startNotifier];
@@ -48,7 +48,7 @@
     
     
     self.navigationItem.title = @"3d. Basic Geriatric";
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Fall Risk Assessment (Basic)",
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Functional Self Rated Quality of Health", @"Fall Risk Assessment (Basic)",
                      @"Dementia Assessment (Basic)",
                      nil];
     
@@ -124,7 +124,7 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 14)]; //because until CancerScreening took up the first 13 numbers..
+    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 15)]; //because until CancerScreening took up the first 14 numbers..
     
     [self performSegueWithIdentifier:@"BasicGeriatricToFormSegue" sender:self];
     
@@ -190,7 +190,7 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckFallRiskEligible, kCheckGeriatricDementiaEligible];
+    NSArray *lookupTable = @[kCheckEq5d ,kCheckFallRiskEligible, kCheckGeriatricDementiaEligible];
 
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {

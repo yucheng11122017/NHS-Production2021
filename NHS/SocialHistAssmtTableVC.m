@@ -124,7 +124,7 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 19)]; //because until Finance History Assessment took up the first 18 numbers..
+    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 21)]; //because until Finance History Assessment took up the first 19 numbers..
     
     [self performSegueWithIdentifier:@"SocialHistAssmtToFormSegue" sender:self];
     

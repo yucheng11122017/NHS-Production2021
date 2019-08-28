@@ -627,10 +627,14 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
+                    <connections>
+                        <segue destination="8Jz-sb-g28" kind="show" identifier="ResiPartiToViewSignatureSegue" id="HxC-Eb-GhK"/>
+                        <segue destination="zvF-Xa-pRA" kind="show" identifier="ResiPartiToResearchSignatureSegue" id="F2J-f6-4fU"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ELK-2o-tyC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1511" y="1211"/>
+            <point key="canvasLocation" x="1554" y="1340"/>
         </scene>
         <!--Screening Section Table View Controller-->
         <scene sceneID="xRV-Vc-3S8">
@@ -1287,11 +1291,91 @@
                     <navigationItem key="navigationItem" id="n58-Nh-d8k"/>
                     <connections>
                         <segue destination="8Jz-sb-g28" kind="show" identifier="RegistrationFormToViewSignatureSegue" id="YdR-8P-ebH"/>
+                        <segue destination="zvF-Xa-pRA" kind="show" identifier="RegistrationFormToResearchSignatureSegue" id="wWe-qT-nge"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sVr-bp-UvR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-606" y="3279"/>
+        </scene>
+        <!--Research SignatureVC-->
+        <scene sceneID="it0-MR-efd">
+            <objects>
+                <viewController id="zvF-Xa-pRA" customClass="ResearchSignatureVC" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="sTj-c7-95h"/>
+                        <viewControllerLayoutGuide type="bottom" id="hGq-Yw-iaI"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="gx3-AP-ZvQ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZYf-sa-jWG">
+                                <rect key="frame" x="16" y="170" width="343" height="200"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="200" id="ooc-Y8-iSy"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Participant Signature" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J8E-Zd-fJJ">
+                                <rect key="frame" x="107" y="125" width="161" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="x2l-da-O0X">
+                                <rect key="frame" x="16" y="447" width="343" height="200"/>
+                            </imageView>
+                            <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="W4y-Oz-d3p">
+                                <rect key="frame" x="137" y="255" width="101" height="30"/>
+                                <state key="normal" title="New Signature"/>
+                                <connections>
+                                    <segue destination="9FO-vi-Aq0" kind="show" identifier="view_to_capture" id="2LE-78-Qcb"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fGr-lF-Lny">
+                                <rect key="frame" x="137" y="532" width="101" height="30"/>
+                                <state key="normal" title="New Signature"/>
+                                <connections>
+                                    <segue destination="9FO-vi-Aq0" kind="show" identifier="view_to_capture" id="U1r-4y-v7U"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Witness/Translator Signature" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9x6-FS-YZk">
+                                <rect key="frame" x="77" y="399" width="221.5" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="fGr-lF-Lny" firstAttribute="centerY" secondItem="x2l-da-O0X" secondAttribute="centerY" id="38n-Un-2RR"/>
+                            <constraint firstItem="J8E-Zd-fJJ" firstAttribute="centerX" secondItem="W4y-Oz-d3p" secondAttribute="centerX" id="5Gt-SB-zFt"/>
+                            <constraint firstItem="ZYf-sa-jWG" firstAttribute="trailing" secondItem="gx3-AP-ZvQ" secondAttribute="trailingMargin" id="5J7-iJ-WoH"/>
+                            <constraint firstItem="ZYf-sa-jWG" firstAttribute="leading" secondItem="gx3-AP-ZvQ" secondAttribute="leadingMargin" id="5g6-cY-obs"/>
+                            <constraint firstItem="ZYf-sa-jWG" firstAttribute="top" secondItem="J8E-Zd-fJJ" secondAttribute="bottom" constant="24" id="6ev-dK-Nfi"/>
+                            <constraint firstItem="ZYf-sa-jWG" firstAttribute="centerY" secondItem="W4y-Oz-d3p" secondAttribute="centerY" id="850-eU-1BT"/>
+                            <constraint firstItem="x2l-da-O0X" firstAttribute="top" secondItem="9x6-FS-YZk" secondAttribute="bottom" constant="27" id="9yC-kh-kRQ"/>
+                            <constraint firstItem="ZYf-sa-jWG" firstAttribute="centerX" secondItem="W4y-Oz-d3p" secondAttribute="centerX" id="BcU-JQ-CB5"/>
+                            <constraint firstItem="9x6-FS-YZk" firstAttribute="top" secondItem="ZYf-sa-jWG" secondAttribute="bottom" constant="29" id="Gxd-Lk-H9v"/>
+                            <constraint firstItem="9x6-FS-YZk" firstAttribute="centerX" secondItem="W4y-Oz-d3p" secondAttribute="centerX" id="VcJ-QS-SLd"/>
+                            <constraint firstItem="fGr-lF-Lny" firstAttribute="leading" secondItem="W4y-Oz-d3p" secondAttribute="leading" id="dOt-wO-MQx"/>
+                            <constraint firstItem="ZYf-sa-jWG" firstAttribute="leading" secondItem="x2l-da-O0X" secondAttribute="leading" id="daz-z5-noA"/>
+                            <constraint firstItem="9x6-FS-YZk" firstAttribute="centerX" secondItem="J8E-Zd-fJJ" secondAttribute="centerX" id="evO-22-mwh"/>
+                            <constraint firstItem="ZYf-sa-jWG" firstAttribute="trailing" secondItem="x2l-da-O0X" secondAttribute="trailing" id="pFo-Bl-AC0"/>
+                            <constraint firstAttribute="bottom" secondItem="x2l-da-O0X" secondAttribute="bottom" constant="20" symbolic="YES" id="vqd-MN-gfo"/>
+                            <constraint firstItem="x2l-da-O0X" firstAttribute="height" secondItem="ZYf-sa-jWG" secondAttribute="height" id="yCC-pG-hxr"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="insertSignature1Btn" destination="W4y-Oz-d3p" id="Itx-9w-e5v"/>
+                        <outlet property="insertSignature2Btn" destination="fGr-lF-Lny" id="hC6-eR-KQF"/>
+                        <outlet property="signature1ImageView" destination="ZYf-sa-jWG" id="NxQ-5W-1In"/>
+                        <outlet property="signature2ImageView" destination="x2l-da-O0X" id="DDq-mJ-ydY"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1yb-GE-evA" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2242.4000000000001" y="4324.5877061469273"/>
         </scene>
         <!--Capture SignatureVC-->
         <scene sceneID="beR-cU-Y0G">
@@ -1306,11 +1390,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="N5b-cd-EKc" customClass="UviSignatureView">
-                                <rect key="frame" x="16" y="137" width="343" height="210"/>
+                                <rect key="frame" x="16" y="93" width="343" height="254"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Draw your signature at the space below" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TVg-iQ-lRS">
-                                <rect key="frame" x="16" y="96" width="302" height="21"/>
+                                <rect key="frame" x="16" y="52" width="302" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -1322,15 +1406,25 @@
                                     <action selector="captureSign:" destination="9FO-vi-Aq0" eventType="touchUpInside" id="klg-JA-nOm"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RH2-J5-6PJ">
+                                <rect key="frame" x="169.5" y="444" width="36" height="30"/>
+                                <color key="tintColor" red="1" green="0.055755002611371229" blue="0.0030960250124751898" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title="Clear"/>
+                                <connections>
+                                    <action selector="clearSignature:" destination="9FO-vi-Aq0" eventType="touchUpInside" id="4dR-wI-oXu"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="TVg-iQ-lRS" firstAttribute="leading" secondItem="Dph-Ji-D8H" secondAttribute="leadingMargin" id="I9z-3N-Jxo"/>
                             <constraint firstItem="TVg-iQ-lRS" firstAttribute="top" secondItem="YZy-rd-OBY" secondAttribute="bottom" constant="32" id="L2z-DM-mnM"/>
                             <constraint firstItem="N5b-cd-EKc" firstAttribute="top" secondItem="TVg-iQ-lRS" secondAttribute="bottom" constant="20" id="MbH-Wb-p81"/>
+                            <constraint firstItem="RH2-J5-6PJ" firstAttribute="top" secondItem="Yg3-Bn-4LY" secondAttribute="bottom" constant="25" id="Pdk-1d-9Wj"/>
                             <constraint firstItem="TVg-iQ-lRS" firstAttribute="leading" secondItem="N5b-cd-EKc" secondAttribute="leading" id="Rrq-tz-aeO"/>
                             <constraint firstItem="N5b-cd-EKc" firstAttribute="trailing" secondItem="Dph-Ji-D8H" secondAttribute="trailingMargin" id="VTb-Xt-iba"/>
                             <constraint firstItem="ygv-h9-pV9" firstAttribute="top" secondItem="Yg3-Bn-4LY" secondAttribute="bottom" constant="248" id="fPA-G1-CGa"/>
+                            <constraint firstItem="RH2-J5-6PJ" firstAttribute="centerX" secondItem="Yg3-Bn-4LY" secondAttribute="centerX" id="iox-2h-srq"/>
                             <constraint firstItem="N5b-cd-EKc" firstAttribute="centerX" secondItem="Yg3-Bn-4LY" secondAttribute="centerX" id="oVb-pJ-p0U"/>
                             <constraint firstItem="Yg3-Bn-4LY" firstAttribute="top" secondItem="N5b-cd-EKc" secondAttribute="bottom" constant="42" id="wgj-d3-CjB"/>
                         </constraints>
@@ -1357,35 +1451,35 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="pZ1-9u-Lyr">
-                                <rect key="frame" x="16" y="170" width="343" height="200"/>
+                                <rect key="frame" x="16" y="126" width="343" height="200"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="200" id="7wA-Kf-iA5"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Participant Signature" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7C7-Vz-eMW">
-                                <rect key="frame" x="107" y="125" width="161" height="21"/>
+                                <rect key="frame" x="107" y="81" width="161" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="6BB-4y-aNI">
-                                <rect key="frame" x="16" y="447" width="343" height="200"/>
+                                <rect key="frame" x="16" y="403" width="343" height="200"/>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Consent-taker Signature" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JWz-LB-ilL">
-                                <rect key="frame" x="93.5" y="402" width="188" height="21"/>
+                                <rect key="frame" x="93.5" y="358" width="188" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hiV-M6-95Q">
-                                <rect key="frame" x="137" y="255" width="101" height="30"/>
+                                <rect key="frame" x="137" y="211" width="101" height="30"/>
                                 <state key="normal" title="New Signature"/>
                                 <connections>
-                                    <segue destination="9FO-vi-Aq0" kind="show" identifier="view_to_capture" id="CP8-R0-eFq"/>
+                                    <action selector="signBtn1Pressed:" destination="8Jz-sb-g28" eventType="touchUpInside" id="ndg-70-chk"/>
                                 </connections>
                             </button>
                             <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="keV-GQ-67j">
-                                <rect key="frame" x="137" y="532" width="101" height="30"/>
+                                <rect key="frame" x="137" y="488" width="101" height="30"/>
                                 <state key="normal" title="New Signature"/>
                                 <connections>
                                     <segue destination="9FO-vi-Aq0" kind="show" identifier="view_to_capture" id="ybx-Px-eaS"/>
@@ -1417,11 +1511,12 @@
                         <outlet property="insertSignature2Btn" destination="keV-GQ-67j" id="nqJ-zX-V6l"/>
                         <outlet property="signature1ImageView" destination="pZ1-9u-Lyr" id="IcK-Ru-2Kg"/>
                         <outlet property="signature2ImageView" destination="6BB-4y-aNI" id="Bgo-xE-MGm"/>
+                        <segue destination="9FO-vi-Aq0" kind="show" identifier="goToCaptureSignature" id="NUQ-7o-dKa"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cve-Q4-PKl" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-607.20000000000005" y="3953.9730134932538"/>
+            <point key="canvasLocation" x="-644" y="4100"/>
         </scene>
         <!--Questionnaire FormVC-->
         <scene sceneID="y9z-SC-PHT">
@@ -1812,7 +1907,9 @@
         <image name="sorting_icon" width="22" height="22"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="ybx-Px-eaS"/>
+        <segue reference="HxC-Eb-GhK"/>
+        <segue reference="NUQ-7o-dKa"/>
+        <segue reference="F2J-f6-4fU"/>
         <segue reference="8JK-CG-z6b"/>
         <segue reference="zBn-OM-x69"/>
         <segue reference="uj3-UQ-1eo"/>

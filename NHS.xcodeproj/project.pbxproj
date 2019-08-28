@@ -63,6 +63,7 @@
 		C3C2F30AA2C4B174444C3807 /* Pods_NHSUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 209345AB6DD8B9F1E078D209 /* Pods_NHSUITests.framework */; };
 		DB769014230EC73600E20A19 /* ResearchConsent.pdf in Resources */ = {isa = PBXBuildFile; fileRef = DB769013230EC73500E20A19 /* ResearchConsent.pdf */; };
 		DB7690162310492B00E20A19 /* ScreeningConsent.pdf in Resources */ = {isa = PBXBuildFile; fileRef = DB7690152310492B00E20A19 /* ScreeningConsent.pdf */; };
+		DB7690192315711700E20A19 /* ResearchSignatureVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DB7690182315711700E20A19 /* ResearchSignatureVC.m */; };
 		DBB7B9FD230DA3B60059574F /* UviSignatureView.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB7B9FB230DA3B60059574F /* UviSignatureView.m */; };
 		DBB7BA02230DA3C40059574F /* CaptureSignatureVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB7B9FE230DA3C30059574F /* CaptureSignatureVC.m */; };
 		DBB7BA03230DA3C40059574F /* ViewSignatureVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB7BA01230DA3C40059574F /* ViewSignatureVC.m */; };
@@ -202,6 +203,8 @@
 		D6D48DA6CEA8B44D498464D0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		DB769013230EC73500E20A19 /* ResearchConsent.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ResearchConsent.pdf; sourceTree = "<group>"; };
 		DB7690152310492B00E20A19 /* ScreeningConsent.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ScreeningConsent.pdf; sourceTree = "<group>"; };
+		DB7690172315711700E20A19 /* ResearchSignatureVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ResearchSignatureVC.h; sourceTree = "<group>"; };
+		DB7690182315711700E20A19 /* ResearchSignatureVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ResearchSignatureVC.m; sourceTree = "<group>"; };
 		DBB7B9FB230DA3B60059574F /* UviSignatureView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UviSignatureView.m; path = Models/UviSignatureView/UviSignatureView.m; sourceTree = "<group>"; };
 		DBB7B9FC230DA3B60059574F /* UviSignatureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UviSignatureView.h; path = Models/UviSignatureView/UviSignatureView.h; sourceTree = "<group>"; };
 		DBB7B9FE230DA3C30059574F /* CaptureSignatureVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaptureSignatureVC.m; sourceTree = "<group>"; };
@@ -405,6 +408,8 @@
 				DBB7BA01230DA3C40059574F /* ViewSignatureVC.m */,
 				DBB7BA00230DA3C40059574F /* CaptureSignatureVC.h */,
 				DBB7B9FE230DA3C30059574F /* CaptureSignatureVC.m */,
+				DB7690172315711700E20A19 /* ResearchSignatureVC.h */,
+				DB7690182315711700E20A19 /* ResearchSignatureVC.m */,
 			);
 			name = "New Resident VC";
 			sourceTree = "<group>";
@@ -892,6 +897,7 @@
 				E16C41DB213781AD00E05419 /* CancerScreeningEligibAssessTableVC.m in Sources */,
 				01B893FE1F3E05CC00201995 /* PageGuideVC.m in Sources */,
 				01D48ED21F3A1839002C3928 /* SocialWorkTableVC.m in Sources */,
+				DB7690192315711700E20A19 /* ResearchSignatureVC.m in Sources */,
 				015F682A1F4A7F4E000B6D5E /* SeriSubsectionTableVC.m in Sources */,
 				018D8C3C213E386800B13595 /* FinanceHistAndAssessTableVC.m in Sources */,
 				E13B8F0B1D66F62900C3A81D /* UIScrollViewWithTouchesBegan.m in Sources */,

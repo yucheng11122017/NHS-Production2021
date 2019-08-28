@@ -36,6 +36,9 @@ typedef enum getDataState {
 @property (strong, nonatomic) NSDictionary *residentParticulars;
 @property (strong, nonatomic) NSDictionary *phlebEligibDict;
 @property (strong, nonatomic) NSDictionary *modeOfScreeningDict;
+@property (strong, nonatomic) NSDictionary *consentScreeningDict;
+@property (strong, nonatomic) NSDictionary *consentResearchDict;
+@property (strong, nonatomic) NSDictionary *mammogramInterestDict;
 @property (strong, nonatomic) NSNumber *residentID;
 //@property (strong, nonatomic) NSString *reportFilePath;
 //@property (strong, nonatomic) UIButton *reportButton;
@@ -49,7 +52,7 @@ typedef enum getDataState {
     
 //    enableReportButton = false;
     self.navigationItem.title = @"Integrated Profile";
-    _yearlyProfile = [[NSArray alloc] initWithObjects:@"2017",@"2018",@"2019", nil];
+    _yearlyProfile = [[NSArray alloc] initWithObjects:@"2018",@"2019",@"2020", nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -69,6 +72,21 @@ typedef enum getDataState {
         _modeOfScreeningDict = @{};
     } else
         _modeOfScreeningDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mode_of_screening"]];
+    
+    if ([_residentDetails objectForKey:@"consent_disclosure"] == (id)[NSNull null]) {    //present crashes
+        _consentScreeningDict = @{};
+    } else
+        _consentScreeningDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"consent_disclosure"]];
+    
+    if ([_residentDetails objectForKey:@"consent_research"] == (id)[NSNull null]) {    //present crashes
+        _consentResearchDict = @{};
+    } else
+        _consentResearchDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"consent_research"]];
+    
+    if ([_residentDetails objectForKey:@"mammogram_interest"] == (id)[NSNull null]) {    //present crashes
+        _mammogramInterestDict = @{};
+    } else
+    _mammogramInterestDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mammogram_interest"]];
     
     _residentID = _residentParticulars[kResidentId];
 
@@ -157,17 +175,14 @@ typedef enum getDataState {
         NSNumber *preRegDone = @1;
         NSNumber *serialNum = [[NSUserDefaults standardUserDefaults] objectForKey:kNhsSerialNum];
         
-        if ([text containsString:@"2018"]) {
-//            if ([preRegDone isEqual:@0]) {
-//                [cell setUserInteractionEnabled:NO];
-//                [cell.textLabel setTextColor:[UIColor grayColor]];
-//            } else {
-//                [cell setUserInteractionEnabled:YES];
-//                cell.textLabel.textColor = [UIColor blackColor];
-//            }
-#warning PERMANENT DISABLE FOR NOW
-            [cell setUserInteractionEnabled:NO];
-            [cell.textLabel setTextColor:[UIColor grayColor]];
+        if ([text containsString:@"2019"]) {
+            if ([preRegDone isEqual:@0]) {
+                [cell setUserInteractionEnabled:NO];
+                [cell.textLabel setTextColor:[UIColor grayColor]];
+            } else {
+                [cell setUserInteractionEnabled:YES];
+                cell.textLabel.textColor = [UIColor blackColor];
+            }
             
             if (serialNum != (id) [NSNull null]) {
                 if ([serialNum isKindOfClass:[NSNumber class]]) {  //as long as have value
@@ -193,7 +208,7 @@ typedef enum getDataState {
             
         }
         
-        else if ([text containsString:@"2017"] || [text containsString:@"2019"]) {
+        else if ([text containsString:@"2018"] || [text containsString:@"2020"]) {
             [cell setUserInteractionEnabled:NO];
             [cell.textLabel setTextColor:[UIColor grayColor]];
         }
@@ -241,7 +256,7 @@ typedef enum getDataState {
 
 - (void) showPopUpBox {
     
-    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"2018 Screening Profile", nil)
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"2019 Screening Profile", nil)
                                                                               message:@""
                                                                        preferredStyle:UIAlertControllerStyleAlert];
     
@@ -259,61 +274,61 @@ typedef enum getDataState {
                                                        [self performSegueWithIdentifier:@"ProfileToFollowUpSegue" sender:self];
                                                    }];
     
-    if ([[ResidentProfile sharedManager] hasConsentImage]) {
-        consentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Show Consent Form", nil)
-                                                     style:UIAlertActionStyleDefault
-                                                   handler:^(UIAlertAction * action) {
-                                                       [self performSegueWithIdentifier:@"ProfileToConsentFormSegue" sender:self];
-                                                   }];
-    } else {
-        consentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Submit Consent Form", nil)
-                                                     style:UIAlertActionStyleDefault
-                                                   handler:^(UIAlertAction * action) {
-                                                       [self performSegueWithIdentifier:@"ProfileToConsentFormSegue" sender:self];
-                                                   }];
-        
-//#warning Just to make testing faster, remove for official App release!
-        if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood] containsString:@"Lengkok"]) {
-            formAction.enabled = NO;
-            reportAction.enabled = NO;
-        }
-    }
+//    if ([[ResidentProfile sharedManager] hasConsentImage]) {
+//        consentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Show Consent Form", nil)
+//                                                     style:UIAlertActionStyleDefault
+//                                                   handler:^(UIAlertAction * action) {
+//                                                       [self performSegueWithIdentifier:@"ProfileToConsentFormSegue" sender:self];
+//                                                   }];
+//    } else {
+//        consentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Submit Consent Form", nil)
+//                                                     style:UIAlertActionStyleDefault
+//                                                   handler:^(UIAlertAction * action) {
+//                                                       [self performSegueWithIdentifier:@"ProfileToConsentFormSegue" sender:self];
+//                                                   }];
     
-    if ([[ResidentProfile sharedManager] consentForResearch]) {
-        if ([[ResidentProfile sharedManager] hasResearchConsentImage]) {
-            researchConsentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Show Research Consent Form", nil)
-                                                         style:UIAlertActionStyleDefault
-                                                       handler:^(UIAlertAction * action) {
-                                                           [self performSegueWithIdentifier:@"ProfileToResearchConsentFormSegue" sender:self];
-                                                       }];
-        } else {
-            researchConsentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Submit Research Consent Form", nil)
-                                                         style:UIAlertActionStyleDefault
-                                                       handler:^(UIAlertAction * action) {
-                                                           [self performSegueWithIdentifier:@"ProfileToResearchConsentFormSegue" sender:self];
-                                                       }];
-            
-            //In this case, disable only if they consented for research, yet haven't submit the form
-            if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood] containsString:@"Lengkok"]) {
-                formAction.enabled = NO;
-                reportAction.enabled = NO;
-            }
-        }
-        
-    } else {    //didn't give approval for research
-        researchConsentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Submit Research Consent Form", nil)
-                                                             style:UIAlertActionStyleDefault
-                                                           handler:^(UIAlertAction * action) {
-                                                               [self performSegueWithIdentifier:@"ProfileToResearchConsentFormSegue" sender:self];
-                                                           }];
-        researchConsentFormAction.enabled = NO; //don't need to submit
-    }
+//#warning Just to make testing faster, remove for official App release!
+//        if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood] containsString:@"Lengkok"]) {
+//            formAction.enabled = NO;
+//            reportAction.enabled = NO;
+//        }
+//    }
+    
+//    if ([[ResidentProfile sharedManager] consentForResearch]) {
+//        if ([[ResidentProfile sharedManager] hasResearchConsentImage]) {
+//            researchConsentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Show Research Consent Form", nil)
+//                                                         style:UIAlertActionStyleDefault
+//                                                       handler:^(UIAlertAction * action) {
+//                                                           [self performSegueWithIdentifier:@"ProfileToResearchConsentFormSegue" sender:self];
+//                                                       }];
+//        } else {
+//            researchConsentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Submit Research Consent Form", nil)
+//                                                         style:UIAlertActionStyleDefault
+//                                                       handler:^(UIAlertAction * action) {
+//                                                           [self performSegueWithIdentifier:@"ProfileToResearchConsentFormSegue" sender:self];
+//                                                       }];
+//
+//            //In this case, disable only if they consented for research, yet haven't submit the form
+//            if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood] containsString:@"Lengkok"]) {
+//                formAction.enabled = NO;
+//                reportAction.enabled = NO;
+//            }
+//        }
+//
+//    } else {    //didn't give approval for research
+//        researchConsentFormAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Submit Research Consent Form", nil)
+//                                                             style:UIAlertActionStyleDefault
+//                                                           handler:^(UIAlertAction * action) {
+//                                                               [self performSegueWithIdentifier:@"ProfileToResearchConsentFormSegue" sender:self];
+//                                                           }];
+//        researchConsentFormAction.enabled = NO; //don't need to submit
+//    }
     
 //    reportAction.enabled = enableReportButton;
-    if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood] containsString:@"Lengkok"]) {  //for kampong glam, don't need to show the other two buttons
-        [alertController addAction:consentFormAction];
-        [alertController addAction:researchConsentFormAction];
-    }
+//    if ([[[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood] containsString:@"Lengkok"]) {  //for kampong glam, don't need to show the other two buttons
+//        [alertController addAction:consentFormAction];
+//        [alertController addAction:researchConsentFormAction];
+//    }
     [alertController addAction:formAction];
     [alertController addAction:reportAction];
     
@@ -374,7 +389,7 @@ typedef enum getDataState {
     else if (status == ReachableViaWiFi || status == ReachableViaWWAN) {
         if (_residentID != nil && _residentID != (id) [NSNull null]) {
             //don't do anything
-            //            [[ScreeningDictionary sharedInstance] fetchFromServer];
+//            [[ScreeningDictionary sharedInstance] fetchFromServer];
         }
 
     }
@@ -389,10 +404,34 @@ typedef enum getDataState {
 }
 
 - (void) reloadTable: (NSNotification *) notification {
+
     _residentDetails = [[ScreeningDictionary sharedInstance] dictionary];
-    _residentParticulars = [_residentDetails objectForKey:@"resi_particulars"];
-    _phlebEligibDict = [_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"];
-    _modeOfScreeningDict = [_residentDetails objectForKey:@"mode_of_screening"];
+    
+    if ([_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"] == (id)[NSNull null]) { //present crashes
+        _phlebEligibDict = @{};
+    } else
+    _phlebEligibDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"]];
+    
+    if ([_residentDetails objectForKey:@"mode_of_screening"] == (id)[NSNull null]) {    //present crashes
+        _modeOfScreeningDict = @{};
+    } else
+    _modeOfScreeningDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mode_of_screening"]];
+    
+    if ([_residentDetails objectForKey:@"consent_disclosure"] == (id)[NSNull null]) {    //present crashes
+        _consentScreeningDict = @{};
+    } else
+    _consentScreeningDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"consent_disclosure"]];
+    
+    if ([_residentDetails objectForKey:@"consent_research"] == (id)[NSNull null]) {    //present crashes
+        _consentResearchDict = @{};
+    } else
+    _consentResearchDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"consent_research"]];
+    
+    if ([_residentDetails objectForKey:@"mammogram_interest"] == (id)[NSNull null]) {    //present crashes
+        _mammogramInterestDict = @{};
+    } else
+    _mammogramInterestDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mammogram_interest"]];
+    
     [self.tableView reloadData];    //put in the ticks
     [SVProgressHUD dismiss];
 }
@@ -414,6 +453,18 @@ typedef enum getDataState {
     if ([segue.destinationViewController respondsToSelector:@selector(setModeOfScreeningDict:)]) {
         [segue.destinationViewController performSelector:@selector(setModeOfScreeningDict:)
                                               withObject:_modeOfScreeningDict];
+    }
+    if ([segue.destinationViewController respondsToSelector:@selector(setConsentDisclosureDict:)]) {
+        [segue.destinationViewController performSelector:@selector(setConsentDisclosureDict:)
+                                              withObject:_consentScreeningDict];
+    }
+    if ([segue.destinationViewController respondsToSelector:@selector(setConsentResearchDict:)]) {
+        [segue.destinationViewController performSelector:@selector(setConsentResearchDict:)
+                                              withObject:_consentResearchDict];
+    }
+    if ([segue.destinationViewController respondsToSelector:@selector(setMammogramInterestDict:)]) {
+        [segue.destinationViewController performSelector:@selector(setMammogramInterestDict:)
+                                              withObject:_mammogramInterestDict];
     }
 //    if ([segue.destinationViewController respondsToSelector:@selector(setReportFilepath:)]) {
 //        [segue.destinationViewController performSelector:@selector(setReportFilepath:)

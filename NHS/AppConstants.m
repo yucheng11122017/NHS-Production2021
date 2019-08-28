@@ -31,6 +31,7 @@ NSString *const kFieldName = @"field_name";
 NSString *const kNewContent = @"new_content";
 NSString *const kScreenLocation = @"screening_location";
 NSString *const kResiParticulars = @"resi_particulars";
+NSString *const kFileType = @"file_type";
 
 #pragma mark - Resident Particulars
 
@@ -86,7 +87,26 @@ NSString *const kRemarks = @"remarks";
 NSString *const kPreregCompleted = @"prereg_completed";
 NSString *const kIsFinal = @"is_final";
 NSString *const kConsent = @"consent";
+
+// consent_disclosure
+NSString *const kLangExplainedIn = @"lang_explained_in";
+NSString *const kLangExplainedInOthers = @"lang_explained_in_others";
+NSString *const kConsentTakerFullName = @"consent_taker_full_name";
+NSString *const kMatriculationNumber = @"matriculation_number";
+NSString *const kOrganisation = @"organisation";
+NSString *const kOrganisationOthers = @"organisation_others";
+
+// consent_research
 NSString *const kConsentToResearch = @"consent_research";
+NSString *const kConsentRecontact = @"consent_recontact";
+NSString *const kAgree6PointsImageName = @"agree_6_points_image_name";
+NSString *const kConsentTakerFullName2 = @"consent_taker_full_name_2";
+NSString *const kConsentSignatureImageName = @"consent_signature_image_name";
+NSString *const kTranslationDone = @"translation_done";
+NSString *const kWitnessTranslatorFullName = @"witness_translator_full_name";
+NSString *const kWitnessTranslatorSignatureImageName = @"witness_translator_signature_image_name";
+
+
 NSString *const kNhsSerialNum = @"nhs_serial_num";
 
 
@@ -104,11 +124,12 @@ NSString *const kNhsSerialNum = @"nhs_serial_num";
 NSString *const kAge40 = @"age_40";
 NSString *const kChronicCond = @"chronic_cond";
 NSString *const kRegFollowup = @"reg_followup";
+NSString *const kEligibleBloodTest = @"eligible_blood_test";
 NSString *const kNoBloodTest = @"no_blood_test";
 NSString *const kWantFreeBt = @"want_free_bt";
 NSString *const kDidPhleb = @"did_phleb";
 NSString *const kIsPr = @"is_pr";
-NSString *const kMammoInterest = @"mammo_interest";
+NSString *const kMammogramInterest = @"mammogram_interest";
 
 #pragma mark - Phlebotomy (not in registration fields)
 NSString *const kFastingBloodGlucose = @"fasting_blood_glu";
@@ -184,6 +205,11 @@ NSString *const kLipidSeeingDocRegularly= @"lipid_seeing_doc_regularly";
 NSString *const kLipidCurrentlyPrescribed= @"lipid_currently_prescribed";
 NSString *const kLipidTakingRegularly= @"lipid_taking_regularly";
 
+/** Stroke */
+NSString *const kStrokeHasInformed= @"stroke_has_informed";
+NSString *const kStrokeSeeingDocRegularly= @"stroke_seeing_doc_regularly";
+NSString *const kStrokeCurrentlyPrescribed= @"stroke_currently_prescribed";
+
 /** Hypertension */
 NSString *const kHTHasInformed = @"ht_has_informed";
 NSString *const kHTCheckedBp = @"ht_checked_bp";
@@ -199,8 +225,21 @@ NSString *const kMedConds = @"med_conds";
 NSString *const kHadSurgery = @"had_surgery";
 
 /** Healthcare Barriers */
-NSString *const kExistingDoc = @"existing_doc";
-NSString *const kWhyNotFollowUp = @"why_not_follow_up";
+NSString *const kGpFamDoc = @"gp_fam_doc";
+NSString *const kFamMed = @"fam_med";
+NSString *const kPolyclinic = @"polyclinic";
+NSString *const kSocHospital = @"soc_hospital";
+NSString *const kHCBRemarks = @"remarks";
+NSString *const kNotSeeNeed = @"not_see_need";
+NSString *const kCantMakeTime = @"cant_make_time";
+NSString *const kHCBMobility = @"mobility";
+NSString *const kFinancial = @"financial";
+NSString *const kScaredOfDoc = @"scared_of_doc";
+NSString *const kPreferTraditional = @"prefer_traditional";
+NSString *const kHCBOthers = @"others";
+NSString *const kAeFreq = @"ae_freq";
+NSString *const kHospitalizedFreq = @"hospitalized_freq";
+//NSString *const kWhyNotFollowUp = @"why_not_follow_up";
 NSString *const kOtherBarrier = @"other_barrier";
 
 /** Family History */
@@ -231,11 +270,18 @@ NSString *const kHighFats = @"high_fats";
 NSString *const kProcessedFoods = @"processed_foods";
 
 /** Exercise History */
+NSString *const kDoesEngagePhysical = @"does_engage_physical";
 NSString *const kEngagePhysical = @"engage_physical";
 NSString *const kNoTime = @"no_time";
 NSString *const kTooTired = @"too_tired";
 NSString *const kTooLazy = @"too_lazy";
 NSString *const kNoInterest = @"no_interest";
+
+/** Functional Self Rated Quality of Health (EQ5D) */
+NSString *const kWalking = @"walking";
+NSString *const kTakingCare = @"taking_care";
+NSString *const kUsualActivities = @"usual_activities";
+NSString *const kPainDiscomfort = @"pain_discomfort";
 
 /** Fall Risk Eligible */
 NSString *const kUndergoneAssmt = @"undergone_assmt";
@@ -294,6 +340,11 @@ NSString *const kFeelGood = @"feel_good";
 NSString *const kConfide = @"confide";
 NSString *const kDownDiscouraged = @"down_discouraged";
 NSString *const kSocialAssmtScore = @"social_assmt_score";
+
+/** Loneliness */
+NSString *const kLackCompanionship = @"lack_companionship";
+NSString *const kLeftOut = @"left_out";
+NSString *const kIsolated = @"isolated";
 
 /** Depression Assessment (Basic) */
 NSString *const kPhqQ1 = @"phq_q1";
@@ -445,7 +496,7 @@ NSString *const kRequiresBedbug = @"requires_bedbug";
 NSString *const kRequiresDecluttering = @"requires_decluttering";
 
 /** Summary */
-NSString *const kFinancial = @"financial";
+NSString *const kHCBFinancial = @"financial";
 NSString *const kEldercare = @"eldercare";
 NSString *const kBasic = @"basic";
 NSString *const kBehEmo = @"beh_emo";
@@ -900,6 +951,7 @@ NSString *const kCheckProfiling = @"check_profiling";
 NSString *const kCheckDiabetes = @"check_diabetes";
 NSString *const kCheckHyperlipidemia = @"check_hyperlipidemia";
 NSString *const kCheckHypertension = @"check_hypertension";
+NSString *const kCheckStroke = @"check_stroke";
 NSString *const kCheckMedicalHistory = @"check_medical_history";
 NSString *const kCheckSurgery = @"check_surgery";
 NSString *const kCheckHealthcareBarriers = @"check_healthcare_barriers";
@@ -916,6 +968,7 @@ NSString *const kCheckMammogramEligible = @"check_mammogram_eligible";
 NSString *const kCheckPapSmearEligible = @"check_pap_smear_eligible";
 
 /**     3d. Basic Geriatric (group)       */
+NSString *const kCheckEq5d = @"check_eq5d";
 NSString *const kCheckFallRiskEligible = @"check_fall_risk_eligible";
 NSString *const kCheckGeriatricDementiaEligible = @"check_geriatric_dementia_eligible";
 
@@ -930,23 +983,26 @@ NSString *const kCheckSocialHistory = @"check_social_history";
 NSString *const kCheckSocialAssmt = @"check_social_assmt";
 
 /**     3g. Psychology History & Assessment (group)       */
+NSString *const kCheckLoneliness = @"check_loneliness";
 NSString *const kCheckDepression = @"check_depression";
 NSString *const kCheckSuicideRisk = @"check_suicide_risk";
 
 /**     4. Basic Vision     */
 NSString *const kCheckSnellenTest = @"check_snellen_test";
 
-/**     5. Advanced Geriatric (group)    */
-NSString *const kCheckAdvFallRiskAssmt = @"check_adv_fall_risk_assmt";
+/**     5. Advanced Geriatric    */
 NSString *const kCheckGeriatricDementiaAssmt = @"check_geriatric_dementia_assmt";
 
-/**     6. Dental     */
+/**     6. Fall Risk Assessment    */
+NSString *const kCheckPhysiotherapy = @"check_physiotherapy";
+
+/**     7. Dental     */
 NSString *const kCheckBasicDental = @"check_basic_dental";
 
-/**     7. Hearing     */
+/**     8. Hearing     */
 NSString *const kCheckHearing = @"check_hearing";
 
-/**     8. Advanced Vision (group)     */
+/**     9. Advanced Vision (group)     */
 NSString *const kCheckSeriMedHist = @"check_seri_med_hist";
 NSString *const kCheckSeriVa = @"check_seri_va";
 NSString *const kCheckSeriAutorefractor = @"check_seri_autorefractor";
@@ -955,18 +1011,18 @@ NSString *const kCheckSeriAhe = @"check_seri_ahe";
 NSString *const kCheckSeriPhe = @"check_seri_phe";
 NSString *const kCheckSeriDiag = @"check_seri_diag";
 
-/**     9. Doctor's Consultation     */
-NSString *const kCheckDocConsult = @"check_doc_consult";
+/**     10. Emergency Services     */
+NSString *const kCheckEmergencyServices = @"check_emergency_services";
 
-/**     10. Additional Services     */
+/**     11. Additional Services     */
 NSString *const kCheckAddServices = @"check_add_services";
 
-/**     11. Social Work (group)     */
+/**     12. Social Work (group)     */
 NSString *const kCheckSwDepression = @"check_sw_depression";
 NSString *const kCheckSwAdvAssmt = @"check_sw_adv_assmt";
 NSString *const kCheckSwReferrals = @"check_sw_referrals";
 
-/**     12. Summary & Health Education     */
+/**     13. Summary & Health Education     */
     //don't need any checks for this!
 
 
@@ -987,6 +1043,10 @@ NSString *const kCheckFuncHearing = @"check_func_hearing";
 NSString *const kCheckPSFUMedIssues = @"check_psfu_med";
 NSString *const kCheckPSFUSocialIssues = @"check_psfu_social";
 NSString *const kCheckGeno = @"check_geno";
+
+//removed in 2019
+NSString *const kCheckAdvFallRiskAssmt = @"check_adv_fall_risk_assmt";
+NSString *const kCheckDocConsult = @"check_doc_consult";
 
 
 @end

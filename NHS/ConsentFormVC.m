@@ -107,14 +107,14 @@
 
 - (void) getConsentImageFromServer {
     NSUserDefaults *defaults =  [NSUserDefaults standardUserDefaults];
-    [[ServerComm sharedServerCommInstance] retrieveConsentImageForResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
+//    [[ServerComm sharedServerCommInstance] retrieveConsentImageForResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
 }
 
 
 #pragma mark - NSNotificationCenter
 - (void) imageExist: (NSNotification *) notification {
-    NSString *consentImagePath = [[ServerComm sharedServerCommInstance] getRetrievedConsentImagePath];
-    _consentImage = [UIImage imageWithContentsOfFile:consentImagePath];
+//    NSString *consentImagePath = [[ServerComm sharedServerCommInstance] getRetrievedConsentImagePath];
+//    _consentImage = [UIImage imageWithContentsOfFile:consentImagePath];
     
     [self setupImageViewAndNavigationController];
 }
@@ -156,9 +156,9 @@
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         ServerComm *client = [ServerComm sharedServerCommInstance];
         
-        [client saveConsentFormImage:chosenImage
-                         forResident:[defaults objectForKey:kResidentId]
-                            withNric:[defaults objectForKey:kNRIC]];
+//        [client saveConsentFormImage:chosenImage
+//                         forResident:[defaults objectForKey:kResidentId]
+//                            withNric:[defaults objectForKey:kNRIC]];
     }
     
 //    [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:kCheckGeno andNewContent:@"1"];    //post this for completion too.

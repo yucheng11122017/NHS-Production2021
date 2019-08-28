@@ -41,10 +41,11 @@ typedef enum formName {
     Profiling,
     BasicVision,
     AdvGer,
+    FallRiskAssess,
     Dental,
     Hearing,
     AdvVision,
-    DocConsult,
+    EmerSvcs,
     AddSvcs,
     SocialWk,
     SummaryNHealthEdu
@@ -140,8 +141,9 @@ NSString *const kQuestionFifteen = @"q15";
             break;
         case AddSvcs: form = [self initAdditionalSvcs];
             break;
-        case DocConsult: form = [self initRefForDoctorConsult];
-            break;
+//        case DocConsult: form = [self initRefForDoctorConsult];
+//            break;
+        
 //        case 11: form = [self initFallRiskAssessment];
 //            break;
 //        case 12: form = [self initDementiaAssessment];
@@ -1008,74 +1010,74 @@ NSString *const kQuestionFifteen = @"q15";
     
     return [super initWithForm:formDescriptor];
 }
-
-- (id) initRefForDoctorConsult {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Referral for Doctor Consult"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    NSDictionary *refForDocConsultDict = [self.fullScreeningForm objectForKey:SECTION_DOC_CONSULT];
-    
-    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
-    
-    if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckDocConsult];
-        if ([check isKindOfClass:[NSNumber class]]) {
-            isFormFinalized = [check boolValue];
-        }
-    }
-    
-    formDescriptor.assignFirstResponderOnShow = YES;
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    XLFormRowDescriptor *didDocConsultRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDidDocConsult rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone doctor's consultation?"];
-    didDocConsultRow.required = YES;
-    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDidDocConsult] != (id)[NSNull null])
-        didDocConsultRow.value = [self getYesNofromOneZero:refForDocConsultDict[kDidDocConsult]];
-    
-    [self setDefaultFontWithRow:didDocConsultRow];
-    didDocConsultRow.selectorOptions = @[@"Yes", @"No"];
-    didDocConsultRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:didDocConsultRow];
-
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Doctor's Notes (Only doctor's to edit)"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocNotes
-                                                rowType:XLFormRowDescriptorTypeTextView];
-    [row.cellConfigAtConfigure setObject:@"Type your notes here..." forKey:@"textView.placeholder"];
-
-    //value
-    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocNotes] != (id)[NSNull null]) row.value = refForDocConsultDict[kDocNotes];
-    
-    [section addFormRow:row];
-
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocName
-                                                rowType:XLFormRowDescriptorTypeName title:@"Name of Doctor"];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-
-    //value
-    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocName] != (id)[NSNull null]) row.value = refForDocConsultDict[kDocName];
-    
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocReferred rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Provided with Referral Letter?"];
-    row.selectorOptions = @[@"Yes", @"No"];
-    [self setDefaultFontWithRow:row];
-    row.required = NO;
-    
-    //value
-    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocReferred] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:refForDocConsultDict[kDocReferred]];
-    
-    [section addFormRow:row];
-    
-    return [super initWithForm:formDescriptor];
-}
+//
+//- (id) initRefForDoctorConsult {
+//    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Referral for Doctor Consult"];
+//    XLFormSectionDescriptor * section;
+//    XLFormRowDescriptor * row;
+//    NSDictionary *refForDocConsultDict = [self.fullScreeningForm objectForKey:SECTION_DOC_CONSULT];
+//
+//    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+//
+//    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+//        NSNumber *check = checkDict[kCheckDocConsult];
+//        if ([check isKindOfClass:[NSNumber class]]) {
+//            isFormFinalized = [check boolValue];
+//        }
+//    }
+//
+//    formDescriptor.assignFirstResponderOnShow = YES;
+//
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+//    [formDescriptor addFormSection:section];
+//
+//    XLFormRowDescriptor *didDocConsultRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDidDocConsult rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone doctor's consultation?"];
+//    didDocConsultRow.required = YES;
+//    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDidDocConsult] != (id)[NSNull null])
+//        didDocConsultRow.value = [self getYesNofromOneZero:refForDocConsultDict[kDidDocConsult]];
+//
+//    [self setDefaultFontWithRow:didDocConsultRow];
+//    didDocConsultRow.selectorOptions = @[@"Yes", @"No"];
+//    didDocConsultRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+//    [section addFormRow:didDocConsultRow];
+//
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@"Doctor's Notes (Only doctor's to edit)"];
+//    [formDescriptor addFormSection:section];
+//
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocNotes
+//                                                rowType:XLFormRowDescriptorTypeTextView];
+//    [row.cellConfigAtConfigure setObject:@"Type your notes here..." forKey:@"textView.placeholder"];
+//
+//    //value
+//    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocNotes] != (id)[NSNull null]) row.value = refForDocConsultDict[kDocNotes];
+//
+//    [section addFormRow:row];
+//
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+//    [formDescriptor addFormSection:section];
+//
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocName
+//                                                rowType:XLFormRowDescriptorTypeName title:@"Name of Doctor"];
+//    [self setDefaultFontWithRow:row];
+//    row.required = NO;
+//
+//    //value
+//    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocName] != (id)[NSNull null]) row.value = refForDocConsultDict[kDocName];
+//
+//    [section addFormRow:row];
+//
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocReferred rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Provided with Referral Letter?"];
+//    row.selectorOptions = @[@"Yes", @"No"];
+//    [self setDefaultFontWithRow:row];
+//    row.required = NO;
+//
+//    //value
+//    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocReferred] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:refForDocConsultDict[kDocReferred]];
+//
+//    [section addFormRow:row];
+//
+//    return [super initWithForm:formDescriptor];
+//}
 
 - (id) initDentalCheckup {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"6. Dental"];
@@ -2146,7 +2148,7 @@ NSString *const kQuestionFifteen = @"q15";
                 break;
             case AddSvcs: fieldName = kCheckAddServices;
                 break;
-            case DocConsult: fieldName = kCheckDocConsult;
+            case EmerSvcs: fieldName = kCheckEmergencyServices;
                 break;
 //            case SummaryNHealthEdu: fieldName = kCheckEd;
 //                break;
@@ -2193,7 +2195,7 @@ NSString *const kQuestionFifteen = @"q15";
                 break;
             case AddSvcs: fieldName = kCheckAddServices;
                 break;
-            case DocConsult: fieldName = kCheckDocConsult;
+            case EmerSvcs: fieldName = kCheckEmergencyServices;
                 break;
 //            case HealthEdu: fieldName = kCheckEd;
 //                break;
@@ -3262,7 +3264,7 @@ NSString *const kQuestionFifteen = @"q15";
     if (!tableDidEndEditing) return;
     else {
         UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Take note", nil)
-                                                                                  message:[NSString stringWithFormat:@"The resident’s %@ falls within the emergency range. Please inform the safety IC / any nearby committee member immediately.", parameter]
+                                                                                  message:[NSString stringWithFormat:@"The resident’s %@ falls within the emergency range. Please inform the Emergency IC / any nearby committee member immediately.", parameter]
                                                                            preferredStyle:UIAlertControllerStyleAlert];
         
         [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)

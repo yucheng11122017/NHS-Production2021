@@ -40,7 +40,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
-    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0, nil];
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0, @0, nil];
     
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
     [self.hostReachability startNotifier];
@@ -48,7 +48,8 @@
     
     
     self.navigationItem.title = @"3g. Psychological History & Assessment";
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Depression Assessment (Basic)",
+    
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Loneliness", @"Depression Assessment (Basic)",
                      @"Suicide Risk Assessment (Basic)",
                      nil];
     
@@ -124,7 +125,7 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 21)]; //because until Social History Assessment took up the first 20 numbers..
+    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 23)]; //because until Social History Assessment took up the first 21 numbers..
     
     [self performSegueWithIdentifier:@"PsychoHistAssmtToFormSegue" sender:self];
     
@@ -190,7 +191,7 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckDepression, kCheckSuicideRisk];
+    NSArray *lookupTable = @[kCheckLoneliness, kCheckDepression, kCheckSuicideRisk];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {

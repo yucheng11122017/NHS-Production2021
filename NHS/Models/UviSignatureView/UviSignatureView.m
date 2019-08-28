@@ -68,10 +68,10 @@ static CGPoint midpoint(CGPoint p0, CGPoint p1) {
     NSData *saveData = [NSKeyedArchiver archivedDataWithRootObject:_pathArray];
     
     switch (index) {
-        case 1:[[NSUserDefaults standardUserDefaults] setObject:saveData forKey:SCREENING_PARTICIPANT_SIGNATURE];
-        break;
-        case 2:[[NSUserDefaults standardUserDefaults] setObject:saveData forKey:SCREENING_CONSENT_TAKER_SIGNATURE];
-        break;
+//        case 1:[[NSUserDefaults standardUserDefaults] setObject:saveData forKey:SCREENING_PARTICIPANT_SIGNATURE];
+//        break;
+//        case 2:[[NSUserDefaults standardUserDefaults] setObject:saveData forKey:SCREENING_CONSENT_TAKER_SIGNATURE];
+//        break;
         
         default: [[NSUserDefaults standardUserDefaults] setObject:saveData forKey:USER_SIGNATURE_PATH];
         break;

@@ -125,7 +125,7 @@
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 9)]; //because Medical History took up the first 8 numbers..
+    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 10)]; //because Medical History took up the first 9 numbers..
     
     [self performSegueWithIdentifier:@"dietHistToFormSegue" sender:self];
     

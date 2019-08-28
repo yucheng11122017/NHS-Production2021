@@ -155,8 +155,10 @@ typedef enum sectionRowNumber {
         
         if (indexPath.row == BasicGeriatricRow) {
             if (![[ResidentProfile sharedManager] isEligibleFallRisk]) {  //not eligible
-                cell.userInteractionEnabled = NO;
-                [cell.textLabel setTextColor:[UIColor grayColor]];
+                
+#warning FOR NOW ENABLE THIS ALWAYS!
+//                cell.userInteractionEnabled = NO;
+//                [cell.textLabel setTextColor:[UIColor grayColor]];
             }
         }
         
@@ -477,6 +479,7 @@ typedef enum sectionRowNumber {
         if ([key isEqualToString:kCheckDiabetes] ||
             [key isEqualToString:kCheckHyperlipidemia] ||
             [key isEqualToString:kCheckHypertension] ||
+            [key isEqualToString:kCheckStroke] ||
             [key isEqualToString:kCheckMedicalHistory] ||
             [key isEqualToString:kCheckSurgery] ||
             [key isEqualToString:kCheckHealthcareBarriers] ||
@@ -530,7 +533,8 @@ typedef enum sectionRowNumber {
 - (NSNumber *) checkAllBasicGeriatricsSections:(NSDictionary *) checksDict {
     int count=0;
     for (NSString *key in [checksDict allKeys]) {   //check through all 3 sub-sections
-        if ([key isEqualToString:kCheckFallRiskEligible] ||
+        if ([key isEqualToString:kCheckEq5d] ||
+            [key isEqualToString:kCheckFallRiskEligible] ||
             [key isEqualToString:kCheckGeriatricDementiaEligible]) {
             
             if ([[checksDict objectForKey:key] isEqual:@1])
@@ -579,7 +583,8 @@ typedef enum sectionRowNumber {
 - (NSNumber *) checkAllPsychoHistSections:(NSDictionary *) checksDict {
     int count=0;
     for (NSString *key in [checksDict allKeys]) {   //check through all 3 sub-sections
-        if ([key isEqualToString:kCheckDepression] ||
+        if ([key isEqualToString:kCheckLoneliness] ||
+            [key isEqualToString:kCheckDepression] ||
             [key isEqualToString:kCheckSuicideRisk]) {
             
             if ([[checksDict objectForKey:key] isEqual:@1])

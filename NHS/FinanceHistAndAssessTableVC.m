@@ -125,7 +125,7 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 16)]; //because until Dementia Assessment took up the first 15 numbers..
+    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 18)]; //because until Dementia Assessment took up the first 17 numbers..
     
     [self performSegueWithIdentifier:@"FinanceHistAssessToFormSegue" sender:self];
     

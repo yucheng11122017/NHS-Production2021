@@ -40,7 +40,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
-    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0, nil];       //altogether 8 rows
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0, nil];       //altogether 9 rows
     
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
     [self.hostReachability startNotifier];
@@ -51,6 +51,7 @@
     _rowLabelsText= [[NSArray alloc] initWithObjects:@"Diabetes Mellitus",
                      @"Hyperlipidemia",
                      @"Hypertension",
+                     @"Stroke",
                      @"Others",
                      @"Surgery",
                      @"Barriers to Healthcare",
@@ -197,7 +198,7 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckDiabetes, kCheckHyperlipidemia, kCheckHypertension, kCheckMedicalHistory, kCheckSurgery, kCheckHealthcareBarriers, kCheckFamHist, kCheckRiskStratification];
+    NSArray *lookupTable = @[kCheckDiabetes, kCheckHyperlipidemia, kCheckHypertension, kCheckStroke, kCheckMedicalHistory, kCheckSurgery, kCheckHealthcareBarriers, kCheckFamHist, kCheckRiskStratification];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {

@@ -14,6 +14,8 @@
 
 #define SCREENING_PARTICIPANT_SIGNATURE  @"user_signature_path1"
 #define SCREENING_CONSENT_TAKER_SIGNATURE  @"user_signature_path2"
+#define RESEARCH_PARTICIPANT_6_PTS_SIGNATURE  @"user_signature_path3"
+#define RESEARCH_WITNESS_SIGNATURE  @"user_signature_path4"
 
 #define REMOTE_HOST_NAME @"www.apple.com"
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
@@ -26,7 +28,10 @@
 
 #define SECTION_RESI_PART                       @"resi_particulars"
 #define SECTION_MODE_OF_SCREENING               @"mode_of_screening"
+#define SECTION_CONSENT_DISCLOSURE              @"consent_disclosure"
+#define SECTION_CONSENT_RESEARCH                @"consent_research"
 #define SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT    @"phlebotomy_eligibility_assmt"
+#define SECTION_MAMMOGRAM_INTEREST              @"mammogram_interest"
 #define SECTION_PHLEBOTOMY                      @"phlebotomy"
 #define SECTION_PROFILING_SOCIOECON             @"profiling_socioecon"
 #define SECTION_FIN_ASSMT                       @"fin_assmt"
@@ -43,6 +48,7 @@
 #define SECTION_DIABETES                        @"diabetes"
 #define SECTION_HYPERLIPIDEMIA                  @"hyperlipidemia"
 #define SECTION_HYPERTENSION                    @"hypertension"
+#define SECTION_STROKE                          @"stroke"
 #define SECTION_MEDICAL_HISTORY                 @"medical_history"
 #define SECTION_SURGERY                         @"surgery"
 #define SECTION_HEALTHCARE_BARRIERS             @"healthcare_barriers"
@@ -51,6 +57,7 @@
 #define SECTION_DIET                            @"diet"
 #define SECTION_EXERCISE                        @"exercise"
 
+#define SECTION_EQ5D                            @"eq5d"
 #define SECTION_FALL_RISK_ELIGIBLE              @"fall_risk_eligible"
 #define SECTION_GERIATRIC_DEMENTIA_ELIGIBLE     @"geriatric_dementia_eligible"
 
@@ -59,6 +66,7 @@
 #define SECTION_SOCIAL_HISTORY                  @"social_history"
 #define SECTION_SOCIAL_ASSMT                    @"social_assmt"
 
+#define SECTION_LONELINESS                      @"loneliness"
 #define SECTION_DEPRESSION                      @"depression"
 #define SECTION_SUICIDE_RISK                    @"suicide_risk"
 
@@ -115,6 +123,7 @@ extern NSString *const kQualifyPapSmear;
 extern NSString *const kQualifyFallAssess;
 extern NSString *const kQualifyDementia;
 extern NSString *const kQualifyPhleb;
+extern NSString *const kFileType;
 
 
 #pragma mark - Resident Particulars submission
@@ -181,7 +190,24 @@ extern NSString *const kRemarks;
 extern NSString *const kPreregCompleted;
 extern NSString *const kIsFinal;
 extern NSString *const kConsent;
+
+// consent_disclosure
+extern NSString *const kLangExplainedIn;
+extern NSString *const kLangExplainedInOthers;
+extern NSString *const kConsentTakerFullName;
+extern NSString *const kMatriculationNumber;
+extern NSString *const kOrganisation;
+extern NSString *const kOrganisationOthers;
+
+// consent_research
 extern NSString *const kConsentToResearch;
+extern NSString *const kConsentRecontact;
+extern NSString *const kAgree6PointsImageName;
+extern NSString *const kConsentTakerFullName2;
+extern NSString *const kConsentSignatureImageName;
+extern NSString *const kTranslationDone;
+extern NSString *const kWitnessTranslatorFullName;
+extern NSString *const kWitnessTranslatorSignatureImageName;
 extern NSString *const kNhsSerialNum;
 
 
@@ -199,11 +225,12 @@ extern NSString *const SearchBarIsFirstResponderKey;
 //extern NSString *const kAge40;
 extern NSString *const kChronicCond;
 extern NSString *const kRegFollowup;
+extern NSString *const kEligibleBloodTest;
 extern NSString *const kNoBloodTest;
 extern NSString *const kWantFreeBt;
 extern NSString *const kDidPhleb;
 extern NSString *const kIsPr;
-extern NSString *const kMammoInterest;
+extern NSString *const kMammogramInterest;
 
 #pragma mark - Phlebotomy (not in registration fields)
 extern NSString *const kFastingBloodGlucose;
@@ -284,6 +311,11 @@ extern NSString *const kLipidSeeingDocRegularly;
 extern NSString *const kLipidCurrentlyPrescribed;
 extern NSString *const kLipidTakingRegularly;
 
+/** Stroke */
+extern NSString *const kStrokeHasInformed;
+extern NSString *const kStrokeSeeingDocRegularly;
+extern NSString *const kStrokeCurrentlyPrescribed;
+
 /** Hypertension */
 extern NSString *const kHTHasInformed;
 extern NSString *const kHTCheckedBp;
@@ -299,8 +331,21 @@ extern NSString *const kMedConds;
 extern NSString *const kHadSurgery;
 
 /** Healthcare Barriers */
-extern NSString *const kExistingDoc;
-extern NSString *const kWhyNotFollowUp;
+extern NSString *const kGpFamDoc;
+extern NSString *const kFamMed;
+extern NSString *const kPolyclinic;
+extern NSString *const kSocHospital;
+extern NSString *const kHCBRemarks;
+extern NSString *const kNotSeeNeed;
+extern NSString *const kCantMakeTime;
+extern NSString *const kHCBMobility;
+extern NSString *const kHCBFinancial;
+extern NSString *const kScaredOfDoc;
+extern NSString *const kPreferTraditional;
+extern NSString *const kHCBOthers;
+extern NSString *const kAeFreq;
+extern NSString *const kHospitalizedFreq;
+//extern NSString *const kWhyNotFollowUp;
 extern NSString *const kOtherBarrier;
 
 /** Family History */
@@ -331,11 +376,18 @@ extern NSString *const kHighFats;
 extern NSString *const kProcessedFoods;
 
 /** Exercise History */
+extern NSString *const kDoesEngagePhysical;
 extern NSString *const kEngagePhysical;
 extern NSString *const kNoTime;
 extern NSString *const kTooTired;
 extern NSString *const kTooLazy;
 extern NSString *const kNoInterest;
+
+/** Functional Self Rated Quality of Health (EQ5D) */
+extern NSString *const kWalking;
+extern NSString *const kTakingCare;
+extern NSString *const kUsualActivities;
+extern NSString *const kPainDiscomfort;
 
 /** Fall Risk Eligible */
 extern NSString *const kUndergoneAssmt;
@@ -394,6 +446,11 @@ extern NSString *const kFeelGood;
 extern NSString *const kConfide;
 extern NSString *const kDownDiscouraged;
 extern NSString *const kSocialAssmtScore;
+
+/** Loneliness */
+extern NSString *const kLackCompanionship;
+extern NSString *const kLeftOut;
+extern NSString *const kIsolated;
 
 /** Depression Assessment (Basic) */
 extern NSString *const kPhqQ1;
@@ -1008,6 +1065,7 @@ extern NSString *const kCheckProfiling;
 extern NSString *const kCheckDiabetes;
 extern NSString *const kCheckHyperlipidemia;
 extern NSString *const kCheckHypertension;
+extern NSString *const kCheckStroke;
 extern NSString *const kCheckMedicalHistory;
 extern NSString *const kCheckSurgery;
 extern NSString *const kCheckHealthcareBarriers;
@@ -1024,6 +1082,7 @@ extern NSString *const kCheckMammogramEligible;
 extern NSString *const kCheckPapSmearEligible;
 
 /**     3d. Basic Geriatric (group)       */
+extern NSString *const kCheckEq5d;
 extern NSString *const kCheckFallRiskEligible;
 extern NSString *const kCheckGeriatricDementiaEligible;
 
@@ -1038,23 +1097,26 @@ extern NSString *const kCheckSocialHistory;
 extern NSString *const kCheckSocialAssmt;
 
 /**     3g. Psychology History & Assessment (group)       */
+extern NSString *const kCheckLoneliness;
 extern NSString *const kCheckDepression;
 extern NSString *const kCheckSuicideRisk;
 
 /**     4. Basic Vision     */
 extern NSString *const kCheckSnellenTest;
 
-/**     5. Advanced Geriatric (group)    */
-extern NSString *const kCheckAdvFallRiskAssmt;
+/**     5. Advanced Geriatric    */
 extern NSString *const kCheckGeriatricDementiaAssmt;
 
-/**     6. Dental     */
+/**    6. Fall Risk Assessment     */
+extern NSString *const kCheckPhysiotherapy;
+
+/**    7. Dental     */
 extern NSString *const kCheckBasicDental;
 
-/**     7. Hearing     */
+/**     8. Hearing     */
 extern NSString *const kCheckHearing;
 
-/**     8. Advanced Vision (group)     */
+/**     9. Advanced Vision (group)     */
 extern NSString *const kCheckSeriMedHist;
 extern NSString *const kCheckSeriVa;
 extern NSString *const kCheckSeriAutorefractor;
@@ -1063,18 +1125,18 @@ extern NSString *const kCheckSeriAhe;
 extern NSString *const kCheckSeriPhe;
 extern NSString *const kCheckSeriDiag;
 
-/**     9. Doctor's Consultation     */
-extern NSString *const kCheckDocConsult;
+/** 10. Emergency Services          */
+extern NSString *const kCheckEmergencyServices;
 
-/**     10. Additional Services     */
+/**     11. Additional Services     */
 extern NSString *const kCheckAddServices;
 
-/**     11. Social Work (group)     */
+/**     12. Social Work (group)     */
 extern NSString *const kCheckSwDepression;
 extern NSString *const kCheckSwAdvAssmt;
 extern NSString *const kCheckSwReferrals;
 
-/**     12. Summary & Health Education     */
+/**     13. Summary & Health Education     */
 //don't need any checks for this!
 
 /**     UNUSED!!     */
@@ -1092,6 +1154,10 @@ extern NSString *const kCheckFuncHearing;
 extern NSString *const kCheckPSFUMedIssues;
 extern NSString *const kCheckPSFUSocialIssues;
 extern NSString *const kCheckGeno;
+
+//remove in 2019
+extern NSString *const kCheckAdvFallRiskAssmt;
+extern NSString *const kCheckDocConsult;
 
 
 

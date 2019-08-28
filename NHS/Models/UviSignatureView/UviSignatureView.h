@@ -26,5 +26,6 @@
 @property (nonatomic, readonly) BOOL signatureExists;
 - (void)captureSignatureWithIndex:(int) index;
 - (UIImage*_Nullable)signatureImage:(CGPoint)position text:(NSString*_Nullable)text;
+- (void) erase;
 
 @end

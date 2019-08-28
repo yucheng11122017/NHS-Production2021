@@ -76,35 +76,49 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
                          successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlock
                          andFailBlock:(void (^)(NSURLSessionDataTask *task, NSError *error))failBlock;
 
-#pragma mark - Genogram stuffs
+#pragma mark - Image DL & UL
 -(NSString *)getRetrievedGenogramImagePath;
+-(NSString *)getdDownloadedImagePath;
 
--(void)retrieveGenogramImageForResident:(NSNumber *)residentID
-                               withNric:(NSString *)nric;
+-(void)uploadImage:(UIImage *) image forResident: (NSNumber *) residentID
+          withNric:(NSString *)nric
+   andWithFileType:(NSString *) fileType
+ withProgressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
+ completionHandler:(void (^)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))uploadCompletionHandler;
 
--(void)saveGenogram:(UIImage *) genogram
-        forResident: (NSNumber *) residentID
-           withNric:(NSString *) nric;
+-(void)downloadImageForChildWithChild:(NSNumber *) childID
+                             withNric:(NSString *)nric
+                          andFiletype:(NSString *) filetype;
+
+#pragma mark - Genogram stuffs
+//-(NSString *)getRetrievedGenogramImagePath;
+//
+//-(void)retrieveGenogramImageForResident:(NSNumber *)residentID
+//                               withNric:(NSString *)nric;
+//
+//-(void)saveGenogram:(UIImage *) genogram
+//        forResident: (NSNumber *) residentID
+//           withNric:(NSString *) nric;
 
 #pragma mark - Consent Form
--(void)saveConsentFormImage:(UIImage *) consentForm
-        forResident: (NSNumber *) residentID
-           withNric:(NSString *) nric;
-
--(NSString *)getRetrievedConsentImagePath;
-
--(void)retrieveConsentImageForResident:(NSNumber *) residentID
-                              withNric:(NSString *)nric;
+//-(void)saveConsentFormImage:(UIImage *) consentForm
+//        forResident: (NSNumber *) residentID
+//           withNric:(NSString *) nric;
+//
+//-(NSString *)getRetrievedConsentImagePath;
+//
+//-(void)retrieveConsentImageForResident:(NSNumber *) residentID
+//                              withNric:(NSString *)nric;
 
 #pragma mark - Research Consent Form
--(void)saveResearchConsentFormImage:(UIImage *) consentForm
-                        forResident:(NSNumber *) residentID
-                           withNric:(NSString *)nric;
-
--(NSString *)getRetrievedResearchConsentImagePath;
-
--(void)retrieveResearchConsentImageForResident:(NSNumber *) residentID
-                                      withNric:(NSString *)nric;
+//-(void)saveResearchConsentFormImage:(UIImage *) consentForm
+//                        forResident:(NSNumber *) residentID
+//                           withNric:(NSString *)nric;
+//
+//-(NSString *)getRetrievedResearchConsentImagePath;
+//
+//-(void)retrieveResearchConsentImageForResident:(NSNumber *) residentID
+//                                      withNric:(NSString *)nric;
 
 #pragma mark - Autorefractor Image
 -(void)saveAutorefractorFormImage:(UIImage *) consentForm

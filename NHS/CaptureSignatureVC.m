@@ -39,10 +39,10 @@
     
     NSLog(@"This is signature %@", _signatureIndex);
     NSData *data;
-    if ([_signatureIndex isEqualToNumber:@1])
-        data = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_PARTICIPANT_SIGNATURE];
-    else
-        data = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_CONSENT_TAKER_SIGNATURE];
+//    if ([_signatureIndex isEqualToNumber:@1])
+//        data = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_PARTICIPANT_SIGNATURE];
+//    else
+//        data = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_CONSENT_TAKER_SIGNATURE];
     
     NSMutableArray *signPathArray = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     [self.signatureView setPathArray:signPathArray];
@@ -63,6 +63,9 @@
     }
 }
 
+- (IBAction)clearSignature:(id)sender {
+    [self.signatureView erase];
+}
 
 -(IBAction)captureSign:(id)sender {
     

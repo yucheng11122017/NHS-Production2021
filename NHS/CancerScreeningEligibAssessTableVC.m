@@ -140,7 +140,7 @@
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 11)]; //because Medical History took up the first 8 numbers..
+    selectedRow = [NSNumber numberWithInteger:(indexPath.row + 12)]; //because Medical History took up the first 11 numbers..
     
     [self performSegueWithIdentifier:@"CancerEligibAssessToFormSegue" sender:self];
     

@@ -6,10 +6,10 @@
 //  Copyright © 2019 NUS. All rights reserved.
 //
 
-#import "ViewSignatureVC.h"
+#import "ResearchSignatureVC.h"
 #import "AppConstants.h"
 
-@interface ViewSignatureVC () {
+@interface ResearchSignatureVC () {
     NSNumber *index;
 }
 
@@ -19,7 +19,7 @@
 
 @end
 
-@implementation ViewSignatureVC
+@implementation ResearchSignatureVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -44,12 +44,12 @@
     [self.view addGestureRecognizer:longPressGesture];
     
     NSString *formName;
-//    if ([sender.tag containsString:@"research"]) {
-//        formName = @"ResearchConsent";
-//    } else {
-        formName = @"ScreeningConsent";
-//    }
-//    UIViewController *webVC = [[UIViewController alloc] init];
+    //    if ([sender.tag containsString:@"research"]) {
+    //        formName = @"ResearchConsent";
+    //    } else {
+    formName = @"ResearchConsent";
+    //    }
+    //    UIViewController *webVC = [[UIViewController alloc] init];
     
     _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     
@@ -60,13 +60,7 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Hide Form" style:UIBarButtonItemStyleDone target:self action:@selector(hideWebViewBtnPressed:)];
     
     [self.view addSubview:_webView];
-//    [self.navigationController pushViewController:webVC animated:YES];
-}
-
--(void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    
+    //    [self.navigationController pushViewController:webVC animated:YES];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -106,19 +100,19 @@
     self.insertSignature2Btn.hidden = NO;
     self.signature1ImageView.image = nil;
     self.signature2ImageView.image = nil;
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:SCREENING_PARTICIPANT_SIGNATURE];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:SCREENING_CONSENT_TAKER_SIGNATURE];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:RESEARCH_PARTICIPANT_6_PTS_SIGNATURE];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:RESEARCH_WITNESS_SIGNATURE];
     
 }
 
 - (void) loadImageIfAny {
-    NSString *imagePath1 = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_PARTICIPANT_SIGNATURE];
+    NSString *imagePath1 = [[NSUserDefaults standardUserDefaults] objectForKey:RESEARCH_PARTICIPANT_6_PTS_SIGNATURE];
     if (imagePath1) {
         _signature1ImageView.image = [UIImage imageWithData:[NSData dataWithContentsOfFile:imagePath1]];
         _insertSignature1Btn.hidden = true;
     }
     
-    NSString *imagePath2 = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_CONSENT_TAKER_SIGNATURE];
+    NSString *imagePath2 = [[NSUserDefaults standardUserDefaults] objectForKey:RESEARCH_WITNESS_SIGNATURE];
     if (imagePath2) {
         _signature2ImageView.image = [UIImage imageWithData:[NSData dataWithContentsOfFile:imagePath2]];
         _insertSignature2Btn.hidden = true;
@@ -131,11 +125,11 @@
     if ([index isEqualToNumber:@1]) {
         _insertSignature1Btn.hidden = YES;
         _signature1ImageView.image = signImage;
-        [self saveImageInDirectory: signImage withIdentifier: SCREENING_PARTICIPANT_SIGNATURE];
+        [self saveImageInDirectory: signImage withIdentifier: RESEARCH_PARTICIPANT_6_PTS_SIGNATURE];
     } else {
         _insertSignature2Btn.hidden = YES;
         _signature2ImageView.image = signImage;
-        [self saveImageInDirectory: signImage withIdentifier: SCREENING_CONSENT_TAKER_SIGNATURE];
+        [self saveImageInDirectory: signImage withIdentifier: RESEARCH_WITNESS_SIGNATURE];
     }
 }
 
@@ -163,16 +157,6 @@
     
     return [documentsPath stringByAppendingPathComponent:name];
 }
-- (IBAction)signBtn1Pressed:(id)sender {
-    NSString *someText =  @"I consent to NHS directly disclosing the Information and my past screening and follow-up information (participant’s past screening and follow-up information under NHS’ Screening and Follow-Up Programme) to NHS’ collaborators (refer to organisations/institutions that work in partnership with NHS for the provision of screening and follow-up related services, such as but not limited to: MOH, HPB, Regional Health Systems, Senior Cluster Network Operators, etc. where necessary) for the purposes of checking if I require re-screening, further tests, follow-up action and/or referral to community programmes/activities.";
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Read this" message:someText preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self performSegueWithIdentifier:@"goToCaptureSignature" sender:self];
-    }];
-    [alertController addAction:okAction];
-    [self presentViewController:alertController animated:true completion:nil];
-}
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
@@ -180,11 +164,6 @@
         CaptureSignatureVC *destination = segue.destinationViewController;
         destination.delegate = self;
         NSUInteger tagNumber = ((UIButton *) sender).tag;
-        destination.signatureIndex = [NSNumber numberWithInteger:tagNumber];
-    } else if ([segue.identifier containsString:@"CaptureSignature"]) {
-        CaptureSignatureVC *destination = segue.destinationViewController;
-        destination.delegate = self;
-        NSUInteger tagNumber = 1;
         destination.signatureIndex = [NSNumber numberWithInteger:tagNumber];
     }
 }

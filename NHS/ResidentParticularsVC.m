@@ -19,7 +19,7 @@
 //XLForms stuffs
 #import "XLForm.h"
 
-
+#define GREEN_COLOR [UIColor colorWithRed:88.0/255.0 green:214.0/255.0 blue:141.0/255.0 alpha:1.0]
 
 typedef enum getDataState {
     inactive,
@@ -47,11 +47,12 @@ typedef enum rowTypes {
 
 @interface ResidentParticularsVC () {
     NSString *neighbourhood;
-    XLFormRowDescriptor* dobRow, *ageRow, *age40aboveRow;;
+    XLFormRowDescriptor* dobRow, *ageRow, *age40aboveRow, *screeningSignButtonRow, *researchSignButtonRow;
     int successCounter, failCounter;
     NetworkStatus status;
     int fetchDataState;
     NSString *block, *street;
+    UIColor *screeningSignColor, *researchSignColor;
 }
 
 //@property (strong, nonatomic) NSMutableDictionary *resiPartiDict;
@@ -69,6 +70,9 @@ typedef enum rowTypes {
     NSLog(@"Resident selected %@", _residentParticularsDict);
     NSLog(@"%@", _phlebEligibDict);
     NSLog(@"%@", _modeOfScreeningDict);
+    NSLog(@"%@", _consentDisclosureDict);
+    NSLog(@"%@", _consentResearchDict);
+    NSLog(@"%@", _mammogramInterestDict);
     
     neighbourhood = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
     
@@ -103,6 +107,7 @@ typedef enum rowTypes {
 - (void) viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
+    [self updateSignatureButtonColors];
     self.navigationController.navigationBar.topItem.title = @"Resident Particulars";
 }
 
@@ -121,7 +126,6 @@ typedef enum rowTypes {
     // Dispose of any resources that can be recreated.
 }
 
-
 - (id) initResidentParticularsForm {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Resident Particulars"];
     XLFormSectionDescriptor * section;
@@ -135,25 +139,28 @@ typedef enum rowTypes {
     
     // Name
     XLFormRowDescriptor *nameRow = [XLFormRowDescriptor formRowDescriptorWithTag:kName rowType:XLFormRowDescriptorTypeName title:@"Resident Name"];
-    nameRow.required = YES;
     nameRow.value = _residentParticularsDict[kName];
+    nameRow.required = YES;
     [self setDefaultFontWithRow:nameRow];
     [nameRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [section addFormRow:nameRow];
     
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Gender"];
-    row.selectorOptions = @[@"Male", @"Female"];
-    [self setDefaultFontWithRow:row];
+    XLFormRowDescriptor *genderRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Gender"];
+    genderRow.selectorOptions = @[@"Male", @"Female"];
+    [self setDefaultFontWithRow:genderRow];
     if ([_residentParticularsDict count] > 0) {
         if ([_residentParticularsDict[kGender] isEqualToString:@"M"])
-            row.value = @"Male";
+            genderRow.value = @"Male";
         else
-            row.value = @"Female";
+            genderRow.value = @"Female";
     }
-    row.required = YES;
-    [section addFormRow:row];
+    genderRow.required = YES;
+    [section addFormRow:genderRow];
     
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    section.footerTitle = @"Only Singaporeans/PRs (with a valid NRIC/FIN) are eligible for screening.";
+    [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *nricRow = [XLFormRowDescriptor formRowDescriptorWithTag:kNRIC rowType:XLFormRowDescriptorTypeName title:@"NRIC"];
     nricRow.required = YES;
@@ -170,7 +177,10 @@ typedef enum rowTypes {
         }
     };
     
-    dobRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBirthDate rowType:XLFormRowDescriptorTypeText title:@"DOB (DDMMYYYY)"];
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    dobRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBirthDate rowType:XLFormRowDescriptorTypeText title:@"DOB (YYYY-MM-DD)"];
     
     if ([_residentParticularsDict count] > 0) {
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
@@ -178,7 +188,7 @@ typedef enum rowTypes {
         dateFormatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];  //otherwise 1st Jan will not be able to be read.
         NSDate *date = [dateFormatter dateFromString:_residentParticularsDict[kBirthDate]];
         // change to new format
-        dateFormatter.dateFormat = @"ddMMYYYY";
+        dateFormatter.dateFormat = @"YYYY-MM-dd";
         dobRow.value = [dateFormatter stringFromDate:date];
         
     }
@@ -193,7 +203,7 @@ typedef enum rowTypes {
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy"];
-    NSString *yearOfBirth = [dobRow.value substringFromIndex:4];
+    NSString *yearOfBirth = [dobRow.value substringWithRange:NSMakeRange(0, 4)];        //to match YYYY-MM-dd
     NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
     NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
     NSLog(@"%li", (long)age);
@@ -209,7 +219,7 @@ typedef enum rowTypes {
     [self setDefaultFontWithRow:citizenshipRow];
     citizenshipRow.selectorOptions = @[@"Singaporean", @"PR", @"Foreigner"];
     [section addFormRow:citizenshipRow];
-
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHpNumber rowType:XLFormRowDescriptorTypePhone title:@"HP Number"];
     row.required = YES;
     row.value = [_residentParticularsDict objectForKey:kHpNumber];
@@ -234,11 +244,7 @@ typedef enum rowTypes {
     if ([_residentParticularsDict objectForKey:kNokName] != (id)[NSNull null] && [_residentParticularsDict objectForKey:kNokName]) {
         row.value = [_residentParticularsDict objectForKey:kNokName];
     }
-        
     [section addFormRow:row];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];   /// NEW SECTION
-    [formDescriptor addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kNokRelationship rowType:XLFormRowDescriptorTypeSelectorPush title:@"Relationship to resident"]; //i.e. (resident's ______)
     row.required = YES;
@@ -275,53 +281,23 @@ typedef enum rowTypes {
         }
     };
     
-    
     XLFormRowDescriptor * spokenLangRow;
-    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeSelectorPush title:@"Preferred Spoken Languages"];
-    spokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew"];
+    //    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeMultipleSelector title:@"Spoken Languages"];
+    //2019
+    spokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpokenLang rowType:XLFormRowDescriptorTypeSelectorPush title:@"Preferred Spoken Language"];
+    spokenLangRow.selectorOptions = @[@"English", @"Mandarin", @"Malay", @"Tamil", @"Hindi", @"Cantonese", @"Hokkien", @"Teochew"];
     [self setDefaultFontWithRow:spokenLangRow];
     spokenLangRow.required = YES;
-
-//    spokenLangRow.value = [self getSpokenLangArray:_residentParticularsDict];
     spokenLangRow.value = [_residentParticularsDict objectForKey:kSpokenLang];
     [section addFormRow:spokenLangRow];
     
     XLFormRowDescriptor *backupSpokenLangRow;
-    backupSpokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBackupSpokenLang rowType:XLFormRowDescriptorTypeSelectorPush title:@"Backup Spoken Languages"];
-    backupSpokenLangRow.selectorOptions = @[@"Cantonese", @"English", @"Hindi", @"Hokkien", @"Malay", @"Mandarin", @"Tamil", @"Teochew", @"None"];
+    backupSpokenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBackupSpokenLang rowType:XLFormRowDescriptorTypeSelectorPush title:@"Backup Spoken Language"];
+    backupSpokenLangRow.selectorOptions = @[@"English", @"Mandarin", @"Malay", @"Tamil", @"Hindi", @"Cantonese", @"Hokkien", @"Teochew", @"None"];
     [self setDefaultFontWithRow:backupSpokenLangRow];
-    backupSpokenLangRow.required = YES;
     backupSpokenLangRow.value = [_residentParticularsDict objectForKey:kBackupSpokenLang];
+    backupSpokenLangRow.required = YES;
     [section addFormRow:backupSpokenLangRow];
-    
-//    spokenLangRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-//        if (newValue != oldValue) {
-//            if (newValue != nil && newValue != (id) [NSNull null]) {
-//                if (oldValue != nil && oldValue != (id) [NSNull null]) {
-//                    NSMutableSet *oldSet = [NSMutableSet setWithCapacity:[oldValue count]];
-//                    [oldSet addObjectsFromArray:oldValue];
-//                    NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
-//                    [newSet addObjectsFromArray:newValue];
-//
-//                    if ([newSet count] > [oldSet count]) {
-//                        [newSet minusSet:oldSet];
-//                        NSArray *array = [newSet allObjects];
-//                        [self postSpokenLangWithLangName:[array firstObject] andValue:@"1"];
-//                    } else {
-//                        [oldSet minusSet:newSet];
-//                        NSArray *array = [oldSet allObjects];
-//                        [self postSpokenLangWithLangName:[array firstObject] andValue:@"0"];
-//                    }
-//                } else {
-//                    [self postSpokenLangWithLangName:[newValue firstObject] andValue:@"1"];
-//                }
-//            } else {
-//                if (oldValue != nil && oldValue != (id) [NSNull null]) {
-//                    [self postSpokenLangWithLangName:[oldValue firstObject] andValue:@"0"];
-//                }
-//            }
-//        }
-//    };
     
     XLFormRowDescriptor *writtenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWrittenLang rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Written Language"];
     writtenLangRow.required = YES;
@@ -331,7 +307,7 @@ typedef enum rowTypes {
     if ([_residentParticularsDict objectForKey:kWrittenLang] != (id)[NSNull null] && [_residentParticularsDict objectForKey:kWrittenLang]) {
         writtenLangRow.value = [_residentParticularsDict objectForKey:kWrittenLang];
     }
-    
+
     [section addFormRow:writtenLangRow];
     
     writtenLangRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
@@ -354,79 +330,34 @@ typedef enum rowTypes {
     XLFormRowDescriptor *addressRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"address_block_street" rowType:XLFormRowDescriptorTypeSelectorPush title:@"Address"];
     addressRow.required = YES;
     if ([neighbourhood isEqualToString:@"Kampong Glam"])
-        addressRow.selectorOptions = @[@"Blk 4 Beach Road", @"Blk 5 Beach Road", @"Blk 6 Beach Road", @"Blk 7 North Bridge Road", @"Blk 8 North Bridge Road", @"Blk 9 North Bridge Road", @"Blk 10 North Bridge Road", @"Blk 18 Jalan Sultan", @"Blk 19 Jalan Sultan", @"Others"];
+    addressRow.selectorOptions = @[@"Blk 4 Beach Road",
+                                   @"Blk 5 Beach Road",
+                                   @"Blk 6 Beach Road",
+                                   @"Blk 7 North Bridge Road",
+                                   @"Blk 8 North Bridge Road",
+                                   @"Blk 9 North Bridge Road",
+                                   @"Blk 10 North Bridge Road",
+                                   @"Blk 18 Jalan Sultan",
+                                   @"Blk 19 Jalan Sultan",
+                                   @"Others"];
     else
-        addressRow.selectorOptions = @[@"1 Jln Bt Merah",
-                                       @"2 Jln Bt Merah",
-                                       @"3 Jln Bt Merah",
-                                       @"7 Jln Bt Merah",
-                                       @"11 Jln Bt Merah",
-                                       @"12 Jln Bt Merah",
-                                       @"13 Jln Bt Merah",
-                                       @"14 Jln Bt Merah",
-                                       @"28 Jln Bt Merah",
-                                       @"8 Jln Rumah Tinggi",
-                                       @"9 Jln Rumah Tinggi",
-                                       @"10 Jln Rumah Tinggi",
-                                       @"35 Jln Rumah Tinggi",
-                                       @"36 Jln Rumah Tinggi",
-                                       @"37 Jln Rumah Tinggi",
-                                       @"39 Jln Rumah Tinggi",
-                                       @"40 Jln Rumah Tinggi",
-                                       @"43 Lengkok Bahru",
-                                       @"44 Lengkok Bahru",
-                                       @"45 Lengkok Bahru",
-                                       @"46 Lengkok Bahru",
-                                       @"47 Lengkok Bahru",
-                                       @"48 Lengkok Bahru",
-                                       @"51 Lengkok Bahru",
-                                       @"52 Lengkok Bahru",
-                                       @"53 Lengkok Bahru",
-                                       @"54 Lengkok Bahru",
-                                       @"55 Lengkok Bahru",
-                                       @"56 Lengkok Bahru",
-                                       @"57 Lengkok Bahru",
-                                       @"58 Lengkok Bahru",
-                                       @"59 Lengkok Bahru",
-                                       @"61 Lengkok Bahru",
-                                       @"63A Lengkok Bahru",
-                                       @"63B Lengkok Bahru",
-                                       @"28 Hoy Fatt Rd",
-                                       @"49 Hoy Fatt Rd",
-                                       @"50 Hoy Fatt Rd",
-                                       @"119 Bt Merah Lane 1",
-                                       @"121 Bt Merah Lane 1",
-                                       @"122 Bt Merah Lane 1",
-                                       @"124 Bt Merah Lane 1",
-                                       @"125 Bt Merah Lane 1",
-                                       @"127 Bt Merah Lane 1",
-                                       @"Others"];
+    addressRow.selectorOptions = @[
+                                   @"Blk 3 Jln Bukit Merah",
+                                   @"55 Lengkok Bahru",
+                                   @"56 Lengkok Bahru",
+                                   @"57 Lengkok Bahru",
+                                   @"58 Lengkok Bahru",
+                                   @"59 Lengkok Bahru",
+                                   @"61 Lengkok Bahru",
+                                   @"Others"];
     [self setDefaultFontWithRow:addressRow];
-    
     addressRow.value = [self getAddressFromStreetAndBlock];
-    
     [section addFormRow:addressRow];
-    
-    addressRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            street = [self getStreetFromAddress:newValue];
-            block  = [self getBlockFromStreetName:street];
-
-            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kAddressStreet andNewContent:street];
-            double delayInSeconds = 1.0;
-            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                //code to be executed on the main queue after delay
-                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kAddressBlock andNewContent:block];
-            });
-        }
-    };
     
     XLFormRowDescriptor *addressOthersBlock = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressOthersBlock rowType:XLFormRowDescriptorTypeText title:@"Address (Others)-Block"];
     addressOthersBlock.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", addressRow];
     [addressOthersBlock.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:addressOthersBlock];
-    
     if ([_residentParticularsDict objectForKey:kAddressOthersBlock] != (id)[NSNull null] && [_residentParticularsDict objectForKey:kAddressOthersBlock]) {
         addressOthersBlock.value = _residentParticularsDict[kAddressOthersBlock];
     }
@@ -436,13 +367,37 @@ typedef enum rowTypes {
     addressOthersRoadName.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", addressRow];
     [addressOthersRoadName.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:addressOthersRoadName];
-    
     if ([_residentParticularsDict objectForKey:kAddressOthersRoadName] != (id)[NSNull null] && [_residentParticularsDict objectForKey:kAddressOthersRoadName]) {
         addressOthersRoadName.value = _residentParticularsDict[kAddressOthersRoadName];
     }
     [section addFormRow:addressOthersRoadName];
     
+    addressRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            street = [self getStreetFromAddress:newValue];
+            block  = [self getBlockFromStreetName:street];
+            
+            [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kAddressStreet andNewContent:street];
+            double delayInSeconds = 1.0;
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                //code to be executed on the main queue after delay
+                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kAddressBlock andNewContent:block];
+            });
+            
+            if ([newValue containsString:@"Others"]) {
+                addressOthersBlock.required = YES;
+                addressOthersRoadName.required = YES;
+            } else {
+                addressOthersBlock.required = NO;
+                addressOthersRoadName.required = NO;
+            }
+            [self reloadFormRow:addressOthersBlock];
+            [self reloadFormRow:addressOthersRoadName];
+        }
+    };
     
+
     XLFormRowDescriptor *unitRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAddressUnitNum rowType:XLFormRowDescriptorTypeText title:@"Unit No"];
     [self setDefaultFontWithRow:unitRow];
     [unitRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
@@ -455,6 +410,7 @@ typedef enum rowTypes {
     unitRow.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         
         if (![oldValue isEqual:newValue]) { //otherwise this segment will crash
+            
             NSString *CAPSed = [rowDescriptor.editTextValue uppercaseString];
             rowDescriptor.value = CAPSed;
         }
@@ -465,33 +421,159 @@ typedef enum rowTypes {
     [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     [self setDefaultFontWithRow:row];
     [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Postal Code must be 6 digits" regex:@"^(?=.*\\d).{6}$"]];
-    
     if ([_residentParticularsDict objectForKey:kAddressPostCode] != (id)[NSNull null] && [_residentParticularsDict objectForKey:kAddressPostCode]) {
         row.value = _residentParticularsDict[kAddressPostCode];
     }
+
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Consent"];   /// NEW SECTION
-    section.footerTitle = @"I consent to NHS directly disclosing the Information and my past screening and follow-up information (participant’s past screening and follow-up information under NHS’ Screening and Follow-Up Programme) to NHS’ collaborators (refer to organisations/institutions that work in partnership with NHS for the provision of screening and follow-up related services, such as but not limited to: MOH, HPB, Regional Health Systems, Senior Cluster Network Operators, etc. where necessary) for the purposes of checking if I require re-screening, further tests, follow-up action and/or referral to community programmes/activities.";
+    section.footerTitle = @"Select no during prepubs. Ask ONLY during screening.";
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kConsent rowType:XLFormRowDescriptorTypeBooleanSwitch title:@"Consent to disclosure of information"];
-    row.required = YES;
+    //    XLFormRowDescriptor *showScreenConsentFormBtnRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"show_screening_consent" rowType:XLFormRowDescriptorTypeButton title:@"Show Screening Consent Form"];
+    //    showScreenConsentFormBtnRow.required = NO;
+    //    showScreenConsentFormBtnRow.action.formSelector = @selector(goToShowConsentForm:);
+    //    showScreenConsentFormBtnRow.cellConfigAtConfigure[@"backgroundColor"] = [UIColor colorWithRed:35/255.0 green:22/255.0 blue:120/255.0 alpha:1.0];
+    //    showScreenConsentFormBtnRow.cellConfig[@"textLabel.textColor"] = [UIColor whiteColor];
+    //    [section addFormRow:showScreenConsentFormBtnRow];
+    
+    XLFormRowDescriptor *consentInfoRow = [XLFormRowDescriptor formRowDescriptorWithTag:kConsent rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Consent to disclosure of information"];
+    consentInfoRow.selectorOptions = @[@"Yes", @"No"];
+    consentInfoRow.required = YES;
+    [self setDefaultFontWithRow:consentInfoRow];
     if ([_residentParticularsDict objectForKey:kConsent] != (id)[NSNull null])
-        row.value = [_residentParticularsDict objectForKey:kConsent];
-    [self setDefaultFontWithRow:row];
-    [section addFormRow:row];
+        consentInfoRow.value = [self getYesNoFromOneZero:[_residentParticularsDict objectForKey:kConsent]];
+    [section addFormRow:consentInfoRow];
+    
+    XLFormRowDescriptor *langExplainedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLangExplainedIn rowType:XLFormRowDescriptorTypeSelectorPush title:@"Language explained in"];
+    langExplainedRow.selectorOptions = @[@"English", @"Malay", @"Chinese", @"Tamil", @"Others"];
+    [self setDefaultFontWithRow:langExplainedRow];
+    langExplainedRow.required = YES;
+    langExplainedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentInfoRow];
+    if ([_consentDisclosureDict objectForKey:kLangExplainedIn] != (id)[NSNull null] && [_consentDisclosureDict objectForKey:kLangExplainedIn]) {
+        langExplainedRow.value = _consentDisclosureDict[kLangExplainedIn];
+    }
+    [section addFormRow:langExplainedRow];
+    
+    XLFormRowDescriptor *langExplainedOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLangExplainedInOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    langExplainedOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", langExplainedRow];
+    [langExplainedOthersRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [self setDefaultFontWithRow:langExplainedOthersRow];
+    langExplainedOthersRow.required = YES;
+    if ([_consentDisclosureDict objectForKey:kLangExplainedInOthers] != (id)[NSNull null] && [_consentDisclosureDict objectForKey:kLangExplainedInOthers]) {
+        langExplainedOthersRow.value = _consentDisclosureDict[kLangExplainedInOthers];
+    }
+    [section addFormRow:langExplainedOthersRow];
+    
+    XLFormRowDescriptor *consentTakerNameRow = [XLFormRowDescriptor formRowDescriptorWithTag:kConsentTakerFullName rowType:XLFormRowDescriptorTypeName title:@"Consent Taker Full Name"];
+    consentTakerNameRow.required = YES;
+    [consentTakerNameRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [self setDefaultFontWithRow:consentTakerNameRow];
+    consentTakerNameRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentInfoRow];
+    if ([_consentDisclosureDict objectForKey:kConsentTakerFullName] != (id)[NSNull null] && [_consentDisclosureDict objectForKey:kConsentTakerFullName]) {
+        consentTakerNameRow.value = _consentDisclosureDict[kConsentTakerFullName];
+    }
+    [section addFormRow:consentTakerNameRow];
+    
+    XLFormRowDescriptor *matricNoRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMatriculationNumber rowType:XLFormRowDescriptorTypeName title:@"Matriculation Number"];
+    matricNoRow.required = YES;
+    [matricNoRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [self setDefaultFontWithRow:matricNoRow];
+    matricNoRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentInfoRow];
+    if ([_consentDisclosureDict objectForKey:kMatriculationNumber] != (id)[NSNull null] && [_consentDisclosureDict objectForKey:kMatriculationNumber]) {
+        matricNoRow.value = _consentDisclosureDict[kMatriculationNumber];
+    }
+    [section addFormRow:matricNoRow];
+    
+    XLFormRowDescriptor *orgRow = [XLFormRowDescriptor formRowDescriptorWithTag:kOrganisation rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Organisation"];
+    orgRow.selectorOptions = @[@"NUS Medicine", @"NUS Nursing", @"NTU Medicine", @"NUS Social Work", @"Others"];
+    [self setDefaultFontWithRow:orgRow];
+    orgRow.required = YES;
+    orgRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentInfoRow];
+    if ([_consentDisclosureDict objectForKey:kOrganisation] != (id)[NSNull null] && [_consentDisclosureDict objectForKey:kOrganisation]) {
+        orgRow.value = _consentDisclosureDict[kOrganisation];
+    }
+    [section addFormRow:orgRow];
+    
+    XLFormRowDescriptor *orgOthersRow = [XLFormRowDescriptor formRowDescriptorWithTag:kOrganisationOthers rowType:XLFormRowDescriptorTypeText title:@"Others"];
+    orgOthersRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Others'", orgRow];
+    [orgOthersRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [self setDefaultFontWithRow:orgOthersRow];
+    orgOthersRow.required = YES;
+    if ([_consentDisclosureDict objectForKey:kOrganisationOthers] != (id)[NSNull null] && [_consentDisclosureDict objectForKey:kOrganisationOthers]) {
+        orgOthersRow.value = _consentDisclosureDict[kOrganisationOthers];
+    }
+
+    [section addFormRow:orgOthersRow];
+    
+    screeningSignButtonRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"sign_screening_btn" rowType:XLFormRowDescriptorTypeButton title:@"Sign Screening Consent"];
+    screeningSignButtonRow.required = NO;
+    screeningSignButtonRow.action.formSelector = @selector(goToViewSignatureVC:);
+    screeningSignButtonRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentInfoRow];
+    screeningSignButtonRow.cellConfigAtConfigure[@"backgroundColor"] = screeningSignColor;
+    screeningSignButtonRow.cellConfig[@"textLabel.textColor"] = [UIColor whiteColor];
+    [section addFormRow:screeningSignButtonRow];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Consent to Research"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
+    section.footerTitle = @"Select no during prepubs. Ask ONLY during screening.";
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kConsentToResearch rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Consent to research"];
-    row.required = NO;
-    row.selectorOptions = @[@"Yes", @"No"];
+    //    XLFormRowDescriptor *showResearchConsentFormBtnRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"show_research_consent" rowType:XLFormRowDescriptorTypeButton title:@"Show Research Consent Form"];
+    //    showResearchConsentFormBtnRow.required = NO;
+    //    showResearchConsentFormBtnRow.action.formSelector = @selector(goToShowConsentForm:);
+    //    showResearchConsentFormBtnRow.cellConfigAtConfigure[@"backgroundColor"] = [UIColor colorWithRed:35/255.0 green:22/255.0 blue:120/255.0 alpha:1.0];
+    //    showResearchConsentFormBtnRow.cellConfig[@"textLabel.textColor"] = [UIColor whiteColor];
+    //    [section addFormRow:showResearchConsentFormBtnRow];
+    
+    XLFormRowDescriptor *consentResearchRow = [XLFormRowDescriptor formRowDescriptorWithTag:kConsentToResearch rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Consent to research"];
+    consentResearchRow.selectorOptions = @[@"Yes", @"No"];
+    consentResearchRow.required = YES;
+    [self setDefaultFontWithRow:consentResearchRow];
     if ([_residentParticularsDict objectForKey:kConsentToResearch] != (id)[NSNull null])
-        row.value = [self getYesNoFromOneZero:[_residentParticularsDict objectForKey:kConsentToResearch]];
-    [self setDefaultFontWithRow:row];
-    [section addFormRow:row];
+        consentResearchRow.value = [self getYesNoFromOneZero:[_consentResearchDict objectForKey:kConsentToResearch]];
+    [section addFormRow:consentResearchRow];
+    
+    XLFormRowDescriptor *consentRecontactRow = [XLFormRowDescriptor formRowDescriptorWithTag:kConsentRecontact rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Consent to be recontacted for further studies"];
+    consentRecontactRow.selectorOptions = @[@"Yes", @"No"];
+    consentRecontactRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    consentRecontactRow.required = YES;
+    [self setDefaultFontWithRow:consentRecontactRow];
+    consentRecontactRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentResearchRow];
+    if ([_consentResearchDict objectForKey:kConsentRecontact] != (id)[NSNull null] && [_consentResearchDict objectForKey:kConsentRecontact]) {
+        consentRecontactRow.value = [self getYesNoFromOneZero:_consentResearchDict[kConsentRecontact]];
+    }
+    [section addFormRow:consentRecontactRow];
+    
+    XLFormRowDescriptor *translationDoneRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTranslationDone rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Translation Done?"];
+    translationDoneRow.selectorOptions = @[@"Yes", @"No"];
+    translationDoneRow.required = YES;
+    translationDoneRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentResearchRow];
+    [self setDefaultFontWithRow:translationDoneRow];
+    if ([_consentResearchDict objectForKey:kTranslationDone] != (id)[NSNull null] && [_consentResearchDict objectForKey:kTranslationDone]) {
+        translationDoneRow.value = [self getYesNoFromOneZero:_consentResearchDict[kTranslationDone]];
+    }
+    [section addFormRow:translationDoneRow];
+    
+    XLFormRowDescriptor *witnessTransFullName = [XLFormRowDescriptor formRowDescriptorWithTag:kWitnessTranslatorFullName rowType:XLFormRowDescriptorTypeName title:@"Witness and/or Translator Full Name"];
+    witnessTransFullName.required = YES;
+    [witnessTransFullName.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    [self setDefaultFontWithRow:witnessTransFullName];
+    witnessTransFullName.cellConfig[@"textLabel.numberOfLines"] = @0;
+    witnessTransFullName.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentResearchRow];
+    if ([_consentResearchDict objectForKey:kWitnessTranslatorFullName] != (id)[NSNull null] && [_consentResearchDict objectForKey:kWitnessTranslatorFullName]) {
+        witnessTransFullName.value = _consentResearchDict[kWitnessTranslatorFullName];
+    }
+    [section addFormRow:witnessTransFullName];
+    
+    researchSignButtonRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"sign_research_btn" rowType:XLFormRowDescriptorTypeButton title:@"Sign Research Consent"];
+    researchSignButtonRow.required = NO;
+    researchSignButtonRow.action.formSelector = @selector(goToResearchSignatureVC:);
+    researchSignButtonRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", consentResearchRow];
+    researchSignButtonRow.cellConfigAtConfigure[@"backgroundColor"] = researchSignColor;
+    researchSignButtonRow.cellConfig[@"textLabel.textColor"] = [UIColor whiteColor];
+    [section addFormRow:researchSignButtonRow];
+    
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"INDICATORS"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
@@ -504,7 +586,6 @@ typedef enum rowTypes {
     sporeanRow.selectorOptions = @[@"Yes",@"No"];
     sporeanRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     sporeanRow.disabled = @1;
-    
     [section addFormRow:sporeanRow];
     
     XLFormRowDescriptor *prRow = [XLFormRowDescriptor formRowDescriptorWithTag:kIsPr
@@ -567,14 +648,38 @@ typedef enum rowTypes {
     age40aboveRow.disabled = @YES;
     age40aboveRow.selectorOptions = @[@"Yes",@"No"];
     
+    //    __weak __typeof(self)weakSelf = self;
+    //    dobRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+    //        if (newValue != oldValue) {
+    //            // Calculate age
+    //            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    //            [dateFormatter setDateFormat:@"yyyy"];
+    //            NSString *yearOfBirth = [dateFormatter stringFromDate:newValue];
+    //            NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
+    //            NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
+    //            NSLog(@"%li", (long)age);
+    //            rowDescriptor.value = [NSNumber numberWithLong:age];
+    //            [weakSelf reloadFormRow:rowDescriptor];
+    //
+    //            if (age >= 40) {
+    //                age40aboveRow.value = @"Yes";
+    //                age40aboveRow.disabled = @YES;
+    //                [weakSelf updateFormRow:age40aboveRow];
+    //            } else {
+    //                age40aboveRow.value = @"No";
+    //                age40aboveRow.disabled = @YES;
+    //                [weakSelf updateFormRow:age40aboveRow];
+    //            }
+    //        }
+    //    };
     if (age >= 40) {
         age40aboveRow.value = @"Yes";
     } else {
         age40aboveRow.value = @"No";
     }
+    
     age40aboveRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:age40aboveRow];
-    
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Phlebotomy Eligibility Assessment"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
@@ -593,9 +698,7 @@ typedef enum rowTypes {
     chronicCondRow.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:chronicCondRow];
     chronicCondRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    
     chronicCondRow.value = [self getYesNoFromOneZero:[_phlebEligibDict objectForKey:kChronicCond]];
-    
     [section addFormRow:chronicCondRow];
     
     XLFormRowDescriptor *noFollowUpPcpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kRegFollowup rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is resident under regular follow-up with primary care physician?"];
@@ -616,7 +719,7 @@ typedef enum rowTypes {
     noBloodTestRow.value = [self getYesNoFromOneZero:[_phlebEligibDict objectForKey:kNoBloodTest]];
     [section addFormRow:noBloodTestRow];
     
-    XLFormRowDescriptor *eligibleBTRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"eligible_BT"
+    XLFormRowDescriptor *eligibleBTRow = [XLFormRowDescriptor formRowDescriptorWithTag:kEligibleBloodTest
                                                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                                                  title:@"Is resident eligible for a blood test? (auto-calculated)"];
     [self setDefaultFontWithRow:eligibleBTRow];
@@ -626,9 +729,9 @@ typedef enum rowTypes {
     eligibleBTRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     
     if ([[ResidentProfile sharedManager] isEligiblePhleb])
-        eligibleBTRow.value = @"Yes";
+    eligibleBTRow.value = @"Yes";
     else
-        eligibleBTRow.value = @"No";
+    eligibleBTRow.value = @"No";
     
     [section addFormRow:eligibleBTRow];
     
@@ -636,7 +739,7 @@ typedef enum rowTypes {
         if (newValue != oldValue) {
             if ([newValue isEqualToString:@"Yes"]) {
                 NSDictionary *dict =  [self.form formValues];
-                if (([dict objectForKey:kChronicCond] == (id)[NSNull null] && [dict objectForKey:kRegFollowup] == (id)[NSNull null])|| [dict objectForKey:kSporeanPr] == (id)[NSNull null] || [dict objectForKey:kIsPr] == (id)[NSNull null] || [dict objectForKey:kAgeCheck] == (id)[NSNull null] || [dict objectForKey:kNoBloodTest] == (id)[NSNull null]) {
+                if (([dict objectForKey:kChronicCond] == (id)[NSNull null] || [dict objectForKey:kRegFollowup] == (id)[NSNull null])|| [dict objectForKey:kSporeanPr] == (id)[NSNull null] || [dict objectForKey:kIsPr] == (id)[NSNull null] || [dict objectForKey:kAgeCheck] == (id)[NSNull null] || [dict objectForKey:kNoBloodTest] == (id)[NSNull null]) {
                     eligibleBTRow.value = @"No";
                     [self reloadFormRow:eligibleBTRow];
                     return;
@@ -772,9 +875,33 @@ typedef enum rowTypes {
     if (![isComm boolValue]) didPhlebRow.hidden = @YES;  //if it's not Comms, then hide this.
     didPhlebRow.selectorOptions = @[@"No, not at all", @"Yes, Saturday", @"Yes, Sunday", @"No, referred to next Saturday", @"Yes, additional session"];
     didPhlebRow.value = [_phlebEligibDict objectForKey:kDidPhleb];
+    didPhlebRow.value = @"No, not at all";
     didPhlebRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:didPhlebRow];
     
+    if (![neighbourhood containsString:@"Kampong"]) {
+        XLFormRowDescriptor *mammoInterestRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammogramInterest
+                                                                                      rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                                        title:@"Are you interested in taking a mammogram on Saturday 10am-1pm?"];
+        [self setDefaultFontWithRow:mammoInterestRow];
+        mammoInterestRow.required = YES;
+        mammoInterestRow.selectorOptions = @[@"Yes",@"No"];
+        mammoInterestRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+        mammoInterestRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Female'", genderRow];
+        mammoInterestRow.value = [self getYesNoFromOneZero:[_mammogramInterestDict objectForKey:kMammogramInterest]];
+        [section addFormRow:mammoInterestRow];
+    }
+        
+    
+    //
+    //    genderRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+    //        if (newValue != oldValue) {
+    //            if ([newValue isEqualToString:@"Female"]) {
+    //                mammo
+    //            }
+    //        }
+    //    }
+    //
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Mode of Screening"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
     
@@ -799,9 +926,9 @@ typedef enum rowTypes {
     [self setDefaultFontWithRow:centralDateRow];
     
     if ([neighbourhood isEqualToString:@"Kampong Glam"]) {
-        centralDateRow.selectorOptions = @[@"8 Sept", @"9 Sept"];
+        centralDateRow.selectorOptions = @[@"7 Sept", @"8 Sept"];
     } else {
-        centralDateRow.selectorOptions = @[@"6 Oct (Lengkok Bahru)", @"7 Oct (3 Jalan Bukit Merah)"];
+        centralDateRow.selectorOptions = @[@"5 Oct (Lengkok Bahru)", @"6 Oct (3 Jalan Bukit Merah)"];
     }
     centralDateRow.required = YES;
     centralDateRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Centralised'", screenModeRow];
@@ -810,7 +937,7 @@ typedef enum rowTypes {
     }
     [section addFormRow:centralDateRow];
     
-    XLFormRowDescriptor *apptDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"appt_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date did the resident attend screening?"];
+    XLFormRowDescriptor *apptDateQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"appt_date_q" rowType:XLFormRowDescriptorTypeInfo title:@"Non-Phleb door-to-door Date (only available from 1-3pm)"];
     apptDateQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     apptDateQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
     [self setDefaultFontWithRow:apptDateQRow];
@@ -818,13 +945,12 @@ typedef enum rowTypes {
     
     XLFormRowDescriptor *apptDateRow = [XLFormRowDescriptor formRowDescriptorWithTag:kApptDate rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
     if ([neighbourhood isEqualToString:@"Kampong Glam"]) {
-        apptDateRow.selectorOptions = @[@"8 Sept", @"9 Sept"];
+        apptDateRow.selectorOptions = @[@"7 Sept", @"8 Sept"];
     } else {
-        apptDateRow.selectorOptions = @[@"6 Oct (Lengkok Bahru)", @"7 Oct (3 Jalan Bukit Merah)"];
+        apptDateRow.selectorOptions = @[@"5 Oct (Lengkok Bahru)", @"6 Oct (3 Jalan Bukit Merah)"];
     }
     apptDateRow.noValueDisplayText = @"Tap here";
     apptDateRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
-    
     if (!apptDateRow.isHidden) {    //which means that screen mode is D2D
         if (eligibleBTRow.value != nil && eligibleBTRow.value != (id)[NSNull null]) {
             if ([eligibleBTRow.value isEqualToString:@"Yes"]) {
@@ -841,8 +967,7 @@ typedef enum rowTypes {
     }
     [section addFormRow:apptDateRow];
     
-    /** ONLY IF ELIGIBLE FOR PHLEB */
-    XLFormRowDescriptor *phlebApptQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"phleb_appt_q" rowType:XLFormRowDescriptorTypeInfo title:@"Which date did the resident attend screening?"];
+    XLFormRowDescriptor *phlebApptQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"phleb_appt_q" rowType:XLFormRowDescriptorTypeInfo title:@"Phleb door-to-door Date (only available from 9-11am)"];
     phlebApptQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     phlebApptQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
     [self setDefaultFontWithRow:phlebApptQRow];
@@ -850,9 +975,9 @@ typedef enum rowTypes {
     
     XLFormRowDescriptor *phlebApptRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhlebAppt rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@""];
     if ([neighbourhood isEqualToString:@"Kampong Glam"]) {
-        phlebApptRow.selectorOptions = @[@"8 Sept", @"9 Sept"];
+        phlebApptRow.selectorOptions = @[@"7 Sept", @"8 Sept"];
     } else {
-        phlebApptRow.selectorOptions = @[@"6 Oct (Lengkok Bahru)", @"7 Oct (3 Jalan Bukit Merah)"];
+        phlebApptRow.selectorOptions = @[@"5 Oct (Lengkok Bahru)", @"6 Oct (3 Jalan Bukit Merah)"];
     }
     phlebApptRow.noValueDisplayText = @"Tap here";
     phlebApptRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Door-to-door'", screenModeRow];
@@ -908,7 +1033,7 @@ typedef enum rowTypes {
     screenModeRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
             if ([newValue isEqualToString:@"Door-to-door"]) {
-                if ([eligibleBTRow.value isEqualToString:@"No"]) {
+                if ([eligibleBTRow.value isEqualToString:@"No"] || eligibleBTRow.value == nil) {
                     apptDateRow.hidden = @NO;
                     apptDateQRow.hidden = @NO;
                     phlebApptQRow.hidden = @YES;
@@ -938,9 +1063,20 @@ typedef enum rowTypes {
     if (_modeOfScreeningDict != (id)[NSNull null] && [_modeOfScreeningDict objectForKey:kNotes] != (id)[NSNull null]) {
         commentsRow.value = [_modeOfScreeningDict objectForKey:kNotes];
     }
+    
     [section addFormRow:commentsRow];
     
+    
     return [super initWithForm:formDescriptor];
+}
+
+#pragma mark - XLFormButton Segue
+- (void) goToViewSignatureVC: (XLFormRowDescriptor *) sender {
+    [self performSegueWithIdentifier:@"ResiPartiToViewSignatureSegue" sender:self];
+}
+
+- (void) goToResearchSignatureVC: (XLFormRowDescriptor *) sender {
+    [self performSegueWithIdentifier:@"ResiPartiToResearchSignatureSegue" sender:self];
 }
 
 #pragma mark - XLFormViewControllerDelegate 
@@ -956,12 +1092,6 @@ typedef enum rowTypes {
         [self reloadFormRow:rowDescriptor];
         
     }
-//    else if ([rowDescriptor.tag isEqualToString:kAddressOthers]) {
-//        NSString *CAPSed = [rowDescriptor.value uppercaseString];
-//        rowDescriptor.value = CAPSed;
-//        [self reloadFormRow:rowDescriptor];
-//        //no return here...
-//    }
     
     NSArray * validationErrors = [self formValidationErrors];
     if (validationErrors.count > 0) {
@@ -1061,6 +1191,17 @@ typedef enum rowTypes {
             [self checkIfPostCodeIsValid:rowDescriptor];
             return;
         }
+        else if ([rowDescriptor.tag isEqualToString:kLangExplainedInOthers] ||
+                 [rowDescriptor.tag isEqualToString:kConsentTakerFullName] ||
+                 [rowDescriptor.tag isEqualToString:kMatriculationNumber] ||
+                 [rowDescriptor.tag isEqualToString:kOrganisationOthers]) {
+            [self postSingleFieldWithSection:SECTION_CONSENT_DISCLOSURE andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
+            return;
+        }
+        else if ([rowDescriptor.tag isEqualToString:kWitnessTranslatorFullName]) {
+            [self postSingleFieldWithSection:SECTION_CONSENT_RESEARCH andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
+            return;
+        }
         
         [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:rowDescriptor.value];
     }
@@ -1092,10 +1233,22 @@ typedef enum rowTypes {
         [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kWrittenLang andNewContent:newValue];
     }
     else if ([rowDescriptor.tag isEqualToString:kConsent]) {
-        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kConsent andNewContent:newValue];
+        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kConsent andNewContent:[self getYesNoFromOneZero:newValue]];
+    }
+    else if ([rowDescriptor.tag isEqualToString:kLangExplainedIn]) {
+        [self postSingleFieldWithSection:SECTION_CONSENT_DISCLOSURE andFieldName:kLangExplainedIn andNewContent:newValue];
+    }
+    else if ([rowDescriptor.tag isEqualToString:kOrganisation]) {
+        [self postSingleFieldWithSection:SECTION_CONSENT_DISCLOSURE andFieldName:kOrganisation andNewContent:newValue];
     }
     else if ([rowDescriptor.tag isEqualToString:kConsentToResearch]) {
-        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kConsentToResearch andNewContent:[self getOneZerofromYesNo:newValue]];
+        [self postSingleFieldWithSection:SECTION_CONSENT_RESEARCH andFieldName:kConsentToResearch andNewContent:[self getOneZerofromYesNo:newValue]];
+    }
+    else if ([rowDescriptor.tag isEqualToString:kConsentRecontact]) {
+        [self postSingleFieldWithSection:SECTION_CONSENT_RESEARCH andFieldName:kConsentRecontact andNewContent:[self getOneZerofromYesNo:newValue]];
+    }
+    else if ([rowDescriptor.tag isEqualToString:kTranslationDone]) {
+        [self postSingleFieldWithSection:SECTION_CONSENT_RESEARCH andFieldName:kTranslationDone andNewContent:[self getOneZerofromYesNo:newValue]];
     }
     else if ([rowDescriptor.tag isEqualToString:kWantFreeBt]) {
         [self postSingleFieldWithSection:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT andFieldName:kWantFreeBt andNewContent:[self getOneZerofromYesNo:newValue]];
@@ -1109,8 +1262,14 @@ typedef enum rowTypes {
     else if ([rowDescriptor.tag isEqualToString:kNoBloodTest]) {
         [self postSingleFieldWithSection:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT andFieldName:kNoBloodTest andNewContent:[self getOneZerofromYesNo:newValue]];
     }
+    else if ([rowDescriptor.tag isEqualToString:kEligibleBloodTest]) {
+        [self postSingleFieldWithSection:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT andFieldName:kEligibleBloodTest andNewContent:newValue];
+    }
     else if ([rowDescriptor.tag isEqualToString:kDidPhleb]) {
         [self postSingleFieldWithSection:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT andFieldName:kDidPhleb andNewContent:newValue];
+    }
+    else if ([rowDescriptor.tag isEqualToString:kMammogramInterest]) {
+        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_INTEREST andFieldName:kMammogramInterest andNewContent:newValue];
     }
     else if ([rowDescriptor.tag isEqualToString:kScreenMode]) {
         [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kScreenMode andNewContent:newValue];
@@ -1715,6 +1874,47 @@ typedef enum rowTypes {
     UIFontDescriptor * fontD = [font.fontDescriptor
                                 fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     return [UIFont fontWithDescriptor:fontD size:0];
+}
+
+- (void) updateSignatureButtonColors {
+
+    NSString *str1 = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_PARTICIPANT_SIGNATURE];
+    NSString *str2 = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_CONSENT_TAKER_SIGNATURE];
+    NSString *str3 = [[NSUserDefaults standardUserDefaults] objectForKey:RESEARCH_PARTICIPANT_6_PTS_SIGNATURE];
+    NSString *str4 = [[NSUserDefaults standardUserDefaults] objectForKey:RESEARCH_WITNESS_SIGNATURE];
+    
+    if (str1 != nil) {
+        if (str2 != nil) {
+            screeningSignColor = GREEN_COLOR;
+        } else {
+            screeningSignColor = [UIColor orangeColor];
+        }
+    } else {
+        if (str2 != nil) {
+            screeningSignColor = [UIColor orangeColor];
+        } else {
+            screeningSignColor = [UIColor redColor];
+        }
+    }
+    
+    if (str3 != nil) {
+        if (str4 != nil) {
+            researchSignColor = GREEN_COLOR;
+        } else {
+            researchSignColor = [UIColor orangeColor];
+        }
+    } else {
+        if (str4 != nil) {
+            researchSignColor = [UIColor orangeColor];
+        } else {
+            researchSignColor = [UIColor redColor];
+        }
+    }
+    screeningSignButtonRow.cellConfig[@"backgroundColor"] = screeningSignColor;
+    researchSignButtonRow.cellConfig[@"backgroundColor"] = researchSignColor;
+    [self reloadFormRow:screeningSignButtonRow];
+    [self reloadFormRow:researchSignButtonRow];
+    
 }
 
 /*

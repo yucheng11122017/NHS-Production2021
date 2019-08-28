@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ViewSignatureVC : UIViewController<CaptureSignatureViewDelegate, UIGestureRecognizerDelegate>
+@interface ResearchSignatureVC : UIViewController<CaptureSignatureViewDelegate, UIGestureRecognizerDelegate>
 
 @property (strong, nonatomic) IBOutlet UIImageView *signature1ImageView;
 @property (strong, nonatomic) IBOutlet UIImageView *signature2ImageView;

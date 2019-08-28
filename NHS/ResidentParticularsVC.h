@@ -14,12 +14,18 @@
 @property (strong, nonatomic) NSDictionary* residentParticularsDict;
 @property (strong, nonatomic) NSDictionary* phlebEligibDict;
 @property (strong, nonatomic) NSDictionary* modeOfScreeningDict;
+@property (strong, nonatomic) NSDictionary* consentDisclosureDict;
+@property (strong, nonatomic) NSDictionary* consentResearchDict;
+@property (strong, nonatomic) NSDictionary* mammogramInterestDict;
 @property (strong, nonatomic) NSNumber * loadDataFlag;
 
 // Public Methods
 - (void) setResidentParticularsDict:(NSDictionary *)residentParticularsDict;
 //- (void) setphlebEligibDict:(NSDictionary *)phlebEligibDict;
 - (void) setModeOfScreeningDict:(NSDictionary *)modeOfScreeningDict;
+- (void) setConsentDisclosureDict:(NSDictionary *)consentDisclosureDict;
+- (void) setConsentResearchDict:(NSDictionary *)consentResearchDict;
+- (void) setMammogramInterestDict:(NSDictionary *)mammogramInterestDict;
 - (void) setLoadDataFlag:(NSNumber*) loadDataFlag;
 
 

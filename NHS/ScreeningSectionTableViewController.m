@@ -32,10 +32,11 @@ typedef enum sectionRowNumber {
     Profiling,
     BasicVision,
     AdvancedGeriatric,
+    FallRiskAssessment,
     Dental,
     Hearing,
     AdvancedVision,
-    DoctorsConsultation,
+    EmergencyServices,
     AdditionalServices,
     SocialWork,
     Summary_HealthEducation
@@ -101,7 +102,7 @@ typedef enum sectionRowNumber {
     
     _residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId]; //need this for fetching data
 
-    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0, nil];
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0, nil];
     
     @synchronized (self) {
         [self updateCellAccessory];
@@ -133,9 +134,11 @@ typedef enum sectionRowNumber {
         [self loadDraftIfAny];
     }
 #endif
+    //2019
+    self.rowTitles = @[@"1. Triage", @"2. Phlebotomy", @"3. Profiling", @"4. Basic Vision", @"5. Advanced Geriatric",@"6. Fall Risk Assessment", @"7. Dental", @"8. Hearing", @"9. Advanced Vision", @"10. Emergency Services", @"11. Additional Services", @"12. Social Work", @"Summary & Health Education"];
     
     //2018
-    self.rowTitles = @[@"1. Triage", @"2. Phlebotomy (no need to fill)", @"3. Profiling", @"4. Basic Vision", @"5. Advanced Geriatric", @"6. Dental", @"7. Hearing", @"8. Advanced Vision", @"9. Doctor's Consultation", @"10. Additional Services", @"11. Social Work", @"Summary & Health Education"];
+//    self.rowTitles = @[@"1. Triage", @"2. Phlebotomy (no need to fill)", @"3. Profiling", @"4. Basic Vision", @"5. Advanced Geriatric", @"6. Dental", @"7. Hearing", @"8. Advanced Vision", @"9. Doctor's Consultation", @"10. Additional Services", @"11. Social Work", @"Summary & Health Education"];
     
     //2017
 //    self.rowTitles = @[@"Phlebotomy", @"Mode of Screening",@"Profiling", @"Geriatric Depression Assessment", @"Social Work", @"Triage", @"4. Basic Vision", @"Additional Services", @"Doctor's Consultation", @"6. Dental", @"8. Advanced Vision", @"5. Advanced Geriatric", @"Geriatric Dementia Asssesment", @"Health Education"];
@@ -233,8 +236,8 @@ typedef enum sectionRowNumber {
         }
         else if (indexPath.row == Phlebotomy) {
 //            if (![[ResidentProfile sharedManager] isEligiblePhleb]) {
-                cell.userInteractionEnabled = NO;
-                [cell.textLabel setTextColor:[UIColor grayColor]];
+                cell.userInteractionEnabled = YES;
+//                [cell.textLabel setTextColor:[UIColor grayColor]];
                 return cell;
 //            }
         }else if (indexPath.row == AdvancedVision) {
@@ -386,8 +389,11 @@ typedef enum sectionRowNumber {
         } else if (indexPath.row == AdvancedGeriatric) {
             [self performSegueWithIdentifier:@"screeningSectionToAdvGeriatricsSectionSegue" sender:self];
             return;
-        } else if (indexPath.row == DoctorsConsultation) {
-            selectedRow = [NSNumber numberWithInteger:DoctorsConsultation];
+        } else if (indexPath.row == FallRiskAssessment) {
+            selectedRow = [NSNumber numberWithInteger:FallRiskAssessment];
+        }
+        else if (indexPath.row == EmergencyServices) {
+            selectedRow = [NSNumber numberWithInteger:EmergencyServices];
         }  else if (indexPath.row == Summary_HealthEducation) {
             selectedRow = [NSNumber numberWithInteger:Summary_HealthEducation];
         }
@@ -582,14 +588,16 @@ typedef enum sectionRowNumber {
     
     
     if ([_completionCheck count] < 1) {
-        _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0, nil];
+        _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0,@0, nil];
     } else {
         [_completionCheck removeAllObjects];
     }
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
     NSDictionary *modeOfScreeningDict = [_fullScreeningForm objectForKey:SECTION_MODE_OF_SCREENING];
     
-    NSArray *lookupTable = @[kCheckClinicalResults, kCheckPhleb, @"check_overall_profiling", kCheckSnellenTest, @"check_overall_adv_geriatric", kCheckBasicDental, kCheckHearing, @"check_overall_adv_vision", kCheckDocConsult, kCheckAddServices,@"check_overall_sw", kCheckEd];
+    NSArray *lookupTable = @[kCheckClinicalResults, kCheckPhleb, @"check_overall_profiling", kCheckSnellenTest, kCheckGeriatricDementiaAssmt, kCheckPhysiotherapy, kCheckBasicDental, kCheckHearing, @"check_overall_adv_vision", kCheckEmergencyServices ,kCheckAddServices,@"check_overall_sw", kCheckEd];
+    // 2019
+    // removed kCheckAdvFallRiskAssmt, kCheckDocConsult
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         
@@ -599,24 +607,25 @@ typedef enum sectionRowNumber {
                 [_completionCheck addObject:[self checkAllProfilingSections:checksDict]];
             } else if (i == Phlebotomy) {
 //                if (![[ResidentProfile sharedManager] isEligiblePhleb]) {  //not eligible
-                    [_completionCheck addObject:@1];    //always completed
+//                    [_completionCheck addObject:@1];    //always completed
 //                }
 //                else {
-//                    NSString *key = lookupTable[i];
-                    
-//                    NSNumber *doneNum = [checksDict objectForKey:key];
-//                    [_completionCheck addObject:doneNum];
+                    NSString *key = lookupTable[i];
+                
+                    NSNumber *doneNum = [checksDict objectForKey:key];
+                    [_completionCheck addObject:doneNum];
 //                }
             }
-            else if (i == AdvancedGeriatric) {
-                if (![[ResidentProfile sharedManager] isEligibleAdvFallRisk]) {  //not eligible
-                    [_completionCheck addObject:@1];
-                }
-                else {
-                    //check all advanced geriatric
-                    [_completionCheck addObject:[self checkAllAdvGeriatricSections:checksDict]];
-                }
-            }
+            //no longer a group
+//            else if (i == AdvancedGeriatric) {
+//                if (![[ResidentProfile sharedManager] isEligibleAdvFallRisk]) {  //not eligible
+//                    [_completionCheck addObject:@1];
+//                }
+//                else {
+//                    //check all advanced geriatric
+//                    [_completionCheck addObject:[self checkAllAdvGeriatricSections:checksDict]];
+//                }
+//            }
             else if (i == Dental) {
                 if (modeOfScreeningDict != (id)[NSNull null]) {
                     NSString *screenMode = [modeOfScreeningDict objectForKey:kScreenMode];

@@ -73,7 +73,7 @@
         shownOverlayView = true;
         [self.containerView removeFromSuperview];   //don't show containerView at all!
         NSUserDefaults *defaults =  [NSUserDefaults standardUserDefaults];
-        [[ServerComm sharedServerCommInstance] retrieveGenogramImageForResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
+//        [[ServerComm sharedServerCommInstance] retrieveGenogramImageForResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
     } else {
     
         _imageView.hidden = YES;
@@ -343,7 +343,7 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
     ServerComm *client = [ServerComm sharedServerCommInstance];
-    [client saveGenogram:_genogramImage forResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
+//    [client saveGenogram:_genogramImage forResident:[defaults objectForKey:kResidentId] withNric:[defaults objectForKey:kNRIC]];
     [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:kCheckGeno andNewContent:@"1"];    //post this for completion too.
     [self setupImageViewAndNavigationController];
     
