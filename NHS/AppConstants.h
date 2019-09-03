@@ -33,6 +33,7 @@
 #define SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT    @"phlebotomy_eligibility_assmt"
 #define SECTION_MAMMOGRAM_INTEREST              @"mammogram_interest"
 #define SECTION_IMAGES                          @"images"
+#define SECTION_PHLEBOTOMY_RESULTS              @"phlebotomy_results"
 #define SECTION_PHLEBOTOMY                      @"phlebotomy"
 #define SECTION_PROFILING_SOCIOECON             @"profiling_socioecon"
 #define SECTION_FIN_ASSMT                       @"fin_assmt"
@@ -233,6 +234,16 @@ extern NSString *const kWantFreeBt;
 extern NSString *const kDidPhleb;
 extern NSString *const kIsPr;
 extern NSString *const kMammogramInterest;
+
+#pragma mark - Phlebotomy - Results Collection
+extern NSString *const kPhlebDone;
+extern NSString *const kModeOfContact;
+extern NSString *const kPreferredDay;
+extern NSString *const kPreferredTime;
+extern NSString *const kPreferredLanguage;
+extern NSString *const kResultsCollection;
+extern NSString *const kPhlebFollowUp;
+
 
 #pragma mark - Phlebotomy (not in registration fields)
 extern NSString *const kFastingBloodGlucose;
@@ -1057,6 +1068,7 @@ extern NSString *const kSocIssueOthersText;
 extern NSString *const kCheckClinicalResults;
 
 /**     2. Phlebotomy       */
+extern NSString *const kCheckPhlebResults;
 extern NSString *const kCheckPhleb;
 
 extern NSString *const kCheckScreenMode;

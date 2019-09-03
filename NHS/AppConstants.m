@@ -131,6 +131,16 @@ NSString *const kDidPhleb = @"did_phleb";
 NSString *const kIsPr = @"is_pr";
 NSString *const kMammogramInterest = @"mammogram_interest";
 
+#pragma mark - Phlebotomy - Results Collection
+NSString *const kPhlebDone = @"phleb_done";
+NSString *const kModeOfContact = @"mode_of_contact";
+NSString *const kPreferredDay = @"preferred_day";
+NSString *const kPreferredTime = @"preferred_time";
+NSString *const kPreferredLanguage = @"preferred_language";
+NSString *const kResultsCollection = @"results_collection";
+NSString *const kPhlebFollowUp = @"follow_up";
+
+
 #pragma mark - Phlebotomy (not in registration fields)
 NSString *const kFastingBloodGlucose = @"fasting_blood_glu";
 NSString *const kTriglycerides = @"triglycerides";
@@ -941,6 +951,7 @@ NSString *const kSocIssueOthersText = @"specify_issue";
 NSString *const kCheckClinicalResults = @"check_clinical_results";
 
 /**     2. Phlebotomy       */
+NSString *const kCheckPhlebResults = @"check_phlebotomy_results";
 NSString *const kCheckPhleb = @"check_phlebotomy";
 
 NSString *const kCheckScreenMode = @"check_screen_mode";

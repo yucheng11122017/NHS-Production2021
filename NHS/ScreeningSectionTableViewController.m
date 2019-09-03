@@ -375,6 +375,9 @@ typedef enum sectionRowNumber {
         if (indexPath.row == Profiling) {
             [self performSegueWithIdentifier:@"sectionToProfilingSegue" sender:self];
             return;
+        } else if (indexPath.row == Phlebotomy) {
+            [self performSegueWithIdentifier:@"screeningSectionToPhlebSubsectionSegue" sender:self];
+            return;
         }
         else if (indexPath.row == SocialWork) {
             [self performSegueWithIdentifier:@"screenSectionToSocialWorkSegue" sender:self];
@@ -595,7 +598,7 @@ typedef enum sectionRowNumber {
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
     NSDictionary *modeOfScreeningDict = [_fullScreeningForm objectForKey:SECTION_MODE_OF_SCREENING];
     
-    NSArray *lookupTable = @[kCheckClinicalResults, kCheckPhleb, @"check_overall_profiling", kCheckSnellenTest, kCheckGeriatricDementiaAssmt, kCheckPhysiotherapy, kCheckBasicDental, kCheckHearing, @"check_overall_adv_vision", kCheckEmergencyServices ,kCheckAddServices,@"check_overall_sw", kCheckEd];
+    NSArray *lookupTable = @[kCheckClinicalResults, kCheckPhlebResults, @"check_overall_profiling", kCheckSnellenTest, kCheckGeriatricDementiaAssmt, kCheckPhysiotherapy, kCheckBasicDental, kCheckHearing, @"check_overall_adv_vision", kCheckEmergencyServices ,kCheckAddServices,@"check_overall_sw", kCheckEd];
     // 2019
     // removed kCheckAdvFallRiskAssmt, kCheckDocConsult
     

@@ -126,8 +126,8 @@ NSString *const kQuestionFifteen = @"q15";
         
         case Triage: form = [self initTriage];
             break;
-        case Phleb: form = [self initPhlebotomy];
-            break;
+//        case Phleb: form = [self initPhlebotomy];
+//            break;
         case Dental: form = [self initDentalCheckup];
             break;
         case Hearing: form = [self initHearing];
@@ -209,61 +209,6 @@ NSString *const kQuestionFifteen = @"q15";
 }
 
 #pragma mark - Forms methods
-
-- (id) initPhlebotomy {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Phlebotomy"];
-    XLFormSectionDescriptor * section;
-    
-    sporeanPr = age40 = false;
-    
-//    NSDictionary *phlebotomyEligibDict = _fullScreeningForm[SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT];
-    NSDictionary *phlebotomyDict = _fullScreeningForm[SECTION_PHLEBOTOMY];
-    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
-    
-    if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckPhleb];
-        if ([check isKindOfClass:[NSNumber class]]) {
-            isFormFinalized = [check boolValue];
-        }
-    }
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    XLFormRowDescriptor *glucoseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFastingBloodGlucose rowType:XLFormRowDescriptorTypeDecimal title:@"Fasting blood glucose (mmol/L)"];
-    if (phlebotomyDict != (id)[NSNull null]) glucoseRow.value = phlebotomyDict[kFastingBloodGlucose];
-    [self setDefaultFontWithRow:glucoseRow];
-    [section addFormRow:glucoseRow];
-    
-    XLFormRowDescriptor *triglyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTriglycerides rowType:XLFormRowDescriptorTypeDecimal title:@"Triglycerides (mmol/L)"];
-    if (phlebotomyDict != (id)[NSNull null]) triglyRow.value = phlebotomyDict[kTriglycerides];
-    [self setDefaultFontWithRow:triglyRow];
-    [section addFormRow:triglyRow];
-    
-    XLFormRowDescriptor *ldlRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLDL rowType:XLFormRowDescriptorTypeDecimal title:@"LDL Cholesterol (mmol/L)"];
-    if (phlebotomyDict != (id)[NSNull null]) ldlRow.value = phlebotomyDict[kLDL];
-    [self setDefaultFontWithRow:ldlRow];
-    [section addFormRow:ldlRow];
-    
-    XLFormRowDescriptor *hdlRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHDL rowType:XLFormRowDescriptorTypeDecimal title:@"HDL Cholesterol (mmol/L)"];
-    if (phlebotomyDict != (id)[NSNull null]) hdlRow.value = phlebotomyDict[kHDL];
-    [self setDefaultFontWithRow:hdlRow];
-    hdlRow.required = NO;
-    [section addFormRow:hdlRow];
-    
-    XLFormRowDescriptor *totCholesterolRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTotCholesterol rowType:XLFormRowDescriptorTypeDecimal title:@"Total Cholesterol (mmol/L)"];
-    if (phlebotomyDict != (id)[NSNull null]) totCholesterolRow.value = phlebotomyDict[kTotCholesterol];
-    [self setDefaultFontWithRow:totCholesterolRow];
-    [section addFormRow:totCholesterolRow];
-    
-    XLFormRowDescriptor *cholesHdlRatioRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCholesterolHdlRatio rowType:XLFormRowDescriptorTypeDecimal title:@"Cholesterol/HDL ratio"];
-    if (phlebotomyDict != (id)[NSNull null]) cholesHdlRatioRow.value = phlebotomyDict[kCholesterolHdlRatio];
-    [self setDefaultFontWithRow:cholesHdlRatioRow];
-    [section addFormRow:cholesHdlRatioRow];
-    
-    return [super initWithForm:formDescriptor];
-}
-
 - (id) initTriage {
     
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Triage"];
