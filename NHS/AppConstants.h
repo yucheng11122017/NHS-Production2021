@@ -32,6 +32,7 @@
 #define SECTION_CONSENT_RESEARCH                @"consent_research"
 #define SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT    @"phlebotomy_eligibility_assmt"
 #define SECTION_MAMMOGRAM_INTEREST              @"mammogram_interest"
+#define SECTION_IMAGES                          @"images"
 #define SECTION_PHLEBOTOMY                      @"phlebotomy"
 #define SECTION_PROFILING_SOCIOECON             @"profiling_socioecon"
 #define SECTION_FIN_ASSMT                       @"fin_assmt"
@@ -80,6 +81,7 @@
 #define SECTION_SOC_WORK_SUMMARY                @"soc_work_summary"
 #define SECTION_CLINICAL_RESULTS                @"clinical_results"
 #define SECTION_SNELLEN_TEST                    @"snellen_test"
+#define SECTION_EMERGENCY_SERVICES              @"emergency_services"
 #define SECTION_ADD_SERVICES                    @"add_services"
 #define SECTION_DOC_CONSULT                     @"doc_consult"
 #define SECTION_BASIC_DENTAL                    @"basic_dental"
@@ -671,6 +673,13 @@ extern NSString *const kEduStatus;
 extern NSString *const kDementiaStatus;
 extern NSString *const kReqFollowupAdvGer;
 
+#pragma mark - Emergency Services
+
+extern NSString *const kUndergoneEmerSvcs;
+extern NSString *const kDocNotes;
+extern NSString *const kDocName;
+extern NSString *const kDocReferred;
+
 #pragma mark - Additional Services
 
 extern NSString *const kAppliedChas;
@@ -678,14 +687,6 @@ extern NSString *const kReferColonos;
 extern NSString *const kReceiveFit;
 extern NSString *const kReferMammo;
 extern NSString *const kReferPapSmear;
-
-#pragma mark - Doctor's consult
-
-extern NSString *const kDidDocConsult;
-extern NSString *const kDocNotes;
-extern NSString *const kDocName;
-extern NSString *const kDocReferred;
-
 
 #pragma mark - Basic dental check-up
 

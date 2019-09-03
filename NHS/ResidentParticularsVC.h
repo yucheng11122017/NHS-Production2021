@@ -17,6 +17,7 @@
 @property (strong, nonatomic) NSDictionary* consentDisclosureDict;
 @property (strong, nonatomic) NSDictionary* consentResearchDict;
 @property (strong, nonatomic) NSDictionary* mammogramInterestDict;
+@property (strong, nonatomic) NSArray* signImagesArray;
 @property (strong, nonatomic) NSNumber * loadDataFlag;
 
 // Public Methods
@@ -26,6 +27,7 @@
 - (void) setConsentDisclosureDict:(NSDictionary *)consentDisclosureDict;
 - (void) setConsentResearchDict:(NSDictionary *)consentResearchDict;
 - (void) setMammogramInterestDict:(NSDictionary *)mammogramInterestDict;
+- (void) setSignImagesArray:(NSArray *)signImagesArray;
 - (void) setLoadDataFlag:(NSNumber*) loadDataFlag;
 
 

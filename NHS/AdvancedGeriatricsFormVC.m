@@ -55,6 +55,11 @@ typedef enum formName {
     
     //must init first before [super viewDidLoad]
     int formNumber = [_formNo intValue];
+    
+    
+    formNumber++;   //to compensate the deleted first part of this section
+    
+    
     switch (formNumber) {
             //case 0 is for demographics
             
@@ -317,17 +322,17 @@ typedef enum formName {
         return;
     } else {
         NSString *fieldName;
-        
-        switch ([self.formNo intValue]) {
-            case FallRiskAssmt: fieldName = kCheckAdvFallRiskAssmt;
-                break;
-            case DementiaAssmt: fieldName = kCheckGeriatricDementiaAssmt;
-                break;
-            default:
-                break;
-                
-        }
-        
+//
+//        switch ([self.formNo intValue]) {
+//            case FallRiskAssmt: fieldName = kCheckAdvFallRiskAssmt;
+//                break;
+//            case DementiaAssmt:
+//                break;
+//            default:
+//                break;
+//
+//        }
+        fieldName = kCheckGeriatricDementiaAssmt;
         [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"1"];
         [SVProgressHUD setMaximumDismissTimeInterval:1.0];
         [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];

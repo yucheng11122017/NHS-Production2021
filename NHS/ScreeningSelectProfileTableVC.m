@@ -16,6 +16,8 @@
 #import "ResidentProfile.h"
 
 #define PDFREPORT_LOADED_NOTIF @"Pdf report downloaded"
+#define IMAGE_LOADED_NOTIF @"Image downloaded"
+#define IMAGE_FAILED_NOTIF @"Image failed"
 #define CELL_RIGHT_MARGIN_OFFSET 64
 
 typedef enum getDataState {
@@ -39,6 +41,7 @@ typedef enum getDataState {
 @property (strong, nonatomic) NSDictionary *consentScreeningDict;
 @property (strong, nonatomic) NSDictionary *consentResearchDict;
 @property (strong, nonatomic) NSDictionary *mammogramInterestDict;
+@property (strong, nonatomic) NSArray *imagesArray;
 @property (strong, nonatomic) NSNumber *residentID;
 //@property (strong, nonatomic) NSString *reportFilePath;
 //@property (strong, nonatomic) UIButton *reportButton;
@@ -63,35 +66,42 @@ typedef enum getDataState {
     
     [self checkConsentFormsSubmission];
     
-    if ([_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"] == (id)[NSNull null]) { //present crashes
+    if ([_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"] == (id)[NSNull null]) { //prevent crashes
         _phlebEligibDict = @{};
     } else
         _phlebEligibDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"]];
     
-    if ([_residentDetails objectForKey:@"mode_of_screening"] == (id)[NSNull null]) {    //present crashes
+    if ([_residentDetails objectForKey:@"mode_of_screening"] == (id)[NSNull null]) {    //prevent crashes
         _modeOfScreeningDict = @{};
     } else
         _modeOfScreeningDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mode_of_screening"]];
     
-    if ([_residentDetails objectForKey:@"consent_disclosure"] == (id)[NSNull null]) {    //present crashes
+    if ([_residentDetails objectForKey:@"consent_disclosure"] == (id)[NSNull null]) {    //prevent crashes
         _consentScreeningDict = @{};
     } else
         _consentScreeningDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"consent_disclosure"]];
     
-    if ([_residentDetails objectForKey:@"consent_research"] == (id)[NSNull null]) {    //present crashes
+    if ([_residentDetails objectForKey:@"consent_research"] == (id)[NSNull null]) {    //prevent crashes
         _consentResearchDict = @{};
     } else
         _consentResearchDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"consent_research"]];
     
-    if ([_residentDetails objectForKey:@"mammogram_interest"] == (id)[NSNull null]) {    //present crashes
+    if ([_residentDetails objectForKey:@"mammogram_interest"] == (id)[NSNull null]) {    //prevent crashes
         _mammogramInterestDict = @{};
     } else
     _mammogramInterestDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mammogram_interest"]];
+    
+    if ([_residentDetails objectForKey:SECTION_IMAGES] == (id)[NSNull null]) {    //prevent crashes
+        _imagesArray = @[];
+    } else
+        _imagesArray = [[NSArray alloc] initWithArray:[_residentDetails objectForKey:SECTION_IMAGES]];
     
     _residentID = _residentParticulars[kResidentId];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshTable:) name:@"enableProfileEntry" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageAPIdone:) name:IMAGE_LOADED_NOTIF object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageAPIdone:) name:IMAGE_FAILED_NOTIF object:nil];
     
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -184,6 +194,25 @@ typedef enum getDataState {
                 cell.textLabel.textColor = [UIColor blackColor];
             }
             
+            if ([_imagesArray count] == 0) {
+                [cell setUserInteractionEnabled:NO];
+                [cell.textLabel setTextColor:[UIColor grayColor]];
+                [cell.textLabel setText:@"2019 (❗️Requires signing)"];
+            } else {
+                for (NSDictionary *dict in _imagesArray) {
+                    if ([[dict objectForKey:@"file_type"] isEqualToString:@"resident_sign"]) {
+                        [cell setUserInteractionEnabled:YES];
+                        cell.textLabel.textColor = [UIColor blackColor];
+                        [cell.textLabel setText:@"2019"];
+                        break;
+                    } else {
+                        [cell setUserInteractionEnabled:NO];
+                        [cell.textLabel setTextColor:[UIColor grayColor]];
+                        [cell.textLabel setText:@"2019 (❗️Requires signing)"];
+                    }
+                }
+            }
+            
             if (serialNum != (id) [NSNull null]) {
                 if ([serialNum isKindOfClass:[NSNumber class]]) {  //as long as have value
 
@@ -221,9 +250,10 @@ typedef enum getDataState {
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.section == 0) {   //resident particulars
-//        NSInteger selectedRow = [NSNumber numberWithInteger:indexPath.row];
         
-        [self performSegueWithIdentifier:@"showResiPartiSegue" sender:self];
+        NSDictionary *particularsDict = [[[ResidentProfile sharedManager] fullDict] objectForKey:kResiParticulars];
+        
+        [self downloadSignatureImages: particularsDict];
         
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
@@ -238,19 +268,55 @@ typedef enum getDataState {
     }
 }
 
-- (void) checkConsentFormsSubmission {
-    NSDictionary *consentDictionary = [_residentDetails objectForKey:@"consents"];
-    NSDictionary *researchConsentDictionary = [_residentDetails objectForKey:@"consent_research"];
-    if (consentDictionary != (id)[NSNull null] && consentDictionary) {
-        [[ResidentProfile sharedManager] setConsentImgExists:YES];
-    } else {
-        [[ResidentProfile sharedManager] setConsentImgExists:NO];
-    }
+- (void) downloadSignatureImages: (NSDictionary *) residentParticularsDict {
     
-    if (researchConsentDictionary != (id)[NSNull null] && researchConsentDictionary) {
-        [[ResidentProfile sharedManager] setResearchConsentImgExists:YES];
-    } else {
-        [[ResidentProfile sharedManager] setResearchConsentImgExists:NO];
+    // For signature images
+    if (self.imagesArray != (id)[NSNull null]) {
+        if ([self.imagesArray isKindOfClass:[NSArray class]]) {
+            if ([self.imagesArray count] > 0) {
+                ;
+                [[ServerComm sharedServerCommInstance] setOngoingDownloads:@0]; //reset this number
+                
+                for (NSDictionary *imageMetadata in self.imagesArray) {
+                    NSLog(@"downloading image: %@", imageMetadata);
+                    NSNumber *count = [[ServerComm sharedServerCommInstance] ongoingDownloads];
+                    count = [NSNumber numberWithInteger:[count integerValue] + 1];
+                    [[ServerComm sharedServerCommInstance] setOngoingDownloads:count];
+                    if ([[imageMetadata objectForKey:@"file_type"] isEqualToString:@"resident_sign"]) {
+                        [[ServerComm sharedServerCommInstance] downloadImageWithResident:residentParticularsDict[kResidentId] withNric:residentParticularsDict[kNRIC] andFiletype:@"resident_sign"];
+                    } else if ([[imageMetadata objectForKey:@"file_type"] isEqualToString:@"consent_disclosure"]) {
+                        [[ServerComm sharedServerCommInstance] downloadImageWithResident:residentParticularsDict[kResidentId] withNric:residentParticularsDict[kNRIC] andFiletype:@"consent_disclosure"];
+                    } else if ([[imageMetadata objectForKey:@"file_type"] isEqualToString:@"agree_6_points"]) {
+                        [[ServerComm sharedServerCommInstance] downloadImageWithResident:residentParticularsDict[kResidentId] withNric:residentParticularsDict[kNRIC] andFiletype:@"agree_6_points"];
+                    } else if ([[imageMetadata objectForKey:@"file_type"] isEqualToString:@"witness_translator"]) {
+                        [[ServerComm sharedServerCommInstance] downloadImageWithResident:residentParticularsDict[kResidentId] withNric:residentParticularsDict[kNRIC] andFiletype:@"witness_translator"];
+                    }
+                }
+                return;
+            }
+        }
+    }
+    // no images to download
+    [self performSegueWithIdentifier:@"showResiPartiSegue" sender:self];
+}
+
+- (void) checkConsentFormsSubmission {
+//    NSDictionary *consentDictionary = [_residentDetails objectForKey:@"consents"];
+//    NSDictionary *researchConsentDictionary = [_residentDetails objectForKey:@"consent_research"];
+//    if (consentDictionary != (id)[NSNull null] && consentDictionary) {
+//        [[ResidentProfile sharedManager] setConsentImgExists:YES];
+//    } else {
+//        [[ResidentProfile sharedManager] setConsentImgExists:NO];
+//    }
+//
+//    if (researchConsentDictionary != (id)[NSNull null] && researchConsentDictionary) {
+//        [[ResidentProfile sharedManager] setResearchConsentImgExists:YES];
+//    } else {
+//        [[ResidentProfile sharedManager] setResearchConsentImgExists:NO];
+//    }
+    NSDictionary *consentDictionary = [_residentDetails objectForKey:SECTION_IMAGES];
+    if (consentDictionary != (id)[NSNull null] && [consentDictionary count] > 0) {
+        
     }
 }
 
@@ -260,7 +326,7 @@ typedef enum getDataState {
                                                                               message:@""
                                                                        preferredStyle:UIAlertControllerStyleAlert];
     
-    UIAlertAction *consentFormAction, *researchConsentFormAction;
+//    UIAlertAction *consentFormAction, *researchConsentFormAction;
      UIAlertAction *formAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Screening Form", nil)
                                                         style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
@@ -432,8 +498,17 @@ typedef enum getDataState {
     } else
     _mammogramInterestDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mammogram_interest"]];
     
+    if ([_residentDetails objectForKey:SECTION_IMAGES] == (id)[NSNull null]) {    //prevent crashes
+        _imagesArray = @[];
+    } else
+        _imagesArray = [[NSArray alloc] initWithArray:[_residentDetails objectForKey:SECTION_IMAGES]];
+    
     [self.tableView reloadData];    //put in the ticks
     [SVProgressHUD dismiss];
+}
+
+- (void) imageAPIdone: (NSNotification *) notification {
+    [self performSegueWithIdentifier:@"showResiPartiSegue" sender:self];
 }
 
 
@@ -465,6 +540,10 @@ typedef enum getDataState {
     if ([segue.destinationViewController respondsToSelector:@selector(setMammogramInterestDict:)]) {
         [segue.destinationViewController performSelector:@selector(setMammogramInterestDict:)
                                               withObject:_mammogramInterestDict];
+    }
+    if ([segue.destinationViewController respondsToSelector:@selector(setSignImagesArray:)]) {
+        [segue.destinationViewController performSelector:@selector(setSignImagesArray:)
+                                              withObject:_imagesArray];
     }
 //    if ([segue.destinationViewController respondsToSelector:@selector(setReportFilepath:)]) {
 //        [segue.destinationViewController performSelector:@selector(setReportFilepath:)

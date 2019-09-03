@@ -555,6 +555,13 @@ NSString *const kEduStatus = @"edu_status";
 NSString *const kDementiaStatus = @"dementia_status";
 NSString *const kReqFollowupAdvGer = @"req_followup";
 
+#pragma mark - Emergency Services
+
+NSString *const kUndergoneEmerSvcs = @"undergone_emergency_services";
+NSString *const kDocNotes = @"doc_notes";
+NSString *const kDocName = @"doc_name";
+NSString *const kDocReferred = @"doc_referred";
+
 #pragma mark - Additional Services
 
 NSString *const kAppliedChas = @"applied_chas";
@@ -562,14 +569,6 @@ NSString *const kReferColonos = @"refer_colonos";
 NSString *const kReceiveFit = @"receive_fit";
 NSString *const kReferMammo = @"refer_mammo";
 NSString *const kReferPapSmear = @"refer_pap_smear";
-
-#pragma mark - Doctor's consult
-
-NSString *const kDidDocConsult = @"undergone_doc_consult";
-NSString *const kDocNotes = @"doc_notes";
-NSString *const kDocName = @"doc_name";
-NSString *const kDocReferred = @"doc_referred";
-
 
 #pragma mark - Basic dental check-up
 

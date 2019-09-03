@@ -15,6 +15,7 @@
 
 @property (strong,nonatomic) AFHTTPSessionManager *uploadManager;
 @property (strong, nonatomic) AFHTTPSessionManager *downloadManager;
+@property (strong, nonatomic) NSNumber *ongoingDownloads;
 
 //#pragma mark Therapist Info methods
 //- (void)loginWithUserName:(NSString *)userName
@@ -86,9 +87,9 @@ successBlock:(void (^)(NSURLSessionDataTask *task, id responseObject))successBlo
  withProgressBlock:(void (^)(NSProgress *downloadProgress))progressBlock
  completionHandler:(void (^)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error))uploadCompletionHandler;
 
--(void)downloadImageForChildWithChild:(NSNumber *) childID
-                             withNric:(NSString *)nric
-                          andFiletype:(NSString *) filetype;
+-(void)downloadImageWithResident:(NSNumber *) residentID
+                        withNric:(NSString *)nric
+                     andFiletype:(NSString *) filetype;
 
 #pragma mark - Genogram stuffs
 //-(NSString *)getRetrievedGenogramImagePath;

@@ -41,7 +41,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
-    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0, nil];
+    _completionCheck = [[NSMutableArray alloc] initWithObjects:@0, nil];
     
     self.hostReachability = [Reachability reachabilityWithHostName:REMOTE_HOST_NAME];
     [self.hostReachability startNotifier];
@@ -51,8 +51,8 @@
     
     self.navigationItem.title = @"5. Advanced Geriatrics";
 
-    //2018
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Fall Risk Assessment (Advanced)", @"Dementia Assessment (Advanced – AMT)", nil];
+    //2019
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"Dementia Assessment (Advanced – AMT)", nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -191,7 +191,7 @@
     }
     
     NSDictionary *checksDict = [_fullScreeningForm objectForKey:SECTION_CHECKS];
-    NSArray *lookupTable = @[kCheckAdvFallRiskAssmt, kCheckGeriatricDementiaAssmt];
+    NSArray *lookupTable = @[kCheckGeriatricDementiaAssmt];
     
     if (checksDict != nil && checksDict != (id)[NSNull null]) {
         for (int i=0; i<[lookupTable count]; i++) {

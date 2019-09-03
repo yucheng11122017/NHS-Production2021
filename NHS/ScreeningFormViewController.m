@@ -139,10 +139,11 @@ NSString *const kQuestionFifteen = @"q15";
 //            break;
         case BasicVision: form = [self initSnellenEyeTest];
             break;
+        case EmerSvcs: form = [self initEmergencySvcs];
+            break;
         case AddSvcs: form = [self initAdditionalSvcs];
             break;
-//        case DocConsult: form = [self initRefForDoctorConsult];
-//            break;
+        
         
 //        case 11: form = [self initFallRiskAssessment];
 //            break;
@@ -287,7 +288,7 @@ NSString *const kQuestionFifteen = @"q15";
     [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *systolic_1;
-    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Sys rowType:XLFormRowDescriptorTypeDecimal title:@"BP 1 (Systolic)"];
+    systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Sys rowType:XLFormRowDescriptorTypeInteger title:@"BP 1 (Systolic)"];
     systolic_1.required = YES;
     
     //value
@@ -302,7 +303,7 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:systolic_1];
     
     XLFormRowDescriptor *diastolic_1;
-    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Dias rowType:XLFormRowDescriptorTypeDecimal title:@"BP 1 (Diastolic)"];
+    diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Dias rowType:XLFormRowDescriptorTypeInteger title:@"BP 1 (Diastolic)"];
     diastolic_1.required = YES;
 
     //value
@@ -312,7 +313,7 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:diastolic_1];
     
     XLFormRowDescriptor *systolic_2;
-    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Sys rowType:XLFormRowDescriptorTypeDecimal title:@"BP 2 (Systolic)"];
+    systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Sys rowType:XLFormRowDescriptorTypeInteger title:@"BP 2 (Systolic)"];
     systolic_2.required = YES;
     
     //value
@@ -325,7 +326,7 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:systolic_2];
     
     XLFormRowDescriptor *diastolic_2;
-    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Dias rowType:XLFormRowDescriptorTypeDecimal title:@"BP 2 (Diastolic)"];
+    diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Dias rowType:XLFormRowDescriptorTypeInteger title:@"BP 2 (Diastolic)"];
     diastolic_2.required = YES;
     
     //value
@@ -335,7 +336,7 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:diastolic_2];
     
     XLFormRowDescriptor *systolic_3;
-    systolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Sys rowType:XLFormRowDescriptorTypeDecimal title:@"BP 3 (Systolic)"];
+    systolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Sys rowType:XLFormRowDescriptorTypeInteger title:@"BP 3 (Systolic)"];
     systolic_3.required = NO;
     //    [systolic_3.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
     
@@ -350,7 +351,7 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:systolic_3];
     
     XLFormRowDescriptor *diastolic_3;
-    diastolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Dias rowType:XLFormRowDescriptorTypeDecimal title:@"BP 3 (Diastolic)"];
+    diastolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Dias rowType:XLFormRowDescriptorTypeInteger title:@"BP 3 (Diastolic)"];
     //    [diastolic_3.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
     diastolic_3.required = NO;
     
@@ -891,6 +892,79 @@ NSString *const kQuestionFifteen = @"q15";
     
 }
 
+-(id) initEmergencySvcs {
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Emergency Services"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    NSDictionary *emerSvsDict = [self.fullScreeningForm objectForKey:SECTION_EMERGENCY_SERVICES];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckEmergencyServices];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    formDescriptor.assignFirstResponderOnShow = YES;
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *didEmerSvcsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kUndergoneEmerSvcs rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone Emergency Services?"];
+    didEmerSvcsRow.required = YES;
+    if (emerSvsDict != (id)[NSNull null] && [emerSvsDict objectForKey:kUndergoneEmerSvcs] != (id)[NSNull null])
+        didEmerSvcsRow.value = [self getYesNofromOneZero:emerSvsDict[kUndergoneEmerSvcs]];
+    
+    [self setDefaultFontWithRow:didEmerSvcsRow];
+    didEmerSvcsRow.selectorOptions = @[@"Yes", @"No"];
+    didEmerSvcsRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [section addFormRow:didEmerSvcsRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Doctor's Notes"];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *docNotesRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDocNotes
+                                                rowType:XLFormRowDescriptorTypeTextView];
+    [docNotesRow.cellConfigAtConfigure setObject:@"Type your notes here..." forKey:@"textView.placeholder"];
+    docNotesRow.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", didEmerSvcsRow];
+    //value
+    if (emerSvsDict != (id)[NSNull null] && [emerSvsDict objectForKey:kDocNotes] != (id)[NSNull null]) docNotesRow.value = emerSvsDict[kDocNotes];
+    
+    [section addFormRow:docNotesRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *docNameRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDocName
+                                                rowType:XLFormRowDescriptorTypeName title:@"Name of Doctor"];
+    [self setDefaultFontWithRow:docNameRow];
+    docNameRow.required = NO;
+    docNameRow.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", didEmerSvcsRow];
+    
+    //value
+    if (emerSvsDict != (id)[NSNull null] && [emerSvsDict objectForKey:kDocName] != (id)[NSNull null]) docNameRow.value = emerSvsDict[kDocName];
+    
+    [section addFormRow:docNameRow];
+    
+    XLFormRowDescriptor *docReferredRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDocReferred rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Provided with Referral Letter?"];
+    docReferredRow.selectorOptions = @[@"Yes", @"No"];
+    [self setDefaultFontWithRow:docReferredRow];
+    docReferredRow.required = NO;
+    docReferredRow.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", didEmerSvcsRow];
+    
+    //value
+    if (emerSvsDict != (id)[NSNull null] && [emerSvsDict objectForKey:kDocReferred] != (id)[NSNull null]) docReferredRow.value = [self getYesNofromOneZero:emerSvsDict[kDocReferred]];
+    [section addFormRow:docReferredRow];
+    
+
+    return [super initWithForm:formDescriptor];
+}
+
+
 -(id) initAdditionalSvcs {
     
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Additional Services"];
@@ -1010,74 +1084,7 @@ NSString *const kQuestionFifteen = @"q15";
     
     return [super initWithForm:formDescriptor];
 }
-//
-//- (id) initRefForDoctorConsult {
-//    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Referral for Doctor Consult"];
-//    XLFormSectionDescriptor * section;
-//    XLFormRowDescriptor * row;
-//    NSDictionary *refForDocConsultDict = [self.fullScreeningForm objectForKey:SECTION_DOC_CONSULT];
-//
-//    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
-//
-//    if (checkDict != nil && checkDict != (id)[NSNull null]) {
-//        NSNumber *check = checkDict[kCheckDocConsult];
-//        if ([check isKindOfClass:[NSNumber class]]) {
-//            isFormFinalized = [check boolValue];
-//        }
-//    }
-//
-//    formDescriptor.assignFirstResponderOnShow = YES;
-//
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//
-//    XLFormRowDescriptor *didDocConsultRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDidDocConsult rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone doctor's consultation?"];
-//    didDocConsultRow.required = YES;
-//    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDidDocConsult] != (id)[NSNull null])
-//        didDocConsultRow.value = [self getYesNofromOneZero:refForDocConsultDict[kDidDocConsult]];
-//
-//    [self setDefaultFontWithRow:didDocConsultRow];
-//    didDocConsultRow.selectorOptions = @[@"Yes", @"No"];
-//    didDocConsultRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-//    [section addFormRow:didDocConsultRow];
-//
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@"Doctor's Notes (Only doctor's to edit)"];
-//    [formDescriptor addFormSection:section];
-//
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocNotes
-//                                                rowType:XLFormRowDescriptorTypeTextView];
-//    [row.cellConfigAtConfigure setObject:@"Type your notes here..." forKey:@"textView.placeholder"];
-//
-//    //value
-//    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocNotes] != (id)[NSNull null]) row.value = refForDocConsultDict[kDocNotes];
-//
-//    [section addFormRow:row];
-//
-//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-//    [formDescriptor addFormSection:section];
-//
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocName
-//                                                rowType:XLFormRowDescriptorTypeName title:@"Name of Doctor"];
-//    [self setDefaultFontWithRow:row];
-//    row.required = NO;
-//
-//    //value
-//    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocName] != (id)[NSNull null]) row.value = refForDocConsultDict[kDocName];
-//
-//    [section addFormRow:row];
-//
-//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kDocReferred rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Provided with Referral Letter?"];
-//    row.selectorOptions = @[@"Yes", @"No"];
-//    [self setDefaultFontWithRow:row];
-//    row.required = NO;
-//
-//    //value
-//    if (refForDocConsultDict != (id)[NSNull null] && [refForDocConsultDict objectForKey:kDocReferred] != (id)[NSNull null]) row.value = [self getYesNofromOneZero:refForDocConsultDict[kDocReferred]];
-//
-//    [section addFormRow:row];
-//
-//    return [super initWithForm:formDescriptor];
-//}
+
 
 - (id) initDentalCheckup {
     XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"6. Dental"];
@@ -2298,19 +2305,12 @@ NSString *const kQuestionFifteen = @"q15";
     /* Additional Services */
     else if ([rowDescriptor.tag isEqualToString:kAppliedChas]) {
         [self postSingleFieldWithSection:SECTION_ADD_SERVICES andFieldName:kAppliedChas andNewContent:ansFromYesNo];
-    } else if ([rowDescriptor.tag isEqualToString:kReferColonos]) {
-        [self postSingleFieldWithSection:SECTION_ADD_SERVICES andFieldName:kReferColonos andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kReceiveFit]) {
         [self postSingleFieldWithSection:SECTION_ADD_SERVICES andFieldName:kReceiveFit andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kReferMammo]) {
         [self postSingleFieldWithSection:SECTION_ADD_SERVICES andFieldName:kReferMammo andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kReferPapSmear]) {
         [self postSingleFieldWithSection:SECTION_ADD_SERVICES andFieldName:kReferPapSmear andNewContent:ansFromYesNo];
-    }
-    
-    /* Doctor's Consult */
-    else if ([rowDescriptor.tag isEqualToString:kDocReferred]) {
-        [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDocReferred andNewContent:ansFromYesNo];
     }
     
     /* Basic Dental Check-up */
@@ -2379,9 +2379,11 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kApptReferred andNewContent:ansFromYesNo];
     }
     
-    /* 9. Doctor's Consultation */
-     else if ([rowDescriptor.tag isEqualToString:kDidDocConsult]) {
-         [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDidDocConsult andNewContent:ansFromYesNo];
+    /* 10. Emergency Services  */
+     else if ([rowDescriptor.tag isEqualToString:kUndergoneEmerSvcs]) {
+         [self postSingleFieldWithSection:SECTION_EMERGENCY_SERVICES andFieldName:kUndergoneEmerSvcs andNewContent:ansFromYesNo];
+     } else if ([rowDescriptor.tag isEqualToString:kDocReferred]) {
+         [self postSingleFieldWithSection:SECTION_EMERGENCY_SERVICES andFieldName:kDocReferred andNewContent:ansFromYesNo];
      }
     
     /* Fall Risk Assessment */
@@ -2618,9 +2620,9 @@ NSString *const kQuestionFifteen = @"q15";
     
     /* Doctor's Consult */
     else if ([rowDescriptor.tag isEqualToString:kDocNotes]) {
-        [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDocNotes andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_EMERGENCY_SERVICES andFieldName:kDocNotes andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kDocName]) {
-        [self postSingleFieldWithSection:SECTION_DOC_CONSULT andFieldName:kDocName andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_EMERGENCY_SERVICES andFieldName:kDocName andNewContent:rowDescriptor.value];
     }
     
     /* Geriatric Dementia Assessment */

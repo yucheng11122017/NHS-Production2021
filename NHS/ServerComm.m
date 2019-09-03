@@ -16,7 +16,8 @@
 #define GENOGRAM_LOADED_NOTIF @"Genogram image downloaded"
 #define CONSENT_LOADED_NOTIF @"Consent image downloaded"
 #define RESEARCH_CONSENT_LOADED_NOTIF @"Research Consent image downloaded"
-#define IMAGE_LOADED_NOTIF @"Image image downloaded"
+#define IMAGE_LOADED_NOTIF @"Image downloaded"
+#define IMAGE_FAILED_NOTIF @"Image failed"
 #define AUTOREFRACTOR_LOADED_NOTIF @"Autorefractor image downloaded"
 #define PDFREPORT_LOADED_NOTIF @"Pdf report downloaded"
 
@@ -269,7 +270,7 @@
     
     NSURL *filePathUrl = [NSURL fileURLWithPath:filePath];
     
-    NSDictionary *input = @{@"id": residentID,
+    NSDictionary *input = @{@"resident_id": residentID,
                             kNRIC: nric,
                             kFileType: fileType
                             };
@@ -298,12 +299,12 @@
     [uploadTask resume];
 }
 
--(void)downloadImageForChildWithChild:(NSNumber *) childID
+-(void)downloadImageWithResident:(NSNumber *) residentID
                              withNric:(NSString *)nric
                           andFiletype:(NSString *) filetype {
     
     //setup input parameters
-    NSDictionary *input = @{@"id": childID,
+    NSDictionary *input = @{@"resident_id": residentID,
                             kNRIC: nric,
                             kFileType:filetype
                             };
@@ -315,6 +316,8 @@
     self.uploadManager.responseSerializer.acceptableContentTypes = [NSSet setWithArray:@[@"text/html",@"application/json"]];
     self.downloadManager.securityPolicy.allowInvalidCertificates = NO;
     
+    
+    
     //send req
     AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
     NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://nhs-som.nus.edu.sg/downloadImage" parameters:data error:&error];
@@ -323,7 +326,7 @@
                                                                             progress:
                                         ^(NSProgress * _Nonnull downloadProgress) {
                                             [SVProgressHUD showProgress:downloadProgress.fractionCompleted status:@"Downloading Image..."];
-                                            //                                            NSLog(@"Download Progress… %f", downloadProgress.fractionCompleted);
+//                                                                                        NSLog(@"Download Progress… %f", downloadProgress.fractionCompleted);
                                         }
                                                                          destination:
                                         ^NSURL * _Nonnull(NSURL * _Nonnull targetPath, NSURLResponse * _Nonnull response) {
@@ -332,7 +335,9 @@
                                                                                                          appropriateForURL:nil
                                                                                                                     create:NO
                                                                                                                      error:nil];
-                                            return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+//                                            return [documentsDirectoryURL URLByAppendingPathComponent:[response suggestedFilename]];
+                                            return [documentsDirectoryURL URLByAppendingPathComponent:[filetype stringByAppendingString:@".png"]];
+                                            
                                         }
                                                                    completionHandler:
                                         ^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
@@ -342,18 +347,29 @@
                                                 [SVProgressHUD setMaximumDismissTimeInterval:1.0];
                                                 [SVProgressHUD showErrorWithStatus:@"Download failed!"];
                                                 NSLog(@"Error: %@", error);
+                                                
+                                                [[NSNotificationCenter defaultCenter] postNotificationName:IMAGE_FAILED_NOTIF
+                                                                                                    object:self
+                                                                                                  userInfo:nil];
                                             } else {
+                                                _ongoingDownloads = [NSNumber numberWithInteger:[_ongoingDownloads integerValue] - 1];
                                                 
-                                                [SVProgressHUD dismiss];
+                                                NSLog(@"REMAINING DOWNLOADS: %@", _ongoingDownloads);
+                                                if ([_ongoingDownloads isEqualToNumber:@0]) {
+                                                    [SVProgressHUD showSuccessWithStatus:@"Signatures downloaded!"];
+                                                    [SVProgressHUD setMaximumDismissTimeInterval:2.0];
+                                                    [[NSNotificationCenter defaultCenter] postNotificationName:IMAGE_LOADED_NOTIF object:nil];
+                                                    
+                                                }
                                                 
-                                                NSLog(@"Success: %@ \n\nImage downloaded at: %@", response, [filePath absoluteString]);
+                                                NSLog(@"Success: Image downloaded at: %@", [filePath absoluteString]);
                                                 
                                                 NSDictionary *userInfo = NSDictionaryOfVariableBindings(response, filePath);
                                                 
-                                                // send out notification!
-                                                [[NSNotificationCenter defaultCenter] postNotificationName:IMAGE_LOADED_NOTIF
-                                                                                                    object:self
-                                                                                                  userInfo:userInfo];
+//                                                // send out notification!
+//                                                [[NSNotificationCenter defaultCenter] postNotificationName:IMAGE_LOADED_NOTIF
+//                                                                                                    object:self
+//                                                                                                  userInfo:userInfo];
                                             }
                                         }];
     

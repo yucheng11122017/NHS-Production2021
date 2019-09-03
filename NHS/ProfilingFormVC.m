@@ -677,7 +677,7 @@ typedef enum formName {
     hasInformed_Stroke.required = YES;
     
     if (strokeDict != (id)[NSNull null] && [strokeDict objectForKey:kHasInformed] != (id)[NSNull null]) {
-        hasInformed_Stroke.value = [self getYesNoFromOneZero:strokeDict[kStrokeHasInformed]];
+        hasInformed_Stroke.value = [self getYesNoFromOneZero:strokeDict[kHasInformed]];
     }
     
     [section addFormRow:hasInformed_Stroke];
@@ -699,7 +699,7 @@ typedef enum formName {
     
     //value
     if (strokeDict != (id)[NSNull null] && [strokeDict objectForKey:kSeeingDocRegularly] != (id)[NSNull null]) {
-        seeDocRegularlyRow.value = strokeDict[kStrokeSeeingDocRegularly];
+        seeDocRegularlyRow.value = strokeDict[kSeeingDocRegularly];
     }
     
     seeDocRegularlyRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed_Stroke];
@@ -713,8 +713,8 @@ typedef enum formName {
     prescribedRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", hasInformed_Stroke];
     
     //value
-    if (strokeDict != (id)[NSNull null] && [strokeDict objectForKey:kHTCurrentlyPrescribed] != (id)[NSNull null]) {
-        prescribedRow.value = [self getYesNoFromOneZero:strokeDict[kStrokeCurrentlyPrescribed]];
+    if (strokeDict != (id)[NSNull null] && [strokeDict objectForKey:kCurrentlyPrescribed] != (id)[NSNull null]) {
+        prescribedRow.value = [self getYesNoFromOneZero:strokeDict[kCurrentlyPrescribed]];
     }
     
     [section addFormRow:prescribedRow];
@@ -805,22 +805,16 @@ typedef enum formName {
             isFormFinalized = [check boolValue];
         }
     }
-    XLFormRowDescriptor *surgeryQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"surgery_q"
-                                                                              rowType:XLFormRowDescriptorTypeInfo
-                                                                                title:@"Have you had any surgery?"];
-    [self setDefaultFontWithRow:surgeryQRow];
-    surgeryQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [section addFormRow:surgeryQRow];
-    
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHadSurgery
-                                                rowType:XLFormRowDescriptorTypeText
-                                                  title:@""];
+                                                rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                  title:@"Have you had any previous surgery?"];
     row.required = YES;
-    [row.cellConfigAtConfigure setObject:@"Type here" forKey:@"textField.placeholder"];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
+    row.selectorOptions = @[@"Yes", @"No"];
     //value
     if (surgeryDict != (id)[NSNull null] && [surgeryDict objectForKey:kHadSurgery] != (id)[NSNull null]) {
-        row.value = surgeryDict[kHadSurgery];
+        row.value = [self getYesNoFromOneZero:surgeryDict[kHadSurgery]];
     }
     [section addFormRow:row];
     
@@ -1123,12 +1117,17 @@ typedef enum formName {
     
     [section addFormRow:row];
     
+    NSString *gender = [[NSUserDefaults standardUserDefaults] objectForKey:kGender];
+    
+    
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kDelivered4kgOrGestational
                                                 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
                                                   title:@"Have you delivered a baby 4 kg or more; or were previously diagnosed with gestational diabetes mellitus?"];
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.selectorOptions = @[@"Yes", @"No"];
+    if ([gender containsString:@"M"])
+        row.disabled = @YES;
     row.required = YES;
     
     //value
@@ -1956,7 +1955,7 @@ typedef enum formName {
                                       @"1 Slight problem",
                                       @"2 Moderate problem",
                                       @"3 Severe problem",
-                                      @"4 Completed unable to do so"];
+                                      @"4 Completely unable to do so"];
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
@@ -2036,11 +2035,15 @@ typedef enum formName {
                                                                                title:@""];
     painDiscomfortRow.noValueDisplayText = @"Tap here for options";
     painDiscomfortRow.required = YES;
-    painDiscomfortRow.selectorOptions = selectorOptionsArray;
+    painDiscomfortRow.selectorOptions = @[@"0 No pain/discomfort",
+                                          @"1 Slight pain/discomfort",
+                                          @"2 Moderate pain/discomfort",
+                                          @"3 Severe pain/discomfort",
+                                          @"4 Extreme pain/discomfort"];
     
     //value
     if (eq5dDict != (id)[NSNull null] && [eq5dDict objectForKey:kPainDiscomfort] != (id)[NSNull null]) {
-        painDiscomfortRow.value = [self getEq5dOptionsFromNumber:eq5dDict[kPainDiscomfort]];
+        painDiscomfortRow.value = [self getPainDiscomfortFromNumber:eq5dDict[kPainDiscomfort]];
     }
     
     [section addFormRow:painDiscomfortRow];
@@ -2333,7 +2336,7 @@ typedef enum formName {
     [section addFormRow:row];
 
     
-    XLFormRowDescriptor *noDiscloseIncomeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiscloseIncome rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Are you ok with telling me how much your household earns every month? (Ask about resident's monthly household income)"];
+    XLFormRowDescriptor *noDiscloseIncomeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDiscloseIncome rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Are you okay with telling me how much your household earns every month? (Ask about resident's monthly household income)"];
     if (financeHistDict != (id)[NSNull null] && [financeHistDict objectForKey:kDiscloseIncome] != (id)[NSNull null]) noDiscloseIncomeRow.value = [self getYesNoFromOneZero:financeHistDict[kDiscloseIncome]];
     noDiscloseIncomeRow.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:noDiscloseIncomeRow];
@@ -2372,7 +2375,7 @@ typedef enum formName {
     noOfPplInHouse.required = NO;
     [section addFormRow:noOfPplInHouse];
     
-    XLFormRowDescriptor *avgIncomePerHead = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgIncomePerHead rowType:XLFormRowDescriptorTypeDecimal title:@"Resident's household monthly income"];   //auto-calculate
+    XLFormRowDescriptor *avgIncomePerHead = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgIncomePerHead rowType:XLFormRowDescriptorTypeDecimal title:@"Resident's household monthly income in S$"];   //auto-calculate
     
     //value
     if (financeHistDict != (id)[NSNull null] && financeHistDict[avgIncomePerHead] != (id) [NSNull null])
@@ -3373,6 +3376,10 @@ typedef enum formName {
 //        [self postSingleFieldWithSection:SECTION_HEALTHCARE_BARRIERS andFieldName:kWhyNotFollowUp andNewContent:newValue];
 //    }
     
+    /* Surgery */
+    else if ([rowDescriptor.tag isEqualToString:kHadSurgery]) {
+        [self postSingleFieldWithSection:SECTION_SURGERY andFieldName:kHadSurgery andNewContent:ansFromYesNo];
+    }
     
     /* Diet History */
     else if ([rowDescriptor.tag isEqualToString:kAlcohol]) {
@@ -3628,9 +3635,9 @@ typedef enum formName {
     }
     
     /* Surgery */
-    else if ([rowDescriptor.tag isEqualToString:kHadSurgery]) {
-        [self postSingleFieldWithSection:SECTION_SURGERY andFieldName:kHadSurgery andNewContent:rowDescriptor.value];
-    }
+//    else if ([rowDescriptor.tag isEqualToString:kHadSurgery]) {
+//        [self postSingleFieldWithSection:SECTION_SURGERY andFieldName:kHadSurgery andNewContent:ansfrom];
+//    }
     
     /* Healthcare Barriers */
     else if ([rowDescriptor.tag isEqualToString:kHCBRemarks]) {
@@ -3824,6 +3831,8 @@ typedef enum formName {
                 break;
             case Hypertension: fieldName = kCheckHypertension;
                 break;
+            case Stroke: fieldName = kCheckStroke;
+                break;
             case Others: fieldName = kCheckMedicalHistory;
                 break;
             case Surgery: fieldName = kCheckSurgery;
@@ -3910,6 +3919,8 @@ typedef enum formName {
             case Hyperlipidemia: fieldName = kCheckHyperlipidemia;
                 break;
             case Hypertension: fieldName = kCheckHypertension;
+                break;
+            case Stroke: fieldName = kCheckStroke;
                 break;
             case Others: fieldName = kCheckMedicalHistory;
                 break;
@@ -4309,9 +4320,19 @@ typedef enum formName {
     else if ([options isEqualToString:@"1"]) return @"1 Slight problem";
     else if ([options isEqualToString:@"2"]) return @"2 Moderate problem";
     else if ([options isEqualToString:@"3"]) return @"3 Severe problem";
-    else if ([options isEqualToString:@"4"]) return @"4 Completed unable to do so";
+    else if ([options isEqualToString:@"4"]) return @"4 Completely unable to do so";
     else return @"0 No problem";
 }
+
+- (NSString *) getPainDiscomfortFromNumber: (NSString *) options {
+    if ([options isEqualToString:@"0"]) return @"0 No pain/discomfort";
+    else if ([options isEqualToString:@"1"]) return @"1 Slight pain/discomfort";
+    else if ([options isEqualToString:@"2"]) return @"2 Moderate pain/discomfort";
+    else if ([options isEqualToString:@"3"]) return @"3 Severe pain/discomfort";
+    else if ([options isEqualToString:@"4"]) return @"4 Extreme pain/discomfort";
+    else return @"0 No problem";
+}
+
 
 - (NSString *) getLonelinessOptionsFromNumber: (NSNumber *) options {
     if ([options isEqualToNumber:@0]) return @"0 Hardly ever";

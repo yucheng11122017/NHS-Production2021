@@ -15,12 +15,12 @@
 #import "math.h"
 #import "AFNetworking.h"
 
-//XLForms stuffs
-#import "XLForm.h"
-
-#define GREEN_COLOR [UIColor colorWithRed:88.0/255.0 green:214.0/255.0 blue:141.0/255.0 alpha:1.0]
+//XLForms stuffs.0 blue:141.0/255.0 alpha:1.0]
 #define RESI_PART_SECTION @"resi_particulars"
 
+#import "XLForm.h"
+
+#define GREEN_COLOR [UIColor colorWithRed:48.0/255.0 green:207.0/255.0 blue:1.0/255.0 alpha:1.0]
 
 @interface NewScreeningResidentFormVC () {
     NSString *neighbourhood;
@@ -32,7 +32,9 @@
 }
 
 @property (strong, nonatomic) NSNumber *resident_id;
+@property (strong, nonatomic) NSString *nric;
 @property (strong, nonatomic) NSDictionary *oldRecordDictionary;
+@property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
 
 @end
 
@@ -56,7 +58,7 @@
     
     status = [reachability currentReachabilityStatus];
     [self processConnectionStatus];
-    
+    _pushPopTaskArray = [[NSMutableArray alloc] init];
     
     //must init first before [super viewDidLoad]
     form = [self initNewResidentForm];
@@ -280,7 +282,7 @@
     
     XLFormRowDescriptor *writtenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWrittenLang rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Written Language"];
     writtenLangRow.required = YES;
-    writtenLangRow.selectorOptions = @[@"English", @"Chinese", @"Malay", @"Tamil"];
+    writtenLangRow.selectorOptions = @[@"English", @"Chinese", @"Malay", @"Tamil", @"Nil"];
     [self setDefaultFontWithRow:writtenLangRow];
     [section addFormRow:writtenLangRow];
     
@@ -724,7 +726,7 @@
             if ([newValue isEqualToString:@"No"]) {
                 NSDictionary *dict =  [self.form formValues];
                 
-                if ([dict objectForKey:kWantFreeBt] == (id)[NSNull null] || [dict objectForKey:kSporeanPr] == (id)[NSNull null] || [dict objectForKey:kIsPr] == (id)[NSNull null] || [dict objectForKey:kAgeCheck] == (id)[NSNull null] || [dict objectForKey:kChronicCond] == (id)[NSNull null]) {
+                if ([dict objectForKey:kWantFreeBt] == (id)[NSNull null] || [dict objectForKey:kSporeanPr] == (id)[NSNull null] || [dict objectForKey:kIsPr] == (id)[NSNull null] || [dict objectForKey:kAgeCheck] == (id)[NSNull null] || [dict objectForKey:kChronicCond] == (id)[NSNull null] || [dict objectForKey:kRegFollowup] == (id)[NSNull null]) {
                     eligibleBTRow.value = @"No";
                     [self reloadFormRow:eligibleBTRow];
                     return;
@@ -1179,6 +1181,7 @@
     
     //        name = fields[kName];
     nric = fields[kNRIC];
+    self.nric = fields[kNRIC];
     
     /** Replaced after 2.0.3093 */
     birthDate = fields[kBirthDate];
@@ -1283,7 +1286,7 @@
     
     if (![neighbourhood containsString:@"Kampong"] && [gender isEqualToString:@"F"]) {   //only applicable to lengkok bahru ppl, and must be ladies
         // **** MAMMOGRAM INTEREST **** //
-        NSDictionary *dict6 = @{kMammogramInterest:[fields objectForKey:kMammogramInterest]};
+        NSDictionary *dict6 = @{kMammogramInterest:[self getOneZerofromYesNo:[fields objectForKey:kMammogramInterest]]};
         finalDict = @{@"resi_particulars": dict,
                       @"phlebotomy_eligibility_assmt": dict2,
                       @"mode_of_screening":dict3,
@@ -1387,10 +1390,8 @@
 }
 
 - (void) uploadSignatureIfAny {
-    
+    NSArray *signatureKeys = @[SCREENING_PARTICIPANT_SIGNATURE, SCREENING_CONSENT_TAKER_SIGNATURE, RESEARCH_PARTICIPANT_6_PTS_SIGNATURE, RESEARCH_WITNESS_SIGNATURE];
     if (![self hasSignature]) {
-        
-        NSArray *signatureKeys = @[SCREENING_PARTICIPANT_SIGNATURE, SCREENING_CONSENT_TAKER_SIGNATURE, RESEARCH_PARTICIPANT_6_PTS_SIGNATURE, RESEARCH_WITNESS_SIGNATURE];
         
         for (NSString *key in signatureKeys) {
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
@@ -1403,25 +1404,68 @@
         }];
     } else {
         NSLog(@"Got signature!");
-        
-        NSString *imagePath = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_PARTICIPANT_SIGNATURE];
-        UIImage *image;
-        if (imagePath) {
-            image = [UIImage imageWithData:[NSData dataWithContentsOfFile:imagePath]];
+        for (NSString *key in signatureKeys) {
+            NSString *imagePath = [[NSUserDefaults standardUserDefaults] objectForKey:key];
+            UIImage *image;
+            
+            NSString *fileType;
+            if ([key isEqualToString:SCREENING_PARTICIPANT_SIGNATURE]) fileType = @"resident_sign";
+            else if ([key isEqualToString:SCREENING_CONSENT_TAKER_SIGNATURE]) fileType = @"consent_disclosure";
+            else if ([key isEqualToString:RESEARCH_PARTICIPANT_6_PTS_SIGNATURE]) fileType = @"agree_6_points";
+            else if ([key isEqualToString:RESEARCH_WITNESS_SIGNATURE]) fileType = @"witness_translator";
+            
+            // upload image if exist
+            if (imagePath) {
+                image = [UIImage imageWithData:[NSData dataWithContentsOfFile:imagePath]];
+                [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+                [SVProgressHUD showWithStatus:@"Uploading signature"];
+                [_pushPopTaskArray addObject:@{@"image":image, @"file_type":fileType}];
+                
+                NSLog(@"%@", _pushPopTaskArray);
+                
+                [[ServerComm sharedServerCommInstance] uploadImage:image
+                                                       forResident:self.resident_id
+                                                          withNric:self.nric
+                                                   andWithFileType:fileType
+                                                 withProgressBlock:[self progressBlock]
+                                                 completionHandler:[self successBlock]];
+            }
+            
+
         }
-    
-        [[ServerComm sharedServerCommInstance] uploadImage:image forResident:@21 withNric:@"S4433930G" andWithFileType:@"consent_disclosure" withProgressBlock:[self progressBlock] completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
-            
-            NSLog(@"%@", responseObject);
-            
-            [self dismissViewControllerAnimated:YES completion:^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshScreeningResidentTable"
-                                                                    object:self
-                                                                  userInfo:@{kResidentId:self.resident_id}];
-            }];
-            
-        }];
+        
     }
+}
+
+- (void (^)(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error)) successBlock {
+    return ^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error){
+        NSLog(@"%@", responseObject);
+        
+        if (responseObject != (id)[NSNull null] && [responseObject isKindOfClass:[NSDictionary class]]) {
+            [_pushPopTaskArray removeObjectAtIndex:0];
+            
+            if ([_pushPopTaskArray count] == 0) {
+                [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+                [SVProgressHUD dismiss];
+                
+                [self dismissViewControllerAnimated:YES completion:^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"refreshScreeningResidentTable"
+                                                                        object:self
+                                                                      userInfo:@{kResidentId:self.resident_id}];
+                }];
+            } else {
+                NSDictionary *retryDict = [_pushPopTaskArray firstObject];
+                
+                [[ServerComm sharedServerCommInstance] uploadImage:retryDict[@"image"]
+                                                       forResident:self.resident_id
+                                                          withNric:self.nric
+                                                   andWithFileType:retryDict[@"file_type"]
+                                                 withProgressBlock:[self progressBlock]
+                                                 completionHandler:[self successBlock]];
+                
+            }
+        }
+    };
 }
 
 - (BOOL) hasSignature {
@@ -1448,13 +1492,14 @@
 
 - (void (^)(NSURLSessionDataTask *task, id responseObject))personalInfoSuccessBlock {
     return ^(NSURLSessionDataTask *task, id responseObject){
-        NSLog(@"Personal info submission success");
+        
         
         if ([responseObject objectForKey:@"reason"]) {  //if it's not nil (which means there's duplicates)
             [SVProgressHUD setMinimumDismissTimeInterval:1.0];
             [SVProgressHUD showErrorWithStatus:@"This NRIC is already registered!"];
             return;
         }
+        NSLog(@"Personal info submission success");
         
         self.resident_id = [responseObject objectForKey:kResidentId];
         
@@ -1606,41 +1651,6 @@
     return [NSString stringWithFormat:@"%d", blkNo];
 }
 
-//- (void) postSpokenLangWithLangName:(NSString *) language andValue: (NSString *) value {
-//    NSString *fieldName;
-//    if ([language isEqualToString:@"Cantonese"]) fieldName = kLangCanto;
-//    else if ([language isEqualToString:@"English"]) fieldName = kLangEng;
-//    else if ([language isEqualToString:@"Hindi"]) fieldName = kLangHindi;
-//    else if ([language isEqualToString:@"Hokkien"]) fieldName = kLangHokkien;
-//    else if ([language isEqualToString:@"Malay"]) fieldName = kLangMalay;
-//    else if ([language isEqualToString:@"Mandarin"]) fieldName = kLangMandarin;
-//    else if ([language isEqualToString:@"Tamil"]) fieldName = kLangTamil;
-//    else if ([language isEqualToString:@"Teochew"]) fieldName = kLangTeoChew;
-//    else if ([language isEqualToString:@"Others"]) fieldName = kLangOthers;
-//
-    //    [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:fieldName andNewContent:value];
-//}
-
-//- (NSDictionary *) addLangFieldsIfAny: (NSDictionary *) dict {
-//
-//    NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] init];
-//    mutDict = [dict mutableCopy];
-//
-//    NSArray *languageArr = [[self.form formValues] objectForKey:kSpokenLang];
-//
-//    if (languageArr != nil && [languageArr count] > 0) {
-//        if ([languageArr containsObject:@"Cantonese"]) [mutDict setObject:@"1" forKey:kLangCanto];
-//        if ([languageArr containsObject:@"English"]) [mutDict setObject:@"1" forKey:kLangEng];
-//        if ([languageArr containsObject:@"Hindi"]) [mutDict setObject:@"1" forKey:kLangHindi];
-//        if ([languageArr containsObject:@"Hokkien"]) [mutDict setObject:@"1" forKey:kLangHokkien];
-//        if ([languageArr containsObject:@"Malay"]) [mutDict setObject:@"1" forKey:kLangMalay];
-//        if ([languageArr containsObject:@"Mandarin"]) [mutDict setObject:@"1" forKey:kLangMandarin];
-//        if ([languageArr containsObject:@"Tamil"]) [mutDict setObject:@"1" forKey:kLangTamil];
-//        if ([languageArr containsObject:@"Teochew"]) [mutDict setObject:@"1" forKey:kLangTeoChew];
-//    }
-//
-//    return mutDict;
-//}
 
 - (NSDictionary *) addAddressOthersIfAny: (NSDictionary *) dict {
     
@@ -1713,48 +1723,6 @@
     
 }
 
-//- (void) checkPostcodeWithRefTable: (XLFormRowDescriptor *) rowDescriptor {
-//    NSString *blkNo, *roadName, *supposedPostcode;
-//    if ([street isEqualToString:@"Others"]) {
-//        blkNo = [[self.form formValues] objectForKey:kAddressOthersBlock];
-//        roadName = [[self.form formValues] objectForKey:kAddressOthersRoadName];
-//    } else {
-//        blkNo = block;
-//        roadName = street;
-//    }
-//
-//    if ([[roadName uppercaseString] containsString:@"JLN BT MERAH"] || [[roadName uppercaseString] containsString:@"JALAN BUKIT MERAH"]) {
-//        if (blkNo.length == 1) supposedPostcode = [@"15000" stringByAppendingString:blkNo];
-//        if (blkNo.length == 2) supposedPostcode = [@"1500" stringByAppendingString:blkNo];
-//    } else if ([[roadName uppercaseString] containsString:@"RUMAH TINGGI"]) {
-//        if (blkNo.length == 1) supposedPostcode = [@"15000" stringByAppendingString:blkNo];
-//        if (blkNo.length == 2) supposedPostcode = [@"1500" stringByAppendingString:blkNo];
-//
-//        if ([blkNo isEqualToString:@"39"] || [blkNo isEqualToString:@"40"]) supposedPostcode = [supposedPostcode stringByReplacingOccurrencesOfString:@"150" withString:@"151"];
-//    } else if ([[roadName uppercaseString] containsString:@"LENGKOK BAHRU"]) {
-//        if (blkNo.length == 2) supposedPostcode = [@"1500" stringByAppendingString:blkNo];
-//        else if ([blkNo containsString:@"63A"]) supposedPostcode = @"151063";
-//        else if ([blkNo containsString:@"63B"]) supposedPostcode = @"152063";
-//
-//        if ([blkNo isEqualToString:@"47"] || [blkNo isEqualToString:@"48"] || [blkNo isEqualToString:@"55"] || [blkNo isEqualToString:@"57"]) supposedPostcode = [supposedPostcode stringByReplacingOccurrencesOfString:@"150" withString:@"151"];
-//    } else if ([[roadName uppercaseString] containsString:@"HOY FATT ROAD"]) {
-//        if ([blkNo containsString:@"28"]) supposedPostcode = @"151028";
-//        else if ([blkNo containsString:@"49"]) supposedPostcode = @"150049";
-//        else if ([blkNo containsString:@"50"]) supposedPostcode = @"150050";
-//    } else if ([[roadName uppercaseString] containsString:@"BT MERAH LANE 1"] || [[roadName uppercaseString] containsString:@"BUKIT MERAH LANE 1"]) {
-//        if ([blkNo containsString:@"119"]) supposedPostcode = @"151119";
-//        else {
-//            supposedPostcode = [@"150" stringByAppendingString:blkNo];
-//        }
-//    }
-//
-//    if ([rowDescriptor.value isEqualToString:supposedPostcode]) {
-//        NSLog(@"Correct postcode!");
-//    } else {
-//        NSLog(@"Please verify that the postcode is CORRECT!");
-//    }
-//}
-
 - (NSString *) replaceShortForms: (NSString *) originalString {
     NSString *pattern_rd = @"\\bRD\\b";
     NSString *pattern_ave = @"\\bAVE\\b";
@@ -1792,29 +1760,5 @@
     }
     return @"0";
 }
-
-//- (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
-//    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
-//
-//    if([[dictionary objectForKey:kLangCanto] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
-//    if([[dictionary objectForKey:kLangEng] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
-//    if([[dictionary objectForKey:kLangHindi] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
-//    if([[dictionary objectForKey:kLangHokkien] isEqual:@(1)]) [spokenLangArray addObject:@"Hokkien"];
-//    if([[dictionary objectForKey:kLangMalay] isEqual:@(1)]) [spokenLangArray addObject:@"Malay"];
-//    if([[dictionary objectForKey:kLangMandarin] isEqual:@(1)]) [spokenLangArray addObject:@"Mandarin"];
-//    if([[dictionary objectForKey:kLangOthers] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
-//    if([[dictionary objectForKey:kLangTamil] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
-//    if([[dictionary objectForKey:kLangTeoChew] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
-//    return spokenLangArray;
-//}
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
 
 @end

@@ -19,7 +19,10 @@
 //XLForms stuffs
 #import "XLForm.h"
 
-#define GREEN_COLOR [UIColor colorWithRed:88.0/255.0 green:214.0/255.0 blue:141.0/255.0 alpha:1.0]
+#define GREEN_COLOR [UIColor colorWithRed:48.0/255.0 green:207.0/255.0 blue:1.0/255.0 alpha:1.0]
+#define FADED_GREEN_COLOR [UIColor colorWithRed:141.0/255.0 green:255.0/255.0 blue:113.0/255.0 alpha:1.0]
+#define FADED_ORANGE_COLOR [UIColor colorWithRed:255.0/255.0 green:175.0/255.0 blue:113.0/255.0 alpha:1.0]
+#define FADED_RED_COLOR [UIColor colorWithRed:255.0/255.0 green:113.0/255.0 blue:113.0/255.0 alpha:1.0]
 
 typedef enum getDataState {
     inactive,
@@ -52,12 +55,13 @@ typedef enum rowTypes {
     NetworkStatus status;
     int fetchDataState;
     NSString *block, *street;
-    UIColor *screeningSignColor, *researchSignColor;
+    UIColor *screeningSignColor, *screeningSignDisabledColor, *researchSignColor, *researchSignDisabledColor;
 }
 
 //@property (strong, nonatomic) NSMutableDictionary *resiPartiDict;
 @property (strong, nonatomic) NSNumber *resident_id;
 @property (strong, nonatomic) NSMutableArray *pushPopTaskArray;
+@property (strong, nonatomic) NSMutableArray *signaturePresentArray;
 
 @end
 
@@ -83,6 +87,9 @@ typedef enum rowTypes {
     [self processConnectionStatus];
     
     //must init first before [super viewDidLoad]
+    self.signaturePresentArray = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0, nil];
+    [self checkIfSignatureExist];
+    
     form = [self initResidentParticularsForm];
     [self.form setAddAsteriskToRequiredRowsTitle: YES];
     [self.form setAssignFirstResponderOnShow:NO];       //disable the feature of Keyboard always auto show.
@@ -301,7 +308,7 @@ typedef enum rowTypes {
     
     XLFormRowDescriptor *writtenLangRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWrittenLang rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Written Language"];
     writtenLangRow.required = YES;
-    writtenLangRow.selectorOptions = @[@"English", @"Chinese", @"Malay", @"Tamil"];
+    writtenLangRow.selectorOptions = @[@"English", @"Chinese", @"Malay", @"Tamil", @"Nil"];
     [self setDefaultFontWithRow:writtenLangRow];
     
     if ([_residentParticularsDict objectForKey:kWrittenLang] != (id)[NSNull null] && [_residentParticularsDict objectForKey:kWrittenLang]) {
@@ -1139,14 +1146,18 @@ typedef enum rowTypes {
                 [self reloadFormRow:rowDescriptor];
                 
                 NSString *dobString = [NSString stringWithFormat:@"%@", rowDescriptor.value];
-                NSString *birthDate = [self reorderDateString:dobString];
-                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:birthDate];
+//                NSString *birthDate = [self reorderDateString:dobString];
+                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:rowDescriptor.tag andNewContent:dobString];
+
                 
-                NSString *yearOfBirth = [NSString stringWithFormat:@"%@", [dobString substringFromIndex:4]];  //format: DDMMYYYY
+                NSString *yearOfBirth = [NSString stringWithFormat:@"%@", [dobString substringWithRange:NSMakeRange(0, 4)]];  //format: YYYY-MM-dd
                 NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
                 [dateFormatter setDateFormat:@"yyyy"];
                 NSString *thisYear = [dateFormatter stringFromDate:[NSDate date]];
                 NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
+                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:@"yyyy" andNewContent:yearOfBirth];
+                [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kAge andNewContent:[NSString stringWithFormat:@"%li", age]];
+                
                 NSLog(@"%li", (long)age);
                 ageRow.value = [NSNumber numberWithLong:age];
                 [self reloadFormRow:ageRow];
@@ -1210,7 +1221,7 @@ typedef enum rowTypes {
 -(void)formRowDescriptorValueHasChanged:(XLFormRowDescriptor *)rowDescriptor oldValue:(id)oldValue newValue:(id)newValue
 {
     [super formRowDescriptorValueHasChanged:rowDescriptor oldValue:oldValue newValue:newValue];
-    NSString* ansFromGender;
+    NSString* ansFromGender, *ansFromYesNo;
     
     
     if (newValue != (id)[NSNull null] && [newValue isKindOfClass:[NSString class]]) {
@@ -1218,6 +1229,13 @@ typedef enum rowTypes {
             ansFromGender = @"M";
         else if ([newValue isEqualToString:@"Female"])
             ansFromGender = @"F";
+    }
+    
+    if (newValue != (id)[NSNull null] && [newValue isKindOfClass:[NSString class]]) {
+        if ([newValue isEqualToString:@"Yes"])
+            ansFromYesNo = @"1";
+        else if ([newValue isEqualToString:@"No"])
+            ansFromYesNo = @"0";
     }
     
     if ([rowDescriptor.tag isEqualToString:kGender]) {
@@ -1269,7 +1287,7 @@ typedef enum rowTypes {
         [self postSingleFieldWithSection:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT andFieldName:kDidPhleb andNewContent:newValue];
     }
     else if ([rowDescriptor.tag isEqualToString:kMammogramInterest]) {
-        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_INTEREST andFieldName:kMammogramInterest andNewContent:newValue];
+        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_INTEREST andFieldName:kMammogramInterest andNewContent:ansFromYesNo];
     }
     else if ([rowDescriptor.tag isEqualToString:kScreenMode]) {
         [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kScreenMode andNewContent:newValue];
@@ -1380,7 +1398,7 @@ typedef enum rowTypes {
 - (BOOL) isDobValid: (NSString *) dobString {
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"ddMMYYYY";
+    dateFormatter.dateFormat = @"YYYY-MM-dd";
     dateFormatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];  //otherwise 1st Jan will not be able to be read.
     NSDate *date = [dateFormatter dateFromString:dobString];
     
@@ -1876,6 +1894,26 @@ typedef enum rowTypes {
     return [UIFont fontWithDescriptor:fontD size:0];
 }
 
+
+#pragma mark - Others
+- (void) checkIfSignatureExist {
+    if (_signImagesArray != (id)[NSNull null]) {
+        if ([_signImagesArray count] > 0) {
+            for (NSDictionary *dict in _signImagesArray){
+                if ([[dict objectForKey:@"file_type"] isEqualToString:@"resident_sign"]) {
+                    [_signaturePresentArray replaceObjectAtIndex:0 withObject:@1];
+                } else if ([[dict objectForKey:@"file_type"] isEqualToString:@"consent_disclosure"]) {
+                    [_signaturePresentArray replaceObjectAtIndex:1 withObject:@1];
+                } else if ([[dict objectForKey:@"file_type"] isEqualToString:@"agree_6_points"]) {
+                    [_signaturePresentArray replaceObjectAtIndex:2 withObject:@1];
+                } else if ([[dict objectForKey:@"file_type"] isEqualToString:@"witness_translator"]) {
+                    [_signaturePresentArray replaceObjectAtIndex:3 withObject:@1];
+                }
+            }
+        }
+    }
+
+}
 - (void) updateSignatureButtonColors {
 
     NSString *str1 = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_PARTICIPANT_SIGNATURE];
@@ -1883,35 +1921,46 @@ typedef enum rowTypes {
     NSString *str3 = [[NSUserDefaults standardUserDefaults] objectForKey:RESEARCH_PARTICIPANT_6_PTS_SIGNATURE];
     NSString *str4 = [[NSUserDefaults standardUserDefaults] objectForKey:RESEARCH_WITNESS_SIGNATURE];
     
-    if (str1 != nil) {
-        if (str2 != nil) {
+    if (str1 != nil || [[_signaturePresentArray objectAtIndex:0] isEqualToNumber:@1]) {
+        if (str2 != nil || [[_signaturePresentArray objectAtIndex:1] isEqualToNumber:@1]) {
             screeningSignColor = GREEN_COLOR;
+            screeningSignDisabledColor = FADED_GREEN_COLOR;
         } else {
             screeningSignColor = [UIColor orangeColor];
+            screeningSignDisabledColor = FADED_ORANGE_COLOR;
         }
     } else {
-        if (str2 != nil) {
+        if (str2 != nil || [[_signaturePresentArray objectAtIndex:1] isEqualToNumber:@1]) {
             screeningSignColor = [UIColor orangeColor];
+            screeningSignDisabledColor = FADED_ORANGE_COLOR;
         } else {
             screeningSignColor = [UIColor redColor];
+            screeningSignDisabledColor = FADED_RED_COLOR;
         }
     }
     
-    if (str3 != nil) {
-        if (str4 != nil) {
+    if (str3 != nil || [[_signaturePresentArray objectAtIndex:2] isEqualToNumber:@1]) {
+        if (str4 != nil || [[_signaturePresentArray objectAtIndex:3] isEqualToNumber:@1]) {
             researchSignColor = GREEN_COLOR;
+            researchSignDisabledColor = FADED_GREEN_COLOR;
         } else {
             researchSignColor = [UIColor orangeColor];
+            researchSignDisabledColor = FADED_ORANGE_COLOR;
         }
     } else {
-        if (str4 != nil) {
+        if (str4 != nil || [[_signaturePresentArray objectAtIndex:3] isEqualToNumber:@1]) {
             researchSignColor = [UIColor orangeColor];
+            researchSignDisabledColor = FADED_ORANGE_COLOR;
         } else {
             researchSignColor = [UIColor redColor];
+            researchSignDisabledColor = FADED_RED_COLOR;
         }
     }
     screeningSignButtonRow.cellConfig[@"backgroundColor"] = screeningSignColor;
+    screeningSignButtonRow.cellConfigIfDisabled[@"backgroundColor"] = screeningSignDisabledColor;
     researchSignButtonRow.cellConfig[@"backgroundColor"] = researchSignColor;
+    researchSignButtonRow.cellConfigIfDisabled[@"backgroundColor"] = researchSignDisabledColor;
+    
     [self reloadFormRow:screeningSignButtonRow];
     [self reloadFormRow:researchSignButtonRow];
     

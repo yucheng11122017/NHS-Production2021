@@ -55,6 +55,7 @@ typedef enum Category {
 @property (nonatomic) Reachability *hostReachability;
 
 @property BOOL consentImgExist;
+@property BOOL waitFlag;
 
 @end
 
@@ -109,6 +110,7 @@ typedef enum Category {
                                              selector:@selector(refreshScreeningResidentTable:)
                                                  name:@"refreshScreeningResidentTable"
                                                object:nil];
+
     
     _resultsTableController = [[SearchResultsTableController alloc] init];
     _searchController = [[UISearchController alloc] initWithSearchResultsController:self.resultsTableController];
@@ -134,6 +136,7 @@ typedef enum Category {
     self.navigationItem.title = @"Full List of Residents";
     [super viewWillAppear:animated];
     
+    [self deleteAllImages];
     [self refreshConnectionAndTable];
     
 }
@@ -146,6 +149,45 @@ typedef enum Category {
 - (void) refreshConnectionAndTable {
     status = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus];
     [self processConnectionStatus];
+}
+
+- (void) deleteAllImages {
+    // Saved locally ones
+    NSArray *signatureKeys = @[SCREENING_PARTICIPANT_SIGNATURE, SCREENING_CONSENT_TAKER_SIGNATURE, RESEARCH_PARTICIPANT_6_PTS_SIGNATURE, RESEARCH_WITNESS_SIGNATURE];
+    
+    for (NSString *key in signatureKeys) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
+    }   //clear all the signatures before leaving this page.
+    
+    // Downloaded ones
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    if ([paths count] != 0)
+    {
+        NSError *error = nil;
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        
+        // Print out the path to verify we are in the right place
+        NSString *directory = [paths objectAtIndex:0];
+        NSLog(@"Directory: %@", directory);
+        
+        // For each file in the directory, create full path and delete the file
+        for (NSString *file in [fileManager contentsOfDirectoryAtPath:directory error:&error])
+        {
+            NSString *filePath = [directory stringByAppendingPathComponent:file];
+            if (![filePath.pathExtension isEqualToString:@"png"]) continue; //only delete PNG files
+            NSLog(@"File : %@", filePath);
+            
+            BOOL fileDeleted = [fileManager removeItemAtPath:filePath error:&error];
+            
+            if (fileDeleted != YES || error != nil)
+            {
+                // Deal with the error...
+            } else {
+                NSLog(@"DELETED");
+            }
+        }
+        
+    }
 }
 
 
@@ -992,6 +1034,7 @@ typedef enum Category {
 }
 
 
+
 #pragma mark - For Dev Testing
 - (void) generateFakePatient {
     int i;
@@ -1113,7 +1156,6 @@ typedef enum Category {
     NSInteger age = [thisYear integerValue] - [yearOfBirth integerValue];
     
     
-//    [[NSUserDefaults standardUserDefaults] setObject:_sampleResidentDict[kGender] forKey:kGender];
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:age] forKey:kResidentAge];
     [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kResidentId] forKey:kResidentId];
     [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kScreenLocation] forKey:kNeighbourhood];
@@ -1136,6 +1178,7 @@ typedef enum Category {
     if (particularsDict[kNhsSerialNum] != (id) [NSNull null])
         [[NSUserDefaults standardUserDefaults] setObject:particularsDict[kNhsSerialNum] forKey:kNhsSerialNum];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    
 }
 
 #pragma mark - Navigation

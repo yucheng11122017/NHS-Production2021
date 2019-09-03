@@ -492,7 +492,7 @@ typedef enum sectionRowNumber {
                 return @0;
         }
     }
-    if (count == 8) return @1;
+    if (count == 9) return @1;
     else return @0;
 }
 
@@ -593,7 +593,7 @@ typedef enum sectionRowNumber {
                 return @0;
         }
     }
-    if (count == 2) return @1;
+    if (count == 3) return @1;
     else return @0;
 }
 

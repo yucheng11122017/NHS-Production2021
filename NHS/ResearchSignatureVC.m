@@ -8,6 +8,8 @@
 
 #import "ResearchSignatureVC.h"
 #import "AppConstants.h"
+#import "ServerComm.h"
+#import "KAStatusBar.h"
 
 @interface ResearchSignatureVC () {
     NSNumber *index;
@@ -102,13 +104,42 @@
     self.signature2ImageView.image = nil;
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:RESEARCH_PARTICIPANT_6_PTS_SIGNATURE];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:RESEARCH_WITNESS_SIGNATURE];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *downloadedImage1Path = [documentsDirectory stringByAppendingPathComponent:@"agree_6_points.png"];
+    NSString *downloadedImage2Path = [documentsDirectory stringByAppendingPathComponent:@"witness_translator.png"];
     
+    NSError *error;
+    BOOL fileDeleted = [[NSFileManager defaultManager] removeItemAtPath:downloadedImage1Path error:&error];
+    if (!fileDeleted) {
+        NSLog(@"%@ doesn't exist!", downloadedImage1Path.lastPathComponent);
+    }
+    
+    fileDeleted = [[NSFileManager defaultManager] removeItemAtPath:downloadedImage2Path error:&error];
+    if (!fileDeleted) {
+        NSLog(@"%@ doesn't exist!", downloadedImage2Path.lastPathComponent);
+    }
 }
 
 - (void) loadImageIfAny {
-    NSString *imagePath1 = [[NSUserDefaults standardUserDefaults] objectForKey:RESEARCH_PARTICIPANT_6_PTS_SIGNATURE];
-    if (imagePath1) {
-        _signature1ImageView.image = [UIImage imageWithData:[NSData dataWithContentsOfFile:imagePath1]];
+    NSString *imageDataPath1 = [[NSUserDefaults standardUserDefaults] objectForKey:RESEARCH_PARTICIPANT_6_PTS_SIGNATURE];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
+    NSString *downloadedImage1Path = [documentsDirectory stringByAppendingPathComponent:@"agree_6_points.png"];
+    NSData *imgData1 = [NSData dataWithContentsOfFile:downloadedImage1Path];
+    UIImage *thumbNail1 = [[UIImage alloc] initWithData:imgData1];
+    
+    NSString *downloadedImage2Path = [documentsDirectory stringByAppendingPathComponent:@"witness_translator.png"];
+    NSData *imgData2 = [NSData dataWithContentsOfFile:downloadedImage2Path];
+    UIImage *thumbNail2 = [[UIImage alloc] initWithData:imgData2];
+    
+    if (imageDataPath1) {
+        _signature1ImageView.image = [UIImage imageWithData:[NSData dataWithContentsOfFile:imageDataPath1]];
+        _insertSignature1Btn.hidden = true;
+    } else if (thumbNail1) {
+        _signature1ImageView.image = thumbNail1;
         _insertSignature1Btn.hidden = true;
     }
     
@@ -116,20 +147,50 @@
     if (imagePath2) {
         _signature2ImageView.image = [UIImage imageWithData:[NSData dataWithContentsOfFile:imagePath2]];
         _insertSignature2Btn.hidden = true;
+    } else if (thumbNail2) {
+        _signature2ImageView.image = thumbNail2;
+        _insertSignature2Btn.hidden = true;
     }
 }
 
 //implementation of delegate method
 - (void)processCompleted:(UIImage*)signImage withIndex: (NSNumber *)index
 {
+    NSString *nric = [[NSUserDefaults standardUserDefaults] objectForKey:kNRIC];
+    NSNumber *residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId];
+    
     if ([index isEqualToNumber:@1]) {
         _insertSignature1Btn.hidden = YES;
         _signature1ImageView.image = signImage;
         [self saveImageInDirectory: signImage withIdentifier: RESEARCH_PARTICIPANT_6_PTS_SIGNATURE];
+        
+        if (residentID != nil) {
+            [[ServerComm sharedServerCommInstance] uploadImage:signImage forResident:residentID withNric:nric andWithFileType:@"agree_6_points" withProgressBlock:^(NSProgress *downloadProgress) {
+                // do nothing here
+            } completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+                NSLog(@"ResponseObject: %@", responseObject);
+                
+                if (responseObject != (id)[NSNull null] && [[responseObject objectForKey:@"success"] isEqualToNumber:@1]) {
+                    [KAStatusBar showWithStatus:@"Signature uploaded!" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+                }
+            }];
+        }
     } else {
         _insertSignature2Btn.hidden = YES;
         _signature2ImageView.image = signImage;
         [self saveImageInDirectory: signImage withIdentifier: RESEARCH_WITNESS_SIGNATURE];
+        
+        if (residentID != nil) {
+            [[ServerComm sharedServerCommInstance] uploadImage:signImage forResident:residentID withNric:nric andWithFileType:@"witness_translator" withProgressBlock:^(NSProgress *downloadProgress) {
+                // do nothing
+            } completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+                NSLog(@"ResponseObject: %@", responseObject);
+                
+                if (responseObject != (id)[NSNull null] && [[responseObject objectForKey:@"success"] isEqualToNumber:@1]) {
+                    [KAStatusBar showWithStatus:@"Signature uploaded!" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
+                }
+            }];
+        }
     }
 }
 

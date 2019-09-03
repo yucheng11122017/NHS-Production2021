@@ -22,7 +22,7 @@
 #define USERNAME_TEXTFIELD_TAG 3
 #define PASSWORD_TEXTFIELD_TAG 4
 
-//#define DEVELOPMENT_PHASE 1
+#define DEVELOPMENT_PHASE 1
 
 @interface LoginViewController () {
     NSNumber *isComm;

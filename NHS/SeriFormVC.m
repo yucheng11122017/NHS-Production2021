@@ -460,7 +460,7 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Right Eye"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR1 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR1 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -470,7 +470,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR2 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR2 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -480,7 +480,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR3 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 3: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR3 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Right Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -490,7 +490,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR4 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 4: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR4 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Right Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -500,7 +500,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR5 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 5: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR5 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Right Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -510,7 +510,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR1 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR1 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -520,7 +520,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR2 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR2 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -530,7 +530,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR3 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 3: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR3 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Right Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -540,7 +540,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR4 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 4: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR4 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Right Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -549,7 +549,7 @@ typedef enum formName {
         row.value = autoRefractorDict[kCylRightR4];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR5 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 5: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR5 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Right Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -671,7 +671,7 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Left Eye"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR1 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR1 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -681,7 +681,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR2 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR2 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -691,7 +691,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR3 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 3: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR3 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Left Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -701,7 +701,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR4 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 4: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR4 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Left Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -711,7 +711,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR5 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 5: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR5 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Left Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -721,7 +721,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR1 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR1 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -731,7 +731,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR2 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR2 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -741,7 +741,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR3 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 3: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR3 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Left Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -751,7 +751,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR4 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 4: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR4 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Left Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];    //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylLeftR4] != (id)[NSNull null])
@@ -759,7 +759,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR5 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 5: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR5 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Left Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -881,7 +881,7 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPupilDist rowType:XLFormRowDescriptorTypeNumber title:@"Pupillary Distance: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPupilDist rowType:XLFormRowDescriptorTypeDecimal title:@"Pupillary Distance: "];
     [self setDefaultFontWithRow:row];
     
     //value
@@ -1248,7 +1248,7 @@ typedef enum formName {
     eyeSpecRefRow.noValueDisplayText = @"Tap here";
     eyeSpecRefRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:eyeSpecRefRow];
-    eyeSpecRefRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Referral to eye-specialist'", followUpRow];
+    eyeSpecRefRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Referral to eye specialist'", followUpRow];
     
     //value
     if (diagFollowUpDict != (id)[NSNull null] && [diagFollowUpDict objectForKey:kEyeSpecRef] != (id)[NSNull null])
@@ -1256,7 +1256,7 @@ typedef enum formName {
     
     [section addFormRow:eyeSpecRefRow];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNonUrgentRefMths rowType:XLFormRowDescriptorTypeNumber title:@"Non-urgent referral: ___ months"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kNonUrgentRefMths rowType:XLFormRowDescriptorTypeDecimal title:@"Non-urgent referral: ___ months"];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     [self setDefaultFontWithRow:row];
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Non-urgent'", eyeSpecRefRow];
@@ -1278,7 +1278,7 @@ typedef enum formName {
     
     if ([[ResidentProfile sharedManager] canReceiveSpecVoucher]) {
         givenVoucherRow.disabled = @0;
-//        givenVoucherRow.required = YES;
+        givenVoucherRow.required = YES;
     } else {
         givenVoucherRow.disabled = @1;
         givenVoucherRow.required = NO;
@@ -1615,17 +1615,69 @@ typedef enum formName {
         [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kCylRightR4 andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kCylRightR5]) {
         [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kCylRightR5 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kAxisRightR1]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisRightR1 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kAxisRightR2]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisRightR2 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kAxisRightR3]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisRightR3 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kAxisRightR4]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisRightR4 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kAxisRightR5]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisRightR5 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kKerMmRightR1]) {
+    } else if ([rowDescriptor.tag containsString:@"axis_"]) {
+        if ([rowDescriptor.value intValue] > 180 || [rowDescriptor.value intValue] < 0) {
+            [self showAlertControllerWithTitle:@"Invalid value" andMessage:@"The value you keyed in is not valid. It must be an integer between 0 to 180."];
+            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:rowDescriptor]];
+            cell.backgroundColor = [UIColor orangeColor];
+            [UIView animateWithDuration:0.3 animations:^{
+                cell.backgroundColor = [UIColor whiteColor];
+            }];
+            
+            return;
+        }
+        
+        // Right Eye
+        if ([rowDescriptor.tag isEqualToString:kAxisRightR1]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisRightR1 andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kAxisRightR2]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisRightR2 andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kAxisRightR3]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisRightR3 andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kAxisRightR4]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisRightR4 andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kAxisRightR5]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisRightR5 andNewContent:rowDescriptor.value];
+        }
+        
+        // Left Eye
+        else if ([rowDescriptor.tag isEqualToString:kAxisLeftR1]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisLeftR1 andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kAxisLeftR2]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisLeftR2 andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kAxisLeftR3]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisLeftR3 andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kAxisLeftR4]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisLeftR4 andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kAxisLeftR5]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisLeftR5 andNewContent:rowDescriptor.value];
+        }
+    }
+    
+    else if ([rowDescriptor.tag containsString:@"ker_ax"]) {
+        if ([rowDescriptor.value intValue] > 180 || [rowDescriptor.value intValue] < 0) {
+            [self showAlertControllerWithTitle:@"Invalid value" andMessage:@"The value you keyed in is not valid. It must be an integer between 0 to 180."];
+            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:rowDescriptor]];
+            cell.backgroundColor = [UIColor orangeColor];
+            [UIView animateWithDuration:0.3 animations:^{
+                cell.backgroundColor = [UIColor whiteColor];
+            }];
+            
+            return;
+        }
+        
+        if ([rowDescriptor.tag isEqualToString:kKerAxRightR1]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerAxRightR1 andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kKerAxRightR2]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerAxRightR2 andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kKerAxLeftR1]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerAxLeftR1 andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kKerAxLeftR2]) {
+            [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerAxLeftR2 andNewContent:rowDescriptor.value];
+        }
+    }
+    
+    else if ([rowDescriptor.tag isEqualToString:kKerMmRightR1]) {
         [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerMmRightR1 andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kKerMmRightR2]) {
         [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerMmRightR2 andNewContent:rowDescriptor.value];
@@ -1633,10 +1685,6 @@ typedef enum formName {
         [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerDioRightR1 andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kKerDioRightR2]) {
         [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerDioRightR2 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kKerAxRightR1]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerAxRightR1 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kKerAxRightR2]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerAxRightR2 andNewContent:rowDescriptor.value];
     }
     
     else if ([rowDescriptor.tag isEqualToString:kSpLeftR1]) {
@@ -1659,16 +1707,6 @@ typedef enum formName {
         [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kCylLeftR4 andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kCylLeftR5]) {
         [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kCylLeftR5 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kAxisLeftR1]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisLeftR1 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kAxisLeftR2]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisLeftR2 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kAxisLeftR3]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisLeftR3 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kAxisLeftR4]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisLeftR4 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kAxisLeftR5]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAxisLeftR5 andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kKerMmLeftR1]) {
         [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerMmLeftR1 andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kKerMmLeftR2]) {
@@ -1681,18 +1719,28 @@ typedef enum formName {
         [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kPupilDist andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kAutorefractorComment]) {
         [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kAutorefractorComment andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kKerAxLeftR1]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerAxLeftR1 andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kKerAxLeftR2]) {
-        [self postSingleFieldWithSection:SECTION_SERI_AUTOREFRACTOR andFieldName:kKerAxLeftR2 andNewContent:rowDescriptor.value];
     }
     
     //Intra-ocular Pressure
-    else if ([rowDescriptor.tag isEqualToString:kIopRight]) {
-        [self postSingleFieldWithSection:SECTION_SERI_IOP andFieldName:kIopRight andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kIopLeft]) {
-        [self postSingleFieldWithSection:SECTION_SERI_IOP andFieldName:kIopLeft andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kIopComment]) {
+    else if ([rowDescriptor.tag isEqualToString:kIopRight] || [rowDescriptor.tag isEqualToString:kIopLeft] ) {
+        if ([rowDescriptor.value intValue] > 55 || [rowDescriptor.value intValue] < 0) {
+            [self showAlertControllerWithTitle:@"Invalid value" andMessage:@"The value you keyed in is not valid. It must be an integer between 0 to 55."];
+            UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:[self.form indexPathOfFormRow:rowDescriptor]];
+            cell.backgroundColor = [UIColor orangeColor];
+            [UIView animateWithDuration:0.3 animations:^{
+                cell.backgroundColor = [UIColor whiteColor];
+            }];
+            
+            return;
+        }
+        
+        if ([rowDescriptor.tag isEqualToString:kIopRight]) {
+            [self postSingleFieldWithSection:SECTION_SERI_IOP andFieldName:kIopRight andNewContent:rowDescriptor.value];
+        } else if ([rowDescriptor.tag isEqualToString:kIopLeft]) {
+            [self postSingleFieldWithSection:SECTION_SERI_IOP andFieldName:kIopLeft andNewContent:rowDescriptor.value];
+        }
+    }
+    else if ([rowDescriptor.tag isEqualToString:kIopComment]) {
         [self postSingleFieldWithSection:SECTION_SERI_IOP andFieldName:kIopComment andNewContent:rowDescriptor.value];
     }
     
