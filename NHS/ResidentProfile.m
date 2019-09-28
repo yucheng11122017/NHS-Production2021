@@ -52,8 +52,60 @@
     return NO;
 }
 
-- (BOOL) isEligiblePhleb {
+- (BOOL) isEligibleFallRiskAssessment {
+    BOOL gotAMT = false;
+    BOOL condition1 = false;
+    BOOL condition2 = false;
+    
     if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
+        if ([_fullDict objectForKey:SECTION_GERIATRIC_DEMENTIA_ASSMT] != (id)[NSNull null]) { //if the section has at least one entry...
+            NSDictionary *dementiaAssmtDict = [_fullDict objectForKey:SECTION_GERIATRIC_DEMENTIA_ASSMT];
+            
+            if ([dementiaAssmtDict objectForKey:kDementiaStatus] != (id)[NSNull null]) {
+                if ([[dementiaAssmtDict objectForKey:kDementiaStatus] isEqualToString:@"Unlikely"]) {
+                    condition2 = true;
+                }
+            }
+            
+            if ([dementiaAssmtDict objectForKey:kAmtScore] != (id)[NSNull null]) {
+                gotAMT = YES;
+                if (!condition2) return true;
+            }
+        }
+        
+        if ([_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE] != (id)[NSNull null]) { //if the section has at least one entry...
+            NSDictionary *fallRiskEligibDict = [_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE];
+            
+            
+            if ([fallRiskEligibDict objectForKey:kFallRiskStatus] != (id)[NSNull null]) {
+                if ([[fallRiskEligibDict objectForKey:kFallRiskStatus] containsString:@"Low"]) {
+                    condition1 = true;
+                    
+                    if (condition1 && condition2) {
+                        return FALSE;       //the only way to skip FRA, even if got AMT score
+                    }
+                }
+            }
+        }
+        if (gotAMT) return true;
+    }
+    
+    
+    return false;
+    
+}
+
+- (BOOL) isEligiblePhleb {
+    
+    if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
+        if ([_fullDict objectForKey:SECTION_MODE_OF_SCREENING] != (id)[NSNull null]) {
+            NSDictionary *modeOfScreeningDict = [_fullDict objectForKey:SECTION_MODE_OF_SCREENING];
+            NSString *modeOfScreening = [modeOfScreeningDict objectForKey:kScreenMode];
+            if ([modeOfScreening containsString:@"Door"]) { //must be Centralised
+                return NO;
+            }
+        }
+        
         if ([_fullDict objectForKey:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT] != (id)[NSNull null]) { //if the section has at least one entry...
             NSDictionary *phlebEligibDict = [_fullDict objectForKey:SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT];
             NSNumber *wantFreeBT = [phlebEligibDict objectForKey:kWantFreeBt];
@@ -91,50 +143,34 @@
     return NO;
 }
 
-- (BOOL) isEligibleAdvFallRisk {
-    if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
-        if ([_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE] != (id)[NSNull null]) { //if the section has at least one entry...
-            NSDictionary *fallRiskDict = [_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE];
-            NSString *fallRiskStatus = [fallRiskDict objectForKey:kFallRiskStatus];
-            if (fallRiskStatus != (id)[NSNull null] && [fallRiskStatus isEqualToString:@"High Risk"]) return YES;
-        }
-        // Edited on 3rd Oct 2018
-//        if ([_fullDict objectForKey:SECTION_GERIATRIC_DEMENTIA_ELIGIBLE] != (id)[NSNull null]) {
-//            NSDictionary *dementiaEligibleDict = _fullDict[SECTION_GERIATRIC_DEMENTIA_ELIGIBLE];
-//            NSNumber *cognitiveImpair = dementiaEligibleDict[kCognitiveImpair];
-//            NSNumber *age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
-//                                               stringForKey:kResidentAge];
-//
-//            if (cognitiveImpair == (id)[NSNull null]) return NO;
-//            if ([cognitiveImpair integerValue] != 0 && [age integerValue] >= 60) {  // 2 conditions must be met
-//                return YES;
-//            }
-//        }
-    }
-    
-    
-    return NO;
-}
+
+
 
 - (BOOL) isEligibleGeriatricDementiaAssmt {
-    if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
-        if ([_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE] != (id)[NSNull null]) { //if the section has at least one entry...
-            NSDictionary *fallRiskDict = [_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE];
-            NSString *fallRiskStatus = [fallRiskDict objectForKey:kFallRiskStatus];
-            if (fallRiskStatus != (id)[NSNull null] && [fallRiskStatus isEqualToString:@"High Risk"]) return YES;
-        }
-        if ([_fullDict objectForKey:SECTION_GERIATRIC_DEMENTIA_ELIGIBLE] != (id)[NSNull null]) {
-            NSDictionary *dementiaEligibleDict = _fullDict[SECTION_GERIATRIC_DEMENTIA_ELIGIBLE];
-            NSNumber *cognitiveImpair = dementiaEligibleDict[kCognitiveImpair];
-            NSNumber *age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
-                                          stringForKey:kResidentAge];
+    NSNumber *age = (NSNumber *) [[NSUserDefaults standardUserDefaults]
+                                  stringForKey:kResidentAge];
+    if ([age integerValue] >= 60) {
+        
+        if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
             
-            if (cognitiveImpair == (id)[NSNull null]) return NO;
-            if ([cognitiveImpair boolValue] != 0 && [age integerValue] >= 60) {  // 2 conditions must be met
-                return YES;
+            if ([_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE] != (id)[NSNull null]) { //if the section has at least one entry...
+                NSDictionary *fallRiskDict = [_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE];
+                NSString *fallRiskStatus = [fallRiskDict objectForKey:kFallRiskStatus];
+                if (fallRiskStatus != (id)[NSNull null] && [fallRiskStatus containsString:@"High"]) return YES;
+            }
+            
+            if ([_fullDict objectForKey:SECTION_GERIATRIC_DEMENTIA_ELIGIBLE] != (id)[NSNull null]) {
+                NSDictionary *dementiaEligibleDict = _fullDict[SECTION_GERIATRIC_DEMENTIA_ELIGIBLE];
+                NSNumber *cognitiveImpair = dementiaEligibleDict[kCognitiveImpair];
+                
+                if (cognitiveImpair == (id)[NSNull null]) return NO;
+                if ([cognitiveImpair boolValue] != 0) return YES;
             }
         }
     }
+    return NO;    //MUST BE AGE >= 60
+    
+    
     
     
     return NO;
@@ -305,12 +341,13 @@
             NSNumber *receiveFinAssit = [finAssmtDict objectForKey:kReceiveFinAssist];
             NSNumber *seekFinAssist = [finAssmtDict objectForKey:kSeekFinAssist];
             
-            if (copeFin == (id)[NSNull null] || receiveFinAssit == (id)[NSNull null] || seekFinAssist == (id)[NSNull null]) return NO;
-            // NO NO YES
-            if(![copeFin boolValue] &&
-                ![receiveFinAssit boolValue] &&
-                ![seekFinAssist boolValue])
-                return YES;
+            if (copeFin != (id)[NSNull null] && receiveFinAssit != (id)[NSNull null] && seekFinAssist != (id)[NSNull null]) {
+                // NO NO YES
+                if(![copeFin boolValue] &&
+                   ![receiveFinAssit boolValue] &&
+                   [seekFinAssist boolValue])
+                    return YES;
+            }
         }
         if ([_fullDict objectForKey:SECTION_SOCIAL_ASSMT] != (id)[NSNull null]) { //if the section has at least one entry...
             NSDictionary *socAssmtDict = [_fullDict objectForKey:SECTION_SOCIAL_ASSMT];
@@ -322,7 +359,7 @@
         if ([_fullDict objectForKey:SECTION_DEPRESSION] != (id)[NSNull null]) { //if the section has at least one entry...
             NSDictionary *depressionDict = [_fullDict objectForKey:SECTION_DEPRESSION];
             NSNumber *phq2Score = [depressionDict objectForKey:kPhqQ2Score];
-            if (phq2Score != (id)[NSNull null] && [phq2Score integerValue] > 3) return YES;
+            if (phq2Score != (id)[NSNull null] && [phq2Score integerValue] >= 3) return YES;
         }
         
         if ([_fullDict objectForKey:SECTION_SUICIDE_RISK] != (id)[NSNull null]) { //if the section has at least one entry...
@@ -340,7 +377,13 @@
         if ([_fullDict objectForKey:SECTION_DEPRESSION] != (id)[NSNull null]) { //if the section has at least one entry...
             NSDictionary *depressionDict = [_fullDict objectForKey:SECTION_DEPRESSION];
             NSNumber *phq2Score = [depressionDict objectForKey:kPhqQ2Score];
-            if (phq2Score != (id)[NSNull null] && [phq2Score integerValue] > 3) return YES;
+            if (phq2Score != (id)[NSNull null] && [phq2Score integerValue] >= 3) return YES;
+        }
+        
+        if ([_fullDict objectForKey:SECTION_SUICIDE_RISK] != (id)[NSNull null]) { //if the section has at least one entry...
+            NSDictionary *suicideRiskDict = [_fullDict objectForKey:SECTION_SUICIDE_RISK];
+            NSNumber *possibleSuicide = [suicideRiskDict objectForKey:kPossibleSuicide];
+            if (possibleSuicide != (id)[NSNull null] && [possibleSuicide boolValue]) return YES;
         }
         
     }
@@ -493,12 +536,12 @@
 
 - (BOOL) canReceiveSpecVoucher {
     if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
-        if ([_fullDict objectForKey:SECTION_SNELLEN_TEST] != (id)[NSNull null]) { //if the section has at least one entry...
-            NSDictionary *snellenEyeDict = [_fullDict objectForKey:SECTION_SNELLEN_TEST];
-            NSNumber *needSpecs = [snellenEyeDict objectForKey:kSpecs];
-            if (needSpecs == (id)[NSNull null]) return NO;
+        if ([_fullDict objectForKey:SECTION_SERI_DIAG] != (id)[NSNull null]) { //if the section has at least one entry...
+            NSDictionary *seriDiagDict = [_fullDict objectForKey:SECTION_SERI_DIAG];
+            NSString *followUp = [seriDiagDict objectForKey:kFollowUp];
+            if (followUp == (id)[NSNull null]) return NO;
             
-            if ([needSpecs boolValue]) {
+            if ([followUp isEqualToString:@"Need spectacles"]) {
                 if ([_fullDict objectForKey:SECTION_PROFILING_SOCIOECON] != (id)[NSNull null]) { //if the section has at least one entry...
                     NSDictionary *financeDict = [_fullDict objectForKey:SECTION_PROFILING_SOCIOECON];
                     NSNumber *avgIncomePerHead = [financeDict objectForKey:kAvgIncomePerHead];

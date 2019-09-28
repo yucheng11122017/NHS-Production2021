@@ -26,7 +26,6 @@ typedef enum formName {
 @interface PhlebFormVC () {
     BOOL internetDCed;
     BOOL isFormFinalized;
-    XLFormRowDescriptor *dementiaStatusRow;
 }
 
 @property (nonatomic) Reachability *hostReachability;
@@ -124,32 +123,38 @@ typedef enum formName {
     
     XLFormRowDescriptor *glucoseRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFastingBloodGlucose rowType:XLFormRowDescriptorTypeDecimal title:@"Fasting blood glucose (mmol/L)"];
     if (phlebotomyDict != (id)[NSNull null]) glucoseRow.value = phlebotomyDict[kFastingBloodGlucose];
+    glucoseRow.disabled = @1;
     [self setDefaultFontWithRow:glucoseRow];
     [section addFormRow:glucoseRow];
     
     XLFormRowDescriptor *triglyRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTriglycerides rowType:XLFormRowDescriptorTypeDecimal title:@"Triglycerides (mmol/L)"];
     if (phlebotomyDict != (id)[NSNull null]) triglyRow.value = phlebotomyDict[kTriglycerides];
+    triglyRow.disabled = @1;
     [self setDefaultFontWithRow:triglyRow];
     [section addFormRow:triglyRow];
     
     XLFormRowDescriptor *ldlRow = [XLFormRowDescriptor formRowDescriptorWithTag:kLDL rowType:XLFormRowDescriptorTypeDecimal title:@"LDL Cholesterol (mmol/L)"];
     if (phlebotomyDict != (id)[NSNull null]) ldlRow.value = phlebotomyDict[kLDL];
+    ldlRow.disabled = @1;
     [self setDefaultFontWithRow:ldlRow];
     [section addFormRow:ldlRow];
     
     XLFormRowDescriptor *hdlRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHDL rowType:XLFormRowDescriptorTypeDecimal title:@"HDL Cholesterol (mmol/L)"];
     if (phlebotomyDict != (id)[NSNull null]) hdlRow.value = phlebotomyDict[kHDL];
+    hdlRow.disabled = @1;
     [self setDefaultFontWithRow:hdlRow];
     hdlRow.required = NO;
     [section addFormRow:hdlRow];
     
     XLFormRowDescriptor *totCholesterolRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTotCholesterol rowType:XLFormRowDescriptorTypeDecimal title:@"Total Cholesterol (mmol/L)"];
     if (phlebotomyDict != (id)[NSNull null]) totCholesterolRow.value = phlebotomyDict[kTotCholesterol];
+    totCholesterolRow.disabled = @1;
     [self setDefaultFontWithRow:totCholesterolRow];
     [section addFormRow:totCholesterolRow];
     
     XLFormRowDescriptor *cholesHdlRatioRow = [XLFormRowDescriptor formRowDescriptorWithTag:kCholesterolHdlRatio rowType:XLFormRowDescriptorTypeDecimal title:@"Cholesterol/HDL ratio"];
     if (phlebotomyDict != (id)[NSNull null]) cholesHdlRatioRow.value = phlebotomyDict[kCholesterolHdlRatio];
+    cholesHdlRatioRow.disabled = @1;
     [self setDefaultFontWithRow:cholesHdlRatioRow];
     [section addFormRow:cholesHdlRatioRow];
     

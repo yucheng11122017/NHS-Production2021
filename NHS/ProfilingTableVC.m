@@ -155,10 +155,8 @@ typedef enum sectionRowNumber {
         
         if (indexPath.row == BasicGeriatricRow) {
             if (![[ResidentProfile sharedManager] isEligibleFallRisk]) {  //not eligible
-                
-#warning FOR NOW ENABLE THIS ALWAYS!
-//                cell.userInteractionEnabled = NO;
-//                [cell.textLabel setTextColor:[UIColor grayColor]];
+                cell.userInteractionEnabled = NO;
+                [cell.textLabel setTextColor:[UIColor grayColor]];
             }
         }
         
@@ -543,7 +541,7 @@ typedef enum sectionRowNumber {
                 return @0;
         }
     }
-    if (count == 2) return @1;
+    if (count == 3) return @1;
     else return @0;
 }
 

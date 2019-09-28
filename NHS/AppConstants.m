@@ -105,9 +105,15 @@ NSString *const kConsentSignatureImageName = @"consent_signature_image_name";
 NSString *const kTranslationDone = @"translation_done";
 NSString *const kWitnessTranslatorFullName = @"witness_translator_full_name";
 NSString *const kWitnessTranslatorSignatureImageName = @"witness_translator_signature_image_name";
-
-
 NSString *const kNhsSerialNum = @"nhs_serial_num";
+
+
+NSString *const kMammogramInterest = @"mammogram_interest";
+//NSString *const kHasChas = @"has_chas";       // repeated
+NSString *const kDoneBefore = @"done_before";
+NSString *const kWillingPay = @"willing_pay";
+
+
 
 
 
@@ -129,7 +135,7 @@ NSString *const kNoBloodTest = @"no_blood_test";
 NSString *const kWantFreeBt = @"want_free_bt";
 NSString *const kDidPhleb = @"did_phleb";
 NSString *const kIsPr = @"is_pr";
-NSString *const kMammogramInterest = @"mammogram_interest";
+
 
 #pragma mark - Phlebotomy - Results Collection
 NSString *const kPhlebDone = @"phleb_done";
@@ -565,8 +571,20 @@ NSString *const kEduStatus = @"edu_status";
 NSString *const kDementiaStatus = @"dementia_status";
 NSString *const kReqFollowupAdvGer = @"req_followup";
 
-#pragma mark - Emergency Services
+#pragma mark - 6. Fall Risk Assessment
+NSString *const kSitStand = @"sit_stand";
+NSString *const kBalance = @"balance";
+NSString *const kGaitSpeed = @"gait_speed";
+NSString *const kSpbbScore = @"sppb_score";
+NSString *const kTimeUpGo = @"time_up_go";
+NSString *const kFallRisk = @"fall_risk";
+NSString *const kPhysioNotes = @"physio_notes";
+NSString *const kKeyResults = @"key_results";
+NSString *const kExternalRisks = @"external_risks";
+NSString *const kOtherFactors = @"other_factors";
+NSString *const kRecommendations = @"recommendations";
 
+#pragma mark - Emergency Services
 NSString *const kUndergoneEmerSvcs = @"undergone_emergency_services";
 NSString *const kDocNotes = @"doc_notes";
 NSString *const kDocName = @"doc_name";
@@ -616,6 +634,12 @@ NSString *const kAudioR2000Hz40 = @"audio_R_2000Hz_40";
 NSString *const kAudioL4000Hz40 = @"audio_L_4000Hz_40";
 NSString *const kAudioR4000Hz40 = @"audio_R_4000Hz_40";
 NSString *const kApptReferred = @"appt_referred";
+NSString *const kReferrerName = @"referrer_name";
+NSString *const kHearingReferrerSign = @"hearing_referrer_sign";
+NSString *const kAbnormalHearing = @"abnormal_hearing";
+NSString *const kUpcomingAppt = @"upcoming_appt";
+NSString *const kApptLocation = @"appt_location";
+NSString *const kHearingFollowUp = @"follow_up";
 
 #pragma mark - SERI Advanced Eye Screening
 
@@ -752,8 +776,8 @@ NSString *const kDiagnosisOs = @"diagnosis_os";
 
 NSString *const kDidFallRiskAssess = @"did_fall_risk_assess";
 NSString *const kPsfuFRA = @"psfu";
-NSString *const kBalance = @"balance";
-NSString *const kGaitSpeed = @"gait_speed";
+//NSString *const kBalance = @"balance";
+//NSString *const kGaitSpeed = @"gait_speed";
 NSString *const kChairStand = @"chair_stand";
 NSString *const kTotal = @"total";
 NSString *const kReqFollowupFRA = @"req_followup";
@@ -1002,6 +1026,7 @@ NSString *const kCheckSnellenTest = @"check_snellen_test";
 
 /**     5. Advanced Geriatric    */
 NSString *const kCheckGeriatricDementiaAssmt = @"check_geriatric_dementia_assmt";
+NSString *const kCheckReferrals = @"check_referrals";
 
 /**     6. Fall Risk Assessment    */
 NSString *const kCheckPhysiotherapy = @"check_physiotherapy";
@@ -1011,6 +1036,7 @@ NSString *const kCheckBasicDental = @"check_basic_dental";
 
 /**     8. Hearing     */
 NSString *const kCheckHearing = @"check_hearing";
+NSString *const kCheckFollowUp = @"check_follow_up";
 
 /**     9. Advanced Vision (group)     */
 NSString *const kCheckSeriMedHist = @"check_seri_med_hist";

@@ -16,6 +16,7 @@
 #define SCREENING_CONSENT_TAKER_SIGNATURE  @"user_signature_path2"
 #define RESEARCH_PARTICIPANT_6_PTS_SIGNATURE  @"user_signature_path3"
 #define RESEARCH_WITNESS_SIGNATURE  @"user_signature_path4"
+#define HEARING_REFERRER_SIGNATURE  @"user_signature_path5"
 
 #define REMOTE_HOST_NAME @"www.apple.com"
 #define ERROR_INFO @"com.alamofire.serialization.response.error.data"
@@ -44,6 +45,7 @@
 #define SECTION_PAP_SMEAR_ELIGIBLE              @"pap_smear_eligible"
 #define SECTION_FALL_RISK_ELIGIBLE              @"fall_risk_eligible"
 #define SECTION_GERIATRIC_DEMENTIA_ELIGIBLE     @"geriatric_dementia_eligible"
+#define SECTION_PHYSIOTHERAPY                   @"physiotherapy"
 #define SECTION_GENOGRAM                        @"genograms"
 #define SECTION_PROFILING_COMMENTS              @"profiling_comments"
 #define SECTION_PROFILING                       @"profiling"
@@ -60,7 +62,6 @@
 #define SECTION_EXERCISE                        @"exercise"
 
 #define SECTION_EQ5D                            @"eq5d"
-#define SECTION_FALL_RISK_ELIGIBLE              @"fall_risk_eligible"
 #define SECTION_GERIATRIC_DEMENTIA_ELIGIBLE     @"geriatric_dementia_eligible"
 
 #define SECTION_CURRENT_SOCIOECO_SITUATION      @"current_socioeco_situation"
@@ -72,7 +73,7 @@
 #define SECTION_DEPRESSION                      @"depression"
 #define SECTION_SUICIDE_RISK                    @"suicide_risk"
 
-#define SECTION_ADV_FALL_RISK_ASSMT             @"adv_fall_risk_assmt"
+//#define SECTION_ADV_FALL_RISK_ASSMT             @"adv_fall_risk_assmt"
 #define SECTION_GERIATRIC_DEMENTIA_ASSMT        @"geriatric_dementia_assmt"
 
 #define SECTION_CURRENT_PHY_STATUS              @"current_phy_status"
@@ -86,7 +87,10 @@
 #define SECTION_ADD_SERVICES                    @"add_services"
 #define SECTION_DOC_CONSULT                     @"doc_consult"
 #define SECTION_BASIC_DENTAL                    @"basic_dental"
+
+
 #define SECTION_HEARING                         @"hearing"
+#define SECTION_FOLLOW_UP                       @"follow_up"
 
 #define SECTION_SERI_MED_HIST                   @"seri_med_hist"
 #define SECTION_SERI_VA                         @"seri_va"
@@ -213,6 +217,10 @@ extern NSString *const kWitnessTranslatorFullName;
 extern NSString *const kWitnessTranslatorSignatureImageName;
 extern NSString *const kNhsSerialNum;
 
+extern NSString *const kMammogramInterest;
+//extern NSString *const kHasChas;  //repeated
+extern NSString *const kDoneBefore;
+extern NSString *const kWillingPay;
 
 
 /* Search Bar constants
@@ -233,7 +241,7 @@ extern NSString *const kNoBloodTest;
 extern NSString *const kWantFreeBt;
 extern NSString *const kDidPhleb;
 extern NSString *const kIsPr;
-extern NSString *const kMammogramInterest;
+
 
 #pragma mark - Phlebotomy - Results Collection
 extern NSString *const kPhlebDone;
@@ -684,6 +692,19 @@ extern NSString *const kEduStatus;
 extern NSString *const kDementiaStatus;
 extern NSString *const kReqFollowupAdvGer;
 
+#pragma mark - 6. Fall Risk Assessment
+extern NSString *const kSitStand;
+extern NSString *const kBalance;
+extern NSString *const kGaitSpeed;
+extern NSString *const kSpbbScore;
+extern NSString *const kTimeUpGo;
+extern NSString *const kFallRisk;
+extern NSString *const kPhysioNotes;
+extern NSString *const kKeyResults;
+extern NSString *const kExternalRisks;
+extern NSString *const kOtherFactors;
+extern NSString *const kRecommendations;
+
 #pragma mark - Emergency Services
 
 extern NSString *const kUndergoneEmerSvcs;
@@ -735,6 +756,12 @@ extern NSString *const kAudioR2000Hz40;
 extern NSString *const kAudioL4000Hz40;
 extern NSString *const kAudioR4000Hz40;
 extern NSString *const kApptReferred;
+extern NSString *const kReferrerName;
+extern NSString *const kHearingReferrerSign;
+extern NSString *const kAbnormalHearing;
+extern NSString *const kUpcomingAppt;
+extern NSString *const kApptLocation;
+extern NSString *const kHearingFollowUp;
 
 #pragma mark - SERI Advanced Eye Screening
 
@@ -1119,6 +1146,7 @@ extern NSString *const kCheckSnellenTest;
 
 /**     5. Advanced Geriatric    */
 extern NSString *const kCheckGeriatricDementiaAssmt;
+extern NSString *const kCheckReferrals;
 
 /**    6. Fall Risk Assessment     */
 extern NSString *const kCheckPhysiotherapy;
@@ -1128,6 +1156,7 @@ extern NSString *const kCheckBasicDental;
 
 /**     8. Hearing     */
 extern NSString *const kCheckHearing;
+extern NSString *const kCheckFollowUp;
 
 /**     9. Advanced Vision (group)     */
 extern NSString *const kCheckSeriMedHist;

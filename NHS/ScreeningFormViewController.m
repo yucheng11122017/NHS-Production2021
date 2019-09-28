@@ -71,7 +71,7 @@ NSString *const kQuestionFifteen = @"q15";
 @interface ScreeningFormViewController () {
     NSString *gender;
     NSArray *spoken_lang_value;
-    XLFormRowDescriptor *preEdScoreRow, *postEdScoreRow, *showPostEdSectionBtnRow, *phqTotalScoreRow;
+    XLFormRowDescriptor *preEdScoreRow, *postEdScoreRow, *showPostEdSectionBtnRow, *phqTotalScoreRow, *spbbScoreRow, *fallRiskRow;
     XLFormSectionDescriptor *preEdSection, *postEdSection;
     NSString *neighbourhood, *citizenship;
     NSNumber *age;
@@ -130,13 +130,15 @@ NSString *const kQuestionFifteen = @"q15";
 //            break;
         case Dental: form = [self initDentalCheckup];
             break;
-        case Hearing: form = [self initHearing];
-            break;
+//        case Hearing: form = [self initHearing];
+//            break;
 //        case 2: form = [self initProfiling];
 //            break;
 //        case 3: form = [self initGeriaDepressAssess];
 //            hasShownDepressAlertBox = false;
 //            break;
+        case FallRiskAssess: form = [self initPhysioNotes];
+            break;
         case BasicVision: form = [self initSnellenEyeTest];
             break;
         case EmerSvcs: form = [self initEmergencySvcs];
@@ -565,17 +567,22 @@ NSString *const kQuestionFifteen = @"q15";
     [section addFormRow:diabeticRow];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeDecimal title:@"CBG (mmol/L)"];
+    row.required = NO;
     
-    //value
+    NSString *didPhleb = [[_fullScreeningForm objectForKey:SECTION_RESI_PART] objectForKey:kDidPhleb];
+    
     if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kIsDiabetic] != (id)[NSNull null]) {
         diabeticRow.value = [self getYesNofromOneZero:triageDict[kIsDiabetic]];
         if ([diabeticRow.value isEqualToString:@"Yes"]) {
-            row.required = YES;
+            if (didPhleb == (id)[NSNull null] || [didPhleb containsString:@"No"]) {
+                row.required = YES;
+                row.disabled = @0;
+            }
         } else {
+            row.disabled = @1;
             row.required = NO;
         }
     }
-    row.disabled = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", diabeticRow];
     [self setDefaultFontWithRow:row];
     
     //value
@@ -587,8 +594,11 @@ NSString *const kQuestionFifteen = @"q15";
     diabeticRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
         if (newValue != oldValue) {
             if ([newValue isEqualToString:@"Yes"]) {
-                row.disabled = @NO;
-                row.required = YES;
+                NSString *didPhleb = [[_fullScreeningForm objectForKey:SECTION_RESI_PART] objectForKey:kDidPhleb];
+                if (didPhleb == (id)[NSNull null] || [didPhleb containsString:@"No"]) {
+                    row.disabled = @NO;
+                    row.required = YES;
+                }
             } else {
                 row.disabled = @YES;
                 row.required = NO;
@@ -909,6 +919,277 @@ NSString *const kQuestionFifteen = @"q15";
     return [super initWithForm:formDescriptor];
 }
 
+- (id) initPhysioNotes {
+    
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"6. Fall Risk Assessment"];
+    XLFormSectionDescriptor * section;
+    XLFormRowDescriptor * row;
+    
+    NSDictionary *physioDict = _fullScreeningForm[SECTION_PHYSIOTHERAPY];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckPhysiotherapy];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Physiotherapy Notes"];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *sitToStandQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"sts_q"
+                                                                                    rowType:XLFormRowDescriptorTypeInfo
+                                                                                      title:@"a. 5x Sit-to-Stand"];
+    sitToStandQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:sitToStandQRow];
+    [section addFormRow:sitToStandQRow];
+    
+    
+    XLFormRowDescriptor *sitToStandRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSitStand
+                                                                                   rowType:XLFormRowDescriptorTypeSelectorPush
+                                                                                     title:@""];
+    sitToStandRow.noValueDisplayText = @"Tap here";
+    sitToStandRow.required = YES;
+    sitToStandRow.selectorOptions = @[@"0 Not able to complete 5 sit-to-stand/Unattempted",
+                                      @"1 Complete in >16.7s",
+                                      @"2 Complete in 16.6-13.7s",
+                                      @"3 Complete in 13.6-11.2s",
+                                      @"4 Complete in <11.2s"];
+    
+    //value
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kSitStand] != (id)[NSNull null])
+        sitToStandRow.value = [self getSTSValueFromArray:physioDict[kSitStand]];
+    
+    [section addFormRow:sitToStandRow];
+    
+    XLFormRowDescriptor *balanceQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"balance_q"
+                                                                                rowType:XLFormRowDescriptorTypeInfo
+                                                                                  title:@"b. Balance \ni) Side-by-side (10 sec max) \nii) Semi-tandem (10 sec max) \niii) Tandem (10 sec max)"];
+    balanceQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:balanceQRow];
+    [section addFormRow:balanceQRow];
+    
+    
+    XLFormRowDescriptor *balanceRow = [XLFormRowDescriptor formRowDescriptorWithTag:kBalance
+                                                                               rowType:XLFormRowDescriptorTypeSelectorPush
+                                                                                 title:@""];
+    balanceRow.noValueDisplayText = @"Tap here";
+    balanceRow.required = YES;
+    balanceRow.selectorOptions = @[@"0 Side-by-side <10s or unable to perform/Unattempted",
+                                      @"1 Side-by-side 10s, <10s semi-tandem",
+                                      @"2 Semi-tandem 10s, tandem 0-2s",
+                                      @"3 Semi-tandem 10s, tandem 3-9s",
+                                      @"4 Tandem ≥ 10s"];
+    
+    //value
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kBalance] != (id)[NSNull null])
+        balanceRow.value = [self getBalanceValueFromArray:physioDict[kBalance]];
+    
+    [section addFormRow:balanceRow];
+    
+    XLFormRowDescriptor *gaitSpeedQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"gs_q"
+                                                                             rowType:XLFormRowDescriptorTypeInfo
+                                                                               title:@"c. 8-Feet Walk (Gait speed test)"];
+    gaitSpeedQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:gaitSpeedQRow];
+    [section addFormRow:gaitSpeedQRow];
+    
+    
+    XLFormRowDescriptor *gaitSpeedRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGaitSpeed
+                                                                            rowType:XLFormRowDescriptorTypeSelectorPush
+                                                                              title:@""];
+    gaitSpeedRow.noValueDisplayText = @"Tap here";
+    gaitSpeedRow.required = YES;
+    gaitSpeedRow.selectorOptions = @[@"0 Not attempted/not able",
+                                   @"1 Completed in >5.7s",
+                                   @"2 Completed in 4.1-5.7s",
+                                   @"3 Completed in 3.2-4.0s",
+                                   @"4 Completed in <3.1s"];
+    
+    //value
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kGaitSpeed] != (id)[NSNull null])
+        gaitSpeedRow.value = [self getGaitSpeedValueFromArray:physioDict[kGaitSpeed]];
+    
+    [section addFormRow:gaitSpeedRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    section.footerTitle = @"NOTE: Score is auto-calculated";
+    [formDescriptor addFormSection:section];
+    
+    spbbScoreRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSpbbScore
+                                                         rowType:XLFormRowDescriptorTypeNumber
+                                                           title:@"Total SPBB Score (max score 12)"];
+    spbbScoreRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    spbbScoreRow.disabled = @1;
+    [self setDefaultFontWithRow:spbbScoreRow];
+    [spbbScoreRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    //value
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kSpbbScore] != (id)[NSNull null])
+        spbbScoreRow.value = physioDict[kSpbbScore];
+    
+    [section addFormRow:spbbScoreRow];
+    
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *tugQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"tug_q"
+                                                                               rowType:XLFormRowDescriptorTypeInfo
+                                                                                 title:@"Timed Up and Go (seconds) (0 if unattempted)"];
+    tugQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:tugQRow];
+    [section addFormRow:tugQRow];
+    
+    
+    XLFormRowDescriptor *tugRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTimeUpGo
+                                                                              rowType:XLFormRowDescriptorTypeDecimal
+                                                                                title:@""];
+    tugRow.required = YES;
+    [self setDefaultFontWithRow:tugRow];
+    [tugRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    //value
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kTimeUpGo] != (id)[NSNull null])
+        tugRow.value = physioDict[kTimeUpGo];
+    
+    [section addFormRow:tugRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@"Fall Risk "];
+    [formDescriptor addFormSection:section];
+    
+    fallRiskRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFallRisk
+                                                         rowType:XLFormRowDescriptorTypeText
+                                                           title:@"Fall Risk"];
+    fallRiskRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    fallRiskRow.disabled = @1;
+    [self setDefaultFontWithRow:fallRiskRow];
+    [fallRiskRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kFallRisk] != (id)[NSNull null])
+        fallRiskRow.value = physioDict[kFallRisk];
+    
+    [section addFormRow:fallRiskRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *physioNotesQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"physionotes_q"
+                                                                         rowType:XLFormRowDescriptorTypeInfo
+                                                                           title:@"Falls in the past 1 year"];
+    physioNotesQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:physioNotesQRow];
+    [section addFormRow:physioNotesQRow];
+    
+    XLFormRowDescriptor *physioNotesRow = [XLFormRowDescriptor formRowDescriptorWithTag:kPhysioNotes
+                                                        rowType:XLFormRowDescriptorTypeTextView
+                                                          title:@""];
+//    physioNotesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    physioNotesRow.required = YES;
+    [self setDefaultFontWithRow:physioNotesRow];
+//    [physioNotesRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kPhysioNotes] != (id)[NSNull null])
+        physioNotesRow.value = physioDict[kPhysioNotes];
+    
+    [section addFormRow:physioNotesRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *keyResultsQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"keyresults_q"
+                                                                                 rowType:XLFormRowDescriptorTypeInfo
+                                                                                   title:@"Key results for the tests"];
+    keyResultsQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:keyResultsQRow];
+    [section addFormRow:keyResultsQRow];
+    
+    
+    XLFormRowDescriptor *keyResultsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kKeyResults
+                                                                                rowType:XLFormRowDescriptorTypeTextView
+                                                                                  title:@""];
+    //    physioNotesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    keyResultsRow.required = YES;
+    [self setDefaultFontWithRow:keyResultsRow];
+    //    [physioNotesRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kKeyResults] != (id)[NSNull null])
+        keyResultsRow.value = physioDict[kKeyResults];
+    
+    [section addFormRow:keyResultsRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *externalRisksQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"externalrisks_q"
+                                                                                rowType:XLFormRowDescriptorTypeInfo
+                                                                                  title:@"External risks factors (Environmental/Footwear)"];
+    externalRisksQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:externalRisksQRow];
+    [section addFormRow:externalRisksQRow];
+    
+    XLFormRowDescriptor *externalRisksRow = [XLFormRowDescriptor formRowDescriptorWithTag:kExternalRisks
+                                                                                rowType:XLFormRowDescriptorTypeTextView
+                                                                                  title:@""];
+    //    physioNotesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    externalRisksRow.required = YES;
+    [self setDefaultFontWithRow:externalRisksRow];
+    //    [physioNotesRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kExternalRisks] != (id)[NSNull null])
+        externalRisksRow.value = physioDict[kExternalRisks];
+    
+    [section addFormRow:externalRisksRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *otherFactorsQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"otherfactors_q"
+                                                                                   rowType:XLFormRowDescriptorTypeInfo
+                                                                                     title:@"Other factors (eg. pain impairing mobility, vision, problems)"];
+    otherFactorsQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:otherFactorsQRow];
+    [section addFormRow:otherFactorsQRow];
+    
+    XLFormRowDescriptor *otherFactorsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kOtherFactors
+                                                                                rowType:XLFormRowDescriptorTypeTextView
+                                                                                  title:@""];
+    //    physioNotesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    otherFactorsRow.required = YES;
+    [self setDefaultFontWithRow:otherFactorsRow];
+    //    [physioNotesRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kOtherFactors] != (id)[NSNull null])
+        otherFactorsRow.value = physioDict[kOtherFactors];
+    
+    [section addFormRow:otherFactorsRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *recommendationsQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"recommendations_q"
+                                                                                  rowType:XLFormRowDescriptorTypeInfo
+                                                                                    title:@"Recommendations"];
+    recommendationsQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:recommendationsQRow];
+    [section addFormRow:recommendationsQRow];
+    
+    XLFormRowDescriptor *recommendationsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kRecommendations
+                                                                                rowType:XLFormRowDescriptorTypeTextView
+                                                                                  title:@""];
+    //    physioNotesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    recommendationsRow.required = YES;
+    [self setDefaultFontWithRow:recommendationsRow];
+    //    [physioNotesRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kRecommendations] != (id)[NSNull null])
+        recommendationsRow.value = physioDict[kRecommendations];
+    
+    [section addFormRow:recommendationsRow];
+    
+    return [super initWithForm:formDescriptor];
+}
+
 
 -(id) initAdditionalSvcs {
     
@@ -1152,401 +1433,6 @@ NSString *const kQuestionFifteen = @"q15";
             }
         }
     };
-    
-    return [super initWithForm:formDescriptor];
-}
-
-
-- (id) initHearing {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"7. Hearing"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    
-    NSDictionary *hearingDict = [_fullScreeningForm objectForKey:SECTION_HEARING];
-    
-    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
-    
-    if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckHearing];
-        if ([check isKindOfClass:[NSNumber class]]) {
-            isFormFinalized = [check boolValue];
-        }
-    }
-    
-    formDescriptor.assignFirstResponderOnShow = YES;
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Hearing Aid"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUsesAidRight rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does the resident use hearing aid for right ear?"];
-    row.required = YES;
-    row.selectorOptions = @[@"Yes", @"No"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [self setDefaultFontWithRow:row];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kUsesAidRight] != (id)[NSNull null])
-        row.value = [self getYesNofromOneZero:hearingDict[kUsesAidRight]];
-    
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUsesAidLeft rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Does the resident use hearing aid for left ear?"];
-    row.required = YES;
-    row.selectorOptions = @[@"Yes", @"No"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [self setDefaultFontWithRow:row];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kUsesAidLeft] != (id)[NSNull null])
-        row.value = [self getYesNofromOneZero:hearingDict[kUsesAidLeft]];
-    
-    [section addFormRow:row];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"HHIE"];
-    [formDescriptor addFormSection:section];
-    
-    XLFormRowDescriptor *attendedHhieRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAttendedHhie rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Attended HHIE?"];
-    attendedHhieRow.required = YES;
-    attendedHhieRow.selectorOptions = @[@"Yes", @"No"];
-    [self setDefaultFontWithRow:attendedHhieRow];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAttendedHhie] != (id)[NSNull null])
-        attendedHhieRow.value = [self getYesNofromOneZero:hearingDict[kAttendedHhie]];
-    
-    [section addFormRow:attendedHhieRow];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kHhieResult rowType:XLFormRowDescriptorTypeInteger title:@"HHIE Result:"];
-    row.required = YES;
-    [self setDefaultFontWithRow:row];
-    row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedHhieRow];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kHhieResult] != (id)[NSNull null])
-        row.value = hearingDict[kHhieResult];
-    
-    [section addFormRow:row];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Tinnitus"];
-    [formDescriptor addFormSection:section];
-    
-    XLFormRowDescriptor *attendedTinnitusRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAttendedTinnitus rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Has Tinnitus? (continuous ringing, hissing or other sounds in ears or head)"];
-    attendedTinnitusRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    attendedTinnitusRow.required = YES;
-    attendedTinnitusRow.selectorOptions = @[@"Yes", @"No"];
-    [self setDefaultFontWithRow:attendedTinnitusRow];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAttendedTinnitus] != (id)[NSNull null])
-        attendedTinnitusRow.value = [self getYesNofromOneZero:hearingDict[kAttendedTinnitus]];
-    
-    [section addFormRow:attendedTinnitusRow];
-    
-    XLFormRowDescriptor *tinnitusResultQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"tinnitus_q"
-                                                                                   rowType:XLFormRowDescriptorTypeInfo
-                                                                                      title:@"How much of a problem is the tinnitus?"];
-    tinnitusResultQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    tinnitusResultQRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedTinnitusRow];
-    [self setDefaultFontWithRow:tinnitusResultQRow];
-    [section addFormRow:tinnitusResultQRow];
-    
-    
-    XLFormRowDescriptor *tinnitusResultRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTinnitusResult
-                                                                                   rowType:XLFormRowDescriptorTypeSelectorActionSheet
-                                                                                     title:@""];
-    tinnitusResultRow.noValueDisplayText = @"Tap here";
-    tinnitusResultRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedTinnitusRow];
-    tinnitusResultRow.required = YES;
-    tinnitusResultRow.selectorOptions = @[@"No problem", @"Small problem", @"Big problem", @"Very big problem"];
-    
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kTinnitusResult] != (id)[NSNull null])
-        tinnitusResultRow.value = hearingDict[kTinnitusResult];
-    
-    [section addFormRow:tinnitusResultRow];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Otoscopy"];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kOtoscopyLeft
-                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
-                                                  title:@"Otoscopy Examination (Left ear)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.required = YES;
-    row.noValueDisplayText = @"Tap here";
-    row.selectorOptions = @[@"NA", @"Pass", @"Needs referral"];
-    [self setDefaultFontWithRow:row];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kOtoscopyLeft] != (id)[NSNull null])
-        row.value = hearingDict[kOtoscopyLeft];
-    
-    [section addFormRow:row];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kOtoscopyRight
-                                                rowType:XLFormRowDescriptorTypeSelectorActionSheet
-                                                  title:@"Otoscopy Examination (Right ear)"];
-    row.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row.required = YES;
-    row.noValueDisplayText = @"Tap here";
-    row.selectorOptions = @[@"NA", @"Pass", @"Needs referral"];
-    [self setDefaultFontWithRow:row];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kOtoscopyRight] != (id)[NSNull null])
-        row.value = hearingDict[kOtoscopyRight];
-    
-    [section addFormRow:row];
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@"Audioscope"];
-    [formDescriptor addFormSection:section];
-    
-    XLFormRowDescriptor *attendedAudioscopeRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAttendedAudioscope rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Attended Audioscope?"];
-    attendedAudioscopeRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    attendedAudioscopeRow.required = YES;
-    attendedAudioscopeRow.selectorOptions = @[@"Yes", @"No"];
-    [self setDefaultFontWithRow:attendedAudioscopeRow];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAttendedAudioscope] != (id)[NSNull null])
-        attendedAudioscopeRow.value = [self getYesNofromOneZero:hearingDict[kAttendedAudioscope]];
-    
-    [section addFormRow:attendedAudioscopeRow];
-    
-    
-    XLFormRowDescriptor *row500hz60 = [XLFormRowDescriptor formRowDescriptorWithTag:kPractice500Hz60 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Practice Tone (500Hz at 60dB in “better ear”)"];
-    row500hz60.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row500hz60.required = YES;
-    row500hz60.selectorOptions = @[@"Pass", @"Fail"];
-    row500hz60.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row500hz60];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kPractice500Hz60] != (id)[NSNull null])
-        row500hz60.value = [self getPassFailfromOneZero:hearingDict[kPractice500Hz60]];
-    
-    [section addFormRow:row500hz60];
-    
-    XLFormRowDescriptor *row500hz25L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL500Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 500Hz at 25 dBHL Results"];
-    row500hz25L.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row500hz25L.required = YES;
-    row500hz25L.selectorOptions = @[@"Pass", @"Fail"];
-    row500hz25L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row500hz25L];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL500Hz25] != (id)[NSNull null])
-        row500hz25L.value = [self getPassFailfromOneZero:hearingDict[kAudioL500Hz25]];
-    
-    [section addFormRow:row500hz25L];
-    
-    XLFormRowDescriptor *row500hz25R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR500Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 500Hz at 25 dBHL Results"];
-    row500hz25R.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row500hz25R.required = YES;
-    row500hz25R.selectorOptions = @[@"Pass", @"Fail"];
-    row500hz25R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row500hz25R];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR500Hz25] != (id)[NSNull null])
-        row500hz25R.value = [self getPassFailfromOneZero:hearingDict[kAudioR500Hz25]];
-    
-    [section addFormRow:row500hz25R];
-    
-    XLFormRowDescriptor *row1000hz25L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL1000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 1000Hz at 25 dBHL Results"];
-    row1000hz25L.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row1000hz25L.required = YES;
-    row1000hz25L.selectorOptions = @[@"Pass", @"Fail"];
-    row1000hz25L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row1000hz25L];
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL1000Hz25] != (id)[NSNull null])
-        row1000hz25L.value = [self getPassFailfromOneZero:hearingDict[kAudioL1000Hz25]];
-    [section addFormRow:row1000hz25L];
-    
-    XLFormRowDescriptor *row1000hz25R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR1000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 1000Hz at 25 dBHL Results"];
-    row1000hz25R.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row1000hz25R.required = YES;
-    row1000hz25R.selectorOptions = @[@"Pass", @"Fail"];
-    row1000hz25R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row1000hz25R];
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR1000Hz25] != (id)[NSNull null])
-        row1000hz25R.value = [self getPassFailfromOneZero:hearingDict[kAudioR1000Hz25]];
-    
-    [section addFormRow:row1000hz25R];
-    
-    XLFormRowDescriptor *row2000hz25L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL2000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 2000Hz at 25 dBHL Results"];
-    row2000hz25L.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row2000hz25L.required = YES;
-    row2000hz25L.selectorOptions = @[@"Pass", @"Fail"];
-    row2000hz25L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row2000hz25L];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL2000Hz25] != (id)[NSNull null])
-        row2000hz25L.value = [self getPassFailfromOneZero:hearingDict[kAudioL2000Hz25]];
-    [section addFormRow:row2000hz25L];
-    
-    XLFormRowDescriptor *row2000hz25R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR2000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 2000Hz at 25 dBHL Results"];
-    row2000hz25R.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row2000hz25R.required = YES;
-    row2000hz25R.selectorOptions = @[@"Pass", @"Fail"];
-    row2000hz25R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row2000hz25R];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR2000Hz25] != (id)[NSNull null])
-        row2000hz25R.value = [self getPassFailfromOneZero:hearingDict[kAudioR2000Hz25]];
-    
-    [section addFormRow:row2000hz25R];
-    
-    XLFormRowDescriptor *row4000hz25L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL4000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 4000Hz at 25 dBHL Results"];
-    row4000hz25L.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row4000hz25L.required = YES;
-    row4000hz25L.selectorOptions = @[@"Pass", @"Fail"];
-    row4000hz25L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row4000hz25L];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL4000Hz25] != (id)[NSNull null])
-        row4000hz25L.value = [self getPassFailfromOneZero:hearingDict[kAudioL4000Hz25]];
-    [section addFormRow:row4000hz25L];
-    
-    XLFormRowDescriptor *row4000hz25R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR4000Hz25 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 4000Hz at 25 dBHL Results"];
-    row4000hz25R.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row4000hz25R.required = YES;
-    row4000hz25R.selectorOptions = @[@"Pass", @"Fail"];
-    row4000hz25R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row4000hz25R];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR4000Hz25] != (id)[NSNull null])
-        row4000hz25R.value = [self getPassFailfromOneZero:hearingDict[kAudioR4000Hz25]];
-    
-    [section addFormRow:row4000hz25R];
-    
-    XLFormRowDescriptor *row500hz40L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL500Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 500Hz at 40 dBHL Results"];
-    row500hz40L.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row500hz40L.required = YES;
-    row500hz40L.selectorOptions = @[@"Pass", @"Fail"];
-    row500hz40L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row500hz40L];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL500Hz40] != (id)[NSNull null])
-        row500hz40L.value = [self getPassFailfromOneZero:hearingDict[kAudioL500Hz40]];
-    
-    [section addFormRow:row500hz40L];
-    
-    XLFormRowDescriptor *row500hz40R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR500Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 500Hz at 40 dBHL Results"];
-    row500hz40R.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row500hz40R.required = YES;
-    row500hz40R.selectorOptions = @[@"Pass", @"Fail"];
-    row500hz40R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row500hz40R];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR500Hz40] != (id)[NSNull null])
-        row500hz40R.value = [self getPassFailfromOneZero:hearingDict[kAudioR500Hz40]];
-    
-    [section addFormRow:row500hz40R];
-    
-    XLFormRowDescriptor *row1000hz40L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL1000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 1000Hz at 40 dBHL Results"];
-    row1000hz40L.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row1000hz40L.required = YES;
-    row1000hz40L.selectorOptions = @[@"Pass", @"Fail"];
-    row1000hz40L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row1000hz40L];
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL1000Hz40] != (id)[NSNull null])
-        row1000hz40L.value = [self getPassFailfromOneZero:hearingDict[kAudioL1000Hz40]];
-    [section addFormRow:row1000hz40L];
-    
-    XLFormRowDescriptor *row1000hz40R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR1000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 1000Hz at 40 dBHL Results"];
-    row1000hz40R.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row1000hz40R.required = YES;
-    row1000hz40R.selectorOptions = @[@"Pass", @"Fail"];
-    row1000hz40R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row1000hz40R];
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR1000Hz40] != (id)[NSNull null])
-        row1000hz40R.value = [self getPassFailfromOneZero:hearingDict[kAudioR1000Hz40]];
-    
-    [section addFormRow:row1000hz40R];
-    
-    XLFormRowDescriptor *row2000hz40L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL2000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 2000Hz at 40 dBHL Results"];
-    row2000hz40L.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row2000hz40L.required = YES;
-    row2000hz40L.selectorOptions = @[@"Pass", @"Fail"];
-    row2000hz40L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row2000hz40L];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL2000Hz40] != (id)[NSNull null])
-        row2000hz40L.value = [self getPassFailfromOneZero:hearingDict[kAudioL2000Hz40]];
-    [section addFormRow:row2000hz40L];
-    
-    XLFormRowDescriptor *row2000hz40R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR2000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 2000Hz at 40 dBHL Results"];
-    row2000hz40R.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row2000hz40R.required = YES;
-    row2000hz40R.selectorOptions = @[@"Pass", @"Fail"];
-    row2000hz40R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row2000hz40R];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR2000Hz40] != (id)[NSNull null])
-        row2000hz40R.value = [self getPassFailfromOneZero:hearingDict[kAudioR2000Hz40]];
-    
-    [section addFormRow:row2000hz40R];
-    
-    XLFormRowDescriptor *row4000hz40L = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioL4000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (L) 4000Hz at 40 dBHL Results"];
-    row4000hz40L.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row4000hz40L.required = YES;
-    row4000hz40L.selectorOptions = @[@"Pass", @"Fail"];
-    row4000hz40L.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row4000hz40L];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioL4000Hz40] != (id)[NSNull null])
-        row4000hz40L.value = [self getPassFailfromOneZero:hearingDict[kAudioL4000Hz40]];
-    [section addFormRow:row4000hz40L];
-    
-    XLFormRowDescriptor *row4000hz40R = [XLFormRowDescriptor formRowDescriptorWithTag:kAudioR4000Hz40 rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Audioscope (R) 4000Hz at 40 dBHL Results"];
-    row4000hz40R.cellConfig[@"textLabel.numberOfLines"] = @0;
-    row4000hz40R.required = YES;
-    row4000hz40R.selectorOptions = @[@"Pass", @"Fail"];
-    row4000hz40R.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", attendedAudioscopeRow];
-    [self setDefaultFontWithRow:row4000hz40R];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kAudioR4000Hz40] != (id)[NSNull null])
-        row4000hz40R.value = [self getPassFailfromOneZero:hearingDict[kAudioR4000Hz40]];
-    
-    [section addFormRow:row4000hz40R];
-    
-//    NSArray *audioscopeVariables = @[row500hz60, row500hz25L, row500hz25R, row500hz40L, row500hz40R,
-//                                     row1000hz25L, row1000hz25R, row1000hz40L, row1000hz40R,
-//                                     row2000hz25L, row2000hz25R, row2000hz40L, row2000hz40R,
-//                                     row4000hz25L, row4000hz25R, row4000hz40L, row4000hz40R];
- 
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    XLFormRowDescriptor *referredApptRow = [XLFormRowDescriptor formRowDescriptorWithTag:kApptReferred rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Need referral?"];
-    referredApptRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    referredApptRow.required = YES;
-    referredApptRow.selectorOptions = @[@"Yes", @"No"];
-    [self setDefaultFontWithRow:referredApptRow];
-    
-    //value
-    if (hearingDict != (id)[NSNull null] && [hearingDict objectForKey:kApptReferred] != (id)[NSNull null])
-        referredApptRow.value = [self getYesNofromOneZero:hearingDict[kApptReferred]];
-    
-    [section addFormRow:referredApptRow];
-
     
     return [super initWithForm:formDescriptor];
 }
@@ -2094,6 +1980,8 @@ NSString *const kQuestionFifteen = @"q15";
                 break;
             case BasicVision: fieldName = kCheckSnellenTest;
                 break;
+            case FallRiskAssess: fieldName = kCheckPhysiotherapy;
+                break;
             case Dental: fieldName = kCheckBasicDental;
                 break;
             case Hearing: fieldName = kCheckHearing;
@@ -2140,6 +2028,8 @@ NSString *const kQuestionFifteen = @"q15";
             case Triage: fieldName = kCheckClinicalResults;
                 break;
             case BasicVision: fieldName = kCheckSnellenTest;
+                break;
+            case FallRiskAssess: fieldName = kCheckPhysiotherapy;
                 break;
             case Dental: fieldName = kCheckBasicDental;
                 break;
@@ -2247,6 +2137,18 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_SNELLEN_TEST andFieldName:kLeftEyePlus andNewContent:newValue];
     }
     
+    /* 6. Fall Risk Assessment */
+    else if ([rowDescriptor.tag isEqualToString:kSitStand]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kSitStand andNewContent:[newValue substringToIndex:1]];
+        [self calculateSpbbScore];
+    } else if ([rowDescriptor.tag isEqualToString:kBalance]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kBalance andNewContent:[newValue substringToIndex:1]];
+        [self calculateSpbbScore];
+    } else if ([rowDescriptor.tag isEqualToString:kGaitSpeed]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kGaitSpeed andNewContent:[newValue substringToIndex:1]];
+        [self calculateSpbbScore];
+    }
+    
     /* Additional Services */
     else if ([rowDescriptor.tag isEqualToString:kAppliedChas]) {
         [self postSingleFieldWithSection:SECTION_ADD_SERVICES andFieldName:kAppliedChas andNewContent:ansFromYesNo];
@@ -2267,61 +2169,6 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kOralHealth andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kDentistReferred]) {
         [self postSingleFieldWithSection:SECTION_BASIC_DENTAL andFieldName:kDentistReferred andNewContent:newValue];
-    }
-    
-    /* 7. Hearing */
-    else if ([rowDescriptor.tag isEqualToString:kUsesAidRight]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kUsesAidRight andNewContent:ansFromYesNo];
-    } else if ([rowDescriptor.tag isEqualToString:kUsesAidLeft]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kUsesAidLeft andNewContent:ansFromYesNo];
-    } else if ([rowDescriptor.tag isEqualToString:kAttendedHhie]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAttendedHhie andNewContent:ansFromYesNo];
-    } else if ([rowDescriptor.tag isEqualToString:kAttendedTinnitus]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAttendedTinnitus andNewContent:ansFromYesNo];
-    } else if ([rowDescriptor.tag isEqualToString:kTinnitusResult]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kTinnitusResult andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kOtoscopyLeft]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kOtoscopyLeft andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kOtoscopyRight]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kOtoscopyRight andNewContent:newValue];
-    } else if ([rowDescriptor.tag isEqualToString:kAttendedAudioscope]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAttendedAudioscope andNewContent:ansFromYesNo];
-    } else if ([rowDescriptor.tag isEqualToString:kPractice500Hz60]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kPractice500Hz60 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioR500Hz25]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR500Hz25 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioL500Hz25]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL500Hz25 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioL1000Hz25]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL1000Hz25 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioR1000Hz25]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR1000Hz25 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioL2000Hz25]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL2000Hz25 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioR2000Hz25]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR2000Hz25 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioL4000Hz25]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL4000Hz25 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioR4000Hz25]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR4000Hz25 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioL500Hz40]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL500Hz40 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioR500Hz40]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR500Hz40 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioL1000Hz40]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL1000Hz40 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioR1000Hz40]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR1000Hz40 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioL2000Hz40]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL2000Hz40 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioR2000Hz40]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR2000Hz40 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioL4000Hz40]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioL4000Hz40 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kAudioR4000Hz40]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kAudioR4000Hz40 andNewContent:ansFromPassFail];
-    } else if ([rowDescriptor.tag isEqualToString:kApptReferred]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kApptReferred andNewContent:ansFromYesNo];
     }
     
     /* 10. Emergency Services  */
@@ -2558,11 +2405,6 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp3Dias andNewContent:rowDescriptor.value];
     }
     
-    /* 7. Hearing */
-    else if ([rowDescriptor.tag isEqualToString:kHhieResult]) {
-        [self postSingleFieldWithSection:SECTION_HEARING andFieldName:kHhieResult andNewContent:rowDescriptor.value];
-    }
-    
     /* Doctor's Consult */
     else if ([rowDescriptor.tag isEqualToString:kDocNotes]) {
         [self postSingleFieldWithSection:SECTION_EMERGENCY_SERVICES andFieldName:kDocNotes andNewContent:rowDescriptor.value];
@@ -2573,6 +2415,22 @@ NSString *const kQuestionFifteen = @"q15";
     /* Geriatric Dementia Assessment */
     else if ([rowDescriptor.tag isEqualToString:kAmtScore]) {
         [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kAmtScore andNewContent:rowDescriptor.value];
+    }
+    
+    /* Fall Risk Assessment */
+    else if ([rowDescriptor.tag isEqualToString:kTimeUpGo]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kTimeUpGo andNewContent:rowDescriptor.value];
+        [self checkFallRisk];
+    } else if ([rowDescriptor.tag isEqualToString:kPhysioNotes]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kPhysioNotes andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kKeyResults]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kKeyResults andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kExternalRisks]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kExternalRisks andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kOtherFactors]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kOtherFactors andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kRecommendations]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kRecommendations andNewContent:rowDescriptor.value];
     }
     
     [self updateAnswerColor:rowDescriptor];
@@ -2647,6 +2505,42 @@ NSString *const kQuestionFifteen = @"q15";
         NSLog(@"SERI Disabled!");
         [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:kQualifySeri];
     }
+}
+
+- (void) calculateSpbbScore {
+    NSDictionary *fields = [self.form formValues];
+    NSArray *arrayOfVarName = @[kSitStand,kBalance,kGaitSpeed];
+    int totalScore = 0;
+    for (NSString *str in arrayOfVarName) {
+        if ([fields objectForKey:str] != nil && [fields objectForKey:str] != (id)[NSNull null] && ![[fields objectForKey:str] isEqualToString:@""]) {
+            totalScore += [[[fields objectForKey:str] substringToIndex:1] intValue];    //the first character is always a number
+        }
+    }
+    
+    spbbScoreRow.value = [NSNumber numberWithInt:totalScore];
+    [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kSpbbScore andNewContent:[NSString stringWithFormat:@"%d", totalScore]];
+    [self reloadFormRow:spbbScoreRow];
+    [self checkFallRisk];
+}
+
+- (void) checkFallRisk {
+    if ([[self.form formValues] objectForKey:kTimeUpGo] != (id)[NSNull null]) {
+        float number = [[[self.form formValues] objectForKey:kTimeUpGo] floatValue];
+        NSNumber *spbbScore = spbbScoreRow.value;
+        if (spbbScore != (id)[NSNull null]) {
+            int spbbScoreInt = [spbbScore intValue];
+            
+            if (spbbScoreInt > 6 && number < 15) {
+                fallRiskRow.value = @"MODERATE RISK";
+            } else {
+                fallRiskRow.value = @"HIGH RISK";
+            }
+            [self reloadFormRow:fallRiskRow];
+            [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kFallRisk andNewContent:fallRiskRow.value];
+            
+        }
+    }
+
 }
 
 - (void) calculateScore: (XLFormRowDescriptor *)sender {
@@ -2861,6 +2755,58 @@ NSString *const kQuestionFifteen = @"q15";
     return array;
 }
 
+- (NSString *) getSTSValueFromArray: (id) value {
+    if ([value isKindOfClass:[NSNumber class]]) {
+        if ([value isEqualToNumber:@0]) return @"0 Not able to complete 5 sit-to-stand/Unattempted";
+        else if ([value isEqualToNumber:@1]) return @"1 Complete in >16.7s";
+        else if ([value isEqualToNumber:@2]) return @"2 Complete in 16.6-13.7s";
+        else if ([value isEqualToNumber:@3]) return @"3 Complete in 13.6-11.2s";
+        else if ([value isEqualToNumber:@4]) return @"4 Complete in <11.2s";
+    } else if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"0"]) return @"0 Not able to complete 5 sit-to-stand/Unattempted";
+        else if ([value isEqualToString:@"1"]) return @"1 Complete in >16.7s";
+        else if ([value isEqualToString:@"2"]) return @"2 Complete in 16.6-13.7s";
+        else if ([value isEqualToString:@"3"]) return @"3 Complete in 13.6-11.2s";
+        else if ([value isEqualToString:@"4"]) return @"4 Complete in <11.2s";
+    }
+    return @"";
+}
+
+- (NSString *) getBalanceValueFromArray: (id) value {
+    if ([value isKindOfClass:[NSNumber class]]) {
+        if ([value isEqualToNumber:@0]) return @"0 Side-by-side <10s or unable to perform/Unattempted";
+        else if ([value isEqualToNumber:@1]) return @"1 Side-by-side 10s, <10s semi-tandem";
+        else if ([value isEqualToNumber:@2]) return @"2 Semi-tandem 10s, tandem 0-2s";
+        else if ([value isEqualToNumber:@3]) return @"3 Semi-tandem 10s, tandem 3-9s";
+        else if ([value isEqualToNumber:@4]) return @"4 Tandem ≥ 10s";
+    } else if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"0"]) return @"0 Side-by-side <10s or unable to perform/Unattempted";
+        else if ([value isEqualToString:@"1"]) return @"1 Side-by-side 10s, <10s semi-tandem";
+        else if ([value isEqualToString:@"2"]) return @"2 Semi-tandem 10s, tandem 0-2s";
+        else if ([value isEqualToString:@"3"]) return @"3 Semi-tandem 10s, tandem 3-9s";
+        else if ([value isEqualToString:@"4"]) return @"4 Tandem ≥ 10s";
+    }
+    return @"";
+}
+
+- (NSString *) getGaitSpeedValueFromArray: (id) value {
+    if ([value isKindOfClass:[NSNumber class]]) {
+        if ([value isEqualToNumber:@0]) return @"0 Not attempted/not able";
+        else if ([value isEqualToNumber:@1]) return @"1 Completed in >5.7s";
+        else if ([value isEqualToNumber:@2]) return @"2 Completed in 4.1-5.7s";
+        else if ([value isEqualToNumber:@3]) return @"3 Completed in 3.2-4.0s";
+        else if ([value isEqualToNumber:@4]) return @"4 Completed in <3.1s";
+    } else if ([value isKindOfClass:[NSString class]]) {
+        if ([value isEqualToString:@"0"]) return @"0 Not attempted/not able";
+        else if ([value isEqualToString:@"1"]) return @"1 Completed in >5.7s";
+        else if ([value isEqualToString:@"2"]) return @"2 Completed in 4.1-5.7s";
+        else if ([value isEqualToString:@"3"]) return @"3 Completed in 3.2-4.0s";
+        else if ([value isEqualToString:@"4"]) return @"4 Completed in <3.1s";
+    }
+    return @"";
+    
+}
+
 
 - (NSArray *) getScreeningTimeArrayFromDict:(NSDictionary *) dictionary andOptions:(NSArray *) options {
     NSMutableArray *screeningTimeArray = [[NSMutableArray alloc] init];
@@ -2966,23 +2912,6 @@ NSString *const kQuestionFifteen = @"q15";
     return @"";
 }
 
-- (NSString *) getPassFailfromOneZero: (id) value {
-    if ([value isKindOfClass:[NSString class]]) {
-        if ([value isEqualToString:@"1"]) {
-            return @"Pass";
-        } else {
-            return @"Fail";
-        }
-    } else if ([value isKindOfClass:[NSNumber class]]) {
-        if ([value isEqual:@1]) {
-            return @"Pass";
-        } else {
-            return @"Fail";
-        }
-    }
-    return @"";
-}
-
 - (NSString *) removePostfixIfAny: (id) value {
     if ([value isKindOfClass:[NSDecimalNumber class]]) {
         return value;
@@ -2995,6 +2924,8 @@ NSString *const kQuestionFifteen = @"q15";
     
     return value;
 }
+
+
 
 #pragma mark - Reachability
 /*!

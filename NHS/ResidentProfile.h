@@ -21,7 +21,7 @@
 
 - (BOOL) isEligiblePhleb;
 - (BOOL) isEligibleFallRisk;
-- (BOOL) isEligibleAdvFallRisk;
+- (BOOL) isEligibleFallRiskAssessment;
 - (BOOL) isEligibleGeriatricDementiaAssmt;
 - (BOOL) isEligibleHearing;
 - (BOOL) isEligibleSmf;

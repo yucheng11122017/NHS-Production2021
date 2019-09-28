@@ -51,6 +51,7 @@ typedef enum rowTypes {
 @interface ResidentParticularsVC () {
     NSString *neighbourhood;
     XLFormRowDescriptor* dobRow, *ageRow, *age40aboveRow, *screeningSignButtonRow, *researchSignButtonRow;
+    XLFormSectionDescriptor *mammoSection;
     int successCounter, failCounter;
     NetworkStatus status;
     int fetchDataState;
@@ -887,28 +888,111 @@ typedef enum rowTypes {
     [section addFormRow:didPhlebRow];
     
     if (![neighbourhood containsString:@"Kampong"]) {
-        XLFormRowDescriptor *mammoInterestRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammogramInterest
-                                                                                      rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                                                        title:@"Are you interested in taking a mammogram on Saturday 10am-1pm?"];
-        [self setDefaultFontWithRow:mammoInterestRow];
-        mammoInterestRow.required = YES;
-        mammoInterestRow.selectorOptions = @[@"Yes",@"No"];
-        mammoInterestRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-        mammoInterestRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Female'", genderRow];
-        mammoInterestRow.value = [self getYesNoFromOneZero:[_mammogramInterestDict objectForKey:kMammogramInterest]];
-        [section addFormRow:mammoInterestRow];
-    }
         
+        
+        mammoSection = [XLFormSectionDescriptor formSectionWithTitle:@"Mammogram"];
+        [formDescriptor addFormSection:mammoSection];
+        
+        XLFormRowDescriptor *mammogramInterestRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammogramInterest
+                                                                     rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                       title:@"Are you interested in taking a mammogram on Saturday 10am-1pm?"];
+        [self setDefaultFontWithRow:mammogramInterestRow];
+        mammogramInterestRow.required = YES;
+        mammogramInterestRow.selectorOptions = @[@"Yes",@"No"];
+        mammogramInterestRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+        mammogramInterestRow.value = [self getYesNoFromOneZero:[_mammogramInterestDict objectForKey:kMammogramInterest]];
+        [mammoSection addFormRow:mammogramInterestRow];
+        
+        XLFormRowDescriptor *hasChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHasChas
+                                                           rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                             title:@"Does the resident have a Blue/Orange CHAS card?"];
+        [self setDefaultFontWithRow:hasChasRow];
+        hasChasRow.required = YES;
+        hasChasRow.selectorOptions = @[@"Yes",@"No"];
+        hasChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+        hasChasRow.value = [self getYesNoFromOneZero:[_mammogramInterestDict objectForKey:kHasChas]];
+        hasChasRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", mammogramInterestRow];
+        [mammoSection addFormRow:hasChasRow];
+        
+        XLFormRowDescriptor *doneB4Row = [XLFormRowDescriptor formRowDescriptorWithTag:kDoneBefore
+                                                          rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                            title:@"Has the resident done a mammogram before?"];
+        [self setDefaultFontWithRow:doneB4Row];
+        doneB4Row.required = YES;
+        doneB4Row.selectorOptions = @[@"Yes",@"No"];
+        doneB4Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+        doneB4Row.value = [self getYesNoFromOneZero:[_mammogramInterestDict objectForKey:kDoneBefore]];
+        doneB4Row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Yes'", mammogramInterestRow];
+        [mammoSection addFormRow:doneB4Row];
+        
+        XLFormRowDescriptor *willingPayRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWillingPay
+                                                              rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                title:@"Is resident willing to pay $10 for mammogram? (To explain that resident has to pay subsidised fee of $10 if this is a repeat mammogram.)"];
+        [self setDefaultFontWithRow:willingPayRow];
+        willingPayRow.required = YES;
+        willingPayRow.selectorOptions = @[@"Yes",@"No"];
+        willingPayRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+        willingPayRow.value = [self getYesNoFromOneZero:[_mammogramInterestDict objectForKey:kWillingPay]];
+        if ([willingPayRow.value isEqualToString:@""]) { //no value
+            willingPayRow.hidden = @YES;
+        }
+        [mammoSection addFormRow:willingPayRow];
+        
+        if ([genderRow.value containsString:@"F"] && [age40aboveRow.value isEqualToString:@"Yes"]) {
+            mammoSection.hidden = @NO;
+        } else {
+            mammoSection.hidden = @YES;
+        }
+        
+        mammogramInterestRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+            if (newValue != oldValue) {
+                if ([newValue isEqualToString:@"Yes"]) {
+                    hasChasRow.hidden = @NO;
+                    doneB4Row.hidden = @NO;
+                } else {
+                    hasChasRow.hidden = @YES;
+                    doneB4Row.hidden = @YES;
+                }
+                
+                [self reloadFormRow:hasChasRow];
+                [self reloadFormRow:doneB4Row];
+            }
+        };
+        
+        
+        hasChasRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+            if (newValue != oldValue) {
+                if ([newValue isEqualToString:@"No"]) {
+                    if (doneB4Row.value != (id)[NSNull null] && [doneB4Row.value isEqualToString:@"Yes"]) {
+                        willingPayRow.hidden = @NO;
+                    } else {
+                        willingPayRow.hidden = @YES;
+                    }
+                } else {
+                    willingPayRow.hidden = @YES;
+                }
+                
+                [self reloadFormRow:willingPayRow];
+            }
+        };
+        
+        doneB4Row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+            if (newValue != oldValue) {
+                if ([newValue isEqualToString:@"Yes"]) {
+                    if (hasChasRow.value != (id)[NSNull null] && [hasChasRow.value isEqualToString:@"No"]) {
+                        willingPayRow.hidden = @NO;
+                    } else {
+                        willingPayRow.hidden = @YES;
+                    }
+                } else {
+                    willingPayRow.hidden = @YES;
+                }
+                
+                [self reloadFormRow:willingPayRow];
+            }
+        };
+    }
     
-    //
-    //    genderRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-    //        if (newValue != oldValue) {
-    //            if ([newValue isEqualToString:@"Female"]) {
-    //                mammo
-    //            }
-    //        }
-    //    }
-    //
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Mode of Screening"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
     
@@ -1251,7 +1335,7 @@ typedef enum rowTypes {
         [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kWrittenLang andNewContent:newValue];
     }
     else if ([rowDescriptor.tag isEqualToString:kConsent]) {
-        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kConsent andNewContent:[self getYesNoFromOneZero:newValue]];
+        [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:kConsent andNewContent:[self getOneZerofromYesNo:newValue]];
     }
     else if ([rowDescriptor.tag isEqualToString:kLangExplainedIn]) {
         [self postSingleFieldWithSection:SECTION_CONSENT_DISCLOSURE andFieldName:kLangExplainedIn andNewContent:newValue];
@@ -1288,6 +1372,15 @@ typedef enum rowTypes {
     }
     else if ([rowDescriptor.tag isEqualToString:kMammogramInterest]) {
         [self postSingleFieldWithSection:SECTION_MAMMOGRAM_INTEREST andFieldName:kMammogramInterest andNewContent:ansFromYesNo];
+    }
+    else if ([rowDescriptor.tag isEqualToString:kHasChas]) {
+        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_INTEREST andFieldName:kHasChas andNewContent:ansFromYesNo];
+    }
+    else if ([rowDescriptor.tag isEqualToString:kDoneBefore]) {
+        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_INTEREST andFieldName:kDoneBefore andNewContent:ansFromYesNo];
+    }
+    else if ([rowDescriptor.tag isEqualToString:kWillingPay]) {
+        [self postSingleFieldWithSection:SECTION_MAMMOGRAM_INTEREST andFieldName:kWillingPay andNewContent:ansFromYesNo];
     }
     else if ([rowDescriptor.tag isEqualToString:kScreenMode]) {
         [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kScreenMode andNewContent:newValue];
@@ -1497,21 +1590,6 @@ typedef enum rowTypes {
     return @"";
 }
 
-//- (NSArray *) getSpokenLangArray: (NSDictionary *) dictionary {
-//    NSMutableArray *spokenLangArray = [[NSMutableArray alloc] init];
-//
-//    if([[dictionary objectForKey:kLangCanto] isEqual:@(1)]) [spokenLangArray addObject:@"Cantonese"];
-//    if([[dictionary objectForKey:kLangEng] isEqual:@(1)]) [spokenLangArray addObject:@"English"];
-//    if([[dictionary objectForKey:kLangHindi] isEqual:@(1)]) [spokenLangArray addObject:@"Hindi"];
-//    if([[dictionary objectForKey:kLangHokkien] isEqual:@(1)]) [spokenLangArray addObject:@"Hokkien"];
-//    if([[dictionary objectForKey:kLangMalay] isEqual:@(1)]) [spokenLangArray addObject:@"Malay"];
-//    if([[dictionary objectForKey:kLangMandarin] isEqual:@(1)]) [spokenLangArray addObject:@"Mandarin"];
-//    if([[dictionary objectForKey:kLangOthers] isEqual:@(1)]) [spokenLangArray addObject:@"Others"];
-//    if([[dictionary objectForKey:kLangTamil] isEqual:@(1)]) [spokenLangArray addObject:@"Tamil"];
-//    if([[dictionary objectForKey:kLangTeoChew] isEqual:@(1)]) [spokenLangArray addObject:@"Teochew"];
-//    return spokenLangArray;
-//}
-
 - (NSString *) getTimeNowInString {
     // get current date/time
     NSDate *today = [NSDate date];
@@ -1521,39 +1599,6 @@ typedef enum rowTypes {
     
     return [localDateTime description];
 }
-
-//- (NSString *) getHousingOwnedRentedFromTwoValues {
-//
-//    if (_residentParticularsDict[kHousingNumRooms] != (id) [NSNull null]) { //got some value
-//        NSString *numRooms = _residentParticularsDict[kHousingNumRooms];
-//        NSString *housingType = _residentParticularsDict[kHousingType];
-//
-//        if (housingType == (id)[NSNull null] || housingType == nil)     //don't continue
-//            return @"";
-//
-//        if (![housingType isEqualToString:@"Private"])
-//            return [NSString stringWithFormat:@"%@, %@-room", housingType, numRooms];
-//        else
-//            return @"Private";
-//    }
-//    return @"";
-//}
-
-//- (void) postSpokenLangWithLangName:(NSString *) language andValue: (NSString *) value {
-//    NSString *fieldName;
-//    if ([language isEqualToString:@"Cantonese"]) fieldName = kLangCanto;
-//    else if ([language isEqualToString:@"English"]) fieldName = kLangEng;
-//    else if ([language isEqualToString:@"Hindi"]) fieldName = kLangHindi;
-//    else if ([language isEqualToString:@"Hokkien"]) fieldName = kLangHokkien;
-//    else if ([language isEqualToString:@"Malay"]) fieldName = kLangMalay;
-//    else if ([language isEqualToString:@"Mandarin"]) fieldName = kLangMandarin;
-//    else if ([language isEqualToString:@"Tamil"]) fieldName = kLangTamil;
-//    else if ([language isEqualToString:@"Teochew"]) fieldName = kLangTeoChew;
-//    else if ([language isEqualToString:@"Others"]) fieldName = kLangOthers;
-//
-//    [self postSingleFieldWithSection:SECTION_RESI_PART andFieldName:fieldName andNewContent:value];
-//}
-
 
 - (NSString *) replaceShortForms: (NSString *) originalString {
     NSString *pattern_rd = @"\\bRD\\b";

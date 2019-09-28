@@ -46,6 +46,10 @@
     
     NSMutableArray *signPathArray = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     [self.signatureView setPathArray:signPathArray];
+    CGFloat borderWidth = 2.0f;
+    
+    self.signatureView.layer.borderColor = [UIColor grayColor].CGColor;
+    self.signatureView.layer.borderWidth = borderWidth;
     [self.signatureView setNeedsDisplay];
 }
 

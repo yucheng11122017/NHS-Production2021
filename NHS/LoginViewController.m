@@ -22,7 +22,7 @@
 #define USERNAME_TEXTFIELD_TAG 3
 #define PASSWORD_TEXTFIELD_TAG 4
 
-#define DEVELOPMENT_PHASE 1
+//#define DEVELOPMENT_PHASE 1
 
 @interface LoginViewController () {
     NSNumber *isComm;
@@ -53,10 +53,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     // Do any additional setup after loading the view, typically from a nib.
 }
-
-
 
 - (void)viewWillAppear:(BOOL)animated {
     

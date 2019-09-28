@@ -18,8 +18,8 @@
 
 
 typedef enum formName {
-    FallRiskAssmt,
     DementiaAssmt,
+    Referrals,
 } formName;
 
 
@@ -56,18 +56,12 @@ typedef enum formName {
     //must init first before [super viewDidLoad]
     int formNumber = [_formNo intValue];
     
-    
-    formNumber++;   //to compensate the deleted first part of this section
-    
-    
     switch (formNumber) {
-            //case 0 is for demographics
-            
-        case FallRiskAssmt:
-            form = [self initAdvFallRiskAssmt];
-            break;
         case DementiaAssmt:
             form = [self initDementiaAssmt];
+            break;
+        case Referrals:
+            form = [self initReferrals];
             break;
         default:
             break;
@@ -106,41 +100,41 @@ typedef enum formName {
     // Dispose of any resources that can be recreated.
 }
 
-- (id) initAdvFallRiskAssmt {
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Adv Fall Risk Assessment"];
-    XLFormSectionDescriptor * section;
-    XLFormRowDescriptor * row;
-    
-    NSDictionary *advFallRiskAssmtDict = [_fullScreeningForm objectForKey:SECTION_ADV_FALL_RISK_ASSMT];
-    
-    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
-    
-    if (checkDict != nil && checkDict != (id)[NSNull null]) {
-        NSNumber *check = checkDict[kCheckAdvFallRiskAssmt];
-        if ([check isKindOfClass:[NSNumber class]]) {
-            isFormFinalized = [check boolValue];
-        }
-    }
-    
-    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
-    [formDescriptor addFormSection:section];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kGivenReferral rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Resident given referral?"];
-    row.noValueDisplayText = @"Tap here";
-    row.required = YES;
-    [self setDefaultFontWithRow:row];
-    row.selectorOptions = @[@"NIL", @"Cluster Operator", @"Hospital"];
-    row.required = YES;
-    
-    //value
-    if (advFallRiskAssmtDict != (id)[NSNull null] && [advFallRiskAssmtDict objectForKey:kGivenReferral] != (id)[NSNull null]) {
-        row.value = [advFallRiskAssmtDict objectForKey:kGivenReferral];
-    }
-    
-    [section addFormRow:row];
-    
-    return [super initWithForm:formDescriptor];
-}
+//- (id) initAdvFallRiskAssmt {
+//    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Adv Fall Risk Assessment"];
+//    XLFormSectionDescriptor * section;
+//    XLFormRowDescriptor * row;
+//
+//    NSDictionary *advFallRiskAssmtDict = [_fullScreeningForm objectForKey:SECTION_ADV_FALL_RISK_ASSMT];
+//
+//    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+//
+//    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+//        NSNumber *check = checkDict[kCheckAdvFallRiskAssmt];
+//        if ([check isKindOfClass:[NSNumber class]]) {
+//            isFormFinalized = [check boolValue];
+//        }
+//    }
+//
+//    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+//    [formDescriptor addFormSection:section];
+//
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:kGivenReferral rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Resident given referral?"];
+//    row.noValueDisplayText = @"Tap here";
+//    row.required = YES;
+//    [self setDefaultFontWithRow:row];
+//    row.selectorOptions = @[@"NIL", @"Cluster Operator", @"Hospital"];
+//    row.required = YES;
+//
+//    //value
+//    if (advFallRiskAssmtDict != (id)[NSNull null] && [advFallRiskAssmtDict objectForKey:kGivenReferral] != (id)[NSNull null]) {
+//        row.value = [advFallRiskAssmtDict objectForKey:kGivenReferral];
+//    }
+//
+//    [section addFormRow:row];
+//
+//    return [super initWithForm:formDescriptor];
+//}
 
 
 - (id) initDementiaAssmt {
@@ -213,6 +207,7 @@ typedef enum formName {
     [section addFormRow:eduStatusRow];
     
     dementiaStatusRow = [XLFormRowDescriptor formRowDescriptorWithTag:kDementiaStatus rowType:XLFormRowDescriptorTypeInfo title:@"Dementia Status (auto-calculate)"];
+    [self setDefaultFontWithRow:dementiaStatusRow];
     dementiaStatusRow.cellConfig[@"textLabel.numberOfLines"] = @0;
 //    [self setDefaultFontWithRow:dementiaStatus];
     
@@ -220,6 +215,56 @@ typedef enum formName {
         dementiaStatusRow.value = dementiaAssmtDict[kDementiaStatus];
 
     [section addFormRow:dementiaStatusRow];
+    
+    if (dementiaAssmtDict != (id)[NSNull null] && [dementiaAssmtDict objectForKey:kUndergoneDementia] != (id)[NSNull null]) {
+        undergoneDementia.value = [self getYesNofromOneZero:dementiaAssmtDict[kUndergoneDementia]];
+        
+        if ([undergoneDementia.value isEqualToString:@"No"]) {
+            amtScoreRow.required = NO;
+            eduStatusRow.required = NO;
+        } else {
+            amtScoreRow.required = YES;
+            eduStatusRow.required = YES;
+        }
+        [self reloadFormRow:amtScoreRow];
+        [self reloadFormRow:eduStatusRow];
+    }
+    
+    undergoneDementia.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqualToString:@"No"]) {
+                amtScoreRow.required = NO;
+                eduStatusRow.required = NO;
+            } else {
+                amtScoreRow.required = YES;
+                eduStatusRow.required = YES;
+            }
+            [self reloadFormRow:amtScoreRow];
+            [self reloadFormRow:eduStatusRow];
+        }
+    };
+    
+    
+    return [super initWithForm:formDescriptor];
+}
+
+- (id) initReferrals {
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Referrals"];
+    XLFormSectionDescriptor * section;
+    
+    NSDictionary *dementiaAssmtDict = [_fullScreeningForm objectForKey:SECTION_GERIATRIC_DEMENTIA_ASSMT];
+    
+    NSDictionary *checkDict = _fullScreeningForm[SECTION_CHECKS];
+    
+    if (checkDict != nil && checkDict != (id)[NSNull null]) {
+        NSNumber *check = checkDict[kCheckReferrals];
+        if ([check isKindOfClass:[NSNumber class]]) {
+            isFormFinalized = [check boolValue];
+        }
+    }
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
     
     XLFormRowDescriptor *reqFollowUpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kReqFollowupAdvGer rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Resident given referral?"];
     reqFollowUpRow.required = YES;
@@ -232,43 +277,9 @@ typedef enum formName {
         reqFollowUpRow.value = dementiaAssmtDict[kReqFollowupAdvGer];
     
     [section addFormRow:reqFollowUpRow];
-    
-    if (dementiaAssmtDict != (id)[NSNull null] && [dementiaAssmtDict objectForKey:kUndergoneDementia] != (id)[NSNull null]) {
-        undergoneDementia.value = [self getYesNofromOneZero:dementiaAssmtDict[kUndergoneDementia]];
-        
-        if ([undergoneDementia.value isEqualToString:@"No"]) {
-            amtScoreRow.required = NO;
-            eduStatusRow.required = NO;
-            reqFollowUpRow.required = NO;
-        } else {
-            amtScoreRow.required = YES;
-            eduStatusRow.required = YES;
-            reqFollowUpRow.required = YES;
-        }
-        [self reloadFormRow:amtScoreRow];
-        [self reloadFormRow:eduStatusRow];
-        [self reloadFormRow:reqFollowUpRow];
-    }
-    
-    undergoneDementia.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqualToString:@"No"]) {
-                amtScoreRow.required = NO;
-                eduStatusRow.required = NO;
-                reqFollowUpRow.required = NO;
-            } else {
-                amtScoreRow.required = YES;
-                eduStatusRow.required = YES;
-                reqFollowUpRow.required = YES;
-            }
-            [self reloadFormRow:amtScoreRow];
-            [self reloadFormRow:eduStatusRow];
-            [self reloadFormRow:reqFollowUpRow];
-        }
-    };
-    
-    
+
     return [super initWithForm:formDescriptor];
+
 }
 
 #pragma mark - Buttons
@@ -282,17 +293,15 @@ typedef enum formName {
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Finalize" style:UIBarButtonItemStyleDone target:self action:@selector(finalizeBtnPressed:)];
         
         NSString *fieldName;
-        
         switch ([self.formNo intValue]) {
-
-            case FallRiskAssmt: fieldName = kCheckAdvFallRiskAssmt;
-                break;
             case DementiaAssmt: fieldName = kCheckGeriatricDementiaAssmt;
                 break;
-                
+            case Referrals: fieldName = kCheckReferrals;
+                break;
+
             default:
                 break;
-                
+
         }
         
         [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"0"]; //un-finalize it
@@ -322,17 +331,16 @@ typedef enum formName {
         return;
     } else {
         NSString *fieldName;
-//
-//        switch ([self.formNo intValue]) {
-//            case FallRiskAssmt: fieldName = kCheckAdvFallRiskAssmt;
-//                break;
-//            case DementiaAssmt:
-//                break;
-//            default:
-//                break;
-//
-//        }
-        fieldName = kCheckGeriatricDementiaAssmt;
+
+        switch ([self.formNo intValue]) {
+            case DementiaAssmt: fieldName = kCheckGeriatricDementiaAssmt;
+                break;
+            case Referrals: fieldName = kCheckReferrals;
+                break;
+            default:
+                break;
+
+        }
         [self postSingleFieldWithSection:SECTION_CHECKS andFieldName:fieldName andNewContent:@"1"];
         [SVProgressHUD setMaximumDismissTimeInterval:1.0];
         [SVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeBlack];
@@ -373,17 +381,18 @@ typedef enum formName {
     }
     
     /* Geriatric Dementia Assessment */
-    if ([rowDescriptor.tag isEqualToString:kGivenReferral]) {
-        [self postSingleFieldWithSection:SECTION_ADV_FALL_RISK_ASSMT andFieldName:kGivenReferral andNewContent:newValue];
-    }
-    
-    else if ([rowDescriptor.tag isEqualToString:kUndergoneDementia]) {
+    if ([rowDescriptor.tag isEqualToString:kUndergoneDementia]) {
         [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kUndergoneDementia andNewContent:ansFromYesNo];
     } else if ([rowDescriptor.tag isEqualToString:kEduStatus]) {
         [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kEduStatus andNewContent:newValue];
         [self tabulateDementiaStatus];
     } else if ([rowDescriptor.tag isEqualToString:kDementiaStatus]) {
-        [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kDementiaStatus andNewContent:newValue];
+        double delayInSeconds = 1.0;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            //code to be executed on the main queue after delay
+            [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kDementiaStatus andNewContent:newValue];
+        });
     } else if ([rowDescriptor.tag isEqualToString:kReqFollowupAdvGer]) {
         [self postSingleFieldWithSection:SECTION_GERIATRIC_DEMENTIA_ASSMT andFieldName:kReqFollowupAdvGer andNewContent:newValue];
     }

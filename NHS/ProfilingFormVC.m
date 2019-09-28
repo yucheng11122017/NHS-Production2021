@@ -897,8 +897,8 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kHCBRemarks rowType:XLFormRowDescriptorTypeText title:@"Remarks (Disease/Destination)"];
     row.required = YES;
-    row.noValueDisplayText = @"Type here";
     [self setDefaultFontWithRow:row];
+    [row.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     //value
     if (healthcareBarriersDict != (id)[NSNull null] && [healthcareBarriersDict objectForKey:kHCBRemarks] != (id)[NSNull null]) {
         row.value = healthcareBarriersDict[kHCBRemarks];
@@ -956,7 +956,9 @@ typedef enum formName {
     
     if ([frequency isEqualToString:@"going"]) {
         whyNotFollowUpQRow.disabled = @YES;
+        whyNotFollowUpQRow.hidden = @YES;
         whyNotFollowUpRow.disabled = @YES;
+        whyNotFollowUpRow.hidden = @YES;
         whyNotFollowUpRow.required = NO;
     } else if ([frequency isEqualToString:@"not"]) {
         doctorSeeQRow.disabled = @YES;
@@ -964,7 +966,9 @@ typedef enum formName {
         doctorSeeRow.disabled = @YES;
     } else {
         whyNotFollowUpQRow.disabled = @YES;
+        whyNotFollowUpQRow.hidden = @YES;
         whyNotFollowUpRow.disabled = @YES;
+        whyNotFollowUpRow.hidden = @YES;
         whyNotFollowUpRow.required = NO;
         doctorSeeQRow.disabled = @YES;
         doctorSeeRow.required = NO;
@@ -1126,9 +1130,11 @@ typedef enum formName {
     [self setDefaultFontWithRow:row];
     row.cellConfig[@"textLabel.numberOfLines"] = @0;
     row.selectorOptions = @[@"Yes", @"No"];
-    if ([gender containsString:@"M"])
-        row.disabled = @YES;
     row.required = YES;
+    if ([gender containsString:@"M"]) {
+        row.disabled = @YES;
+        row.required = NO;
+    }
     
     //value
     if (riskStratDict != (id)[NSNull null] && [riskStratDict objectForKey:kDelivered4kgOrGestational] != (id)[NSNull null]) {
@@ -1596,7 +1602,7 @@ typedef enum formName {
     [self setDefaultFontWithRow:colonoscopy10YrsRow];
     colonoscopy10YrsRow.selectorOptions = @[@"Yes", @"No"];
     colonoscopy10YrsRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
-    colonoscopy10YrsRow.required = NO;
+    colonoscopy10YrsRow.required = YES;
     [section addFormRow:colonoscopy10YrsRow];
     
     colonoscopy10YrsRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
@@ -2205,10 +2211,10 @@ typedef enum formName {
     [section addFormRow:fallRiskScoreRow];
     
     fallRiskStatusRow = [XLFormRowDescriptor formRowDescriptorWithTag:kFallRiskStatus
-                                                              rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                              rowType:XLFormRowDescriptorTypeSelectorPush
                                                                 title:@"Fall Risk Status"];
     [self setDefaultFontWithRow:fallRiskStatusRow];
-    fallRiskStatusRow.selectorOptions = @[@"Low Risk", @"High Risk"];
+    fallRiskStatusRow.selectorOptions = @[@"Low Risk", @"Moderate/High Risk"];
     fallRiskStatusRow.disabled = @YES;
     fallRiskStatusRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     
@@ -2331,8 +2337,6 @@ typedef enum formName {
     row.hidden = [NSString stringWithFormat:@"NOT $%@.value contains ' employed'", employmentRow]; //if there's other employment, don't show this!
     [self setDefaultFontWithRow:row];
     row.required = NO;
-    
-#warning write a code for showing this field as long as employed.
     [section addFormRow:row];
 
     
@@ -2376,6 +2380,7 @@ typedef enum formName {
     [section addFormRow:noOfPplInHouse];
     
     XLFormRowDescriptor *avgIncomePerHead = [XLFormRowDescriptor formRowDescriptorWithTag:kAvgIncomePerHead rowType:XLFormRowDescriptorTypeDecimal title:@"Resident's household monthly income in S$"];   //auto-calculate
+    avgIncomePerHead.cellConfig[@"textLabel.numberOfLines"] = @0;
     
     //value
     if (financeHistDict != (id)[NSNull null] && financeHistDict[avgIncomePerHead] != (id) [NSNull null])
@@ -2587,6 +2592,17 @@ typedef enum formName {
                     NSMutableSet *newSet = [NSMutableSet setWithCapacity:[newValue count]];
                     [newSet addObjectsFromArray:newValue];
                     
+                    if ([newValue containsObject:@"None of the above"]) {
+                        if ([newValue count] > 1) {
+                            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error" message:@"Not allowed to have None and other options. Please remove either option." preferredStyle:UIAlertControllerStyleAlert];
+                            UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                                //do nothing
+                            }];
+                            [alertController addAction:okAction];
+                            [self presentViewController:alertController animated:YES completion:nil];
+                        }
+                    }
+                    
                     if ([newSet count] > [oldSet count]) {
                         [newSet minusSet:oldSet];
                         NSArray *array = [newSet allObjects];
@@ -2656,8 +2672,8 @@ typedef enum formName {
     lowHouseIncomeRow.cellConfig[@"textLabel.numberOfLines"] = @0;    //allow it to expand the cell.
     lowHouseIncomeRow.required = NO;
     
-    if ([[ResidentProfile sharedManager] hasIncome]) lowHouseIncomeRow.disabled = @NO;
-    else lowHouseIncomeRow.disabled = @YES;
+//    if ([[ResidentProfile sharedManager] hasIncome]) lowHouseIncomeRow.disabled = @NO;
+//    else lowHouseIncomeRow.disabled = @YES;
     
     [section addFormRow:lowHouseIncomeRow];
     
@@ -3489,9 +3505,22 @@ typedef enum formName {
         fallRiskScoreRow.value = [NSNumber numberWithInt:[self calculateTotalFallRiskScore]];
         [self reloadFormRow:fallRiskScoreRow];
     } else if ([rowDescriptor.tag isEqualToString:kFallRiskScore]) {
-        [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kFallRiskScore andNewContent:rowDescriptor.value];
+        double delayInSeconds = 1.5;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            //code to be executed on the main queue after delay
+            [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kFallRiskScore andNewContent:rowDescriptor.value];
+        });
+        
+        
     } else if ([rowDescriptor.tag isEqualToString:kFallRiskStatus]) {
-        [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kFallRiskStatus andNewContent:rowDescriptor.value];
+        double delayInSeconds = 1.0;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            //code to be executed on the main queue after delay
+            [self postSingleFieldWithSection:SECTION_FALL_RISK_ELIGIBLE andFieldName:kFallRiskStatus andNewContent:rowDescriptor.value];
+        });
+        
     }
     
     /* Dementia Assessment (Basic) */
@@ -3596,11 +3625,35 @@ typedef enum formName {
             //code to be executed on the main queue after delay
             [self postSingleFieldWithSection:SECTION_DEPRESSION andFieldName:kPhqQ2Score andNewContent:newValue];
         });
+        if ([newValue intValue] >= 3) {
+            NSDictionary *dict = [_fullScreeningForm objectForKey:SECTION_MODE_OF_SCREENING];
+            if ([[dict objectForKey:kScreenMode] containsString:@"Door"])  {
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Message" message:@"Social Work needed, contact SW I/C" preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                    // do nothing
+                }];
+                [alertController addAction:okAction];
+                [self presentViewController:alertController animated:YES completion:nil];
+            }
+        }
     }
 
     /* Suicide Risk Assessment (Basic) */
     else if ([rowDescriptor.tag isEqualToString:kPossibleSuicide]) {
         [self postSingleFieldWithSection:SECTION_SUICIDE_RISK andFieldName:kPossibleSuicide andNewContent:ansFromYesNo];
+        
+        if ([ansFromYesNo boolValue]) {
+            UIAlertController * alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Take note", nil)
+                                                                                      message:@"Social Work Emergency, bring resident to Social Work Emergency room"
+                                                                               preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", nil)
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * okAction) {
+                                                                  //do nothing for now
+                                                              }]];
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
     }
     
 }
@@ -4216,7 +4269,7 @@ typedef enum formName {
     
     /* Return the Score and determine the Risk */
     if (totalScore >= 4) {
-        fallRiskStatusRow.value = @"High Risk";
+        fallRiskStatusRow.value = @"Moderate/High Risk";
         [self reloadFormRow:fallRiskStatusRow];
         return totalScore;
     } else if (totalScore >= 0 && totalScore <= 3) {
@@ -4224,7 +4277,7 @@ typedef enum formName {
         XLFormRowDescriptor *steadinessRow = [_fallRiskQuestionsArray objectAtIndex:2];
         if (assistLevelRow.value) {
             if (![assistLevelRow.value containsString:@"None"]) { // Q1 >= 1
-                fallRiskStatusRow.value = @"High Risk";
+                fallRiskStatusRow.value = @"Moderate/High Risk";
                 [self reloadFormRow:fallRiskStatusRow];
                 return totalScore;
                 
@@ -4233,7 +4286,7 @@ typedef enum formName {
         
         if (steadinessRow.value) {
             if (![steadinessRow.value containsString:@"unsteadiness"]) { // Q2 >= 1
-                fallRiskStatusRow.value = @"High Risk";
+                fallRiskStatusRow.value = @"Moderate/High Risk";
                 [self reloadFormRow:fallRiskStatusRow];
                 return totalScore;
             }

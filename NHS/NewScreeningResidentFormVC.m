@@ -14,6 +14,7 @@
 #import "ScreeningSelectProfileTableVC.h"
 #import "math.h"
 #import "AFNetworking.h"
+@import WebKit;
 
 //XLForms stuffs.0 blue:141.0/255.0 alpha:1.0]
 #define RESI_PART_SECTION @"resi_particulars"
@@ -25,7 +26,9 @@
 @interface NewScreeningResidentFormVC () {
     NSString *neighbourhood;
     NetworkStatus status;
-    XLFormRowDescriptor *dobRow, *ageRow, *age40aboveRow, *screeningSignButtonRow, *researchSignButtonRow;
+    XLFormRowDescriptor *dobRow, *ageRow, *age40aboveRow, *screeningSignButtonRow, *researchSignButtonRow, *genderRow;
+    XLFormSectionDescriptor *mammoSection;
+    XLFormRowDescriptor *mammogramInterestRow, *doneB4Row, *hasChasRow, *willingPayRow;
     NSString *block, *street, *yearOfBirth;
     BOOL gotOldRecord;
     UIColor *screeningSignColor, *researchSignColor;
@@ -104,7 +107,7 @@
     [section addFormRow:nameRow];
     
     
-    XLFormRowDescriptor *genderRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Gender"];
+    genderRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGender rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Gender"];
     genderRow.selectorOptions = @[@"Male", @"Female"];
     [self setDefaultFontWithRow:genderRow];
     genderRow.required = YES;
@@ -115,6 +118,15 @@
             genderRow.value = @"Female";
     }
     [section addFormRow:genderRow];
+    
+    
+    __weak __typeof(self)weakSelf = self;
+    genderRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            [weakSelf showHideMammogramSection];
+        }
+    };
+    
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     section.footerTitle = @"Only Singaporeans/PRs (with a valid NRIC/FIN) are eligible for screening.";
@@ -766,26 +778,103 @@
     [section addFormRow:didPhlebRow];
     
     if (![neighbourhood containsString:@"Kampong"]) {
-        XLFormRowDescriptor *mammoInterestRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammogramInterest
-                                                                                      rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                                                        title:@"Are you interested in taking a mammogram on Saturday 10am-1pm?"];
-        [self setDefaultFontWithRow:mammoInterestRow];
-        mammoInterestRow.required = YES;
-        mammoInterestRow.selectorOptions = @[@"Yes",@"No"];
-        mammoInterestRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-        mammoInterestRow.hidden = [NSString stringWithFormat:@"NOT $%@.value contains 'Female'", genderRow];
-        [section addFormRow:mammoInterestRow];
+        
+        
+        mammoSection = [XLFormSectionDescriptor formSectionWithTitle:@"Mammogram"];
+        [formDescriptor addFormSection:mammoSection];
+        
+        mammogramInterestRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammogramInterest
+                                                                     rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                       title:@"Are you interested in taking a mammogram on Saturday 10am-1pm?"];
+        [self setDefaultFontWithRow:mammogramInterestRow];
+        mammogramInterestRow.required = YES;
+        mammogramInterestRow.selectorOptions = @[@"Yes",@"No"];
+        mammogramInterestRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+        [mammoSection addFormRow:mammogramInterestRow];
+        
+        hasChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHasChas
+                                                                                    rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                                      title:@"Does the resident have a Blue/Orange CHAS card?"];
+        [self setDefaultFontWithRow:hasChasRow];
+        hasChasRow.required = YES;
+        hasChasRow.selectorOptions = @[@"Yes",@"No"];
+        hasChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+        hasChasRow.hidden = @YES;       //default hidden
+        [mammoSection addFormRow:hasChasRow];
+        
+        doneB4Row = [XLFormRowDescriptor formRowDescriptorWithTag:kDoneBefore
+                                                                               rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                                 title:@"Has the resident done a mammogram before?"];
+        [self setDefaultFontWithRow:doneB4Row];
+        doneB4Row.required = YES;
+        doneB4Row.selectorOptions = @[@"Yes",@"No"];
+        doneB4Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+        doneB4Row.hidden = @YES;       //default hidden
+        [mammoSection addFormRow:doneB4Row];
+        
+        willingPayRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWillingPay
+                                                                                   rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+                                                                                     title:@"Is resident willing to pay $10 for mammogram? (To explain that resident has to pay subsidised fee of $10 if this is a repeat mammogram.)"];
+        [self setDefaultFontWithRow:willingPayRow];
+        willingPayRow.required = YES;
+        willingPayRow.selectorOptions = @[@"Yes",@"No"];
+        willingPayRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+        willingPayRow.hidden = @YES;        //by default always hidden
+        [mammoSection addFormRow:willingPayRow];
+        
+        mammoSection.hidden = @YES;
+        
+        mammogramInterestRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+            if (newValue != oldValue) {
+                if ([newValue isEqualToString:@"Yes"]) {
+                    hasChasRow.hidden = @NO;
+                    doneB4Row.hidden = @NO;
+                } else {
+                    hasChasRow.hidden = @YES;
+                    doneB4Row.hidden = @YES;
+                }
+                
+                [self reloadFormRow:hasChasRow];
+                [self reloadFormRow:doneB4Row];
+            }
+        };
+        
+        
+        hasChasRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+            if (newValue != oldValue) {
+                if ([newValue isEqualToString:@"No"]) {
+                    if (doneB4Row.value != (id)[NSNull null] && [doneB4Row.value isEqualToString:@"Yes"]) {
+                        willingPayRow.hidden = @NO;
+                    } else {
+                        willingPayRow.hidden = @YES;
+                    }
+                } else {
+                    willingPayRow.hidden = @YES;
+                }
+                
+                [self reloadFormRow:willingPayRow];
+            }
+        };
+        
+        doneB4Row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+            if (newValue != oldValue) {
+                if ([newValue isEqualToString:@"Yes"]) {
+                    if (hasChasRow.value != (id)[NSNull null] && [hasChasRow.value isEqualToString:@"No"]) {
+                        willingPayRow.hidden = @NO;
+                    } else {
+                        willingPayRow.hidden = @YES;
+                    }
+                } else {
+                    willingPayRow.hidden = @YES;
+                }
+                
+                [self reloadFormRow:willingPayRow];
+            }
+        };
     }
     
-//
-//    genderRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-//        if (newValue != oldValue) {
-//            if ([newValue isEqualToString:@"Female"]) {
-//                mammo
-//            }
-//        }
-//    }
-//
+    
+    
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Mode of Screening"];   /// NEW SECTION
     [formDescriptor addFormSection:section];
     
@@ -929,26 +1018,26 @@
     [self performSegueWithIdentifier:@"RegistrationFormToResearchSignatureSegue" sender:self];
 }
 
-- (void) goToShowConsentForm: (XLFormRowDescriptor *) sender {
-    
-    NSString *formName;
-    if ([sender.tag containsString:@"research"]) {
-        formName = @"ResearchConsent";
-    } else {
-        formName = @"ScreeningConsent";
-    }
-    UIViewController *webVC = [[UIViewController alloc] init];
-    
-    UIWebView *webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, webVC.view.frame.size.width, webVC.view.frame.size.height)];
-    
-    NSURL *targetURL = [[NSBundle mainBundle] URLForResource:formName withExtension:@"pdf"];
-    NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
-    [webView setScalesPageToFit:YES];
-    [webView loadRequest:request];
-    
-    [webVC.view addSubview:webView];
-    [self.navigationController pushViewController:webVC animated:YES];
-}
+//- (void) goToShowConsentForm: (XLFormRowDescriptor *) sender {
+//    NSString *formName;
+//    if ([sender.tag containsString:@"research"]) {
+//        formName = @"ResearchConsent";
+//    } else {
+//        formName = @"ScreeningConsent";
+//    }
+//    UIViewController *webVC = [[UIViewController alloc] init];
+//
+//    NSURL *targetURL = [[NSBundle mainBundle] URLForResource:formName withExtension:@"pdf"];
+//    NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
+//    WKWebViewConfiguration *theConfiguration = [[WKWebViewConfiguration alloc] init];
+//    WKWebView *wkWebView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, webVC.view.frame.size.width, webVC.view.frame.size.height) configuration:theConfiguration];
+//    [wkWebView loadRequest:request];
+//
+//    [webVC.view addSubview:wkWebView];
+//
+//
+//    [self.navigationController pushViewController:webVC animated:YES];
+//}
 
 
 #pragma mark - XLFormViewControllerDelegate
@@ -995,10 +1084,12 @@
                 age40aboveRow.value = @"Yes";
                 age40aboveRow.disabled = @YES;
                 [self updateFormRow:age40aboveRow];
+                [self showHideMammogramSection];
             } else {
                 age40aboveRow.value = @"No";
                 age40aboveRow.disabled = @YES;
                 [self updateFormRow:age40aboveRow];
+                [self showHideMammogramSection];
             }
         }
     }
@@ -1249,6 +1340,7 @@
                   kTranslationDone:[self getOneZerofromYesNo:[fields objectForKey:kTranslationDone]],
                   kWitnessTranslatorFullName:[fields objectForKey:kWitnessTranslatorFullName]};
     }
+
     // **** PHLEB PART **** //
     
     NSString *didPhlebEntry = [fields objectForKey:kDidPhleb];
@@ -1284,9 +1376,29 @@
     
     NSDictionary *finalDict;
     
-    if (![neighbourhood containsString:@"Kampong"] && [gender isEqualToString:@"F"]) {   //only applicable to lengkok bahru ppl, and must be ladies
+    if (![neighbourhood containsString:@"Kampong"] && ![mammoSection.hidden boolValue]) {   //only applicable to lengkok bahru ppl, and must be ladies' age >=40
         // **** MAMMOGRAM INTEREST **** //
-        NSDictionary *dict6 = @{kMammogramInterest:[self getOneZerofromYesNo:[fields objectForKey:kMammogramInterest]]};
+        NSDictionary *dict6 = @{kMammogramInterest:[self getOneZerofromYesNo:[fields objectForKey:kMammogramInterest]]
+                                };
+        
+        NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:dict6];
+        
+        if (![hasChasRow.hidden boolValue]) {
+            
+            [mutDict setObject:[self getOneZerofromYesNo:[fields objectForKey:kHasChas]] forKey:kHasChas];
+            dict6 = mutDict;
+        }
+        
+        if (![doneB4Row.hidden boolValue]) {
+            [mutDict setObject:[self getOneZerofromYesNo:[fields objectForKey:kDoneBefore]] forKey:kDoneBefore];
+            dict6 = mutDict;
+        }
+        
+        if (![willingPayRow.hidden boolValue]) {
+            [mutDict setObject:[self getOneZerofromYesNo:[fields objectForKey:kWillingPay]] forKey:kWillingPay];
+            dict6 = mutDict;
+        }
+        
         finalDict = @{@"resi_particulars": dict,
                       @"phlebotomy_eligibility_assmt": dict2,
                       @"mode_of_screening":dict3,
@@ -1295,12 +1407,12 @@
                       @"mammogram_interest": dict6
                       };
     } else {
-        finalDict = @{@"resi_particulars": dict,
-                      @"phlebotomy_eligibility_assmt": dict2,
-                      @"mode_of_screening":dict3,
-                      @"consent_disclosure": dict4,
-                      @"consent_research": dict5
-                      };
+            finalDict = @{@"resi_particulars": dict,
+                          @"phlebotomy_eligibility_assmt": dict2,
+                          @"mode_of_screening":dict3,
+                          @"consent_disclosure": dict4,
+                          @"consent_research": dict5
+                          };
     }
     
     
@@ -1423,16 +1535,24 @@
                 
                 NSLog(@"%@", _pushPopTaskArray);
                 
-                [[ServerComm sharedServerCommInstance] uploadImage:image
-                                                       forResident:self.resident_id
-                                                          withNric:self.nric
-                                                   andWithFileType:fileType
-                                                 withProgressBlock:[self progressBlock]
-                                                 completionHandler:[self successBlock]];
+               
             }
             
 
         }
+        NSDictionary *firstImageDict = [_pushPopTaskArray firstObject];
+        UIImage *image = [firstImageDict objectForKey:@"image"];
+        NSString *fileType = [firstImageDict objectForKey:@"file_type"];
+        
+        // only uploads the first image, the rest will be uploaded in the successBlock itself.
+        [[ServerComm sharedServerCommInstance] uploadImage:image
+                                               forResident:self.resident_id
+                                                  withNric:self.nric
+                                           andWithFileType:fileType
+                                         withProgressBlock:[self progressBlock]
+                                         completionHandler:[self successBlock]];
+        
+        
         
     }
 }
@@ -1442,6 +1562,9 @@
         NSLog(@"%@", responseObject);
         
         if (responseObject != (id)[NSNull null] && [responseObject isKindOfClass:[NSDictionary class]]) {
+            
+            NSLog(@"Submitted this IMAGEBLOCK: %@", _pushPopTaskArray[0]);
+            
             [_pushPopTaskArray removeObjectAtIndex:0];
             
             if ([_pushPopTaskArray count] == 0) {
@@ -1455,7 +1578,7 @@
                 }];
             } else {
                 NSDictionary *retryDict = [_pushPopTaskArray firstObject];
-                
+
                 [[ServerComm sharedServerCommInstance] uploadImage:retryDict[@"image"]
                                                        forResident:self.resident_id
                                                           withNric:self.nric
@@ -1758,7 +1881,29 @@
             return @"0";
         }
     }
-    return @"0";
+    return @"";
 }
 
+
+- (void) showHideMammogramSection {
+    if (genderRow.value != (id)[NSNull null] && age40aboveRow.value != (id)[NSNull null]) {
+        if ([genderRow.value containsString:@"F"] && [age40aboveRow.value isEqualToString:@"Yes"]) {
+            mammoSection.hidden = @NO;
+//            mammogramInterestRow.hidden = @NO;
+//            hasChasRow.hidden = @NO;
+//            doneB4Row.hidden = @NO;
+        } else {
+//            mammogramInterestRow.hidden = @YES;
+//            hasChasRow.hidden = @YES;
+//            doneB4Row.hidden = @YES;
+            mammoSection.hidden = @YES;
+        }
+    }
+//
+//    [self reloadFormRow:mammogramInterestRow];
+//    [self reloadFormRow:hasChasRow];
+//    [self reloadFormRow:doneB4Row];
+    
+
+}
 @end

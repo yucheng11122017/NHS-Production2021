@@ -49,7 +49,7 @@
     
     self.navigationItem.title = @"2. Phlebotomy";
     
-    _rowLabelsText= [[NSArray alloc] initWithObjects:@"2a. Results Collection", @"2b. RESULTS", nil];
+    _rowLabelsText= [[NSArray alloc] initWithObjects:@"2a. Results Collection", @"2b. Results (no need fill in)", nil];
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;

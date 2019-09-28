@@ -34,6 +34,7 @@ typedef enum formName {
     NSArray *snellenIndexOptions, *logmarIndexOptions;
     BOOL isFormFinalized;
     BOOL internetDCed;
+    XLFormRowDescriptor *givenVoucherRow;
 }
 
 
@@ -141,7 +142,7 @@ typedef enum formName {
         }
     }
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUndergoneAdvSeri rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone Advanced SERI?"];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kUndergoneAdvSeri rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone advanced vision screening?"];
     [self setDefaultFontWithRow:row];
 //    row.required = YES;
     row.selectorOptions = @[@"Yes", @"No"];
@@ -460,7 +461,7 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Right Eye"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR1 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Right Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR1 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -470,7 +471,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR2 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Right Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR2 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -480,7 +481,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR3 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Right Eye Reading 3: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR3 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -490,7 +491,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR4 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Right Eye Reading 4: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR4 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -500,7 +501,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR5 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Right Eye Reading 5: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpRightR5 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Right Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -510,7 +511,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR1 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Right Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR1 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -520,7 +521,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR2 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Right Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR2 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -530,7 +531,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR3 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Right Eye Reading 3: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR3 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -540,7 +541,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR4 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Right Eye Reading 4: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR4 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -549,7 +550,7 @@ typedef enum formName {
         row.value = autoRefractorDict[kCylRightR4];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR5 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Right Eye Reading 5: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylRightR5 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Right Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -559,7 +560,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR1 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Right Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR1 rowType:XLFormRowDescriptorTypeNumber title:@"Axis Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -569,7 +570,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR2 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Right Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR2 rowType:XLFormRowDescriptorTypeNumber title:@"Axis Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -579,7 +580,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR3 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Right Eye Reading 3: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR3 rowType:XLFormRowDescriptorTypeNumber title:@"Axis Right Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -589,7 +590,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR4 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Right Eye Reading 4: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR4 rowType:XLFormRowDescriptorTypeNumber title:@"Axis Right Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -599,7 +600,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR5 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Right Eye Reading 5: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisRightR5 rowType:XLFormRowDescriptorTypeNumber title:@"Axis Right Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -609,7 +610,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmRightR1 rowType:XLFormRowDescriptorTypeDecimal title:@"KER MM Right Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmRightR1 rowType:XLFormRowDescriptorTypeNumber title:@"KER MM Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
     
@@ -619,7 +620,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmRightR2 rowType:XLFormRowDescriptorTypeDecimal title:@"KER MM Right Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmRightR2 rowType:XLFormRowDescriptorTypeNumber title:@"KER MM Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
     
@@ -629,7 +630,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioRightR1 rowType:XLFormRowDescriptorTypeDecimal title:@"KER Dio Right Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioRightR1 rowType:XLFormRowDescriptorTypeNumber title:@"KER Dio Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
     
@@ -639,7 +640,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioRightR2 rowType:XLFormRowDescriptorTypeDecimal title:@"KER Dio Right Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioRightR2 rowType:XLFormRowDescriptorTypeNumber title:@"KER Dio Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
     
@@ -648,7 +649,7 @@ typedef enum formName {
         row.value = autoRefractorDict[kKerDioRightR2];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxRightR1 rowType:XLFormRowDescriptorTypeInteger title:@"KER Ax Right Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxRightR1 rowType:XLFormRowDescriptorTypeNumber title:@"KER Ax Right Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -658,7 +659,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxRightR2 rowType:XLFormRowDescriptorTypeInteger title:@"KER Ax Right Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxRightR2 rowType:XLFormRowDescriptorTypeNumber title:@"KER Ax Right Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -671,7 +672,7 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Left Eye"];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR1 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Left Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR1 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -681,7 +682,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR2 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Left Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR2 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -691,7 +692,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR3 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Left Eye Reading 3: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR3 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -701,7 +702,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR4 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Left Eye Reading 4: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR4 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -711,7 +712,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR5 rowType:XLFormRowDescriptorTypeDecimal title:@"Sphere Left Eye Reading 5: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kSpLeftR5 rowType:XLFormRowDescriptorTypeNumber title:@"Sphere Left Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -25 to 15" regex:@"(^([0-9]|[1][0-5])$)|(^([0-9]|[1][0-4]).([2,7]5|5)$)|^-([0-9]|[1][0-9]|[2][0-5])$|^-([0-9]|[1][0-9]|[2][0-4]).([2,7]5|5)$"]];
     
@@ -721,7 +722,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR1 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Left Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR1 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -731,7 +732,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR2 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Left Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR2 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -741,7 +742,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR3 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Left Eye Reading 3: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR3 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -751,7 +752,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR4 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Left Eye Reading 4: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR4 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];    //value
     if (autoRefractorDict != (id)[NSNull null] && [autoRefractorDict objectForKey:kCylLeftR4] != (id)[NSNull null])
@@ -759,7 +760,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR5 rowType:XLFormRowDescriptorTypeDecimal title:@"Cyl Left Eye Reading 5: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCylLeftR5 rowType:XLFormRowDescriptorTypeNumber title:@"Cyl Left Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"Between -9 to 0" regex:@"^([0]|-[9]|(-[0-8]{1})+(?:\\.(25|5|75|0)0*)?)$"]];
     
@@ -769,7 +770,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR1 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Left Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR1 rowType:XLFormRowDescriptorTypeNumber title:@"Axis Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -779,7 +780,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR2 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Left Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR2 rowType:XLFormRowDescriptorTypeNumber title:@"Axis Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
 
@@ -789,7 +790,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR3 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Left Eye Reading 3: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR3 rowType:XLFormRowDescriptorTypeNumber title:@"Axis Left Eye Reading 3: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -799,7 +800,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR4 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Left Eye Reading 4: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR4 rowType:XLFormRowDescriptorTypeNumber title:@"Axis Left Eye Reading 4: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -809,7 +810,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR5 rowType:XLFormRowDescriptorTypeInteger title:@"Axis Left Eye Reading 5: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kAxisLeftR5 rowType:XLFormRowDescriptorTypeNumber title:@"Axis Left Eye Reading 5: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -819,7 +820,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmLeftR1 rowType:XLFormRowDescriptorTypeDecimal title:@"KER MM Left Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmLeftR1 rowType:XLFormRowDescriptorTypeNumber title:@"KER MM Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
     
@@ -829,7 +830,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmLeftR2 rowType:XLFormRowDescriptorTypeDecimal title:@"KER MM Left Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerMmLeftR2 rowType:XLFormRowDescriptorTypeNumber title:@"KER MM Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 5 to 10" regex:@"^((([5-9]{1})+(?:\\.([0-9][0-9])?))|1[0])$"]];
     
@@ -839,7 +840,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioLeftR1 rowType:XLFormRowDescriptorTypeDecimal title:@"KER Dio Left Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioLeftR1 rowType:XLFormRowDescriptorTypeNumber title:@"KER Dio Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
     
@@ -849,7 +850,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioLeftR2 rowType:XLFormRowDescriptorTypeDecimal title:@"KER Dio Left Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerDioLeftR2 rowType:XLFormRowDescriptorTypeNumber title:@"KER Dio Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 30 to 61" regex:@"^(([3-5][0-9]|6[0])+(?:\\.(25|5|75|0)0*)?|6[1])$"]];
     
@@ -858,7 +859,7 @@ typedef enum formName {
         row.value = autoRefractorDict[kKerDioLeftR2];
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxLeftR1 rowType:XLFormRowDescriptorTypeInteger title:@"KER Ax Left Eye Reading 1: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxLeftR1 rowType:XLFormRowDescriptorTypeNumber title:@"KER Ax Left Eye Reading 1: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -868,7 +869,7 @@ typedef enum formName {
     
     [section addFormRow:row];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxLeftR2 rowType:XLFormRowDescriptorTypeInteger title:@"KER Ax Left Eye Reading 2: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kKerAxLeftR2 rowType:XLFormRowDescriptorTypeNumber title:@"KER Ax Left Eye Reading 2: "];
     [self setDefaultFontWithRow:row];
 //    [row addValidator:[XLFormRegexValidator formRegexValidatorWithMsg:@"From 0 to 180" regex:@"^([0-9]|[0-9][0-9]|1[0-7][0-9]|180)$"]];
     
@@ -881,7 +882,7 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPupilDist rowType:XLFormRowDescriptorTypeDecimal title:@"Pupillary Distance: "];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kPupilDist rowType:XLFormRowDescriptorTypeNumber title:@"Pupillary Distance: "];
     [self setDefaultFontWithRow:row];
     
     //value
@@ -1271,7 +1272,7 @@ typedef enum formName {
     section.footerTitle = @"Only eligible if resident has financial need (based on previous questions) AND needs spectacles (advanced eye screening).";
     [formDescriptor addFormSection:section];
     
-    XLFormRowDescriptor *givenVoucherRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGivenVoucher rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Was resident given NHS spectacles voucher?"];
+    givenVoucherRow = [XLFormRowDescriptor formRowDescriptorWithTag:kGivenVoucher rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Was resident given NHS spectacles voucher?"];
 //    givenVoucherRow.required = YES;
     givenVoucherRow.selectorOptions = @[@"Yes", @"No"];
     givenVoucherRow.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -1530,6 +1531,20 @@ typedef enum formName {
         [self processDiagnosisOsWithNewValue:newValue andOldValue:oldValue];
     } else if ([rowDescriptor.tag isEqualToString:kFollowUp]) {
         [self postSingleFieldWithSection:SECTION_SERI_DIAG andFieldName:kFollowUp andNewContent:newValue];
+        if ([newValue isEqualToString:@"Need spectacles"]) {
+            if ([[ResidentProfile sharedManager] canReceiveSpecVoucher]) {
+                givenVoucherRow.disabled = @0;
+                givenVoucherRow.required = YES;
+            } else {
+                givenVoucherRow.disabled = @1;
+                givenVoucherRow.required = NO;
+            }
+        } else {
+            givenVoucherRow.disabled = @1;
+            givenVoucherRow.required = NO;
+        }
+        [self reloadFormRow:givenVoucherRow];
+        
     } else if ([rowDescriptor.tag isEqualToString:kEyeSpecRef]) {
         [self postSingleFieldWithSection:SECTION_SERI_DIAG andFieldName:kEyeSpecRef andNewContent:newValue];
     } else if ([rowDescriptor.tag isEqualToString:kGivenVoucher]) {

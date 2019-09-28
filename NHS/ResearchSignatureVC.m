@@ -10,12 +10,13 @@
 #import "AppConstants.h"
 #import "ServerComm.h"
 #import "KAStatusBar.h"
+@import WebKit;
 
 @interface ResearchSignatureVC () {
     NSNumber *index;
 }
 
-@property (strong, nonatomic) UIWebView *webView;
+@property (strong, nonatomic) WKWebView *wkWebView;
 @property (weak, nonatomic) IBOutlet UIButton *insertSignature1Btn;
 @property (weak, nonatomic) IBOutlet UIButton *insertSignature2Btn;
 
@@ -46,23 +47,18 @@
     [self.view addGestureRecognizer:longPressGesture];
     
     NSString *formName;
-    //    if ([sender.tag containsString:@"research"]) {
-    //        formName = @"ResearchConsent";
-    //    } else {
     formName = @"ResearchConsent";
-    //    }
-    //    UIViewController *webVC = [[UIViewController alloc] init];
-    
-    _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     
     NSURL *targetURL = [[NSBundle mainBundle] URLForResource:formName withExtension:@"pdf"];
     NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
-    [_webView setScalesPageToFit:YES];
-    [_webView loadRequest:request];
+    WKWebViewConfiguration *theConfiguration = [[WKWebViewConfiguration alloc] init];
+    _wkWebView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) configuration:theConfiguration];
+    [_wkWebView loadRequest:request];
+    
+    
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Hide Form" style:UIBarButtonItemStyleDone target:self action:@selector(hideWebViewBtnPressed:)];
     
-    [self.view addSubview:_webView];
-    //    [self.navigationController pushViewController:webVC animated:YES];
+    [self.view addSubview:_wkWebView];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -72,10 +68,10 @@
 
 -(void) hideWebViewBtnPressed:(UIBarButtonItem * __unused)button {
     if ([button.title containsString:@"Hide"]) {
-        _webView.hidden = YES;
+        _wkWebView.hidden = YES;
         button.title = @"Show Form";
     } else {
-        _webView.hidden = NO;
+        _wkWebView.hidden = NO;
         button.title = @"Hide Form";
     }
 }

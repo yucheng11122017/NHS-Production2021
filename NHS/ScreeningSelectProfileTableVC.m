@@ -62,41 +62,7 @@ typedef enum getDataState {
     
     [self.tableView reloadData];
     
-    _residentParticulars = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"resi_particulars"]];
-    
-    [self checkConsentFormsSubmission];
-    
-    if ([_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"] == (id)[NSNull null]) { //prevent crashes
-        _phlebEligibDict = @{};
-    } else
-        _phlebEligibDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"]];
-    
-    if ([_residentDetails objectForKey:@"mode_of_screening"] == (id)[NSNull null]) {    //prevent crashes
-        _modeOfScreeningDict = @{};
-    } else
-        _modeOfScreeningDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mode_of_screening"]];
-    
-    if ([_residentDetails objectForKey:@"consent_disclosure"] == (id)[NSNull null]) {    //prevent crashes
-        _consentScreeningDict = @{};
-    } else
-        _consentScreeningDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"consent_disclosure"]];
-    
-    if ([_residentDetails objectForKey:@"consent_research"] == (id)[NSNull null]) {    //prevent crashes
-        _consentResearchDict = @{};
-    } else
-        _consentResearchDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"consent_research"]];
-    
-    if ([_residentDetails objectForKey:@"mammogram_interest"] == (id)[NSNull null]) {    //prevent crashes
-        _mammogramInterestDict = @{};
-    } else
-    _mammogramInterestDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mammogram_interest"]];
-    
-    if ([_residentDetails objectForKey:SECTION_IMAGES] == (id)[NSNull null]) {    //prevent crashes
-        _imagesArray = @[];
-    } else
-        _imagesArray = [[NSArray alloc] initWithArray:[_residentDetails objectForKey:SECTION_IMAGES]];
-    
-    _residentID = _residentParticulars[kResidentId];
+    [self loadAllDictionaries];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshTable:) name:@"enableProfileEntry" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
@@ -125,6 +91,47 @@ typedef enum getDataState {
     
     status = [reachability currentReachabilityStatus];
     [self processConnectionStatus];
+}
+
+- (void) loadAllDictionaries {
+    _residentDetails = [[ResidentProfile sharedManager] fullDict];
+
+    
+    _residentParticulars = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"resi_particulars"]];
+    
+    [self checkConsentFormsSubmission];
+    
+    if ([_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"] == (id)[NSNull null]) { //prevent crashes
+        _phlebEligibDict = @{};
+    } else
+        _phlebEligibDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"]];
+    
+    if ([_residentDetails objectForKey:@"mode_of_screening"] == (id)[NSNull null]) {    //prevent crashes
+        _modeOfScreeningDict = @{};
+    } else
+        _modeOfScreeningDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mode_of_screening"]];
+    
+    if ([_residentDetails objectForKey:@"consent_disclosure"] == (id)[NSNull null]) {    //prevent crashes
+        _consentScreeningDict = @{};
+    } else
+        _consentScreeningDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"consent_disclosure"]];
+    
+    if ([_residentDetails objectForKey:@"consent_research"] == (id)[NSNull null]) {    //prevent crashes
+        _consentResearchDict = @{};
+    } else
+        _consentResearchDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"consent_research"]];
+    
+    if ([_residentDetails objectForKey:@"mammogram_interest"] == (id)[NSNull null]) {    //prevent crashes
+        _mammogramInterestDict = @{};
+    } else
+        _mammogramInterestDict = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"mammogram_interest"]];
+    
+    if ([_residentDetails objectForKey:SECTION_IMAGES] == (id)[NSNull null]) {    //prevent crashes
+        _imagesArray = @[];
+    } else
+        _imagesArray = [[NSArray alloc] initWithArray:[_residentDetails objectForKey:SECTION_IMAGES]];
+    
+    _residentID = _residentParticulars[kResidentId];
 }
 
 #pragma mark - Table view data source
@@ -274,10 +281,13 @@ typedef enum getDataState {
     if (self.imagesArray != (id)[NSNull null]) {
         if ([self.imagesArray isKindOfClass:[NSArray class]]) {
             if ([self.imagesArray count] > 0) {
-                ;
+                
                 [[ServerComm sharedServerCommInstance] setOngoingDownloads:@0]; //reset this number
                 
                 for (NSDictionary *imageMetadata in self.imagesArray) {
+                    if ([[imageMetadata objectForKey:@"file_type"] containsString:@"hearing"]) {
+                        continue; //ignore this hearing image!
+                    }
                     NSLog(@"downloading image: %@", imageMetadata);
                     NSNumber *count = [[ServerComm sharedServerCommInstance] ongoingDownloads];
                     count = [NSNumber numberWithInteger:[count integerValue] + 1];
@@ -472,6 +482,7 @@ typedef enum getDataState {
 - (void) reloadTable: (NSNotification *) notification {
 
     _residentDetails = [[ScreeningDictionary sharedInstance] dictionary];
+    _residentParticulars = [[NSDictionary alloc] initWithDictionary:[_residentDetails objectForKey:@"resi_particulars"]];
     
     if ([_residentDetails objectForKey:@"phlebotomy_eligibility_assmt"] == (id)[NSNull null]) { //present crashes
         _phlebEligibDict = @{};

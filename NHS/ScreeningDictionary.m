@@ -73,11 +73,11 @@
     return ^(NSURLSessionDataTask *task, id responseObject){
         
         _dictionary = responseObject;
-        [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_RELOAD_TABLE object:self];
         NSLog(@"fetched!");
         [self saveCoreData];
         [[ResidentProfile sharedManager] updateProfile:_dictionary];
         [self prepareAdditionalSvcs];
+        [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_RELOAD_TABLE object:self];
         // save all the qualify stuffs for additional services
         
         [SVProgressHUD dismiss];

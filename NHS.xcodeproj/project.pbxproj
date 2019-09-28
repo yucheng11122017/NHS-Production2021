@@ -66,6 +66,9 @@
 		DB7690192315711700E20A19 /* ResearchSignatureVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DB7690182315711700E20A19 /* ResearchSignatureVC.m */; };
 		DB9CF20D231E977A00B74CED /* PhlebotomyTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9CF20C231E977A00B74CED /* PhlebotomyTableVC.m */; };
 		DB9CF210231E99F400B74CED /* PhlebFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9CF20F231E99F400B74CED /* PhlebFormVC.m */; };
+		DB9CF2532321682800B74CED /* HearingTableVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9CF2522321682800B74CED /* HearingTableVC.m */; };
+		DB9CF25623216B6100B74CED /* HearingFormVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9CF25523216B6000B74CED /* HearingFormVC.m */; };
+		DB9CF259232259BD00B74CED /* HearingSignatureVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9CF258232259BD00B74CED /* HearingSignatureVC.m */; };
 		DBB7B9FD230DA3B60059574F /* UviSignatureView.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB7B9FB230DA3B60059574F /* UviSignatureView.m */; };
 		DBB7BA02230DA3C40059574F /* CaptureSignatureVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB7B9FE230DA3C30059574F /* CaptureSignatureVC.m */; };
 		DBB7BA03230DA3C40059574F /* ViewSignatureVC.m in Sources */ = {isa = PBXBuildFile; fileRef = DBB7BA01230DA3C40059574F /* ViewSignatureVC.m */; };
@@ -211,6 +214,12 @@
 		DB9CF20C231E977A00B74CED /* PhlebotomyTableVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PhlebotomyTableVC.m; sourceTree = "<group>"; };
 		DB9CF20E231E99F400B74CED /* PhlebFormVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhlebFormVC.h; sourceTree = "<group>"; };
 		DB9CF20F231E99F400B74CED /* PhlebFormVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PhlebFormVC.m; sourceTree = "<group>"; };
+		DB9CF2512321682800B74CED /* HearingTableVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HearingTableVC.h; sourceTree = "<group>"; };
+		DB9CF2522321682800B74CED /* HearingTableVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HearingTableVC.m; sourceTree = "<group>"; };
+		DB9CF25423216B6000B74CED /* HearingFormVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HearingFormVC.h; sourceTree = "<group>"; };
+		DB9CF25523216B6000B74CED /* HearingFormVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HearingFormVC.m; sourceTree = "<group>"; };
+		DB9CF257232259BD00B74CED /* HearingSignatureVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HearingSignatureVC.h; sourceTree = "<group>"; };
+		DB9CF258232259BD00B74CED /* HearingSignatureVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HearingSignatureVC.m; sourceTree = "<group>"; };
 		DBB7B9FB230DA3B60059574F /* UviSignatureView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UviSignatureView.m; path = Models/UviSignatureView/UviSignatureView.m; sourceTree = "<group>"; };
 		DBB7B9FC230DA3B60059574F /* UviSignatureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UviSignatureView.h; path = Models/UviSignatureView/UviSignatureView.h; sourceTree = "<group>"; };
 		DBB7B9FE230DA3C30059574F /* CaptureSignatureVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaptureSignatureVC.m; sourceTree = "<group>"; };
@@ -472,6 +481,7 @@
 				DB9CF20A231E974000B74CED /* Phlebotomy */,
 				018D8C4721425F3800B13595 /* Advanced Geriatrics */,
 				01D48ECF1F3A1812002C3928 /* Social Work */,
+				DB9CF250232167F800B74CED /* Hearing */,
 				015F68271F4A7EF3000B6D5E /* SERI Eye Screening */,
 			);
 			name = Screening;
@@ -508,6 +518,19 @@
 				DB9CF20F231E99F400B74CED /* PhlebFormVC.m */,
 			);
 			name = Phlebotomy;
+			sourceTree = "<group>";
+		};
+		DB9CF250232167F800B74CED /* Hearing */ = {
+			isa = PBXGroup;
+			children = (
+				DB9CF2512321682800B74CED /* HearingTableVC.h */,
+				DB9CF2522321682800B74CED /* HearingTableVC.m */,
+				DB9CF25423216B6000B74CED /* HearingFormVC.h */,
+				DB9CF25523216B6000B74CED /* HearingFormVC.m */,
+				DB9CF257232259BD00B74CED /* HearingSignatureVC.h */,
+				DB9CF258232259BD00B74CED /* HearingSignatureVC.m */,
+			);
+			name = Hearing;
 			sourceTree = "<group>";
 		};
 		DBB7B9F0230D9A5A0059574F /* UviSignatureView */ = {
@@ -903,6 +926,7 @@
 			files = (
 				DBB7B9FD230DA3B60059574F /* UviSignatureView.m in Sources */,
 				018C04271F3F4A1300582E82 /* NeighbourhoodSelectionVC.m in Sources */,
+				DB9CF2532321682800B74CED /* HearingTableVC.m in Sources */,
 				01D48EC41F346C36002C3928 /* ResidentParticularsVC.m in Sources */,
 				018D8C422140DA0500B13595 /* PsychoHistAssmtTableVC.m in Sources */,
 				E120E40B1D431E9B002DBC7E /* AppDelegate.m in Sources */,
@@ -929,6 +953,7 @@
 				01D7BCF11F6D38E2000FDDED /* DeviceInfo.m in Sources */,
 				018D8C3F213E67AC00B13595 /* SocialHistAssmtTableVC.m in Sources */,
 				015FD7A52163709D0042CC50 /* ResearchConsentFormVC.m in Sources */,
+				DB9CF25623216B6100B74CED /* HearingFormVC.m in Sources */,
 				01137E901F7BAF7B002A0A48 /* ProfilingFormVC.m in Sources */,
 				8EC56F871D60C16300938C2A /* ScreeningSectionTableViewController.m in Sources */,
 				01087AE41F6041700046838E /* ScreeningDictionary.m in Sources */,
@@ -939,6 +964,7 @@
 				8EC56F811D60B88D00938C2A /* ScreeningFormViewController.m in Sources */,
 				016A27F61F5FDB8F0074C36A /* SearchResultsTableController.m in Sources */,
 				018B23821F726C810046F9ED /* ReportViewController.m in Sources */,
+				DB9CF259232259BD00B74CED /* HearingSignatureVC.m in Sources */,
 				01137E8D1F7BADA4002A0A48 /* ProfilingTableVC.m in Sources */,
 				01F3CC401F983E3D0033ECDE /* QuestionnaireFormVC.m in Sources */,
 				01D48EC11F3327B5002C3928 /* ScreeningSelectProfileTableVC.m in Sources */,

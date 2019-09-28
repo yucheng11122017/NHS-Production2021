@@ -1,30 +1,27 @@
 //
-//  ViewSignatureVC.m
+//  HearingSignatureVC.m
 //  NHS
 //
-//  Created by rehabpal on 21/8/19.
+//  Created by rehabpal on 6/9/19.
 //  Copyright © 2019 NUS. All rights reserved.
 //
 
-#import "ViewSignatureVC.h"
+#import "HearingSignatureVC.h"
 #import "AppConstants.h"
 #import "ServerComm.h"
-#import "ResidentProfile.h"
-#import "SVProgressHUD.h"
 #import "KAStatusBar.h"
 @import WebKit;
 
-@interface ViewSignatureVC () {
+@interface HearingSignatureVC () {
     NSNumber *index;
 }
 
 @property (strong, nonatomic) WKWebView *wkWebView;
 @property (weak, nonatomic) IBOutlet UIButton *insertSignature1Btn;
-@property (weak, nonatomic) IBOutlet UIButton *insertSignature2Btn;
 
 @end
 
-@implementation ViewSignatureVC
+@implementation HearingSignatureVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -33,9 +30,6 @@
     
     self.signature1ImageView.layer.borderColor = [UIColor grayColor].CGColor;
     self.signature1ImageView.layer.borderWidth = borderWidth;
-    
-    self.signature2ImageView.layer.borderColor = [UIColor grayColor].CGColor;
-    self.signature2ImageView.layer.borderWidth = borderWidth;
     
     [self loadImageIfAny];
     
@@ -49,43 +43,34 @@
     [self.view addGestureRecognizer:longPressGesture];
     
     NSString *formName;
-    formName = @"ScreeningConsent";
-    
-    NSURL *targetURL = [[NSBundle mainBundle] URLForResource:formName withExtension:@"pdf"];
-    NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
-
-    WKWebViewConfiguration *theConfiguration = [[WKWebViewConfiguration alloc] init];
-    _wkWebView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) configuration:theConfiguration];
-    [_wkWebView loadRequest:request];
-    
-    
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Hide Form" style:UIBarButtonItemStyleDone target:self action:@selector(hideWebViewBtnPressed:)];
-    
-
-    [self.view addSubview:_wkWebView];
-
-}
-
--(void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
+    formName = @"HearingConsent";
+//
+//    NSURL *targetURL = [[NSBundle mainBundle] URLForResource:formName withExtension:@"pdf"];
+//    NSURLRequest *request = [NSURLRequest requestWithURL:targetURL];
+//    WKWebViewConfiguration *theConfiguration = [[WKWebViewConfiguration alloc] init];
+//    _wkWebView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) configuration:theConfiguration];
+//    [_wkWebView loadRequest:request];
     
     
+//    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Hide Form" style:UIBarButtonItemStyleDone target:self action:@selector(hideWebViewBtnPressed:)];
+    
+//    [self.view addSubview:_wkWebView];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
--(void) hideWebViewBtnPressed:(UIBarButtonItem * __unused)button {
-    if ([button.title containsString:@"Hide"]) {
-        _wkWebView.hidden = YES;
-        button.title = @"Show Form";
-    } else {
-        _wkWebView.hidden = NO;
-        button.title = @"Hide Form";
-    }
-}
+//
+//-(void) hideWebViewBtnPressed:(UIBarButtonItem * __unused)button {
+//    if ([button.title containsString:@"Hide"]) {
+//        _wkWebView.hidden = YES;
+//        button.title = @"Show Form";
+//    } else {
+//        _wkWebView.hidden = NO;
+//        button.title = @"Hide Form";
+//    }
+//}
 
 -(void)gestureHandler:(UISwipeGestureRecognizer *)gesture
 {
@@ -106,41 +91,28 @@
 
 - (void) removeBothSignatures {
     self.insertSignature1Btn.hidden = NO;
-    self.insertSignature2Btn.hidden = NO;
     self.signature1ImageView.image = nil;
-    self.signature2ImageView.image = nil;
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:SCREENING_PARTICIPANT_SIGNATURE];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:SCREENING_CONSENT_TAKER_SIGNATURE];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:HEARING_REFERRER_SIGNATURE];
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *downloadedImage1Path = [documentsDirectory stringByAppendingPathComponent:@"resident_sign.png"];
-    NSString *downloadedImage2Path = [documentsDirectory stringByAppendingPathComponent:@"consent_disclosure.png"];
+    NSString *downloadedImage1Path = [documentsDirectory stringByAppendingPathComponent:@"hearing_referrer_sign.png"];
     
     NSError *error;
     BOOL fileDeleted = [[NSFileManager defaultManager] removeItemAtPath:downloadedImage1Path error:&error];
     if (!fileDeleted) {
         NSLog(@"%@ doesn't exist!", downloadedImage1Path.lastPathComponent);
     }
-    
-    fileDeleted = [[NSFileManager defaultManager] removeItemAtPath:downloadedImage2Path error:&error];
-    if (!fileDeleted) {
-        NSLog(@"%@ doesn't exist!", downloadedImage2Path.lastPathComponent);
-    }
 }
 
 - (void) loadImageIfAny {
-    NSString *imageDataPath1 = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_PARTICIPANT_SIGNATURE];
+    NSString *imageDataPath1 = [[NSUserDefaults standardUserDefaults] objectForKey:HEARING_REFERRER_SIGNATURE];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     
-    NSString *downloadedImage1Path = [documentsDirectory stringByAppendingPathComponent:@"resident_sign.png"];
+    NSString *downloadedImage1Path = [documentsDirectory stringByAppendingPathComponent:@"hearing_referrer_sign.png"];
     NSData *imgData1 = [NSData dataWithContentsOfFile:downloadedImage1Path];
     UIImage *thumbNail1 = [[UIImage alloc] initWithData:imgData1];
-    
-    NSString *downloadedImage2Path = [documentsDirectory stringByAppendingPathComponent:@"consent_disclosure.png"];
-    NSData *imgData2 = [NSData dataWithContentsOfFile:downloadedImage2Path];
-    UIImage *thumbNail2 = [[UIImage alloc] initWithData:imgData2];
     
     if (imageDataPath1) {
         _signature1ImageView.image = [UIImage imageWithData:[NSData dataWithContentsOfFile:imageDataPath1]];
@@ -148,15 +120,6 @@
     } else if (thumbNail1) {
         _signature1ImageView.image = thumbNail1;
         _insertSignature1Btn.hidden = true;
-    }
-    
-    NSString *imagePath2 = [[NSUserDefaults standardUserDefaults] objectForKey:SCREENING_CONSENT_TAKER_SIGNATURE];
-    if (imagePath2) {
-        _signature2ImageView.image = [UIImage imageWithData:[NSData dataWithContentsOfFile:imagePath2]];
-        _insertSignature2Btn.hidden = true;
-    } else if (thumbNail2) {
-        _signature2ImageView.image = thumbNail2;
-        _insertSignature2Btn.hidden = true;
     }
 }
 
@@ -166,13 +129,12 @@
     NSString *nric = [[NSUserDefaults standardUserDefaults] objectForKey:kNRIC];
     NSNumber *residentID = [[NSUserDefaults standardUserDefaults] objectForKey:kResidentId];
     
-    if ([index isEqualToNumber:@1]) {
         _insertSignature1Btn.hidden = YES;
         _signature1ImageView.image = signImage;
-        [self saveImageInDirectory: signImage withIdentifier: SCREENING_PARTICIPANT_SIGNATURE];
+        [self saveImageInDirectory: signImage withIdentifier: HEARING_REFERRER_SIGNATURE];
         
         if (residentID != nil) {
-            [[ServerComm sharedServerCommInstance] uploadImage:signImage forResident:residentID withNric:nric andWithFileType:@"resident_sign" withProgressBlock:^(NSProgress *downloadProgress) {
+            [[ServerComm sharedServerCommInstance] uploadImage:signImage forResident:residentID withNric:nric andWithFileType:@"hearing_referrer_sign" withProgressBlock:^(NSProgress *downloadProgress) {
                 // do nothing here
             } completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
                 NSLog(@"ResponseObject: %@", responseObject);
@@ -182,27 +144,6 @@
                 }
             }];
         }
-        
-    } else {
-        _insertSignature2Btn.hidden = YES;
-        _signature2ImageView.image = signImage;
-        [self saveImageInDirectory: signImage withIdentifier: SCREENING_CONSENT_TAKER_SIGNATURE];
-        
-        if (residentID != nil) {
-            [[ServerComm sharedServerCommInstance] uploadImage:signImage forResident:residentID withNric:nric andWithFileType:@"consent_disclosure" withProgressBlock:^(NSProgress *downloadProgress) {
-                // do nothing
-            } completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
-                NSLog(@"ResponseObject: %@", responseObject);
-                
-                if (responseObject != (id)[NSNull null] && [[responseObject objectForKey:@"success"] isEqualToNumber:@1]) {
-                    [KAStatusBar showWithStatus:@"Signature uploaded!" barColor:[UIColor colorWithRed:51/255.0 green:204/255.0 blue:51/255.0 alpha:1.0] andRemoveAfterDelay:[NSNumber numberWithFloat:2.0]];
-                }
-            }];
-        }
-    }
-    
-    
-
 }
 
 - (void) saveImageInDirectory: (UIImage *)image
@@ -229,16 +170,6 @@
     
     return [documentsPath stringByAppendingPathComponent:name];
 }
-- (IBAction)signBtn1Pressed:(id)sender {
-    NSString *someText =  @"I consent to NHS directly disclosing the Information and my past screening and follow-up information (participant’s past screening and follow-up information under NHS’ Screening and Follow-Up Programme) to NHS’ collaborators (refer to organisations/institutions that work in partnership with NHS for the provision of screening and follow-up related services, such as but not limited to: MOH, HPB, Regional Health Systems, Senior Cluster Network Operators, etc. where necessary) for the purposes of checking if I require re-screening, further tests, follow-up action and/or referral to community programmes/activities.";
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Read this" message:someText preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self performSegueWithIdentifier:@"goToCaptureSignature" sender:self];
-    }];
-    [alertController addAction:okAction];
-    [self presentViewController:alertController animated:true completion:nil];
-}
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
@@ -246,11 +177,6 @@
         CaptureSignatureVC *destination = segue.destinationViewController;
         destination.delegate = self;
         NSUInteger tagNumber = ((UIButton *) sender).tag;
-        destination.signatureIndex = [NSNumber numberWithInteger:tagNumber];
-    } else if ([segue.identifier containsString:@"CaptureSignature"]) {
-        CaptureSignatureVC *destination = segue.destinationViewController;
-        destination.delegate = self;
-        NSUInteger tagNumber = 1;
         destination.signatureIndex = [NSNumber numberWithInteger:tagNumber];
     }
 }
