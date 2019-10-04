@@ -12,7 +12,8 @@
 #import "ResidentProfile.h"
 
 //#define baseURL @"https://nus-nhs.ml/"        //for Development
-#define baseURL @"https://nhs-som.nus.edu.sg/"
+//#define baseURL @"https://nhs-som.nus.edu.sg/"
+#define baseURL @"https://pd.homerehab.com.sg/"
 #define GENOGRAM_LOADED_NOTIF @"Genogram image downloaded"
 #define CONSENT_LOADED_NOTIF @"Consent image downloaded"
 #define RESEARCH_CONSENT_LOADED_NOTIF @"Research Consent image downloaded"
@@ -266,7 +267,7 @@
     NSLog(@"error writing to file");
     
     //upload image to server
-    NSURL *URL = [NSURL URLWithString:@"https://nhs-som.nus.edu.sg/uploadImage"];
+    NSURL *URL = [NSURL URLWithString:@"https://pd.homerehab.com.sg/uploadImage"];
     
     NSURL *filePathUrl = [NSURL fileURLWithPath:filePath];
     
@@ -320,7 +321,7 @@
     
     //send req
     AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
-    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://nhs-som.nus.edu.sg/downloadImage" parameters:data error:&error];
+    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://pd.homerehab.com.sg/downloadImage" parameters:data error:&error];
     
     NSURLSessionDownloadTask *dwlTsk = [self.downloadManager downloadTaskWithRequest:req
                                                                             progress:
@@ -398,7 +399,7 @@
 //
 //    //send req
 //    AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
-//    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://nhs-som.nus.edu.sg/downloadGenogram" parameters:data error:&error];
+//    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://pd.homerehab.com.sg/downloadGenogram" parameters:data error:&error];
 //
 //    NSURLSessionDownloadTask *dwlTsk = [self.downloadManager downloadTaskWithRequest:req
 //                                                                            progress:[self downloadGenogramProgressBlock]
@@ -464,7 +465,7 @@
 //        NSLog(@"error writing to file");
 //
 //    //upload image to server
-//    NSURL *URL = [NSURL URLWithString:@"https://nhs-som.nus.edu.sg/uploadGenogram"];
+//    NSURL *URL = [NSURL URLWithString:@"https://pd.homerehab.com.sg/uploadGenogram"];
 //
 //    NSURL *filePathUrl = [NSURL fileURLWithPath:filePath];
 //
@@ -510,7 +511,7 @@
 //        NSLog(@"error writing to file");
 //
 //    //upload image to server
-//    NSURL *URL = [NSURL URLWithString:@"https://nhs-som.nus.edu.sg/uploadConsent"];
+//    NSURL *URL = [NSURL URLWithString:@"https://pd.homerehab.com.sg/uploadConsent"];
 //
 //    NSURL *filePathUrl = [NSURL fileURLWithPath:filePath];
 //
@@ -559,7 +560,7 @@
 //
 //    //send req
 //    AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
-//    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://nhs-som.nus.edu.sg/downloadConsent" parameters:data error:&error];
+//    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://pd.homerehab.com.sg/downloadConsent" parameters:data error:&error];
 //
 //    NSURLSessionDownloadTask *dwlTsk = [self.downloadManager downloadTaskWithRequest:req
 //                                                                            progress:[self downloadConsentProgressBlock]
@@ -628,7 +629,7 @@
 //        NSLog(@"error writing to file");
 //
 //    //upload image to server
-//    NSURL *URL = [NSURL URLWithString:@"https://nhs-som.nus.edu.sg/uploadConsentResearch"];
+//    NSURL *URL = [NSURL URLWithString:@"https://pd.homerehab.com.sg/uploadConsentResearch"];
 //
 //    NSURL *filePathUrl = [NSURL fileURLWithPath:filePath];
 //
@@ -677,7 +678,7 @@
 //
 //    //send req
 //    AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
-//    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://nhs-som.nus.edu.sg/downloadConsentResearch" parameters:data error:&error];
+//    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://pd.homerehab.com.sg/downloadConsentResearch" parameters:data error:&error];
 //
 //    NSURLSessionDownloadTask *dwlTsk = [self.downloadManager downloadTaskWithRequest:req
 //                                                                            progress:[self downloadResearchConsentProgressBlock]
@@ -747,7 +748,7 @@
         NSLog(@"error writing to file");
     
     //upload image to server
-    NSURL *URL = [NSURL URLWithString:@"https://nhs-som.nus.edu.sg/uploadSeriAr"];
+    NSURL *URL = [NSURL URLWithString:@"https://pd.homerehab.com.sg/uploadSeriAr"];
     
     NSURL *filePathUrl = [NSURL fileURLWithPath:filePath];
     
@@ -796,7 +797,7 @@
     
     //send req
     AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
-    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://nhs-som.nus.edu.sg/downloadSeriAr" parameters:data error:&error];
+    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://pd.homerehab.com.sg/downloadSeriAr" parameters:data error:&error];
     
     NSURLSessionDownloadTask *dwlTsk = [self.downloadManager downloadTaskWithRequest:req
                                                                             progress:[self downloadSeriArProgressBlock]
@@ -864,7 +865,7 @@
     
     //send req
     AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
-    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://nhs-som.nus.edu.sg/1707" parameters:data error:&error];
+    NSMutableURLRequest *req = [serializer requestWithMethod:@"POST" URLString:@"https://pd.homerehab.com.sg/1707" parameters:data error:&error];
     
     NSURLSessionDownloadTask *dwlTsk = [self.downloadManager downloadTaskWithRequest:req
                                                                             progress:nil

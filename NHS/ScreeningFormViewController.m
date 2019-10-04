@@ -72,6 +72,7 @@ NSString *const kQuestionFifteen = @"q15";
     NSString *gender;
     NSArray *spoken_lang_value;
     XLFormRowDescriptor *preEdScoreRow, *postEdScoreRow, *showPostEdSectionBtnRow, *phqTotalScoreRow, *spbbScoreRow, *fallRiskRow;
+    XLFormRowDescriptor *systolic_1, *diastolic_1, *systolic_2, *diastolic_2, *systolic_3, *diastolic_3, *systolic_avg, *diastolic_avg;
     XLFormSectionDescriptor *preEdSection, *postEdSection;
     NSString *neighbourhood, *citizenship;
     NSNumber *age;
@@ -230,11 +231,67 @@ NSString *const kQuestionFifteen = @"q15";
     
     formDescriptor.assignFirstResponderOnShow = YES;
     
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    XLFormRowDescriptor *diabeticRow = [XLFormRowDescriptor formRowDescriptorWithTag:kIsDiabetic rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is resident diabetic?"];
+    diabeticRow.selectorOptions = @[@"Yes", @"No"];
+    diabeticRow.required = YES;
+    [self setDefaultFontWithRow:diabeticRow];
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kIsDiabetic] != (id)[NSNull null])
+        diabeticRow.value = [self getYesNofromOneZero:triageDict[kIsDiabetic]];
+    
+    [section addFormRow:diabeticRow];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeDecimal title:@"CBG (mmol/L)"];
+    row.required = NO;
+    
+    NSString *didPhleb = [[_fullScreeningForm objectForKey:SECTION_RESI_PART] objectForKey:kDidPhleb];
+    
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kIsDiabetic] != (id)[NSNull null]) {
+        diabeticRow.value = [self getYesNofromOneZero:triageDict[kIsDiabetic]];
+        if ([diabeticRow.value isEqualToString:@"Yes"]) {
+            if (didPhleb == (id)[NSNull null] || [didPhleb containsString:@"No"]) {
+                row.required = YES;
+                row.disabled = @0;
+            }
+        } else {
+            row.disabled = @1;
+            row.required = NO;
+        }
+    }
+    [self setDefaultFontWithRow:row];
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kCbg] != (id)[NSNull null]) {
+        row.value = triageDict[kCbg];
+        [self updateAnswerColor:row];
+    }
+    
+    diabeticRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+        if (newValue != oldValue) {
+            if ([newValue isEqualToString:@"Yes"]) {
+                NSString *didPhleb = [[_fullScreeningForm objectForKey:SECTION_RESI_PART] objectForKey:kDidPhleb];
+                if (didPhleb == (id)[NSNull null] || [didPhleb containsString:@"No"]) {
+                    row.disabled = @NO;
+                    row.required = YES;
+                }
+            } else {
+                row.disabled = @YES;
+                row.required = NO;
+            }
+            [self reloadFormRow:row];
+        }
+    };
+    
+    [section addFormRow:row];
+    
     // BP1,2,3 - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
-    XLFormRowDescriptor *systolic_1;
     systolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Sys rowType:XLFormRowDescriptorTypeInteger title:@"BP 1 (Systolic)"];
     systolic_1.required = YES;
     
@@ -249,7 +306,6 @@ NSString *const kQuestionFifteen = @"q15";
     [self setDefaultFontWithRow:systolic_1];
     [section addFormRow:systolic_1];
     
-    XLFormRowDescriptor *diastolic_1;
     diastolic_1 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp1Dias rowType:XLFormRowDescriptorTypeInteger title:@"BP 1 (Diastolic)"];
     diastolic_1.required = YES;
 
@@ -259,7 +315,6 @@ NSString *const kQuestionFifteen = @"q15";
     [self setDefaultFontWithRow:diastolic_1];
     [section addFormRow:diastolic_1];
     
-    XLFormRowDescriptor *systolic_2;
     systolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Sys rowType:XLFormRowDescriptorTypeInteger title:@"BP 2 (Systolic)"];
     systolic_2.required = YES;
     
@@ -272,7 +327,6 @@ NSString *const kQuestionFifteen = @"q15";
     [self setDefaultFontWithRow:systolic_2];
     [section addFormRow:systolic_2];
     
-    XLFormRowDescriptor *diastolic_2;
     diastolic_2 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp2Dias rowType:XLFormRowDescriptorTypeInteger title:@"BP 2 (Diastolic)"];
     diastolic_2.required = YES;
     
@@ -282,11 +336,10 @@ NSString *const kQuestionFifteen = @"q15";
     [self setDefaultFontWithRow:diastolic_2];
     [section addFormRow:diastolic_2];
     
-    XLFormRowDescriptor *systolic_3;
     systolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Sys rowType:XLFormRowDescriptorTypeInteger title:@"BP 3 (Systolic)"];
+    systolic_3.disabled = [NSNumber numberWithBool:![self checkIfShouldEnable3rdBP]];
     systolic_3.required = NO;
     //    [systolic_3.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
-    
     
     //value
     if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp3Sys] != (id)[NSNull null]) {
@@ -297,8 +350,8 @@ NSString *const kQuestionFifteen = @"q15";
     [self setDefaultFontWithRow:systolic_3];
     [section addFormRow:systolic_3];
     
-    XLFormRowDescriptor *diastolic_3;
     diastolic_3 = [XLFormRowDescriptor formRowDescriptorWithTag:kBp3Dias rowType:XLFormRowDescriptorTypeInteger title:@"BP 3 (Diastolic)"];
+    diastolic_3.disabled = [NSNumber numberWithBool:![self checkIfShouldEnable3rdBP]];
     //    [diastolic_3.cellConfigAtConfigure setObject:@"Only if necessary" forKey:@"textField.placeholder"];
     diastolic_3.required = NO;
     
@@ -311,13 +364,13 @@ NSString *const kQuestionFifteen = @"q15";
     
     
     //Make them coupled together, such that if one enabled, both enabled.
-    systolic_3.disabled = [NSNumber numberWithBool:![self checkDiffBetweenRow1:systolic_1 andRow2:systolic_2 withDiffOf:5]];
+    systolic_3.disabled = [NSNumber numberWithBool:[self checkIfShouldEnable3rdBP]];
     if ([systolic_3.disabled isEqual:@NO]) {
         diastolic_3.disabled = @NO;
         diastolic_3.required = YES;
         systolic_3.required = YES;
     } else {
-        diastolic_3.disabled = [NSNumber numberWithBool:![self checkDiffBetweenRow1:diastolic_1 andRow2:diastolic_2 withDiffOf:5]];
+        diastolic_3.disabled = [NSNumber numberWithBool:[self checkIfShouldEnable3rdBP]];
         if ([diastolic_3.disabled isEqual:@NO]) {
             systolic_3.disabled = @NO;
             systolic_3.required = YES;
@@ -325,47 +378,27 @@ NSString *const kQuestionFifteen = @"q15";
         }
     }
     
-    //    XLFormRowDescriptor *systolic_avg;
-    //    systolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgSys rowType:XLFormRowDescriptorTypeText title:@"Average BP (Systolic)"];
-    //    systolic_avg.required = YES;
-    //
-    //    //value
-    //    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgSys] != (id)[NSNull null]) {
-    //        systolic_avg.value = triageDict[kBp12AvgSys];
-    //        [self updateAnswerColor:systolic_avg];
-    //    }
-    //
-    //    systolic_avg.disabled = @(1);   //permanent
-    //    [self setDefaultFontWithRow:systolic_avg];
-    //
-    //    [section addFormRow:systolic_avg];
+    systolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgSys rowType:XLFormRowDescriptorTypeText title:@"Average BP (Systolic)"];
     
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgSys] != (id)[NSNull null]) {
+        systolic_avg.value = triageDict[kBp12AvgSys];
+        [self updateAnswerColor:systolic_avg];
+    }
+    
+    systolic_avg.disabled = @(1);   //permanent
+    [self setDefaultFontWithRow:systolic_avg];
+    
+    [section addFormRow:systolic_avg];
+    
+    __weak __typeof(self)weakSelf = self;
     systolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
-            if (newValue != (id)[NSNull null] && systolic_2.value != (id)[NSNull null]) {
-                if ([newValue doubleValue] > 0 && [systolic_2.value doubleValue ]> 0) {     //both filled in
-                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:rowDescriptor andRow2:systolic_2 withDiffOf:5];
-                    
-                    if (diffMoreThan5) {
-                        systolic_3.disabled = @NO;
-                        diastolic_3.disabled = @NO;
-                    } else {
-                        if ([self checkDiffBetweenRow1:diastolic_1 andRow2:diastolic_2 withDiffOf:5]) {
-                            systolic_3.disabled = @NO;
-                            diastolic_3.disabled = @NO;
-                        } else {
-                            systolic_3.disabled = @YES;
-                            diastolic_3.disabled = @YES;
-                        }
-                    }
-                    
-                    //                    systolic_avg.value = @(([newValue doubleValue]+ [systolic_2.value doubleValue])/2);
-                } else if ([newValue doubleValue] > 0)  {//only Systolic_1
-                    //                    systolic_avg.value = newValue;
-                }
-            } else if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) { //only Systolic_1
-                //                systolic_avg.value = newValue;
-            }
+            BOOL flag = [weakSelf checkIfShouldEnable3rdBP];
+
+            systolic_3.disabled = [NSNumber numberWithBool:!flag];
+            diastolic_3.disabled =[NSNumber numberWithBool:!flag];
+            
             systolic_3.required = ![systolic_3.disabled boolValue];
             diastolic_3.required = ![diastolic_3.disabled boolValue];
             [self updateFormRow:systolic_3];
@@ -375,33 +408,11 @@ NSString *const kQuestionFifteen = @"q15";
     
     systolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
-            if (systolic_3.value > 0) {
-                //                systolic_avg.value = @(([systolic_3.value doubleValue]+ [systolic_2.value doubleValue])/2); //if BP3 is keyed in, take BP 2 and BP 3 instead.
-            } else {
-                if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) {
-                    //                    systolic_avg.value = @(([systolic_1.value doubleValue]+ [systolic_2.value doubleValue])/2);
-                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:systolic_1 andRow2:rowDescriptor withDiffOf:5];
-                    
-                    if (diffMoreThan5) {
-                        systolic_3.disabled = @NO;
-                        diastolic_3.disabled = @NO;
-                    } else {
-                        if ([self checkDiffBetweenRow1:diastolic_1 andRow2:diastolic_2 withDiffOf:5]) {
-                            systolic_3.disabled = @NO;
-                            diastolic_3.disabled = @NO;
-                        } else {
-                            systolic_3.disabled = @YES;
-                            diastolic_3.disabled = @YES;
-                        }
-                    }
-                }
-                else {
-                    //                    systolic_avg.value = systolic_1.value;
-                }
-            }
-            //            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:[self removePostfixIfAny:systolic_avg.value]];
-            //            [self updateAnswerColor:systolic_avg];
-            //            [self updateFormRow:systolic_avg];
+            BOOL flag = [weakSelf checkIfShouldEnable3rdBP];
+            
+            systolic_3.disabled = [NSNumber numberWithBool:!flag];
+            diastolic_3.disabled =[NSNumber numberWithBool:!flag];
+            
             systolic_3.required = ![systolic_3.disabled boolValue];
             diastolic_3.required = ![diastolic_3.disabled boolValue];
             [self updateFormRow:systolic_3];
@@ -411,47 +422,22 @@ NSString *const kQuestionFifteen = @"q15";
     };
     
     
-    //    XLFormRowDescriptor *diastolic_avg;
-    //    diastolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgDias rowType:XLFormRowDescriptorTypeText title:@"Average BP (Diastolic)"];
-    //    diastolic_avg.required = YES;
-    //
-    //    //value
-    //    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgDias] != (id)[NSNull null]) diastolic_avg.value = triageDict[kBp12AvgDias];
-    //
-    //    [self setDefaultFontWithRow:diastolic_avg];
-    //    diastolic_avg.disabled = @(1);
-    //    [section addFormRow:diastolic_avg];
-    //
+    diastolic_avg = [XLFormRowDescriptor formRowDescriptorWithTag:kBp12AvgDias rowType:XLFormRowDescriptorTypeText title:@"Average BP (Diastolic)"];
+    
+    //value
+    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kBp12AvgDias] != (id)[NSNull null]) diastolic_avg.value = triageDict[kBp12AvgDias];
+    
+    [self setDefaultFontWithRow:diastolic_avg];
+    diastolic_avg.disabled = @(1);
+    [section addFormRow:diastolic_avg];
     
     
     diastolic_1.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
-            if (newValue != (id)[NSNull null] && diastolic_2.value != (id)[NSNull null]) {
-                if ([newValue doubleValue] > 0 && [diastolic_2.value doubleValue ]> 0) {     //both filled in
-                    //                    diastolic_avg.value = @(([newValue doubleValue]+ [diastolic_2.value doubleValue])/2);
-                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:rowDescriptor andRow2:diastolic_2 withDiffOf:5];
-                    
-                    if (diffMoreThan5) {
-                        systolic_3.disabled = @NO;
-                        diastolic_3.disabled = @NO;
-                    } else {
-                        if ([self checkDiffBetweenRow1:systolic_1 andRow2:systolic_2 withDiffOf:5]) {
-                            systolic_3.disabled = @NO;
-                            diastolic_3.disabled = @NO;
-                        } else {
-                            systolic_3.disabled = @YES;
-                            diastolic_3.disabled = @YES;
-                        }
-                    }
-                    
-                } else if ([newValue doubleValue] > 0)  {//only Diastolic_1
-                    //                    diastolic_avg.value = newValue;
-                }
-            } else if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) { //only Diastolic_1
-                //                diastolic_avg.value = newValue;
-            }
-            //            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
-            //            [self updateFormRow:diastolic_avg];
+            BOOL flag = [weakSelf checkIfShouldEnable3rdBP];
+            
+            systolic_3.disabled = [NSNumber numberWithBool:!flag];
+            diastolic_3.disabled =[NSNumber numberWithBool:!flag];
             
             systolic_3.required = ![systolic_3.disabled boolValue];
             diastolic_3.required = ![diastolic_3.disabled boolValue];
@@ -463,31 +449,11 @@ NSString *const kQuestionFifteen = @"q15";
     
     diastolic_2.onChangeBlock = ^(id oldValue, id newValue, XLFormRowDescriptor* __unused rowDescriptor){
         if ( oldValue != newValue) {
-            if (newValue != (id)[NSNull null] && diastolic_1.value != (id)[NSNull null]) {
-                if ([newValue doubleValue] > 0 && [diastolic_1.value doubleValue ]> 0) {     //both filled in
-                    //                    diastolic_avg.value = @(([newValue doubleValue]+ [diastolic_2.value doubleValue])/2);
-                    BOOL diffMoreThan5 = [self checkDiffBetweenRow1:diastolic_1 andRow2:rowDescriptor withDiffOf:5];
-                    
-                    if (diffMoreThan5) {
-                        systolic_3.disabled = @NO;
-                        diastolic_3.disabled = @NO;
-                    } else {
-                        if ([self checkDiffBetweenRow1:systolic_1 andRow2:systolic_2 withDiffOf:5]) {
-                            systolic_3.disabled = @NO;
-                            diastolic_3.disabled = @NO;
-                        } else {
-                            systolic_3.disabled = @YES;
-                            diastolic_3.disabled = @YES;
-                        }
-                    }
-                } else if ([newValue doubleValue] > 0)  {//only Diastolic_1
-                    //                    diastolic_avg.value = newValue;
-                }
-            } else if (newValue != (id)[NSNull null] && [newValue doubleValue] > 0) { //only Diastolic_1
-                //                diastolic_avg.value = newValue;
-            }
-            //            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
-            //            [self updateFormRow:diastolic_avg];
+            BOOL flag = [weakSelf checkIfShouldEnable3rdBP];
+            
+            systolic_3.disabled = [NSNumber numberWithBool:!flag];
+            diastolic_3.disabled =[NSNumber numberWithBool:!flag];
+            
             systolic_3.required = ![systolic_3.disabled boolValue];
             diastolic_3.required = ![diastolic_3.disabled boolValue];
             [self updateFormRow:systolic_3];
@@ -555,60 +521,6 @@ NSString *const kQuestionFifteen = @"q15";
     [formDescriptor addFormSection:section];
     
     
-    XLFormRowDescriptor *diabeticRow = [XLFormRowDescriptor formRowDescriptorWithTag:kIsDiabetic rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Is resident diabetic?"];
-    diabeticRow.selectorOptions = @[@"Yes", @"No"];
-    diabeticRow.required = YES;
-    [self setDefaultFontWithRow:diabeticRow];
-    
-    //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kIsDiabetic] != (id)[NSNull null])
-        diabeticRow.value = [self getYesNofromOneZero:triageDict[kIsDiabetic]];
-    
-    [section addFormRow:diabeticRow];
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:kCbg rowType:XLFormRowDescriptorTypeDecimal title:@"CBG (mmol/L)"];
-    row.required = NO;
-    
-    NSString *didPhleb = [[_fullScreeningForm objectForKey:SECTION_RESI_PART] objectForKey:kDidPhleb];
-    
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kIsDiabetic] != (id)[NSNull null]) {
-        diabeticRow.value = [self getYesNofromOneZero:triageDict[kIsDiabetic]];
-        if ([diabeticRow.value isEqualToString:@"Yes"]) {
-            if (didPhleb == (id)[NSNull null] || [didPhleb containsString:@"No"]) {
-                row.required = YES;
-                row.disabled = @0;
-            }
-        } else {
-            row.disabled = @1;
-            row.required = NO;
-        }
-    }
-    [self setDefaultFontWithRow:row];
-    
-    //value
-    if (triageDict != (id)[NSNull null] && [triageDict objectForKey:kCbg] != (id)[NSNull null]) {
-        row.value = triageDict[kCbg];
-        [self updateAnswerColor:row];
-    }
-    
-    diabeticRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-        if (newValue != oldValue) {
-            if ([newValue isEqualToString:@"Yes"]) {
-                NSString *didPhleb = [[_fullScreeningForm objectForKey:SECTION_RESI_PART] objectForKey:kDidPhleb];
-                if (didPhleb == (id)[NSNull null] || [didPhleb containsString:@"No"]) {
-                    row.disabled = @NO;
-                    row.required = YES;
-                }
-            } else {
-                row.disabled = @YES;
-                row.required = NO;
-            }
-            [self reloadFormRow:row];
-        }
-    };
-    
-    [section addFormRow:row];
-    
     // BMI calculation - Section
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
@@ -672,6 +584,7 @@ NSString *const kQuestionFifteen = @"q15";
     return [super initWithForm:formDescriptor];
     
 }
+
 
 
 - (id) initSnellenEyeTest {
@@ -951,7 +864,7 @@ NSString *const kQuestionFifteen = @"q15";
                                                                                    rowType:XLFormRowDescriptorTypeSelectorPush
                                                                                      title:@""];
     sitToStandRow.noValueDisplayText = @"Tap here";
-    sitToStandRow.required = YES;
+//    sitToStandRow.required = YES;
     sitToStandRow.selectorOptions = @[@"0 Not able to complete 5 sit-to-stand/Unattempted",
                                       @"1 Complete in >16.7s",
                                       @"2 Complete in 16.6-13.7s",
@@ -976,7 +889,7 @@ NSString *const kQuestionFifteen = @"q15";
                                                                                rowType:XLFormRowDescriptorTypeSelectorPush
                                                                                  title:@""];
     balanceRow.noValueDisplayText = @"Tap here";
-    balanceRow.required = YES;
+//    balanceRow.required = YES;
     balanceRow.selectorOptions = @[@"0 Side-by-side <10s or unable to perform/Unattempted",
                                       @"1 Side-by-side 10s, <10s semi-tandem",
                                       @"2 Semi-tandem 10s, tandem 0-2s",
@@ -1001,7 +914,7 @@ NSString *const kQuestionFifteen = @"q15";
                                                                             rowType:XLFormRowDescriptorTypeSelectorPush
                                                                               title:@""];
     gaitSpeedRow.noValueDisplayText = @"Tap here";
-    gaitSpeedRow.required = YES;
+//    gaitSpeedRow.required = YES;
     gaitSpeedRow.selectorOptions = @[@"0 Not attempted/not able",
                                    @"1 Completed in >5.7s",
                                    @"2 Completed in 4.1-5.7s",
@@ -1031,29 +944,115 @@ NSString *const kQuestionFifteen = @"q15";
     
     [section addFormRow:spbbScoreRow];
     
+    // only for Kampong Glam
+    if ([neighbourhood containsString:@"Kampong"]) {
+        section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+        [formDescriptor addFormSection:section];
+        
+        XLFormRowDescriptor *tugQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"tug_q"
+                                                                             rowType:XLFormRowDescriptorTypeInfo
+                                                                               title:@"Timed Up and Go (seconds) (0 if unattempted)"];
+        tugQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+        [self setDefaultFontWithRow:tugQRow];
+        [section addFormRow:tugQRow];
+        
+        
+        XLFormRowDescriptor *tugRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTimeUpGo
+                                                                            rowType:XLFormRowDescriptorTypeDecimal
+                                                                              title:@""];
+//        tugRow.required = YES;
+        [self setDefaultFontWithRow:tugRow];
+        [tugRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+        //value
+        if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kTimeUpGo] != (id)[NSNull null])
+            tugRow.value = physioDict[kTimeUpGo];
+        
+        [section addFormRow:tugRow];
+    }
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@""];
     [formDescriptor addFormSection:section];
     
-    XLFormRowDescriptor *tugQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"tug_q"
-                                                                               rowType:XLFormRowDescriptorTypeInfo
-                                                                                 title:@"Timed Up and Go (seconds) (0 if unattempted)"];
-    tugQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    [self setDefaultFontWithRow:tugQRow];
-    [section addFormRow:tugQRow];
+    XLFormRowDescriptor *supineSysBpQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"q6"
+                                                                         rowType:XLFormRowDescriptorTypeInfo
+                                                                           title:@"Postural Systolic Blood Pressure (Supine)"];
+    supineSysBpQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:supineSysBpQRow];
+    [section addFormRow:supineSysBpQRow];
     
     
-    XLFormRowDescriptor *tugRow = [XLFormRowDescriptor formRowDescriptorWithTag:kTimeUpGo
-                                                                              rowType:XLFormRowDescriptorTypeDecimal
-                                                                                title:@""];
-    tugRow.required = YES;
-    [self setDefaultFontWithRow:tugRow];
-    [tugRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    XLFormRowDescriptor *supineSysBpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSupineBpSys
+                                                                        rowType:XLFormRowDescriptorTypeInteger
+                                                                          title:@""];
+//    supineSysBpRow.required = YES;
+    [self setDefaultFontWithRow:supineSysBpRow];
+    [supineSysBpRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     //value
-    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kTimeUpGo] != (id)[NSNull null])
-        tugRow.value = physioDict[kTimeUpGo];
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kSupineBpSys] != (id)[NSNull null])
+        supineSysBpRow.value = physioDict[kSupineBpSys];
     
-    [section addFormRow:tugRow];
+    [section addFormRow:supineSysBpRow];
+    
+    XLFormRowDescriptor *supineDiasBpQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"q7"
+                                                                                 rowType:XLFormRowDescriptorTypeInfo
+                                                                                   title:@"Postural Diastolic Blood Pressure (Supine)"];
+    supineDiasBpQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:supineDiasBpQRow];
+    [section addFormRow:supineDiasBpQRow];
+    
+    
+    XLFormRowDescriptor *supineDiasBpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kSupineBpDias
+                                                                                rowType:XLFormRowDescriptorTypeInteger
+                                                                                  title:@""];
+//    supineDiasBpRow.required = YES;
+    [self setDefaultFontWithRow:supineDiasBpRow];
+    [supineDiasBpRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    //value
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kSupineBpDias] != (id)[NSNull null])
+        supineDiasBpRow.value = physioDict[kSupineBpDias];
+    
+    [section addFormRow:supineDiasBpRow];
+    
+    XLFormRowDescriptor *standSysBpQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"q8"
+                                                                                  rowType:XLFormRowDescriptorTypeInfo
+                                                                                    title:@"Postural Systolic Blood Pressure (Standing)"];
+    standSysBpQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:standSysBpQRow];
+    [section addFormRow:standSysBpQRow];
+    
+    
+    XLFormRowDescriptor *standSysBpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kStandBpSys
+                                                                                 rowType:XLFormRowDescriptorTypeInteger
+                                                                                   title:@""];
+//    standSysBpRow.required = YES;
+    [self setDefaultFontWithRow:standSysBpRow];
+    [standSysBpRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    //value
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kStandBpSys] != (id)[NSNull null])
+        standSysBpRow.value = physioDict[kStandBpSys];
+    
+    [section addFormRow:standSysBpRow];
+    
+    XLFormRowDescriptor *standDiasBpQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"q9"
+                                                                                  rowType:XLFormRowDescriptorTypeInfo
+                                                                                    title:@"Postural Diastolic Blood Pressure (Standing)"];
+    standDiasBpQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:standDiasBpQRow];
+    [section addFormRow:standDiasBpQRow];
+    
+    
+    XLFormRowDescriptor *standDiasBpRow = [XLFormRowDescriptor formRowDescriptorWithTag:kStandBpDias
+                                                                                 rowType:XLFormRowDescriptorTypeInteger
+                                                                                   title:@""];
+//    standDiasBpRow.required = YES;
+    [self setDefaultFontWithRow:standDiasBpRow];
+    [standDiasBpRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    //value
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kStandBpDias] != (id)[NSNull null])
+        standDiasBpRow.value = physioDict[kStandBpDias];
+    
+    [section addFormRow:standDiasBpRow];
+    
     
     section = [XLFormSectionDescriptor formSectionWithTitle:@"Fall Risk "];
     [formDescriptor addFormSection:section];
@@ -1063,11 +1062,13 @@ NSString *const kQuestionFifteen = @"q15";
                                                            title:@"Fall Risk"];
     fallRiskRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     fallRiskRow.disabled = @1;
+    fallRiskRow.value = @"HIGH RISK";
+    [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kFallRisk andNewContent:@"HIGH RISK"];
     [self setDefaultFontWithRow:fallRiskRow];
     [fallRiskRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     
-    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kFallRisk] != (id)[NSNull null])
-        fallRiskRow.value = physioDict[kFallRisk];
+//    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kFallRisk] != (id)[NSNull null])
+//        fallRiskRow.value = physioDict[kFallRisk];
     
     [section addFormRow:fallRiskRow];
     
@@ -1085,7 +1086,7 @@ NSString *const kQuestionFifteen = @"q15";
                                                         rowType:XLFormRowDescriptorTypeTextView
                                                           title:@""];
 //    physioNotesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    physioNotesRow.required = YES;
+//    physioNotesRow.required = YES;
     [self setDefaultFontWithRow:physioNotesRow];
 //    [physioNotesRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     
@@ -1109,7 +1110,7 @@ NSString *const kQuestionFifteen = @"q15";
                                                                                 rowType:XLFormRowDescriptorTypeTextView
                                                                                   title:@""];
     //    physioNotesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    keyResultsRow.required = YES;
+//    keyResultsRow.required = YES;
     [self setDefaultFontWithRow:keyResultsRow];
     //    [physioNotesRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     
@@ -1132,7 +1133,7 @@ NSString *const kQuestionFifteen = @"q15";
                                                                                 rowType:XLFormRowDescriptorTypeTextView
                                                                                   title:@""];
     //    physioNotesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    externalRisksRow.required = YES;
+//    externalRisksRow.required = YES;
     [self setDefaultFontWithRow:externalRisksRow];
     //    [physioNotesRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     
@@ -1155,7 +1156,7 @@ NSString *const kQuestionFifteen = @"q15";
                                                                                 rowType:XLFormRowDescriptorTypeTextView
                                                                                   title:@""];
     //    physioNotesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    otherFactorsRow.required = YES;
+//    otherFactorsRow.required = YES;
     [self setDefaultFontWithRow:otherFactorsRow];
     //    [physioNotesRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     
@@ -1178,7 +1179,7 @@ NSString *const kQuestionFifteen = @"q15";
                                                                                 rowType:XLFormRowDescriptorTypeTextView
                                                                                   title:@""];
     //    physioNotesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-    recommendationsRow.required = YES;
+//    recommendationsRow.required = YES;
     [self setDefaultFontWithRow:recommendationsRow];
     //    [physioNotesRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     
@@ -1187,13 +1188,51 @@ NSString *const kQuestionFifteen = @"q15";
     
     [section addFormRow:recommendationsRow];
     
+    
+    XLFormRowDescriptor *moreCommentsQRow = [XLFormRowDescriptor formRowDescriptorWithTag:@"more_comments_q"
+                                                                                     rowType:XLFormRowDescriptorTypeInfo
+                                                                                       title:@"Additional Comments"];
+    moreCommentsQRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    [self setDefaultFontWithRow:moreCommentsQRow];
+    [section addFormRow:moreCommentsQRow];
+    
+    XLFormRowDescriptor *moreCommentsRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMoreComments
+                                                                                    rowType:XLFormRowDescriptorTypeTextView
+                                                                                      title:@""];
+    //    physioNotesRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+    //    recommendationsRow.required = YES;
+    [self setDefaultFontWithRow:moreCommentsRow];
+    //    [physioNotesRow.cellConfigAtConfigure setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
+    
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kMoreComments] != (id)[NSNull null])
+        moreCommentsRow.value = physioDict[kMoreComments];
+    
+    [section addFormRow:moreCommentsRow];
+    
+    section = [XLFormSectionDescriptor formSectionWithTitle:@""];
+    [formDescriptor addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:kGivenReferral rowType:XLFormRowDescriptorTypeSelectorActionSheet title:@"Resident given referral?"];
+    row.noValueDisplayText = @"Tap here";
+    row.required = NO;
+    [self setDefaultFontWithRow:row];
+    row.selectorOptions = @[@"NIL", @"Cluster Operator"];
+    
+    //value
+    if (physioDict != (id)[NSNull null] && [physioDict objectForKey:kGivenReferral] != (id)[NSNull null]) {
+        row.value = [physioDict objectForKey:kGivenReferral];
+    }
+    
+    [section addFormRow:row];
+    
+    
     return [super initWithForm:formDescriptor];
 }
 
 
 -(id) initAdditionalSvcs {
     
-    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Additional Services"];
+    XLFormDescriptor * formDescriptor = [XLFormDescriptor formDescriptorWithTitle:@"Financial and Cancer Services"];
     XLFormSectionDescriptor * section;
     XLFormRowDescriptor * row;
     
@@ -2147,6 +2186,8 @@ NSString *const kQuestionFifteen = @"q15";
     } else if ([rowDescriptor.tag isEqualToString:kGaitSpeed]) {
         [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kGaitSpeed andNewContent:[newValue substringToIndex:1]];
         [self calculateSpbbScore];
+    } else if ([rowDescriptor.tag isEqualToString:kGivenReferral]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kGivenReferral andNewContent:newValue];
     }
     
     /* Additional Services */
@@ -2371,18 +2412,13 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_MODE_OF_SCREENING andFieldName:kNotes andNewContent:rowDescriptor.value];
     }
     
-    /* Profiling */
-    else if ([rowDescriptor.tag isEqualToString:kAvgMthHouseIncome]) {
-        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kAvgMthHouseIncome andNewContent:rowDescriptor.value];
-    } else if ([rowDescriptor.tag isEqualToString:kNumPplInHouse]) {
-        [self postSingleFieldWithSection:SECTION_PROFILING_SOCIOECON andFieldName:kNumPplInHouse andNewContent:rowDescriptor.value];
-    }
-    
     /* Triage */
     else if ([rowDescriptor.tag isEqualToString:kBp1Sys]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp1Sys andNewContent:[self removePostfixIfAny:rowDescriptor.value]];
+        [self calculateBpAvg];
     } else if ([rowDescriptor.tag isEqualToString:kBp1Dias]) {
-        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp1Dias andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp1Dias andNewContent:[self removePostfixIfAny:rowDescriptor.value]];
+        [self calculateBpAvg];
     } else if ([rowDescriptor.tag isEqualToString:kHeightCm]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kHeightCm andNewContent:rowDescriptor.value];
     }else if ([rowDescriptor.tag isEqualToString:kWeightKg]) {
@@ -2396,13 +2432,17 @@ NSString *const kQuestionFifteen = @"q15";
     } else if ([rowDescriptor.tag isEqualToString:kCbg]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kCbg andNewContent:[self removePostfixIfAny:rowDescriptor.value]];
     } else if ([rowDescriptor.tag isEqualToString:kBp2Sys]) {
-        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp2Sys andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp2Sys andNewContent:[self removePostfixIfAny:rowDescriptor.value]];
+        [self calculateBpAvg];
     } else if ([rowDescriptor.tag isEqualToString:kBp2Dias]) {
-        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp2Dias andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp2Dias andNewContent:[self removePostfixIfAny:rowDescriptor.value]];
+        [self calculateBpAvg];
     } else if ([rowDescriptor.tag isEqualToString:kBp3Sys]) {
         [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp3Sys andNewContent:[self removePostfixIfAny:rowDescriptor.value]];
+        [self calculateBpAvg];
     } else if ([rowDescriptor.tag isEqualToString:kBp3Dias]) {
-        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp3Dias andNewContent:rowDescriptor.value];
+        [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp3Dias andNewContent:[self removePostfixIfAny:rowDescriptor.value]];
+        [self calculateBpAvg];
     }
     
     /* Doctor's Consult */
@@ -2420,7 +2460,7 @@ NSString *const kQuestionFifteen = @"q15";
     /* Fall Risk Assessment */
     else if ([rowDescriptor.tag isEqualToString:kTimeUpGo]) {
         [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kTimeUpGo andNewContent:rowDescriptor.value];
-        [self checkFallRisk];
+//        [self checkFallRisk];
     } else if ([rowDescriptor.tag isEqualToString:kPhysioNotes]) {
         [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kPhysioNotes andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kKeyResults]) {
@@ -2431,6 +2471,16 @@ NSString *const kQuestionFifteen = @"q15";
         [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kOtherFactors andNewContent:rowDescriptor.value];
     } else if ([rowDescriptor.tag isEqualToString:kRecommendations]) {
         [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kRecommendations andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kMoreComments]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kMoreComments andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kSupineBpSys]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kSupineBpSys andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kSupineBpDias]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kSupineBpDias andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kStandBpSys]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kStandBpSys andNewContent:rowDescriptor.value];
+    } else if ([rowDescriptor.tag isEqualToString:kStandBpDias]) {
+        [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kStandBpDias andNewContent:rowDescriptor.value];
     }
     
     [self updateAnswerColor:rowDescriptor];
@@ -2438,6 +2488,161 @@ NSString *const kQuestionFifteen = @"q15";
 }
 
 #pragma mark - Other Methods
+
+- (BOOL) checkIfShouldEnable3rdBP {
+    
+    // If there's a NULL or blank
+    if (systolic_1.value == (id)[NSNull null] || diastolic_1.value == (id)[NSNull null]|| systolic_2.value == (id)[NSNull null] || diastolic_2 == (id)[NSNull null]) {
+        return YES;
+    }
+    
+    // If the difference greater than 5 either for SYS or DIAS
+    else if (systolic_1.value != (id)[NSNull null] && diastolic_1.value != (id)[NSNull null] && systolic_2.value != (id)[NSNull null] && diastolic_2.value != (id)[NSNull null]) {
+        if (abs([systolic_1.value intValue] - [systolic_2.value intValue]) >= 5) return YES;
+        else if (abs([diastolic_1.value intValue] - [diastolic_2.value intValue]) >= 5) return YES;
+    }
+    
+    return NO;
+}
+
+- (void) calculateBpAvg {
+    BOOL use12, use23, use13;
+    use12 = use23 = use13 = false;
+    
+    
+    if (![self checkIfShouldEnable3rdBP]) { //means, can settle just among BP1 & BP2
+        use12 = true;
+    }
+    
+    //BP1 got blanks
+    else if (systolic_1.value == (id)[NSNull null] || diastolic_1.value == (id)[NSNull null] || [systolic_1.value intValue] == 0 || [diastolic_1.value intValue] == 0) {
+        if (systolic_2.value != (id)[NSNull null] && diastolic_2.value != (id)[NSNull null] && systolic_3.value != (id)[NSNull null] && diastolic_3.value != (id)[NSNull null]) {
+            //use BP2 & BP3
+            use23 = true;
+        }
+    }
+    
+    //BP2 got blanks
+    else if (systolic_2.value == (id)[NSNull null] || diastolic_2.value == (id)[NSNull null] || [systolic_2.value intValue] == 0 || [diastolic_2.value intValue] == 0) {  //BP2 got blanks
+        if (systolic_1.value != (id)[NSNull null] && diastolic_1.value != (id)[NSNull null] && systolic_3.value != (id)[NSNull null] && diastolic_3.value != (id)[NSNull null]) {
+            //use BP2 & BP3
+            use23 = true;
+            
+        }
+    }
+    // all 3 BPs have values
+    else if (systolic_1.value != (id)[NSNull null] && diastolic_1.value != (id)[NSNull null] && systolic_2.value != (id)[NSNull null] && diastolic_2.value != (id)[NSNull null] && systolic_3.value != (id)[NSNull null] && diastolic_3.value != (id)[NSNull null]) {
+        
+        //check BP1 & BP3 first < 5 mmHg
+        int diff13_sys = abs([systolic_1.value intValue] - [systolic_3.value intValue]);
+        int diff13_dias = abs([diastolic_1.value intValue] - [diastolic_3.value intValue]);
+        int diff23_sys = abs([systolic_2.value intValue] - [systolic_3.value intValue]);
+        int diff23_dias = abs([diastolic_2.value intValue] - [diastolic_3.value intValue]);
+        
+        if (diff13_sys <5 && diff13_dias <5) {
+            if (diff23_sys < 5 && diff23_dias < 5) {
+                // if BOTH also within 5 mmHg
+                
+                NSNumber *systolic_1_Number = [NSNumber numberWithInt:[systolic_1.value intValue]];
+                NSNumber *systolic_2_Number = [NSNumber numberWithInt:[systolic_2.value intValue]];
+                NSNumber *systolic_3_Number = [NSNumber numberWithInt:[systolic_3.value intValue]];
+                
+                
+                NSArray *unsortedArray = @[systolic_1_Number, systolic_2_Number, systolic_3_Number];
+                NSNumber *maxNumber = [unsortedArray valueForKeyPath:@"@max.self"];
+                
+                if ([systolic_1_Number isEqualToNumber:maxNumber]) {
+                    use23 = true;
+                } else if ([systolic_2_Number isEqualToNumber:maxNumber]) {
+                    use13 = true;
+                } else {
+                    use12 = true;
+                }
+            }
+            // if ONLY BP1 & BP3 within 5 mmHg
+            else {
+                use13 = true;
+            }
+        }
+        // if ONLY BP2 & BP3 within 5 mmHg
+        else if (diff23_sys < 5 && diff23_dias < 5) {
+            use23 = true;
+        }
+        // neither of the three have readings within 5 mmHg
+        else {
+            // BP1_sys < 75 OR BP1_dias < 45
+            if ([systolic_1.value intValue] < 75 || [diastolic_1.value intValue] < 45) {
+                use23 = true;
+            }
+            // BP2_sys < 75 OR BP2_dias < 45
+            else if ([systolic_2.value intValue] < 75 || [diastolic_2.value intValue] < 45) {
+                use13 = true;
+            }
+            // BP3_sys < 75 OR BP3_dias < 45
+            else if ([systolic_3.value intValue] < 75 || [diastolic_3.value intValue] < 45) {
+                use12 = true;
+            }
+            // if ALL above 75 for SYS and 45 for DIAS
+            else {
+                NSNumber *systolic_1_Number = [NSNumber numberWithInt:[systolic_1.value intValue]];
+                NSNumber *systolic_2_Number = [NSNumber numberWithInt:[systolic_2.value intValue]];
+                NSNumber *systolic_3_Number = [NSNumber numberWithInt:[systolic_3.value intValue]];
+                
+                
+                NSArray *unsortedArray = @[systolic_1_Number, systolic_2_Number, systolic_3_Number];
+                NSNumber *maxNumber = [unsortedArray valueForKeyPath:@"@max.self"];
+                
+                if ([systolic_1_Number isEqualToNumber:maxNumber]) {
+                    use23 = true;
+                } else if ([systolic_2_Number isEqualToNumber:maxNumber]) {
+                    use13 = true;
+                } else {
+                    use12 = true;
+                }
+            }
+        }
+    }
+    
+    if (use12) {
+        systolic_avg.value = [NSNumber numberWithFloat:([systolic_1.value floatValue] + [systolic_2.value floatValue])/2.0];
+        diastolic_avg.value = [NSNumber numberWithFloat:([diastolic_1.value floatValue] + [diastolic_2.value floatValue])/2.0];
+        double delayInSeconds = 1.0;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            //code to be executed on the main queue after delay
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:systolic_avg.value];
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
+        });
+        
+    } else if (use23) {
+        systolic_avg.value = [NSNumber numberWithFloat:([systolic_2.value floatValue] + [systolic_3.value floatValue])/2.0];
+        diastolic_avg.value = [NSNumber numberWithFloat:([diastolic_2.value floatValue] + [diastolic_3.value floatValue])/2.0];
+        
+        double delayInSeconds = 1.0;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            //code to be executed on the main queue after delay
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:systolic_avg.value];
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
+        });
+    } else if (use13) {
+        systolic_avg.value = [NSNumber numberWithFloat:([systolic_1.value floatValue] + [systolic_3.value floatValue])/2.0];
+        diastolic_avg.value = [NSNumber numberWithFloat:([diastolic_1.value floatValue] + [diastolic_3.value floatValue])/2.0];
+        
+        double delayInSeconds = 1.0;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgSys andNewContent:systolic_avg.value];
+            [self postSingleFieldWithSection:SECTION_CLINICAL_RESULTS andFieldName:kBp12AvgDias andNewContent:diastolic_avg.value];
+        });
+    }
+    
+    [self reloadFormRow:systolic_avg];
+    [self reloadFormRow:diastolic_avg];
+}
+
+
 - (BOOL) checkPhlebEligibility {
     NSDictionary *phlebEligibDict = _fullScreeningForm[SECTION_PHLEBOTOMY_ELIGIBILITY_ASSMT];
     age40 = sporeanPr = chronicCond_noBloodTest = wantFreeBt = false;
@@ -2520,7 +2725,7 @@ NSString *const kQuestionFifteen = @"q15";
     spbbScoreRow.value = [NSNumber numberWithInt:totalScore];
     [self postSingleFieldWithSection:SECTION_PHYSIOTHERAPY andFieldName:kSpbbScore andNewContent:[NSString stringWithFormat:@"%d", totalScore]];
     [self reloadFormRow:spbbScoreRow];
-    [self checkFallRisk];
+//    [self checkFallRisk];
 }
 
 - (void) checkFallRisk {
@@ -3089,7 +3294,7 @@ NSString *const kQuestionFifteen = @"q15";
         return;
     }
     
-    if ([row.tag containsString:@"sys"]) {
+    if ([row.tag containsString:@"sys"] && ![row.tag containsString:@"stand"] && ![row.tag containsString:@"supine"]) {
         if ([row.value integerValue] >= 140) {
             [row.cellConfig setObject:[UIColor redColor] forKey:@"textField.textColor"];
             NSString *str = [NSString stringWithFormat:@"%@", row.value];

@@ -294,6 +294,11 @@ extern NSString *const kFitLast12Mths;
 extern NSString *const kColonoscopy10Yrs;
 extern NSString *const kWantFitKit;
 extern NSString *const kMammo2Yrs;
+
+extern NSString *const kNoBreastSymptoms;
+extern NSString *const kNotBreastfeeding;
+extern NSString *const kNotPregnant;
+
 extern NSString *const kHasChas;
 extern NSString *const kSporean;
 extern NSString *const kWantMammo;
@@ -350,6 +355,7 @@ extern NSString *const kMedConds;
 
 /** Surgery */
 extern NSString *const kHadSurgery;
+extern NSString *const kPastSurgeries;
 
 /** Healthcare Barriers */
 extern NSString *const kGpFamDoc;
@@ -668,8 +674,8 @@ extern NSString *const kIsDiabetic;
 extern NSString *const kCbg;
 extern NSString *const kBp2Sys;
 extern NSString *const kBp2Dias;
-//extern NSString *const kBp12AvgSys;       removed since build 2021
-//extern NSString *const kBp12AvgDias;
+extern NSString *const kBp12AvgSys;
+extern NSString *const kBp12AvgDias;
 extern NSString *const kBp3Sys;
 extern NSString *const kBp3Dias;
 
@@ -704,6 +710,12 @@ extern NSString *const kKeyResults;
 extern NSString *const kExternalRisks;
 extern NSString *const kOtherFactors;
 extern NSString *const kRecommendations;
+
+extern NSString *const kSupineBpSys;
+extern NSString *const kSupineBpDias;
+extern NSString *const kStandBpSys;
+extern NSString *const kStandBpDias;
+extern NSString *const kMoreComments;
 
 #pragma mark - Emergency Services
 

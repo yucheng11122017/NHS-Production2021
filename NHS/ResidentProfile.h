@@ -26,6 +26,7 @@
 - (BOOL) isEligibleHearing;
 - (BOOL) isEligibleSmf;
 - (BOOL) isEligibleAdvancedVision;
+- (BOOL) isEligibleEmerSvcs;
 - (BOOL) isEligibleCHAS;
 - (BOOL) isEligibleReceiveFIT;
 - (BOOL) isEligibleReferMammo;

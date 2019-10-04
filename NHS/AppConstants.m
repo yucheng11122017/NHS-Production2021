@@ -183,6 +183,12 @@ NSString *const kFitLast12Mths= @"fit_last_12_mths";
 NSString *const kColonoscopy10Yrs= @"colonoscopy_10_yrs";
 NSString *const kWantFitKit= @"want_fit_kit";
 NSString *const kMammo2Yrs= @"mammo_2_yrs";
+
+NSString *const kNoBreastSymptoms= @"no_breast_symptoms";
+NSString *const kNotBreastfeeding = @"not_breastfeeding";
+NSString *const kNotPregnant = @"not_pregnant";
+
+
 NSString *const kHasChas= @"has_chas";
 NSString *const kSporean= @"sporean_pr";
 NSString *const kWantMammo= @"want_mammo";
@@ -239,6 +245,7 @@ NSString *const kMedConds = @"med_conds";
 
 /** Surgery */
 NSString *const kHadSurgery = @"had_surgery";
+NSString *const kPastSurgeries = @"past_surgeries";
 
 /** Healthcare Barriers */
 NSString *const kGpFamDoc = @"gp_fam_doc";
@@ -546,8 +553,8 @@ NSString *const kIsDiabetic = @"is_diabetic";
 NSString *const kCbg = @"cbg";
 NSString *const kBp2Sys = @"bp2_sys";
 NSString *const kBp2Dias = @"bp2_dias";
-//NSString *const kBp12AvgSys = @"bp12_avg_sys";    //removed since build 2021
-//NSString *const kBp12AvgDias = @"bp12_avg_dias";
+NSString *const kBp12AvgSys = @"bp12_avg_sys";
+NSString *const kBp12AvgDias = @"bp12_avg_dias";
 NSString *const kBp3Sys = @"bp3_sys";
 NSString *const kBp3Dias = @"bp3_dias";
 
@@ -583,6 +590,13 @@ NSString *const kKeyResults = @"key_results";
 NSString *const kExternalRisks = @"external_risks";
 NSString *const kOtherFactors = @"other_factors";
 NSString *const kRecommendations = @"recommendations";
+
+NSString *const kSupineBpSys = @"supine_bp_sys";
+NSString *const kSupineBpDias = @"supine_bp_dias";
+NSString *const kStandBpSys = @"stand_bp_sys";
+NSString *const kStandBpDias = @"stand_bp_dias";
+NSString *const kMoreComments = @"more_comments";
+
 
 #pragma mark - Emergency Services
 NSString *const kUndergoneEmerSvcs = @"undergone_emergency_services";

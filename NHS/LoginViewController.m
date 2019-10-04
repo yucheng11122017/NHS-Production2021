@@ -245,7 +245,7 @@
     
     // submit credentials
 //    NSString *url = @"https://nus-nhs.ml/volunteerLogin"; //for DEV
-    NSString *url = @"https://nhs-som.nus.edu.sg/volunteerLoginName";
+    NSString *url = @"https://pd.homerehab.com.sg/volunteerLoginName";
     NSDictionary *dict = @{@"fullname": fullname,
                            @"username" : username,
                            @"passkey" : passkey,

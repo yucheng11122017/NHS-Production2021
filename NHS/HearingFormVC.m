@@ -18,6 +18,8 @@
 
 
 #define GREEN_COLOR [UIColor colorWithRed:48.0/255.0 green:207.0/255.0 blue:1.0/255.0 alpha:1.0]
+#define RED_DISABLED_COLOR [UIColor colorWithRed:245.0/255.0 green:183.0/255.0 blue:177.0/255.0 alpha:1.0]
+
 
 typedef enum formName {
     Hearing,
@@ -162,7 +164,7 @@ typedef enum formName {
     section = [XLFormSectionDescriptor formSectionWithTitle:@"HHIE"];
     [formDescriptor addFormSection:section];
     
-    XLFormRowDescriptor *attendedHhieRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAttendedHhie rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Attended HHIE?"];
+    XLFormRowDescriptor *attendedHhieRow = [XLFormRowDescriptor formRowDescriptorWithTag:kAttendedHhie rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone hearing screening?"];  //updated question title
     attendedHhieRow.required = YES;
     attendedHhieRow.selectorOptions = @[@"Yes", @"No"];
     [self setDefaultFontWithRow:attendedHhieRow];
@@ -530,6 +532,12 @@ typedef enum formName {
     referrerSignButtonRow.cellConfig[@"textLabel.textColor"] = [UIColor whiteColor];
     [section addFormRow:referrerSignButtonRow];
     
+    NSString *neighbourhood = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
+    if (![neighbourhood containsString:@"Kampong"]) {
+        referrerNameRow.disabled = @1;
+        referrerSignButtonRow.disabled = @1;
+        referrerSignButtonRow.cellConfigAtConfigure[@"backgroundColor"] = RED_DISABLED_COLOR;
+    }
     
     return [super initWithForm:formDescriptor];
 }
@@ -567,7 +575,7 @@ typedef enum formName {
 
     
 
-    XLFormRowDescriptor *upcomingApptRow = [XLFormRowDescriptor formRowDescriptorWithTag:kUpcomingAppt rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Do you have an upcoming appointment with your ear specialist/audiologist?"];
+    XLFormRowDescriptor *upcomingApptRow = [XLFormRowDescriptor formRowDescriptorWithTag:kUpcomingAppt rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Do you have an upcoming appointment with your ear specialist/audiologist EXCLUDING Hearing Bus?"];   //updated question title
     upcomingApptRow.required = YES;
     [self setDefaultFontWithRow:upcomingApptRow];
     upcomingApptRow.cellConfig[@"textLabel.numberOfLines"] = @0;
@@ -1021,16 +1029,18 @@ typedef enum formName {
 
 - (void) updateSignatureButtonColors {
     
-    NSString *image_str = [[NSUserDefaults standardUserDefaults] objectForKey:HEARING_REFERRER_SIGNATURE];
-    
-    if (image_str != nil) {
-        signColor = GREEN_COLOR;
-    } else {
-        signColor = [UIColor redColor];
+    if (![referrerSignButtonRow.disabled boolValue]) {
+        NSString *image_str = [[NSUserDefaults standardUserDefaults] objectForKey:HEARING_REFERRER_SIGNATURE];
+        
+        if (image_str != nil) {
+            signColor = GREEN_COLOR;
+        } else {
+            signColor = [UIColor redColor];
+        }
+        
+        referrerSignButtonRow.cellConfig[@"backgroundColor"] = signColor;
+        [self reloadFormRow:referrerSignButtonRow];
     }
-    
-    referrerSignButtonRow.cellConfig[@"backgroundColor"] = signColor;
-    [self reloadFormRow:referrerSignButtonRow];
     
 }
 

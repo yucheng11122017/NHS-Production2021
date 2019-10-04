@@ -135,7 +135,7 @@ typedef enum sectionRowNumber {
     }
 #endif
     //2019
-    self.rowTitles = @[@"1. Triage", @"2. Phlebotomy", @"3. Profiling", @"4. Basic Vision", @"5. Advanced Geriatric",@"6. Fall Risk Assessment", @"7. Dental", @"8. Hearing", @"9. Advanced Vision", @"10. Emergency Services", @"11. Additional Services", @"12. Social Work", @"Summary & Health Education"];
+    self.rowTitles = @[@"1. Triage", @"2. Phlebotomy", @"3. Profiling", @"4. Basic Vision", @"5. Advanced Geriatric",@"6. Fall Risk Assessment", @"7. Dental", @"8. Hearing", @"9. Advanced Vision", @"10. Emergency Services", @"11. Financial and Cancer Services", @"12. Social Work", @"Summary & Health Education"];
     
     //2018
 //    self.rowTitles = @[@"1. Triage", @"2. Phlebotomy (no need to fill)", @"3. Profiling", @"4. Basic Vision", @"5. Advanced Geriatric", @"6. Dental", @"7. Hearing", @"8. Advanced Vision", @"9. Doctor's Consultation", @"10. Additional Services", @"11. Social Work", @"Summary & Health Education"];
@@ -270,6 +270,12 @@ typedef enum sectionRowNumber {
             }
             
             if (![[ResidentProfile sharedManager] isEligibleAdvancedVision]) {
+                cell.userInteractionEnabled = NO;
+                [cell.textLabel setTextColor:[UIColor grayColor]];
+                return cell;
+            }
+        } else if(indexPath.row == EmergencyServices) {
+            if (![[ResidentProfile sharedManager] isEligibleEmerSvcs]) {
                 cell.userInteractionEnabled = NO;
                 [cell.textLabel setTextColor:[UIColor grayColor]];
                 return cell;
@@ -631,15 +637,18 @@ typedef enum sectionRowNumber {
             if (i == Profiling) {
                 [_completionCheck addObject:[self checkAllProfilingSections:checksDict]];
             } else if (i == Phlebotomy) {
-//                if (![[ResidentProfile sharedManager] isEligiblePhleb]) {  //not eligible
-//                    [_completionCheck addObject:@1];    //always completed
-//                }
-//                else {
-                    NSString *key = lookupTable[i];
                 
+                NSString *neighbourhood = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
+                if ([neighbourhood containsString:@"Kampong"]) {
+                    NSString *key = lookupTable[i];
                     NSNumber *doneNum = [checksDict objectForKey:key];
                     [_completionCheck addObject:doneNum];
-//                }
+                } else {
+                    [_completionCheck addObject:@1];    //since 2a is disabled for Leng Kee
+                }
+                
+                
+                
             }
             else if (i == AdvancedGeriatric) {
                 if (![[ResidentProfile sharedManager] isEligibleGeriatricDementiaAssmt]) {  //not eligible
@@ -702,6 +711,16 @@ typedef enum sectionRowNumber {
                 } else {
                     //check all advanced vision
                     [_completionCheck addObject:[self checkAllSeriSections:checksDict]];
+                }
+            }
+            else if (i == EmergencyServices) {
+                if (![[ResidentProfile sharedManager] isEligibleEmerSvcs]) {  //not eligible
+                    [_completionCheck addObject:@1];
+                } else {
+                    NSString *key = lookupTable[i];
+                    
+                    NSNumber *doneNum = [checksDict objectForKey:key];
+                    [_completionCheck addObject:doneNum];
                 }
             }
             else if (i == SocialWork) {

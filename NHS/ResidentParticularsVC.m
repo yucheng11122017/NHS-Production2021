@@ -883,7 +883,11 @@ typedef enum rowTypes {
     if (![isComm boolValue]) didPhlebRow.hidden = @YES;  //if it's not Comms, then hide this.
     didPhlebRow.selectorOptions = @[@"No, not at all", @"Yes, Saturday", @"Yes, Sunday", @"No, referred to next Saturday", @"Yes, additional session"];
     didPhlebRow.value = [_phlebEligibDict objectForKey:kDidPhleb];
-    didPhlebRow.value = @"No, not at all";
+    
+    if ([_phlebEligibDict objectForKey:kDidPhleb] != (id)[NSNull null] && [_phlebEligibDict objectForKey:kDidPhleb]) {
+        didPhlebRow.value = _phlebEligibDict[kDidPhleb];
+    }
+    
     didPhlebRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:didPhlebRow];
     
@@ -1659,7 +1663,7 @@ typedef enum rowTypes {
 
 - (void) checkIfPostCodeIsValid: (XLFormRowDescriptor *) rowDescriptor {
     if (rowDescriptor.value) {
-        NSString *url = @"https://nhs-som.nus.edu.sg/addressFromPostalCode";
+        NSString *url = @"https://pd.homerehab.com.sg/addressFromPostalCode";
         NSDictionary *dict = @{@"postalcode": rowDescriptor.value};
         NSDictionary *dataDict = @{ @"data" : dict };
         

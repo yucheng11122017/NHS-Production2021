@@ -53,42 +53,57 @@
 }
 
 - (BOOL) isEligibleFallRiskAssessment {
-    BOOL gotAMT = false;
-    BOOL condition1 = false;
-    BOOL condition2 = false;
     
     if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
-        if ([_fullDict objectForKey:SECTION_GERIATRIC_DEMENTIA_ASSMT] != (id)[NSNull null]) { //if the section has at least one entry...
-            NSDictionary *dementiaAssmtDict = [_fullDict objectForKey:SECTION_GERIATRIC_DEMENTIA_ASSMT];
-            
-            if ([dementiaAssmtDict objectForKey:kDementiaStatus] != (id)[NSNull null]) {
-                if ([[dementiaAssmtDict objectForKey:kDementiaStatus] isEqualToString:@"Unlikely"]) {
-                    condition2 = true;
-                }
-            }
-            
-            if ([dementiaAssmtDict objectForKey:kAmtScore] != (id)[NSNull null]) {
-                gotAMT = YES;
-                if (!condition2) return true;
-            }
-        }
-        
         if ([_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE] != (id)[NSNull null]) { //if the section has at least one entry...
             NSDictionary *fallRiskEligibDict = [_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE];
             
-            
             if ([fallRiskEligibDict objectForKey:kFallRiskStatus] != (id)[NSNull null]) {
-                if ([[fallRiskEligibDict objectForKey:kFallRiskStatus] containsString:@"Low"]) {
-                    condition1 = true;
-                    
-                    if (condition1 && condition2) {
-                        return FALSE;       //the only way to skip FRA, even if got AMT score
-                    }
+                if (![[fallRiskEligibDict objectForKey:kFallRiskStatus] containsString:@"Low"]) {   //moderate/high risk
+                    return true;
                 }
             }
         }
-        if (gotAMT) return true;
     }
+    
+    // UPDATED THE ELIGIBILITY CRITERIA FOR LENG KEE
+    
+//    BOOL gotAMT = false;
+//    BOOL condition1 = false;
+//    BOOL condition2 = false;
+//
+//    if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
+//        if ([_fullDict objectForKey:SECTION_GERIATRIC_DEMENTIA_ASSMT] != (id)[NSNull null]) { //if the section has at least one entry...
+//            NSDictionary *dementiaAssmtDict = [_fullDict objectForKey:SECTION_GERIATRIC_DEMENTIA_ASSMT];
+//
+//            if ([dementiaAssmtDict objectForKey:kDementiaStatus] != (id)[NSNull null]) {
+//                if ([[dementiaAssmtDict objectForKey:kDementiaStatus] isEqualToString:@"Unlikely"]) {
+//                    condition2 = true;
+//                }
+//            }
+//
+//            if ([dementiaAssmtDict objectForKey:kAmtScore] != (id)[NSNull null]) {
+//                gotAMT = YES;
+//                if (!condition2) return true;
+//            }
+//        }
+//
+//        if ([_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE] != (id)[NSNull null]) { //if the section has at least one entry...
+//            NSDictionary *fallRiskEligibDict = [_fullDict objectForKey:SECTION_FALL_RISK_ELIGIBLE];
+//
+//
+//            if ([fallRiskEligibDict objectForKey:kFallRiskStatus] != (id)[NSNull null]) {
+//                if ([[fallRiskEligibDict objectForKey:kFallRiskStatus] containsString:@"Low"]) {
+//                    condition1 = true;
+//
+//                    if (condition1 && condition2) {
+//                        return FALSE;       //the only way to skip FRA, even if got AMT score
+//                    }
+//                }
+//            }
+//        }
+//        if (gotAMT) return true;
+//    }
     
     
     return false;
@@ -216,33 +231,50 @@
     return NO;
 }
 
+- (BOOL) isEligibleEmerSvcs {
+    if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
+        if ([_fullDict objectForKey:SECTION_CLINICAL_RESULTS] != (id)[NSNull null]) { //if the section has at least one entry...
+            NSDictionary *triageDict = [_fullDict objectForKey:SECTION_CLINICAL_RESULTS];
+            NSNumber *cbg = [triageDict objectForKey:kCbg];
+            NSNumber *bpSys = [triageDict objectForKey:kBp12AvgSys];
+    
+            
+            if (cbg == (id)[NSNull null] || bpSys == (id)[NSNull null]) return NO;
+            if ([cbg floatValue] >= 14.0 || [bpSys floatValue] >= 180)  // CBG >= 14.0 OR BP_SYS_AVG >= 180
+                return YES;
+        }
+    }
+    
+    
+    return NO;
+}
+
+
 - (BOOL) isEligibleCHAS {
     if (_fullDict != nil && _fullDict != (id)[NSNull null]) {
-        if ([_fullDict objectForKey:SECTION_CHAS_PRELIM] != (id)[NSNull null]) { //if the section has at least one entry...
-            NSDictionary *chasPrelimDict = [_fullDict objectForKey:SECTION_CHAS_PRELIM];
-//            NSString *haveChasCard = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
-//            NSNumber *expiringSoon = [chasPrelimDict objectForKey:kExpiringSoon];
-            NSNumber *hasChasCard = [chasPrelimDict objectForKey:kDoesOwnChas];
-            NSNumber *wantChas = [chasPrelimDict objectForKey:kWantChas];
-            
-            if (hasChasCard == (id)[NSNull null] || wantChas == (id)[NSNull null]) return NO;
-            
-            BOOL req1 = false;
-            BOOL req2 = false;
-            
-//            if ([haveChasCard containsString:@"None"]) req1 = true;
-//            else {  //already have CHAS card
-//                if (expiringSoon == (id)[NSNull null]) return NO;
-//                if ([expiringSoon boolValue]) req1 = true;
-//                else req1 = false;
-//            }
-            if ([hasChasCard boolValue]) req1 = true;
-            else req1 = false;
-            
-            if ([wantChas boolValue]) req2 = true;
-            else req2 = false;
-            
-            if (req1 && req2) return YES;
+        
+        NSString *citizenship = [[NSUserDefaults standardUserDefaults]
+                                 stringForKey:kCitizenship];
+        
+        if ([citizenship isEqualToString:@"Singaporean"]) {
+            if ([_fullDict objectForKey:SECTION_CHAS_PRELIM] != (id)[NSNull null]) { //if the section has at least one entry...
+                NSDictionary *chasPrelimDict = [_fullDict objectForKey:SECTION_CHAS_PRELIM];
+                //            NSString *haveChasCard = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
+                if (chasPrelimDict != (id)[NSNull null]) {
+                    NSNumber *expiringSoon = [chasPrelimDict objectForKey:kChasExpiringSoon];
+                    NSNumber *hasChasCard = [chasPrelimDict objectForKey:kDoesOwnChas];
+                    
+                    if (hasChasCard != (id)[NSNull null]) {
+                        if (![hasChasCard boolValue]) return YES;   // no chas card
+                    }
+                    
+                    if (expiringSoon != (id)[NSNull null]) {
+                        if ([expiringSoon boolValue]) return YES;
+                    }
+                    
+                }
+                
+            }
         }
     }
     return NO;
@@ -285,17 +317,21 @@
                                          stringForKey:kCitizenship];
                 
                 
-                NSNumber *mammo2Years = [mammogramEligible objectForKey:kMammo2Yrs];
+                NSNumber *noMammo2Years = [mammogramEligible objectForKey:kMammo2Yrs];
+                NSNumber *noBreastSymptom = [mammogramEligible objectForKey:kNoBreastSymptoms];
+                NSNumber *noBreastfeed = [mammogramEligible objectForKey:kNotBreastfeeding];
+                NSNumber *noPregnant = [mammogramEligible objectForKey:kNotPregnant];
 //                NSString *hasChas = [chasPrelimDict objectForKey:kDoesNotOwnChasPioneer];
                 NSNumber *wantMammo = [mammogramEligible objectForKey:kWantMammo];
                 
-                if (mammo2Years == (id)[NSNull null] || wantMammo == (id)[NSNull null]) return NO;
+                if (noMammo2Years == (id)[NSNull null] || noBreastSymptom == (id)[NSNull null] || noBreastfeed == (id)[NSNull null] || noPregnant == (id)[NSNull null]|| wantMammo == (id)[NSNull null]) return NO;
                 // NO NO YES
                 if ([citizenship isEqualToString:@"Singaporean"] &&                 //Singaporean
-                    [age integerValue] >= 50 && [age integerValue] < 70 &&          //age 50-69
-                    ![mammo2Years boolValue] &&                                   // didn't do Mammogram in 2 years
-                    [self hasValidCHAS] &&      //owns a CHAS card (6st Oct 2018)
-//                    ![hasChas containsString:@"None"] &&                            // owns a CHAS card
+                    [age integerValue] >= 40 &&                                     //age 40
+                    [noMammo2Years boolValue] &&                                   // didn't do Mammogram in 2 years
+                    [noBreastSymptom boolValue] &&
+                    [noBreastfeed boolValue] &&
+                    [noPregnant boolValue] &&
                     [wantMammo boolValue])                                        // want mammogram
                     return YES;
             }

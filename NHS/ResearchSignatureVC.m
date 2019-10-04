@@ -56,7 +56,7 @@
     [_wkWebView loadRequest:request];
     
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Hide Form" style:UIBarButtonItemStyleDone target:self action:@selector(hideWebViewBtnPressed:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Sign" style:UIBarButtonItemStyleDone target:self action:@selector(hideWebViewBtnPressed:)];
     
     [self.view addSubview:_wkWebView];
 }
@@ -67,12 +67,12 @@
 }
 
 -(void) hideWebViewBtnPressed:(UIBarButtonItem * __unused)button {
-    if ([button.title containsString:@"Hide"]) {
+    if ([button.title containsString:@"Sign"]) {
         _wkWebView.hidden = YES;
         button.title = @"Show Form";
     } else {
         _wkWebView.hidden = NO;
-        button.title = @"Hide Form";
+        button.title = @"Sign";
     }
 }
 

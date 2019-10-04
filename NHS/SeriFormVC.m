@@ -144,6 +144,7 @@ typedef enum formName {
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:kUndergoneAdvSeri rowType:XLFormRowDescriptorTypeSelectorSegmentedControl title:@"Undergone advanced vision screening?"];
     [self setDefaultFontWithRow:row];
+    row.cellConfig[@"textLabel.numberOfLines"] = @0;
 //    row.required = YES;
     row.selectorOptions = @[@"Yes", @"No"];
     
@@ -1487,6 +1488,10 @@ typedef enum formName {
     //Medical History
     if ([rowDescriptor.tag isEqualToString:kUndergoneAdvSeri]) {
         [self postSingleFieldWithSection:SECTION_SERI_MED_HIST andFieldName:kUndergoneAdvSeri andNewContent:ansFromYesNo];
+        NSDictionary *userInfo = @{@"value":ansFromYesNo};
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"undergoneSeri"
+                                                            object:self
+                                                          userInfo:userInfo];
     }
 
     //Visual Acuity

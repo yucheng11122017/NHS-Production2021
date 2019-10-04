@@ -777,101 +777,101 @@
     didPhlebRow.cellConfig[@"textLabel.numberOfLines"] = @0;
     [section addFormRow:didPhlebRow];
     
-    if (![neighbourhood containsString:@"Kampong"]) {
-        
-        
-        mammoSection = [XLFormSectionDescriptor formSectionWithTitle:@"Mammogram"];
-        [formDescriptor addFormSection:mammoSection];
-        
-        mammogramInterestRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammogramInterest
-                                                                     rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                                       title:@"Are you interested in taking a mammogram on Saturday 10am-1pm?"];
-        [self setDefaultFontWithRow:mammogramInterestRow];
-        mammogramInterestRow.required = YES;
-        mammogramInterestRow.selectorOptions = @[@"Yes",@"No"];
-        mammogramInterestRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-        [mammoSection addFormRow:mammogramInterestRow];
-        
-        hasChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHasChas
-                                                                                    rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                                                      title:@"Does the resident have a Blue/Orange CHAS card?"];
-        [self setDefaultFontWithRow:hasChasRow];
-        hasChasRow.required = YES;
-        hasChasRow.selectorOptions = @[@"Yes",@"No"];
-        hasChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-        hasChasRow.hidden = @YES;       //default hidden
-        [mammoSection addFormRow:hasChasRow];
-        
-        doneB4Row = [XLFormRowDescriptor formRowDescriptorWithTag:kDoneBefore
-                                                                               rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                                                 title:@"Has the resident done a mammogram before?"];
-        [self setDefaultFontWithRow:doneB4Row];
-        doneB4Row.required = YES;
-        doneB4Row.selectorOptions = @[@"Yes",@"No"];
-        doneB4Row.cellConfig[@"textLabel.numberOfLines"] = @0;
-        doneB4Row.hidden = @YES;       //default hidden
-        [mammoSection addFormRow:doneB4Row];
-        
-        willingPayRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWillingPay
-                                                                                   rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
-                                                                                     title:@"Is resident willing to pay $10 for mammogram? (To explain that resident has to pay subsidised fee of $10 if this is a repeat mammogram.)"];
-        [self setDefaultFontWithRow:willingPayRow];
-        willingPayRow.required = YES;
-        willingPayRow.selectorOptions = @[@"Yes",@"No"];
-        willingPayRow.cellConfig[@"textLabel.numberOfLines"] = @0;
-        willingPayRow.hidden = @YES;        //by default always hidden
-        [mammoSection addFormRow:willingPayRow];
-        
-        mammoSection.hidden = @YES;
-        
-        mammogramInterestRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-            if (newValue != oldValue) {
-                if ([newValue isEqualToString:@"Yes"]) {
-                    hasChasRow.hidden = @NO;
-                    doneB4Row.hidden = @NO;
-                } else {
-                    hasChasRow.hidden = @YES;
-                    doneB4Row.hidden = @YES;
-                }
-                
-                [self reloadFormRow:hasChasRow];
-                [self reloadFormRow:doneB4Row];
-            }
-        };
-        
-        
-        hasChasRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-            if (newValue != oldValue) {
-                if ([newValue isEqualToString:@"No"]) {
-                    if (doneB4Row.value != (id)[NSNull null] && [doneB4Row.value isEqualToString:@"Yes"]) {
-                        willingPayRow.hidden = @NO;
-                    } else {
-                        willingPayRow.hidden = @YES;
-                    }
-                } else {
-                    willingPayRow.hidden = @YES;
-                }
-                
-                [self reloadFormRow:willingPayRow];
-            }
-        };
-        
-        doneB4Row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
-            if (newValue != oldValue) {
-                if ([newValue isEqualToString:@"Yes"]) {
-                    if (hasChasRow.value != (id)[NSNull null] && [hasChasRow.value isEqualToString:@"No"]) {
-                        willingPayRow.hidden = @NO;
-                    } else {
-                        willingPayRow.hidden = @YES;
-                    }
-                } else {
-                    willingPayRow.hidden = @YES;
-                }
-                
-                [self reloadFormRow:willingPayRow];
-            }
-        };
-    }
+//    if (![neighbourhood containsString:@"Kampong"]) {
+//
+//
+//        mammoSection = [XLFormSectionDescriptor formSectionWithTitle:@"Mammogram"];
+//        [formDescriptor addFormSection:mammoSection];
+//
+//        mammogramInterestRow = [XLFormRowDescriptor formRowDescriptorWithTag:kMammogramInterest
+//                                                                     rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+//                                                                       title:@"Are you interested in taking a mammogram on Saturday 10am-1pm?"];
+//        [self setDefaultFontWithRow:mammogramInterestRow];
+//        mammogramInterestRow.required = YES;
+//        mammogramInterestRow.selectorOptions = @[@"Yes",@"No"];
+//        mammogramInterestRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+//        [mammoSection addFormRow:mammogramInterestRow];
+//
+//        hasChasRow = [XLFormRowDescriptor formRowDescriptorWithTag:kHasChas
+//                                                                                    rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+//                                                                                      title:@"Does the resident have a Blue/Orange CHAS card?"];
+//        [self setDefaultFontWithRow:hasChasRow];
+//        hasChasRow.required = YES;
+//        hasChasRow.selectorOptions = @[@"Yes",@"No"];
+//        hasChasRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+//        hasChasRow.hidden = @YES;       //default hidden
+//        [mammoSection addFormRow:hasChasRow];
+//
+//        doneB4Row = [XLFormRowDescriptor formRowDescriptorWithTag:kDoneBefore
+//                                                                               rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+//                                                                                 title:@"Has the resident done a mammogram before?"];
+//        [self setDefaultFontWithRow:doneB4Row];
+//        doneB4Row.required = YES;
+//        doneB4Row.selectorOptions = @[@"Yes",@"No"];
+//        doneB4Row.cellConfig[@"textLabel.numberOfLines"] = @0;
+//        doneB4Row.hidden = @YES;       //default hidden
+//        [mammoSection addFormRow:doneB4Row];
+//
+//        willingPayRow = [XLFormRowDescriptor formRowDescriptorWithTag:kWillingPay
+//                                                                                   rowType:XLFormRowDescriptorTypeSelectorSegmentedControl
+//                                                                                     title:@"Is resident willing to pay $10 for mammogram? (To explain that resident has to pay subsidised fee of $10 if this is a repeat mammogram.)"];
+//        [self setDefaultFontWithRow:willingPayRow];
+//        willingPayRow.required = YES;
+//        willingPayRow.selectorOptions = @[@"Yes",@"No"];
+//        willingPayRow.cellConfig[@"textLabel.numberOfLines"] = @0;
+//        willingPayRow.hidden = @YES;        //by default always hidden
+//        [mammoSection addFormRow:willingPayRow];
+//
+//        mammoSection.hidden = @YES;
+//
+//        mammogramInterestRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//            if (newValue != oldValue) {
+//                if ([newValue isEqualToString:@"Yes"]) {
+//                    hasChasRow.hidden = @NO;
+//                    doneB4Row.hidden = @NO;
+//                } else {
+//                    hasChasRow.hidden = @YES;
+//                    doneB4Row.hidden = @YES;
+//                }
+//
+//                [self reloadFormRow:hasChasRow];
+//                [self reloadFormRow:doneB4Row];
+//            }
+//        };
+//
+//
+//        hasChasRow.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//            if (newValue != oldValue) {
+//                if ([newValue isEqualToString:@"No"]) {
+//                    if (doneB4Row.value != (id)[NSNull null] && [doneB4Row.value isEqualToString:@"Yes"]) {
+//                        willingPayRow.hidden = @NO;
+//                    } else {
+//                        willingPayRow.hidden = @YES;
+//                    }
+//                } else {
+//                    willingPayRow.hidden = @YES;
+//                }
+//
+//                [self reloadFormRow:willingPayRow];
+//            }
+//        };
+//
+//        doneB4Row.onChangeBlock = ^(id  _Nullable oldValue, id  _Nullable newValue, XLFormRowDescriptor * _Nonnull rowDescriptor) {
+//            if (newValue != oldValue) {
+//                if ([newValue isEqualToString:@"Yes"]) {
+//                    if (hasChasRow.value != (id)[NSNull null] && [hasChasRow.value isEqualToString:@"No"]) {
+//                        willingPayRow.hidden = @NO;
+//                    } else {
+//                        willingPayRow.hidden = @YES;
+//                    }
+//                } else {
+//                    willingPayRow.hidden = @YES;
+//                }
+//
+//                [self reloadFormRow:willingPayRow];
+//            }
+//        };
+//    }
     
     
     
@@ -1109,7 +1109,7 @@
         }
         
         
-        NSString *url = @"https://nhs-som.nus.edu.sg/isNricValid";
+        NSString *url = @"https://pd.homerehab.com.sg/isNricValid";
         NSDictionary *dict = @{@"nric": rowDescriptor.value};
         NSDictionary *dataDict = @{ @"data" : dict };
         
@@ -1376,44 +1376,46 @@
     
     NSDictionary *finalDict;
     
-    if (![neighbourhood containsString:@"Kampong"] && ![mammoSection.hidden boolValue]) {   //only applicable to lengkok bahru ppl, and must be ladies' age >=40
-        // **** MAMMOGRAM INTEREST **** //
-        NSDictionary *dict6 = @{kMammogramInterest:[self getOneZerofromYesNo:[fields objectForKey:kMammogramInterest]]
-                                };
-        
-        NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:dict6];
-        
-        if (![hasChasRow.hidden boolValue]) {
-            
-            [mutDict setObject:[self getOneZerofromYesNo:[fields objectForKey:kHasChas]] forKey:kHasChas];
-            dict6 = mutDict;
-        }
-        
-        if (![doneB4Row.hidden boolValue]) {
-            [mutDict setObject:[self getOneZerofromYesNo:[fields objectForKey:kDoneBefore]] forKey:kDoneBefore];
-            dict6 = mutDict;
-        }
-        
-        if (![willingPayRow.hidden boolValue]) {
-            [mutDict setObject:[self getOneZerofromYesNo:[fields objectForKey:kWillingPay]] forKey:kWillingPay];
-            dict6 = mutDict;
-        }
-        
-        finalDict = @{@"resi_particulars": dict,
-                      @"phlebotomy_eligibility_assmt": dict2,
-                      @"mode_of_screening":dict3,
-                      @"consent_disclosure": dict4,
-                      @"consent_research": dict5,
-                      @"mammogram_interest": dict6
-                      };
-    } else {
+//    if (![neighbourhood containsString:@"Kampong"] && ![mammoSection.hidden boolValue]) {   //only applicable to lengkok bahru ppl, and must be ladies' age >=40
+//        // **** MAMMOGRAM INTEREST **** //
+//        NSDictionary *dict6 = @{kMammogramInterest:[self getOneZerofromYesNo:[fields objectForKey:kMammogramInterest]]
+//                                };
+//
+//        NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:dict6];
+//
+//        if (![hasChasRow.hidden boolValue]) {
+//
+//            [mutDict setObject:[self getOneZerofromYesNo:[fields objectForKey:kHasChas]] forKey:kHasChas];
+//            dict6 = mutDict;
+//        }
+//
+//        if (![doneB4Row.hidden boolValue]) {
+//            [mutDict setObject:[self getOneZerofromYesNo:[fields objectForKey:kDoneBefore]] forKey:kDoneBefore];
+//            dict6 = mutDict;
+//        }
+//
+//        if (![willingPayRow.hidden boolValue]) {
+//            [mutDict setObject:[self getOneZerofromYesNo:[fields objectForKey:kWillingPay]] forKey:kWillingPay];
+//            dict6 = mutDict;
+//        }
+//
+//        finalDict = @{@"resi_particulars": dict,
+//                      @"phlebotomy_eligibility_assmt": dict2,
+//                      @"mode_of_screening":dict3,
+//                      @"consent_disclosure": dict4,
+//                      @"consent_research": dict5,
+//                      @"mammogram_interest": dict6
+//                      };
+//    } else {
+    
+    // NO NEED MAMMOGRAM INTEREST FOR 5 OCT 2019
             finalDict = @{@"resi_particulars": dict,
                           @"phlebotomy_eligibility_assmt": dict2,
                           @"mode_of_screening":dict3,
                           @"consent_disclosure": dict4,
                           @"consent_research": dict5
                           };
-    }
+//    }
     
     
     
@@ -1795,7 +1797,7 @@
 
 - (void) checkIfPostCodeIsValid: (XLFormRowDescriptor *) rowDescriptor {
     if (rowDescriptor.value) {
-        NSString *url = @"https://nhs-som.nus.edu.sg/addressFromPostalCode";
+        NSString *url = @"https://pd.homerehab.com.sg/addressFromPostalCode";
         NSDictionary *dict = @{@"postalcode": rowDescriptor.value};
         NSDictionary *dataDict = @{ @"data" : dict };
         

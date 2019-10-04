@@ -20,6 +20,7 @@
     NSNumber *selectedRow;
     NSArray *rowTitleArray;
     BOOL internetDCed;
+    BOOL shouldEnableAllSect;
 }
 @property (nonatomic) Reachability *hostReachability;
 @property (strong, nonatomic) NSMutableArray *completionCheck;
@@ -33,8 +34,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    shouldEnableAllSect = false;
+    
     _pushPopTaskArray = [[NSMutableArray alloc] init];
     _fullScreeningForm = [[ScreeningDictionary sharedInstance] dictionary];
+    
+    NSDictionary *medHistDict = [_fullScreeningForm objectForKey:SECTION_SERI_MED_HIST];
+    if (medHistDict != (id)[NSNull null] && medHistDict != nil) {
+        NSNumber *seriDone = [medHistDict objectForKey:kUndergoneAdvSeri];
+        if (seriDone != (id)[NSNull null]) {
+            shouldEnableAllSect = [seriDone boolValue];
+        }
+    }
     
     rowTitleArray = [[NSArray alloc] initWithObjects:@"Medical History", @"Visual Acuity", @"Autorefractor", @"Intra-Ocular Pressure", @"Anterior Health Examination", @"Posterior Health Examination", @"Diagnosis and Follow-up", nil];
     _completionCheck = [[NSMutableArray alloc] initWithObjects:@0,@0,@0,@0,@0,@0,@0, nil];
@@ -43,6 +54,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable:) name:NOTIFICATION_RELOAD_TABLE object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(undergoneSeriNotif:) name:@"undergoneSeri" object:nil];
     
     
     
@@ -151,6 +163,16 @@
     NSString *text = [rowTitleArray objectAtIndex:indexPath.row];
     
     [cell.textLabel setText:text];
+    
+    if (indexPath.row != 0) {   //don't disable medical history
+        if (!shouldEnableAllSect) {
+            cell.userInteractionEnabled = false;
+            cell.textLabel.textColor = [UIColor grayColor];
+        } else {
+            cell.userInteractionEnabled = true;
+            cell.textLabel.textColor = [UIColor blackColor];
+        }
+    }
     
     
     // Put in the ticks if necessary
@@ -279,6 +301,18 @@
     
     self.undergoneSeri = [NSString stringWithFormat:@"%d", value];   //remember must use the setter! otherwise it will not trigger the KVO
     NSLog(@"%@", _undergoneSeri);
+}
+
+- (void) undergoneSeriNotif: (NSNotification *) notification {
+    
+    NSLog(@"RECEIVED NOTIF!");
+    
+    BOOL undergoneSeri = [[notification.userInfo objectForKey:@"value"] boolValue];
+    if (undergoneSeri) {
+        shouldEnableAllSect = true;
+    } else {
+        shouldEnableAllSect = false;
+    }
 }
 
 #pragma mark - KVO

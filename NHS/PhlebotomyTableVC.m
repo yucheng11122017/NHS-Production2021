@@ -110,12 +110,24 @@
     
     [cell.textLabel setText:text];
     
-    // Put in the ticks if necessary
-    if (indexPath.row < [self.completionCheck count]) {
-        if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
+    NSString *neighbourhood = [[NSUserDefaults standardUserDefaults] objectForKey:kNeighbourhood];
+    
+    if ([neighbourhood containsString:@"Kampong"]) {
+        // Put in the ticks if necessary
+        if (indexPath.row < [self.completionCheck count]) {
+            if ([[self.completionCheck objectAtIndex:indexPath.row] isEqualToNumber:@1]) {
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            } else {
+                cell.accessoryType = UITableViewCellAccessoryNone;
+            }
+        }
+    } else {        //only applies to Leng Kee
+        if (indexPath.row == 0) {
+            cell.userInteractionEnabled = NO;
+            cell.textLabel.textColor = [UIColor grayColor]; // disabled 2a
             cell.accessoryType = UITableViewCellAccessoryCheckmark;
         } else {
-            cell.accessoryType = UITableViewCellAccessoryNone;
+            cell.accessoryType = UITableViewCellAccessoryCheckmark; //always checked for 2b since no need to fill
         }
     }
     
